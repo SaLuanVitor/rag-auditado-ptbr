@@ -107,9 +107,9 @@ outputs = model.generate(
 
 Três leituras que importam mais que a API:
 
-**1. `device_map="auto"` é o único lugar onde hardware é _configurado_.** (Ele reaparece na
-linha 21, em `.to(model.device)`, mas ali é consequência da escolha feita aqui, não uma segunda
-decisão.) Sem GPU, a carga cai para CPU e
+**1. `device_map="auto"` é o único lugar onde hardware é _configurado_.** (A **escolha** reaparece na
+linha 21, em `.to(model.device)` — o parâmetro em si não; ali é consequência do que foi decidido
+aqui, não uma segunda decisão.) Sem GPU, a carga cai para CPU e
 a geração fica lenta o suficiente para mudar sua percepção do exemplo. Custo nomeado: um modelo de
 0,6 B roda em CPU; os de 7 B para cima, na prática, não — não sem quantização, que este exemplo não
 cobre.
@@ -226,6 +226,10 @@ Please analyze in detail and generate a character analysis report in the followi
 Character Name: [Provide full name]
 
 Background Story: Introduce the character's origin and background, relationships with other characters, and their role in the story.
+Skill Characteristics: Introduce the character's main skills and abilities, description of special abilities, and combat style characteristics.
+Combat Strategy: Introduce the character's main attack methods, defense mechanisms, special performance in combat, strengths and weaknesses.
+
+Please conduct a detailed analysis based on the information, ensuring accuracy and coherence.
 ```
 
 Isso é o trabalho "fixar o formato" da tabela do modelo mental, feito com clareza: rótulos de

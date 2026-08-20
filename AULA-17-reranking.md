@@ -71,9 +71,12 @@ terceira coisa — ponderação por sinal externo, sem julgar relevância.
 
 ## Parte 1 — RRF, da fórmula à aritmética
 
-`01-RRF-Reranking.py` implementa Reciprocal Rank Fusion **sem biblioteca**, e é o segundo arquivo
-do curso em que você vê um algoritmo de recuperação por inteiro — depois do BM25 e do
-`calculate_similarity()` do CoBERT, os dois que a Aula 08 mostra.
+`01-RRF-Reranking.py` implementa Reciprocal Rank Fusion **sem biblioteca**, e é o **terceiro**
+arquivo do curso em que você vê um algoritmo escrito por inteiro — depois do BM25 e do
+`calculate_similarity()` do CoBERT, os dois que a Aula 08 mostra. É o primeiro de uma categoria
+diferente, e a Aula 08 faz essa distinção: os dois anteriores **pontuam** query contra documento; o
+RRF **decide ranking**, refundindo posições de listas já recuperadas. Estágios diferentes do
+pipeline, não graus do mesmo.
 
 A assinatura, na linha 98:
 
@@ -111,7 +114,8 @@ RRF robusto — e é também o que ele perde.
 ### Por que RRF dispensa scores comparáveis
 
 O score de um documento é a **soma** de `1/(rank+k)` sobre todas as listas em que ele aparece —
-é isso que o `+=` da linha 141 faz. Só a **posição** entra na conta.
+é isso que o `+=` de
+`07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:141` faz. Só a **posição** entra na conta.
 
 Consequência: não importa que uma lista traga cosseno em [0,1], outra BM25 numa escala ilimitada, e
 uma terceira distância L2 onde menor é melhor. Todas são reduzidas a "1º, 2º, 3º".
@@ -249,7 +253,7 @@ cd RAG-from-First-Principles/07-PostRetrieval/01-Reranking
 python 01-RRF-Reranking.py
 ```
 
-Comece aqui e leia a função da linha 98 junto com a saída. Depois **calcule à mão** os scores das
+Comece aqui e leia a função de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` junto com a saída. Depois **calcule à mão** os scores das
 três primeiras posições com `k=60` e confira com o que o script imprime.
 
 ```powershell
@@ -266,7 +270,7 @@ python 05-RankLLM-Reranking.py
 python 06-RecencyWeightedReranking.py
 ```
 
-O `04` exige chave da Cohere. No `06`, imprima o `decay_factor` da linha 150 de cada documento junto com a
+O `04` exige chave da Cohere. No `06`, imprima o `decay_factor` de `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:150` para cada documento, junto com a
 similaridade — ver os dois números lado a lado é o que torna a combinação compreensível.
 
 ---
@@ -284,10 +288,12 @@ recuperar estreito anula o ganho de reordenar.
 **3. Recupere largo demais.** Vá para `k=100` e reordene. Meça o tempo. O cross-encoder faz 100
 forward passes — e a latência mostra por que o estágio de recuperação precisa ser barato.
 
-**4. Prove que a fórmula do arquivo não é a que ordena.** No `06`, troque o `decay_factor` da linha
-150 por `1.0` — combinação de recência anulada — e rode. O ranking **não muda**: a ordem já veio
-pronta da linha 129, de dentro da biblioteca; a linha 150 só calcula um número que é impresso
-depois. Agora mexa em `decay_rate` (linha 73, valor `0.5`), que é o que a linha 83 entrega ao
+**4. Prove que a fórmula do arquivo não é a que ordena.** No `06`, troque o `decay_factor` de
+`07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:150` por `1.0` — combinação de recência anulada — e
+rode. O ranking **não muda**: a ordem já veio pronta de `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:129`,
+de dentro da biblioteca; a linha 150 só calcula um número que é impresso depois. Agora mexa em
+`decay_rate` (`07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:73`, valor `0.5`), que é o que
+`07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:83` entrega ao
 `TimeWeightedVectorStoreRetriever` **antes** da busca — suba para `50.0` e volte para `0.01`,
 comparando as duas ordens. A lição é qual dos dois números o seu código controla de fato.
 

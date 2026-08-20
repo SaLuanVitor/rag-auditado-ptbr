@@ -123,7 +123,8 @@ A diferença entre os dois cortes é de natureza, não de valor:
 | `threshold_cutoff=0.7`  | **absoluto** | mantém as que passam de 0,7 de similaridade |
 
 O percentil **sempre remove metade**, mesmo quando todas as sentenças eram relevantes. O limiar
-pode manter tudo ou **remover tudo** — e é aí que ele é traiçoeiro: se nenhuma sentença atinge 0,7,
+pode manter tudo ou **remover tudo** — e é aí que está o risco (**julgamento:** é o mais traiçoeiro
+dos três): se nenhuma sentença atinge 0,7,
 o chunk fica vazio, e o LLM recebe contexto sem conteúdo.
 
 Isso é o problema de calibração de similaridade absoluta que a Aula 02 antecipou: o valor de cosseno
@@ -288,8 +289,9 @@ diferença entre parecer bem e estar certo.
   Agora o mesmo trecho no Self-RAG, que a Aula 21 vai abrir
   (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py:266-267`):
   a atribuição é idêntica, e o retorno é `{"documents": documents, "question": better_question}`.
-  `grep -c` devolve **2**. Os dois arquivos têm a mesma função com uma palavra de diferença, e só um
-  liga o fio.
+  `grep -c` devolve **2**. A **linha de retorno** difere por uma palavra, e só uma das duas liga o
+  fio. (O `diff` das duas funções mostra mais que isso — docstring, `print` e comentários também
+  mudaram; o que é idêntico é a lógica, e o que difere por uma palavra é o `return`.)
 
   Consequência no CRAG: a chamada de LLM da reescrita é paga e descartada, e a busca na web
   (`01-CRAG-ReflectiveRetrieval.py:367`, `web_search_tool.invoke(question)`) roda sobre a mesma
@@ -318,7 +320,8 @@ diferença entre parecer bem e estar certo.
 8. Diferencie `percentile_cutoff` de `threshold_cutoff`. Qual pode esvaziar o chunk, e por quê?
 9. Qual é o componente central do CRAG, e o que `with_structured_output(GradeDocuments)` garante?
 10. Por que o critério do grader é deliberadamente generoso?
-11. Quais as três saídas possíveis do CRAG conforme o veredito?
+11. O paper do CRAG prevê três saídas conforme o veredito. Quantas o `grade_documents` de
+    `01-CRAG-ReflectiveRetrieval.py` de fato produz, e o que acontece com o caso que sobra?
 12. Qual a diferença entre CRAG e Self-RAG?
 
 ---

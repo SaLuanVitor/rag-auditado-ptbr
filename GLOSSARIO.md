@@ -375,10 +375,14 @@ refinando-a a cada passo.
 resumos, até uma resposta.
 
 **CRAG (Corrective RAG)** — Avalia a qualidade do que foi recuperado e corrige o
-curso — refaz busca, busca na web — quando o material é ruim.
+curso — refaz busca, busca na web — quando o material é ruim. Na implementação do repositório
+(Aula 18) o grafo é **acíclico**: corrige uma vez e segue para a geração, sem voltar a avaliar.
 
-**Self-RAG** — O modelo decide se precisa recuperar, critica o que recuperou e
-critica a própria resposta.
+**Self-RAG** — **No paper**, o modelo decide se precisa recuperar, critica o que recuperou e
+critica a própria resposta. **Na implementação de referência deste curso** (Aula 21) as duas
+críticas existem e a decisão de recuperar **não** — ela recupera sempre; o `Retrieve` do paper não
+tem correspondente no código. A distinção importa: é a diferença entre o que o paper propõe e o que
+o repositório entrega.
 
 **Reflection token** — Token especial que o Self-RAG do paper aprende a emitir junto
 com o texto, sinalizando necessidade de recuperação ou juízo sobre a saída. São quatro

@@ -209,8 +209,7 @@ from llama_index.core.postprocessor import PrevNextNodePostprocessor, AutoPrevNe
 
 Dois pós-processadores, e a diferença entre eles é quem decide:
 
-- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa**: sempre
-  puxa 2 nós antes e depois. Determinístico, barato, previsível.
+- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está escrita, só para frente**. Determinístico, barato, previsível. A classe tem `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do script **não passa**. Então ela puxa os 2 nós seguintes, não 2 de cada lado. **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas `# Should look backward` (linhas 59-60). É defeito do repositório, não desta aula — mas a aula descrevia o mecanismo errado. _Limite: conferido lendo a fonte de `llama-index-core` (0.11.17 e 0.14.24, texto idêntico nas duas); não executei._
 - **`AutoPrevNextNodePostprocessor`** — expansão **decidida por LLM**: o modelo avalia se vale
   expandir e em qual direção. Adaptativo, e custa uma chamada de LLM por consulta.
 
@@ -263,7 +262,7 @@ Compare o contexto entregue com `num_nodes=2` contra `num_nodes=0` (sem expansã
 
 ## Quebre de propósito
 
-**1. Zere a janela.** No `01`, ponha `window_size=0`. Você volta ao chunking de sentença puro — o
+**1. Tente zerar a janela — e leia o erro.** No `01`, ponha `window_size=0`. **Não funciona, e é isso que se aprende:** o campo é declarado `window_size: int = Field(default=DEFAULT_WINDOW_SIZE, ..., gt=0)`, então o Pydantic levanta `ValidationError` na construção do parser, antes de indexar ou recuperar qualquer coisa. A biblioteca se recusa a montar uma janela vazia. Para de fato ver a degradação, use `window_size=1`, o mínimo permitido. _Limite: conferido na fonte de `llama-index-core`; não executei._ Com janela mínima você se aproxima do chunking de sentença puro — o
 extremo "pequeno" da Aula 07, com embedding ótimo e contexto insuficiente. Faça uma pergunta que
 exija o entorno e veja a resposta ficar incompleta.
 

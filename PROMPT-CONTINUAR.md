@@ -66,8 +66,9 @@ E não confie em resumo: CONTE. O gate já afirmou cobertura 29/29 quando eram 2
 foi repassado ao HANDOFF por quem leu o resumo em vez de contar as notas registradas. Extraia todo
 par (aula, nota) por script e liste quais dos números 00 a 28 não aparecem.
 
-AS CINCO REGRAS QUE MAIS IMPORTAM (as quatro primeiras estão entre as 10 da persona; todas nasceram
-de erro real medido):
+AS SETE REGRAS QUE MAIS IMPORTAM (as quatro primeiras estão entre as 10 da persona; todas nasceram
+de erro real medido — e o "cinco" que estava aqui virou falso no instante em que eu acrescentei a
+sexta e a sétima, que é a lição inteira deste projeto em miniatura):
 - Nunca `grep -h` para citar. A flag suprime o caminho, e caminho ausente vira caminho inventado.
 - Par de arquivos exige `diff`. Nunca inferir a diferença pelo sufixo do nome.
 - Import não é uso. Grepar se o símbolo é exercitado antes de citá-lo como evidência.
@@ -80,6 +81,22 @@ de erro real medido):
   alegando que o paper não a tinha. O paper TEM. A correção degradou uma citação correta, e a rodada
   seguinte apontou o defeito que a auditoria anterior criou. O viés é contra o material — isso é
   certo para dar nota, não para editar sem verificar.
+- NOVA, de 20/08 (quarta rodada): **o `GLOSSARIO.md` é irmão de TODA afirmação de aula.** As 29
+  aulas apontam para ele como fonte de definição, então uma correção que não chega nele deixa a
+  versão errada na fonte que o leitor consulta. Dois casos no mesmo dia: (1) a AULA-21 corrigiu
+  "o Self-RAG decide se precisa recuperar" — verdade do paper, falsa da implementação — e a
+  correção chegou na AULA-18 e na AULA-20 e NÃO no glossário, que seguia afirmando a versão nua;
+  (2) a AULA-07 marca como julgamento "a decisão de maior impacto do pipeline" e o glossário
+  afirmava o mesmo superlativo como definição de dicionário. Ao corrigir qualquer alegação:
+  `grep -n "<termo>" GLOSSARIO.md` junto com o grep nas aulas irmãs. **E o CHECKPOINT é irmão do
+  corpo da própria aula:** a AULA-18 estabelece no corpo que o código produz duas saídas, e a
+  pergunta 11 do checkpoint reafirmava "as três saídas" sem a ressalva — quem revisa só pelo
+  checkpoint reaprende o que o corpo acabou de corrigir. Irmãos são: as outras aulas, o glossário,
+  e as seções de fecho da mesma aula.
+- NOVA, de 20/08: **medir uma direção do erro não é medir.** O `checar-vocabulario.js` reportava
+  "0 termos faltando" enquanto o glossário tinha NOVE entradas duplicadas — cinco inseridas por um
+  script meu em termos que já tinham entrada, e uma delas contradizia a entrada boa. Verificador
+  que só procura ausência é cego para excesso. Ele conta as duas coisas agora.
 
 ESTADO DA AVALIAÇÃO: TRÊS rodadas completas, 29 de 29 cada. Curso em 245/348 = 70,4%
 (cenário conservador da terceira rodada).

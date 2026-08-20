@@ -490,7 +490,8 @@ desta.
 
 ## Armadilhas de produção
 
-**Laço sem contador não é resiliência, é dívida.** **Julgamento:** é a ausência mais grave deste exemplo. Todo grafo
+**Julgamento, e a frase inteira é julgamento:** laço sem contador não é resiliência, é dívida — e é
+a ausência mais grave deste exemplo. Todo grafo
 com aresta que volta precisa de um limite e de um comportamento definido para quando o limite for
 atingido.
 

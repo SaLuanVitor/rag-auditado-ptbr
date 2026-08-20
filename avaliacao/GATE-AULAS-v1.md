@@ -1379,3 +1379,130 @@ relatório sem recalcular é o meu defeito mais reincidente nesta auditoria.
 `verify-citations --all`: **PASS**, 1658 OK, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` todos
 em zero, `SKIPPED` 16, `NO_ANCHOR` 16. Vocabulário: 254 conferidos, 0 faltando, 0 duplicados.
 Clone da Packt: vazio, incluindo `--ignored`.
+
+### Lote 4 — 24 de 29, faltam cinco (20/08/2026)
+
+**As cinco sem nota nesta rodada: 00, 01, 10, 14 e 22.** Continuam com a nota da R3. São a faixa
+alta (R3 = 11, 11, 11, 11 e 12), o que significa que a rodada ainda não mediu fundo justamente onde
+a R3 diz que o material está melhor — e a R3 já provou que instrumento mais fundo mede mais baixo.
+Não trate as cinco como boas; trate como não medidas.
+
+Seleção do lote pela **tabela**, não de memória: as seis mais fracas das onze restantes, por
+dimensão zerada ou nota mais baixa.
+
+| Aula | R3 | **R4** | Δ |
+| --- | --- | --- | --- |
+| 19 — Modelo e prompt | 10 | **12** | +2 |
+| 08 — Embeddings, BM25 | 10 | **11** | +1 |
+| 18 — Compressão e CRAG | 9 | **10** | +1 |
+| 21 — Self-RAG | 11 | **9** | −2 |
+| 02 — Vetores e similaridade | 11 | **9** | −2 |
+| 15 — Small-to-big | 11 | **5** | −6 |
+
+**Lote 4 isolado: 56 contra 62 da R3 — o único lote da quarta rodada que somou MENOS.** E o motivo
+é o de sempre: as três que caíram eram as três que a R3 dava como 11/12.
+
+**Acumulado nas 24 auditadas: R4 = 200, R3 = 189.** Δ médio **+0,46**; 12 subiram, 8 caíram, 4
+empataram. **Cinco aulas abaixo de 50%:** 07 (3), 09 (0), 11 (1), 15 (5), 17 (3). Ainda **sem
+classificação** — misturar 24 notas da R4 com 5 da R3 daria 256/348 = 73,6%, e isso continua somando
+dois instrumentos diferentes.
+
+#### O melhor achado do lote veio de uma violação de contrato
+
+O auditor da **AULA-15** baixou os wheels do `langchain` e do `llama-index-core` para
+`C:\Users\luanv\AppData\Local\Temp\lcdl\` para **ler o código-fonte das bibliotecas**. Isso está
+fora do contrato somente-leitura. Ele reportou e não apagou, como a cláusula manda. E encontrou dois
+defeitos `−1` que três rodadas anteriores não acharam:
+
+1. **`PrevNextNodePostprocessor` não expande "antes e depois".** A classe tem
+   `mode: str = Field(default="next")`, e o `_postprocess_nodes` só chama `get_forward_nodes` nesse
+   modo — `get_backward_nodes` exige `mode="previous"` ou `"both"`, que a chamada do script **não
+   passa**. A aula descrevia "sempre puxa 2 nós antes e depois". **E o próprio script espera o
+   contrário:** duas das três perguntas de teste estão anotadas `# Should look backward`
+   (`03-ForwardBackwardContextExpansion.py:59-60`). Defeito do repositório que a aula não viu, mais
+   descrição errada do mecanismo.
+2. **`window_size=0` não "volta ao chunking de sentença puro" — ele estoura.** O campo é
+   `window_size: int = Field(default=DEFAULT_WINDOW_SIZE, ..., gt=0)`; o Pydantic levanta
+   `ValidationError` na construção, antes de indexar qualquer coisa. O exercício mandava observar
+   uma "resposta incompleta" que nunca aparece.
+
+Conferi os dois **lendo os arquivos que ele deixou no disco** — a evidência já existia, e ler não é
+violação nova. `mode: str = Field(default="next")` está em
+`llama_index/core/postprocessor/node.py:167`; o `gt=0` está em
+`llama_index/core/node_parser/text/sentence_window.py:38-42`.
+
+**A tensão é real e vale registrar em vez de esconder:** o contrato somente-leitura proíbe
+exatamente a verificação que pega esta classe de defeito. Uma aula que afirma o comportamento de uma
+biblioteca de terceiros só se audita lendo a biblioteca, e a biblioteca não está instalada. Enquanto
+o contrato ficar como está, **toda alegação sobre `langchain`/`llama-index` neste curso é não
+auditada** — e três rodadas de "PASS" não diziam isso. Duas saídas possíveis para a próxima rodada,
+as duas legítimas: autorizar leitura de fonte de biblioteca num diretório declarado, ou marcar toda
+alegação desse tipo como limite declarado.
+
+#### A outra violação, e por que o prompt a causou
+
+O auditor da **AULA-02** rodou `pip install numpy` no `miniconda` do usuário. Meu prompt continha a
+proibição absoluta ("não cria, modifica ou remove arquivo nenhum, em lugar nenhum") **e**, quatro
+linhas abaixo, "`numpy` pode estar disponível: se puder calcular, calcule". Uma dica com cara de
+permissão ao lado de uma proibição. Mesma classe de lacuna do `E:\tmp` na terceira rodada: o prompt
+proibia sem dizer o que fazer no lugar. `numpy 2.5.2` ficou instalado; remover seria a segunda
+alteração, e a decisão é do dono do ambiente.
+
+Ambos os repositórios terminaram limpos. O clone da Packt: vazio, incluindo `--ignored`.
+
+#### Coerência entre arquivos — três achados que auditor de uma aula só não pediria
+
+**AULA-21 → `GLOSSARIO.md`.** A "correção honesta" da AULA-21 (o Self-RAG "decide se precisa
+recuperar" é verdade **do paper**, não da implementação) chegou na AULA-18 e na AULA-20 — o auditor
+confirmou que as duas hedgeiam — e **não chegou no glossário**, que seguia com a versão nua. O
+glossário é a fonte que as 29 aulas apontam para definição, e eu não o estava grepando ao propagar
+correção. **Segundo caso no mesmo dia** (o primeiro foi o superlativo de chunk da AULA-07). Virou
+regra no `PROMPT-CONTINUAR`.
+
+**AULA-08 → AULA-17.** A AULA-17 dizia que o RRF é "o **segundo** arquivo do curso em que você vê um
+algoritmo por inteiro — depois do BM25 e do `calculate_similarity()`". Depois de dois, é o terceiro.
+E a AULA-08 faz uma distinção que a AULA-17 achatava: os dois anteriores **pontuam** query contra
+documento; o RRF **decide ranking**, refundindo posições. Achatar as categorias foi o que produziu o
+erro de contagem. Corrigido preservando a distinção.
+
+**AULA-18: o checkpoint contra o corpo.** O corpo estabelece, com aviso explícito, que o
+`grade_documents` produz **duas** saídas e que a terceira é do paper. A pergunta 11 do Checkpoint
+perguntava "quais as **três** saídas possíveis do CRAG conforme o veredito?", sem a ressalva. Quem
+revisa só pelo checkpoint reaprende o que o corpo acabou de corrigir. **O checkpoint é irmão do
+corpo** — classe de irmão que eu não grepava.
+
+#### Uma correção minha que estava mais forte que a evidência
+
+O achado do `better_question` (o defeito do CRAG que eu documentei na AULA-18, e o melhor achado da
+auditoria inteira) vinha com a frase "os dois arquivos têm a mesma função com uma palavra de
+diferença". O `diff` das duas funções mostra docstring, `print` e comentários também diferentes. O
+que difere por uma palavra é **a linha de retorno** — que é o ponto, e continua verdadeiro.
+Corrigido para dizer exatamente isso.
+
+#### Âncoras: 17 → 10, abaixo da linha de base
+
+Ao consertar um `NO_ANCHOR` que eu mesmo havia criado na AULA-17, escrevi o caminho **depois** do
+número da linha — violando a regra que este projeto documenta: a janela de ancoragem só olha para
+trás, então o arquivo tem de vir **antes**. Consertei os sete da AULA-17 de uma vez, convertendo
+"linha N" solta em `caminho:linha`, que o verificador valida de verdade em vez de mandar para
+conferência à mão.
+
+`verify-citations --all`: **PASS**, **1668 OK**, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` em
+zero, `SKIPPED` 16, **`NO_ANCHOR` 10** (era 16 no início da sessão). Vocabulário: 0 faltando, 0
+duplicados.
+
+#### Correções do lote 4 — 13
+
+AULA-19 (2): transcrição do template completada com as duas seções que faltavam e o fecho, porque o
+argumento fala de "escopo de cada seção, ordem"; pronome ambíguo desfeito.
+AULA-17 (2 + 4 âncoras): contagem "segundo" → "terceiro" com a distinção preservada; superlativo
+sobre terceiros reformulado.
+AULA-08 (1): "o que quase ninguém que usa BM25 sabe" → afirmação sobre tutoriais, verificável.
+AULA-02 (2): a generalização sobre objetivo contrastivo delimitada à família
+`sentence-transformers` do curso, com o contraexemplo do duplo encoder; o "perto de 0,6" sem fonte
+trocado por "meça no seu", que é o que a aula já ensina a fazer.
+AULA-21 (1) e `GLOSSARIO.md` (2): marcador de julgamento cobrindo a frase inteira; entrada do
+Self-RAG distinguindo paper de implementação; entrada do CRAG registrando que o grafo do
+repositório é acíclico (quatro aulas concordam).
+AULA-15 (2) e AULA-18 (3): os dois `−1` de biblioteca, a precisão do `diff`, o checkpoint e o
+julgamento não marcado.

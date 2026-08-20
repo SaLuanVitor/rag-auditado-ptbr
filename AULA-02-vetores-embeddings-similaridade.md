@@ -80,16 +80,20 @@ ranking em silêncio.
 
 **Similaridade de cosseno** — cosseno do ângulo entre os vetores. Ignora
 comprimento, compara só direção. Vai de −1 (opostos) a 1 (idênticos). É o padrão
-em RAG textual porque os modelos de recuperação são **treinados com objetivo
-contrastivo sobre cosseno**: o espaço é calibrado para ângulo, e a magnitude não
-carrega semântica treinada. (A maioria desses modelos já entrega vetor
-normalizado, onde a norma é constante por construção.)
+em RAG textual porque a família `sentence-transformers` usada neste curso é **treinada com
+objetivo contrastivo sobre cosseno** — o model card do `all-MiniLM-L6-v2` declara isso
+explicitamente — e nela o espaço fica calibrado para ângulo, com a magnitude não carregando
+semântica treinada. Esses modelos já entregam vetor normalizado, onde a norma é constante por
+construção. **Isto não vale para toda recuperação densa:** arquiteturas de duplo encoder treinadas
+com produto interno e negativos no lote não normalizam nem calibram para ângulo. Quando trocar de
+modelo, leia o objetivo de treino antes de escolher a métrica.
 
 > ⚠️ **O intervalo teórico não é o intervalo prático — e isso decide qualquer
 > limiar.** Embeddings de texto ocupam um cone estreito do espaço (anisotropia):
-> pares **sem relação nenhuma** costumam pontuar bem acima de 0, em alguns modelos
-> perto de 0,6. Quem sai daqui achando que 0,5 é "meio parecido" vai calibrar
-> limiar errado — e as Aulas 11 e 14 recomendam usar limiar.
+> pares **sem relação nenhuma** costumam pontuar bem acima de 0 — e o
+> piso é propriedade do modelo, não uma constante: eu não tenho medição própria para citar um
+> número, e número de blog sem corpus declarado não serve. **Meça no seu.** Quem sai daqui achando
+> que 0,5 é "meio parecido" vai calibrar limiar errado — e as Aulas 11 e 14 recomendam usar limiar.
 >
 > Três consequências: score de cosseno **não é probabilidade**; **não é comparável**
 > entre modelos nem entre corpora; e qualquer limiar é propriedade do par

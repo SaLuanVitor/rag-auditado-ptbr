@@ -297,7 +297,8 @@ que `dense_vecs` é o que torna concreto "um vetor por token".
 **1. Mexa no `k1` e no `b`.** Em `03-BM25.py`, teste `k1=0.1` (saturação quase imediata — a
 frequência quase não importa) e `b=0` (sem normalização por comprimento — documentos longos
 passam a dominar). Rode e compare o ranking. Você acabou de sentir o que cada hiperparâmetro
-faz, o que quase ninguém que usa BM25 sabe.
+faz — algo que a maioria dos tutoriais de BM25 não mostra, porque chamam a biblioteca com os
+padrões e seguem adiante.
 
 **2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()`. Se o corpus
 usa vírgula como separador de campo, o ranking degrada. Fixa que BM25 é tão bom quanto sua
