@@ -66,9 +66,12 @@ E não confie em resumo: CONTE. O gate já afirmou cobertura 29/29 quando eram 2
 foi repassado ao HANDOFF por quem leu o resumo em vez de contar as notas registradas. Extraia todo
 par (aula, nota) por script e liste quais dos números 00 a 28 não aparecem.
 
-AS SETE REGRAS QUE MAIS IMPORTAM (as quatro primeiras estão entre as 10 da persona; todas nasceram
-de erro real medido — e o "cinco" que estava aqui virou falso no instante em que eu acrescentei a
-sexta e a sétima, que é a lição inteira deste projeto em miniatura):
+AS REGRAS QUE MAIS IMPORTAM (as quatro primeiras estão entre as 10 da persona; todas nasceram de erro
+real medido). **Este cabeçalho não conta mais as regras, de propósito.** Ele dizia "AS CINCO" e virou
+falso quando entraram a sexta e a sétima; dizia "AS SETE" e viraria falso agora, com a oitava e a
+nona. Cabeçalho que afirma a própria contagem é exatamente o defeito que a lista abaixo ensina a
+evitar — a lição inteira deste projeto em miniatura, cometida duas vezes pelo documento que a ensina.
+A contagem saiu; a lista fica:
 - Nunca `grep -h` para citar. A flag suprime o caminho, e caminho ausente vira caminho inventado.
 - Par de arquivos exige `diff`. Nunca inferir a diferença pelo sufixo do nome.
 - Import não é uso. Grepar se o símbolo é exercitado antes de citá-lo como evidência.
@@ -97,6 +100,22 @@ sexta e a sétima, que é a lição inteira deste projeto em miniatura):
   "0 termos faltando" enquanto o glossário tinha NOVE entradas duplicadas — cinco inseridas por um
   script meu em termos que já tinham entrada, e uma delas contradizia a entrada boa. Verificador
   que só procura ausência é cego para excesso. Ele conta as duas coisas agora.
+- NOVA, de 20/08 (sexta rodada): **proveniência fabricada dentro de ressalva honesta.** É a classe
+  que mais escapa, porque a *forma* parece honesta e o revisor para de ler na ressalva. Três casos:
+  a AULA-07 dizia "não rodei este experimento: exige `unstructured`" — o script usa `PDFReader`/`pypdf`
+  e o `requirements.txt` do módulo tem zero `unstructured`; e as AULAS 23 e 25 diziam "é como as
+  citações desta aula foram conferidas" sobre uma receita de extração por `zlib` que **não recupera
+  nenhuma frase de duas palavras** daqueles PDFs, porque o espaço entre palavras é posicionamento e
+  não literal. Em todos, o limite declarado era verdadeiro e a **razão** dada era inventada. Regra
+  operacional: ao escrever "não verifiquei porque X", verificar X. E ao ler uma ressalva de outro
+  auditor — ou minha, de ontem —, conferir a razão, não só a existência da ressalva.
+- NOVA, de 20/08 (sexta rodada): **corrigir no ponto citado sem greppar os irmãos deixa o defeito de
+  pé.** Já aconteceu dentro de UM arquivo: consertei a alegação de `Literal` na Parte 2 da AULA-14 e
+  deixei três passagens dizendo a coisa removida, uma delas o checkpoint. E acontece na forma pior,
+  em que o conserto se nega a si mesmo: a nota de rodapé que escrevi na AULA-24 explica que
+  small-to-big se divide em três e fecha com uma frase — resíduo da versão anterior da célula — que
+  diz o oposto. Ao editar: grep do termo em TODAS as aulas, no `GLOSSARIO.md`, e no restante do
+  próprio arquivo, incluindo a célula que a nota anota.
 
 ESTADO DA AVALIAÇÃO: QUATRO rodadas completas, 29 de 29 cada. Curso em 231/348 = 66,4% (R4).
 Classificação pela RUBRICA: REQUER REVISÃO, quatro rodadas no mesmo rótulo. Na R4 o percentual

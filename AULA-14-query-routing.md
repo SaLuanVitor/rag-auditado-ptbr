@@ -114,7 +114,7 @@ prompt_templates = [combat_template, story_template]
 prompt_embeddings = embeddings.embed_documents(prompt_templates)
 ```
 
-**A decisão é o argmax do cosseno** (linhas 33, 37–38):
+**A decisão é o argmax do cosseno** — dentro da `prompt_router` (linha 33), o cálculo está nas linhas 37 e 38:
 
 ```python
 def prompt_router(input):

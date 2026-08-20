@@ -156,8 +156,10 @@ maior, porque são dezenas de vetores por chunk em vez de um. **No repositório 
 está completa:** o `03-CoBERT-Reranking.py` faz _mean pooling_ antes de comparar, e o próprio arquivo
 avisa que o ColBERT de verdade usaria a operação MaxSim (Aulas 08 e 17).
 
-**Multimodal embedding** — Texto e imagem no mesmo espaço vetorial, permitindo
-buscar imagem por texto.
+**Multimodal embedding** — Entradas de tipos diferentes projetadas no mesmo espaço vetorial, de modo
+que a distância entre elas seja calculável. Com texto e imagem, permite buscar imagem escrevendo
+texto (Aula 11). Com áudio e vídeo no mesmo espaço — o caso do ImageBind na Aula 27 — cada par de
+modalidades passa a ser uma consulta possível sem código específico por par.
 
 **Fine-tuning de embedding** — Ajustar o modelo ao seu domínio. Vale quando seu
 jargão não existe no treino original.
@@ -284,6 +286,17 @@ dois. A nota de fronteira da Aula 01 registra as duas leituras.
 _responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A intuição: resposta
 se parece mais com resposta do que pergunta se parece com resposta. Custa uma chamada de LLM antes
 de recuperar.
+
+**Query clarification** — Perguntar de volta antes de recuperar, quando a pergunta é ambígua demais
+para ter uma resposta única. No exemplo do repositório (Aula 13) o "perguntar de volta" não existe: a
+árvore de esclarecimento é construída inteira de uma vez, sem entrada do usuário e sem poda — e o
+arquivo nem chega a tocar num retriever. É o destino de rota que a Aula 14 reserva para pergunta que
+cai abaixo do limiar.
+
+**Multi-perspectiva (query)** — Gerar várias reformulações da **mesma** pergunta, para cobrir
+vocabulário diferente, e unir os resultados. Não é `query decomposition`, que quebra a pergunta em
+subperguntas **distintas** — mas o repositório usa a mesma classe (`MultiQueryRetriever`) para as
+duas coisas, e é a Aula 13 que separa os dois usos.
 
 **Query routing** — Direcionar a query para o **destino** certo. Lógico usa regras ou LLM com saída
 restrita a um conjunto de rotas; semântico usa similaridade de embedding. **E o destino não é
@@ -462,7 +475,7 @@ alucinação.
 **Answer relevancy** — A resposta responde à pergunta feita?
 
 **Context precision** — Dos trechos recuperados, quantos eram de fato relevantes? É a primeira
-pergunta da tríade, e `context relevance` é **outro nome para a mesma pergunta** — a Aula 22 põe os
+pergunta da tríade, e `context relevance` ocupa **o mesmo lugar da tríade** — a Aula 22 põe os
 dois na mesma linha da tabela. A diferença é de fornecedor, não de semântica: o RAGAS chama de
 `context precision`, o TruLens de `context relevance`.
 
@@ -579,8 +592,10 @@ tocar no resto.
 **RAG Flow** — A orquestração de módulos e operadores. Decompõe-se em grafo de
 subfunções; no caso mais simples, uma cadeia linear.
 
-**Flow pattern** — Estrutura recorrente de fluxo. São quatro: linear, condicional,
-branching e loop.
+**Flow pattern** — Estrutura recorrente de fluxo. São quatro de **controle de fluxo**: linear,
+condicional, branching e loop. O paper acrescenta um quinto capítulo, `Tuning Pattern`, que é de
+treino e não de topologia — e informa "six typical flow patterns" na lista de contribuições, número
+que a seção V não sustenta. Ver [[Modular RAG]].
 
 **Linear pattern** — Módulos em ordem fixa. Exemplo canônico: RRR
 (Rewrite-Retrieve-Read).
@@ -636,13 +651,16 @@ recuperação por similaridade existe.
 padrões, formular a próxima pergunta a partir da resposta anterior.
 
 **Graph index** — Índice em que nós são entidades, arestas são relações e covariáveis
-são afirmações, tudo extraído do texto por prompt de LLM — sem schema prévio.
+são afirmações, tudo extraído do texto por prompt de LLM — sem schema de banco de grafos e sem
+ontologia de relações. "Sem schema" não é literal: o prompt de extração recebe uma lista fechada de
+**tipos de entidade**, ajustada ao domínio (Aula 23).
 
 **Community detection** — Particionar o grafo em grupos densamente conectados. O
 GraphRAG usa Leiden de forma hierárquica e recursiva.
 
-**Community summary** — Resumo pré-gerado de uma comunidade do grafo. Níveis mais altos
-resumem os resumos dos níveis abaixo, nunca o corpus outra vez.
+**Community summary** — Resumo pré-gerado de uma comunidade do grafo, montado a partir dos element
+summaries (nós, arestas, claims). Em níveis altos, resumos de subcomunidade substituem element
+summaries **quando estes não cabem na janela** — não por regra. Em nenhum nível o corpus é relido.
 
 **Map-reduce summarization** — Cada unidade de contexto produz uma resposta parcial e
 uma rodada final junta as parciais. No GraphRAG as unidades são resumos de comunidade;
@@ -659,8 +677,11 @@ corpus inteiro. Não é o mesmo que dizer que é a etapa mais cara das três: o 
 agregado da indexação (281 minutos), sem decompor por etapa.
 
 **Claim / covariate** — A terceira coisa que a extração puxa de cada chunk, além de entidades e
-relações: uma afirmação atribuída a uma entidade, com sujeito, objeto e período de validade. É o que
-permite ao grafo responder sobre o que foi dito, e não só sobre quem se relaciona com quem.
+relações. O paper define de forma solta — _"important factual statements about entities, such as
+dates, events, and interactions with other entities"_ — e lista o "Claim Extraction Prompt" no
+apêndice sem imprimi-lo; o schema do claim (sujeito, objeto, período de validade) é da biblioteca
+`microsoft/graphrag`, não do paper. É o que permite ao grafo responder sobre o que foi dito, e não só
+sobre quem se relaciona com quem.
 
 **Leiden** — Algoritmo de detecção de comunidades em grafo, usado hierarquicamente pelo GraphRAG
 para particionar o grafo em níveis. Cada nível é uma partição mutuamente exclusiva e coletivamente
@@ -677,7 +698,11 @@ acompanhado de um `scheduling module`, que é quem de fato para; nos exemplos de
 existem os juízes e não existe o escalonador. É a mesma peça de código que a seção de
 Pós-recuperação chama de `grader`, sob o vocabulário do paper.
 
-**GraphRAG** — Constrói grafo de entidades e relações a partir do corpus.
-Responde perguntas de síntese global que busca vetorial não alcança.
+**GraphRAG** — Constrói grafo de entidades e relações a partir do corpus e o particiona em
+comunidades hierárquicas com resumo pré-gerado. Responde perguntas de síntese global que busca
+vetorial não alcança — mas o paper mostra que a maior parte desse ganho vem de a abordagem ser
+**global**, e não de haver grafo: o baseline de map-reduce sem grafo já o obtém. O grafo acrescenta
+ganho pequeno e consistente nos níveis intermediário e folha, e no nível raiz troca esse ganho por
+97% menos tokens (Aula 23).
 
 **Multimodal RAG** — Recupera e gera sobre texto e imagem juntos.

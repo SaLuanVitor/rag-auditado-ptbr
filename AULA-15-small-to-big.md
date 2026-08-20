@@ -211,7 +211,9 @@ Dois pós-processadores, e a diferença entre eles é quem decide:
 
 - **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está escrita, só para frente**. Determinístico, barato, previsível. A classe tem `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do script **não passa**. Então ela puxa os 2 nós seguintes, não 2 de cada lado. **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas `# Should look backward` (linhas 59-60). A incoerência é do repositório: o script pede comportamento para trás e a chamada não o habilita. _Limite: conferido lendo a fonte de `llama-index-core` (0.11.17 e 0.14.24, texto idêntico nas duas); não executei._
 - **`AutoPrevNextNodePostprocessor`** — expansão **decidida por LLM**: o modelo avalia se vale
-  expandir e em qual direção. Adaptativo, e custa uma chamada de LLM por consulta.
+  expandir e em qual direção. Adaptativo, e custa uma chamada de LLM **por nó recuperado** — o `_postprocess_nodes` tem um laço
+`for node in nodes` com a chamada dentro. No script isso dá uma por consulta só porque
+`similarity_top_k=1` (linha 46); com `k=6` seriam seis.
 
 Note o `docstore=docstore`: a expansão precisa saber **quais nós são vizinhos**, e essa informação
 de ordem vive no docstore, não no índice vetorial. O índice não sabe que o nó 47 vem depois do 46 —

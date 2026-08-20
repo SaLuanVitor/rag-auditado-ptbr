@@ -53,8 +53,10 @@ se aprende o mecanismo, não porque seja um caso de grau 2.
 > Custo: o schema fica limitado ao subconjunto que o provedor suporta, e a latência do primeiro
 > token aumenta. Nenhum arquivo deste módulo usa 4b — `grep` por `json_schema` no repositório não
 > encontra nada, e nenhuma das **três** ocorrências de `strict` tem relação com decodificação
-> restrita (`02-DocChunking/05-LlamaIndex-SemanticChunking.py:47` e
-> `Self-RAG-FullImplementation.py:54`). Ao ler a tabela acima, leia o grau 4 como **4a**.
+> restrita: `02-DocChunking/05-LlamaIndex-SemanticChunking.py:47`,
+> `Self-RAG-FullImplementation.py:54` e
+> `04-VectorDB/Milvus/03-SearchAndMetrics/05-group-search.py:76`, esta última um
+> `strict_group_size` de group search. Ao ler a tabela acima, leia o grau 4 como **4a**.
 
 A coluna que importa é a terceira. Subir de grau reduz uma classe de falha e deixa a próxima
 intacta:
@@ -194,7 +196,8 @@ client = OpenAI(
 
 ## Parte 3 — O par `04-Pydantic` que não é um par
 
-⚠️ Este é o ponto do módulo em que a regra 7 do protocolo de citação existe. Os nomes
+⚠️ Este é o ponto do módulo em que a regra 7 do protocolo de citação — *"par de arquivos exige
+`diff`"*, item 7 de `agente/rag-specialist.md` — existe. Os nomes
 `04-Pydantic-v1.py` e `04-Pydantic-v2.py` sugerem duas versões do mesmo exemplo, uma para cada
 versão da biblioteca. O `diff` diz outra coisa: **os dois arquivos compartilham exatamente as duas
 primeiras linhas** — os imports de `pydantic` e de `typing`. Nada mais. São exemplos distintos, com
@@ -265,7 +268,7 @@ símbolos de uma vez.
 
 ## Parte 4 — O par `05-function-calling`: mesma tarefa, mesmo provedor, camadas diferentes
 
-⚠️ Segunda aplicação da regra 7, e o resultado é mais surpreendente que o do par anterior. Os nomes
+⚠️ Segunda aplicação da mesma regra 7, e o resultado é mais surpreendente que o do par anterior. Os nomes
 são `05-function-calling-v1-LangChain.py` e `05-function-calling-v2-DeepSeek.py`. A leitura natural
 — "um usa LangChain, o outro usa DeepSeek" — sugere provedores diferentes. Os arquivos dizem que
 **ambos falam com a DeepSeek**:
@@ -414,11 +417,20 @@ resultados você conseguiria consumir por programa sem escrever um parser à mã
 **Os slots de template têm nomes diferentes por modo.** Em
 `08-Generation/03-ControllingFormatViaOutputParsing/02-LlamaIndex-OutputParsing.py`, o bloco 3
 passa `summary_template` (`:54`); os blocos 4 e 5 passam `text_qa_template` (`:68`, `:83`). São
-parâmetros distintos, e qual
-deles cada modo consome é decisão da biblioteca. `llama_index` **não está instalado neste ambiente**
-— não verifiquei o que acontece ao passar o slot que o modo não usa. Julgamento, e é o tipo de erro
-que não avisa: se o template cair num slot que aquele modo ignora, você vê a saída sem formatação e
-conclui que "o modelo não obedeceu".
+parâmetros distintos, e qual deles cada modo consome é decisão da biblioteca — **e a decisão está
+legível na fonte.** Em `llama_index.core.response_synthesizers.factory`, versão 0.11.17, a
+`get_response_synthesizer` declara os dois parâmetros na assinatura (`text_qa_template` e
+`summary_template`) e então ramifica por modo. `TREE_SUMMARIZE` é o **único** dos oito modos que
+recebe `summary_template`; todos os outros que aceitam template recebem `text_qa_template`. Duas
+consequências:
+
+- **os três blocos do script estão certos** — o 3, em `TREE_SUMMARIZE`, passa `summary_template`; os
+  4 e 5, em `COMPACT_ACCUMULATE` e `SIMPLE_SUMMARIZE`, passam `text_qa_template`;
+- **passar o slot errado não dá erro.** Como a assinatura aceita os dois, o argumento é válido; ele
+  simplesmente não é repassado adiante no ramo daquele modo. É descartado em silêncio.
+
+E é o tipo de erro que não avisa: se o template cair num slot que aquele modo ignora, você vê a saída
+sem formatação e conclui que "o modelo não obedeceu".
 
 **O corpus é pequeno para o que os modos se propõem.** Com 4.462 bytes, o número de chunks é baixo,
 e `REFINE`, `TREE_SUMMARIZE` e `ACCUMULATE` só se diferenciam quando há **muitos** chunks para
@@ -565,8 +577,9 @@ verificar — veja a falha, e note que ela não menciona ferramenta nem schema.
 
 **6. Passe o template no slot errado.** Em `02-LlamaIndex-OutputParsing.py`, troque o
 `summary_template` da linha 54 por `text_qa_template` mantendo `TREE_SUMMARIZE`. Registre o que
-acontece: a saída sai formatada, ou o template é ignorado sem aviso? Esta é a pergunta que a Parte 5
-deixou aberta por não ter a biblioteca instalada.
+acontece. A Parte 5 já dá a resposta pela leitura da fonte — o template é ignorado sem aviso, e sem
+erro —, então o valor do exercício aqui é outro: **confirmar na tela** que a execução não reclama de
+nada. Aprender a reconhecer a falha silenciosa é o ponto; ler que ela existe não substitui vê-la.
 
 **7. Troque `{query_str}` por `{query}`.** No mesmo arquivo, em qualquer um dos três templates. É o
 erro que se comete ao copiar prompt de exemplo do LangChain para o LlamaIndex.

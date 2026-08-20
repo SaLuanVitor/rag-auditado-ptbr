@@ -236,8 +236,9 @@ do corpus — e note que o exemplo de identificador da tabela do "Modelo mental"
 se reproduz aqui**: o corpus é o `battle_scenes.json`, cinco registros de cenas de combate, e o único
 campo parecido com identificador (`id`, valores como `COMBAT_001`) **nunca entra no texto indexado** —
 o `v2` monta os documentos a partir de `title`, `description`, `combat_details` e `scene_info`. Para
-ver o esparso ganhar, use um nome próprio ou um termo técnico que apareça uma vez só (`Flaming
-Mountain`), não um SKU que o corpus não tem. A tabela do "Modelo mental" descreve o padrão; medi-lo
+ver o esparso ganhar, use um nome próprio que de fato esteja no corpus e em **um** documento só —
+`Water Curtain Cave` (em `SCENE_001`) ou `White Bone Spirit` (em `COMBAT_002`) servem —, não um SKU
+que o corpus não tem. A tabela do "Modelo mental" descreve o padrão; medi-lo
 de verdade exigiria um corpus com identificadores indexados.
 
 **2. Alinhe a ordem dos pesos — e note que você está consertando, não quebrando.** Em

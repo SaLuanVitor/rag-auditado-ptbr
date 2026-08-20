@@ -379,7 +379,8 @@ Duas anotações de ambiente:
 
 - É o único script deste subdiretório que chama `load_dotenv()`
   (`08-Generation/02-OptimizingResponseViaPrompts/03-IncreaseComprehensivenessAndDiversityOfResponse.py:2` e `:4`) — `grep -rn "load_dotenv"`
-  nos dois subdiretórios só encontra aqui. Mas o
+  nos dois subdiretórios só acha **chamada** aqui (o mesmo grep também acerta o comentário de um
+  `.env.example`; restrinja a `--include="*.py"` para ver só o que executa). Mas o
   `08-Generation/02-OptimizingResponseViaPrompts/.env.example:2` afirma: _"Every script here loads
   this file via python-dotenv's load_dotenv()."_ É falso para três dos quatro. Nos arquivos 01, 02 e
   04 a chave precisa já estar exportada no ambiente, ou `os.getenv` devolve `None`. Documentação que

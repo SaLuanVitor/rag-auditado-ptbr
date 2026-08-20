@@ -81,9 +81,9 @@ sequência didática do módulo:
 | Arquivo                                                      | Chamada                                                             | O que acrescenta                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------------- | ---------------------------------- |
 | `03-01-LoadAllDocumentsInDirectoryWithLangChain.py:66`       | `DirectoryLoader(data_dir)`                                         | o caso ingênuo: pega tudo          |
-| `03-02-SpecifyParamsWhenLoadingDirectoryWithLangChain.py:10` | `+ glob="**/*.md"`, `use_multithreading=True`, `show_progress=True` | filtra por tipo e paraleliza       |
-| `03-03-ChangeToolWhenLoadingDirectoryWithLangChain.py:11`    | `+ loader_cls=TextLoader`                                           | escolhe o parser                   |
-| `03-04-SkipErrorsWhenLoadingDirectoryWithLangChain.py:12`    | `+ silent_errors=True`                                              | não morre no primeiro arquivo ruim |
+| `03-02-SpecifyParamsWhenLoadingDirectoryWithLangChain.py:10-14` | `+ glob="**/*.md"` (11), `use_multithreading=True` (12), `show_progress=True` (13) | filtra por tipo e paraleliza |
+| `03-03-ChangeToolWhenLoadingDirectoryWithLangChain.py:11-14`    | `+ loader_cls=TextLoader` (13)                                      | escolhe o parser                   |
+| `03-04-SkipErrorsWhenLoadingDirectoryWithLangChain.py:12-15`    | `+ silent_errors=True` (13)                                         | não morre no primeiro arquivo ruim |
 
 O `loader_cls` do `03-03` existe porque o `DirectoryLoader` tem um default que muita gente
 não sabe que está usando: quando você não especifica, ele recorre ao **Unstructured** para
@@ -274,7 +274,11 @@ prepara a Aula 05.
 versão com `silent_errors=True`. Ela conclui sem reclamar. Agora conte quantos documentos
 voltaram contra quantos arquivos existem — e veja o buraco que o silêncio produziu.
 
-**4. Troque o `jq_schema` por `.` puro.** Em `02-LangCHain-JSONLoader-JSON.py`, use
+**4. Troque o `jq_schema` por `.` puro — e reporte o que aconteceu.** O `JSONLoader` vem de
+`langchain_community`, que não está instalado neste ambiente, então **o que segue é previsão, não
+medição**: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
+esperado é uma exceção de validação, não uma migração silenciosa para texto bruto. Em
+`02-LangCHain-JSONLoader-JSON.py`, use
 `jq_schema='.'`. Você volta ao comportamento do `TextLoader`: o JSON inteiro como texto. É a
 prova de que o ganho do `JSONLoader` está no esquema, não na classe.
 
@@ -320,7 +324,7 @@ prova de que o ganho do `JSONLoader` está no esquema, não na classe.
 
 ## Vocabulário
 
-`loader` · `document` · `parsing` · `layout analysis` · `parent-child` · `corpus`
+`loader` · `document` · `parsing` · `parent-child`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

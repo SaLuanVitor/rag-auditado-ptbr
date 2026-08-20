@@ -47,6 +47,10 @@ nomenclatura em `00-SimpleRAG/`:
 | `_Ollama`               | local, na sua máquina           | zero                                 | nenhuma                              |
 | `_HuggingFace`          | modelos locais via transformers | zero                                 | nenhuma (às vezes token de download) |
 
+O token do provedor não é sempre o fim do nome: na série `02_*` ele vem seguido de `_Model`
+(`02_04_LangChain_HuggingFace_Model.py`), e há sufixos de versão (`_v1`, `_v2`) depois disso. Procure
+o token, não a terminação.
+
 O `00-SimpleRAG/.env.example` documenta cada uma dessas variáveis, inclusive um
 endpoint genérico compatível com OpenAI (`CUSTOM_API_KEY` + `CUSTOM_API_BASE_URL`)
 usado por `01_03_LlamaIndex_SwitchToOpenAICompatibleModel.py`.
@@ -137,9 +141,14 @@ dependências pinadas — a instalação demora, `torch` é grande.
 Existem ainda requirements especializados que você só instala quando a aula pedir:
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
 `requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
-acrescenta o que os exemplos de cada framework precisam além do `NoGPU_Mac-Win` — no do LangChain,
-`langchain-deepseek` e `langgraph-prebuilt`; no do LlamaIndex, os equivalentes daquele ecossistema — e não
-está nos `NoGPU_Mac-Win` — instale quando chegar nos `04_LangGraph_RAG*.py` de `00-SimpleRAG/`; e
+acrescenta pouca coisa e **nada em comum entre os dois** — o do LangChain traz `colorama`,
+`langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz `colorama`,
+`llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos oito, o único com uso
+rastreável no repositório é o `langgraph-prebuilt`, importado por
+`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py` — o módulo da Aula 26, não o
+`00-SimpleRAG`. **Os dois `04_LangGraph_RAG*.py` não precisam deste arquivo:** importam apenas
+`langgraph.graph`, e `langgraph==0.2.69` já está no `NoGPU_Mac-Win` (linha 110). Instale só se
+chegar na Aula 26 e o import falhar; e
 `requirements_marker_20250413.txt`, que **nenhuma aula usa**: `grep -rn "import marker"` no
 repositório inteiro não encontra nada, e as duas menções ao `marker_single` estão em tabelas de
 `README.md` e de `99-EN/README.md` — a mesma linha, repetida nos dois —, sobre a geração de um asset

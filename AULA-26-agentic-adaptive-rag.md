@@ -1,6 +1,6 @@
 # AULA 26 — Agentic RAG e Adaptive RAG com LangGraph
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/04-AgenticRAG/` — 6 arquivos (`ls`): 2 scripts (235 e 243 linhas), 3 PNGs e um `.env.example`
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/04-AgenticRAG/` — 6 arquivos (`ls -A`; o `.env.example` é oculto e o `ls` simples mostra 5): 2 scripts (235 e 243 linhas), 3 PNGs e um `.env.example`
 
 ---
 
@@ -172,11 +172,11 @@ E o `hub.pull("rlm/rag-prompt")` (`01-LangChain-AgenticRAG.py:150`) é o mesmo p
 
 ---
 
-## Parte 3 — O arquivo `02`: o roteamento de fonte que o curso ainda não tinha visto
+## Parte 3 — O arquivo `02`: o roteamento de fonte que finalmente decide algo
 
 `02-LangChain-AdaptiveRAG.py` é o exemplo mais completo do repositório em número de componentes: um roteador de fonte, três graders, um reescritor, busca na web e cinco nós.
 
-E ele traz o que a Aula 25 apontou como faltando. O paper Modular RAG diz que rotas divergem em _"retrieval sources, retrieval processes, configurations, models, and prompts"_ — cinco eixos —, e a Aula 25 registrou que o curso só havia visto roteamento de **prompt** (Aulas 14 e 19). Aqui está o eixo da **fonte** (`02-LangChain-AdaptiveRAG.py:50-54`):
+E ele traz o que a Aula 25 apontou como faltando — com uma ressalva que a Aula 25 não fez. O paper Modular RAG diz que rotas divergem em _"retrieval sources, retrieval processes, configurations, models, and prompts"_ — cinco eixos. O eixo da **fonte** já apareceu no curso: `05-PreRetrieval/03-QueryRouting/01-LogicalRouting.py:12-17` declara `class RouteQuery` com `datasource: Literal["python_docs", "js_docs", "golang_docs"]`, a mesma classe e o mesmo campo que aqui. O que é novo não é a técnica; é o que se faz com o resultado. Lá o rótulo era impresso e morria — `route_question` devolve `result.datasource` e o `__main__` só imprime. Aqui ele **governa uma aresta do grafo**, e as duas fontes existem de fato (`02-LangChain-AdaptiveRAG.py:50-54`):
 
 ```python
 class RouteQuery(BaseModel):
@@ -223,7 +223,7 @@ wf.add_edge("retrieve", "grade_documents")
 wf.add_edge("web_search", "generate")
 ```
 
-O que vem do índice é graduado documento por documento; o que vem da web vai **direto para a geração**. Julgamento: é uma assimetria difícil de justificar — resultado de busca na web é, se algo, menos confiável que o índice curado. E ela tem consequência no laço: se a rota escolhida foi a web e o resultado é ruim, o único caminho de correção é o `retry` da geração, que não muda o contexto.
+O que vem do índice é graduado documento por documento; o que vem da web vai **direto para a geração**. Julgamento: é uma assimetria difícil de justificar — resultado de busca na web é, se algo, menos confiável que o índice curado. E ela tem consequência no laço, pior do que parece. O `grade_generation_node` (`:170-177`) tem **duas** saídas de insatisfação: `retry`, quando o detector de alucinação reprova (`:174`), e `rewrite`, quando o grader de resposta reprova (`:177`). O `retry` volta a `generate` com o mesmo contexto. O `rewrite` vai a `transform_query`, que vai a `retrieve` (`:201`) — o nó do **vector store**. Ou seja: uma pergunta que o roteador mandou para a web, se a resposta for julgada incompleta, é reescrita e respondida pelo índice de posts de blog. A decisão do roteador é revertida sem registro, e `web_search` tem grau de entrada 1 — só o START (`:191`). Saiu da rota web, não volta.
 
 **Três ciclos, nenhum com freio.** As arestas condicionais pós-geração (`02-LangChain-AdaptiveRAG.py:205-209`):
 
@@ -291,7 +291,7 @@ Três arquivos deste repositório implementam laço, e nenhum implementa limite 
 
 | Arquivo                                                                                   | Ciclos                                        | Contador      |
 | ----------------------------------------------------------------------------------------- | --------------------------------------------- | ------------- |
-| `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py`                           | **nenhum** — acíclico por construção (`:457`) | não se aplica |
+| `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py`                           | **nenhum** — acíclico por construção (`:434-457`) | não se aplica |
 | `08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py` | 3 (`:354`, `:359`, `:361`)                    | ausente       |
 | `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`                                  | 1 (`:174`)                                    | ausente       |
 | `10-AdvanceRAG/04-AgenticRAG/02-LangChain-AdaptiveRAG.py`                                 | 3 (`:201`, `:208`)                            | ausente       |
@@ -300,7 +300,7 @@ O paper Modular RAG especifica o freio em todos os três subtipos de laço, e no
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 
-> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25**
+> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** — valor documentado da biblioteca, não algo que se leia neste repositório; `langgraph` não está instalado neste ambiente nem há wheel em disco, então confira na versão que você usar antes de contar com ele
 > super-steps, e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
@@ -314,13 +314,13 @@ E há um agravante específico do `01`: o `rewrite` que reseta as mensagens torn
 
 ## Mão na massa
 
-Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` precisa também de `COHERE_API_KEY` e `TAVILY_API_KEY` (`10-AdvanceRAG/04-AgenticRAG/.env.example:7-11`).
+Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **exige** três chaves antes de qualquer outra coisa (`:27-29`) — e só duas são usadas. A `TAVILY_API_KEY` alimenta a busca na web (`:118`). A `COHERE_API_KEY` é pedida em `:28` e **nada no arquivo a consome**: `grep -in "cohere\|rerank"` devolve só o comentário de `pip install` (`:19`) e o próprio `_set_env`. O `10-AdvanceRAG/04-AgenticRAG/.env.example:7` diz que ela serve "for reranking", e não há reranking nenhum no script — você pode digitar qualquer coisa nesse prompt. É o mesmo `.env.example` que afirma, na linha 2, que todo script carrega `.env` por `load_dotenv()`, o que também não acontece.
 
 **1. Veja a decisão do agente.** No `01`, imprima `last_msg.tool_calls` dentro de `should_use_tools` (`:122-129`) e registre, a cada execução, se o roteamento veio da chamada de ferramenta ou da substring. Essa contagem diz quanto do comportamento "agentic" é real.
 
 **2. Tire o `or`.** No mesmo lugar, remova a segunda condição da linha 127 e rode. Se o grafo passar a terminar sem recuperar, você descobriu que o exemplo dependia da substring — e o próximo item explica por quê.
 
-**3. Use o `tools_condition` que está importado.** Substitua `should_use_tools` pelo `tools_condition` da linha 18 e o nó `retrieve` pelo `ToolNode`. Compare o comportamento. É a versão do arquivo que o import prometia.
+**3. Use o `tools_condition` que está importado.** Trocar `should_use_tools` pelo `tools_condition` da linha 18 e o nó `retrieve` pelo `ToolNode` exige duas mudanças que o import não anuncia. A primeira: o mapa de `add_conditional_edges` da linha 170 tem as chaves que `should_use_tools` devolve (`"retrieve"`/`"end"`); com o roteador pronto, o mapa precisa ser reescrito para as chaves que **ele** devolve — confira na versão de `langgraph` que você instalar, porque não pude confirmar aqui. A segunda, mais séria: `AgentState.messages` é `Sequence[BaseMessage]` **sem reducer**, e é por isso que o `Annotated` da linha 3 está morto e que o `retrieve` escrito à mão faz `msgs + [retrieval_msg]` na linha 97. Um nó pronto que devolve só a mensagem que produziu vai **substituir** a lista inteira. Anote `messages` como `Annotated[Sequence[BaseMessage], add_messages]` antes de trocar qualquer coisa. Esse é o exercício de verdade: o import prometia uma arquitetura que o estado não sustenta.
 
 **4. Conserte a descrição da ferramenta.** Descomente as duas URLs (`01-LangChain-AgenticRAG.py:29-30`) para que o índice cubra o que a descrição da linha 47 promete. Depois pergunte algo sobre prompt engineering, antes e depois da mudança, e compare o veredito do grader.
 
@@ -362,7 +362,7 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` pr
 
 **Laço que perde informação.** Resetar o estado a cada volta parece limpeza e é perda. Guarde a pergunta original, e faça as decisões seguintes contra ela.
 
-**Ciclo sem contador, pela terceira vez.** Três dos quatro grafos deste repositório têm laço; nenhum tem limite. **Julgamento:** é o defeito mais recorrente do repositório inteiro, e o mais fácil de corrigir.
+**Ciclo sem contador, pela terceira vez.** O repositório tem seis grafos LangGraph em arquivos `.py` (`grep -rln "StateGraph(" --include=*.py`; sem o filtro entra também o `00-SimpleRAG/04_LangGraph_RAG.ipynb`, e o total é sete); quatro deles têm aresta condicional, e três desses quatro têm laço. Nenhum tem limite. **Julgamento:** é o defeito mais recorrente do repositório inteiro, e o mais fácil de corrigir.
 
 **Fonte alternativa sem controle de qualidade.** Se o índice é graduado e a web não é, você criou um caminho preferencial para material não verificado. E, como a Aula 20 observou sobre o resultado de ferramenta, o que entra no contexto entra como fato.
 
@@ -389,7 +389,7 @@ Responda sem consultar:
 9. Por que a rota `web_search` do arquivo `02` é uma assimetria difícil de justificar?
 10. `grade_generation_node` é um nó do grafo? Onde ele é chamado, e qual o custo escondido disso?
 11. Qual pergunta está comentada no arquivo `02`, e o que a ausência dela impede de testar?
-12. Quantos dos quatro grafos do repositório têm laço, e quantos têm limite de iteração?
+12. Dos seis grafos LangGraph do repositório, quantos têm aresta condicional, quantos têm laço, e quantos têm limite de iteração?
 
 ---
 

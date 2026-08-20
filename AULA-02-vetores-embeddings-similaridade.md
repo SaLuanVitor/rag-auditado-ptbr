@@ -154,15 +154,16 @@ script:
 5. demonstra o caso da negação
 6. demonstra a falha com código de produto
 
-Observe, na saída, três coisas:
+Três coisas para conferir na saída — e note que **só a segunda é garantida**: as outras duas são o
+que eu espero de um modelo treinado como este, não medição que eu tenha feito.
 
 - **Pares sinônimos** têm cosseno alto sem compartilhar palavra **de conteúdo** alguma (as
   stopwords "o" e "no" aparecem nos dois; nenhum substantivo ou verbo aparece). É a busca
   semântica funcionando.
 - **Cosseno e IP** produzem ranking idêntico, porque o modelo normaliza. **L2**
   produz a ordem inversa nos números, mas o mesmo ranking depois de inverter.
-- A frase com **negação** fica próxima da sua afirmativa. Exatamente o problema
-  descrito acima, medido na sua tela.
+- A frase com **negação** deve ficar próxima da sua afirmativa. Exatamente o problema descrito
+  acima — e aqui a medição é sua, na sua tela.
 
 ---
 
@@ -177,13 +178,13 @@ absurdos, essa é a primeira hipótese.
 
 **2. Troque o modelo por um multilíngue.** Substitua `all-MiniLM-L6-v2` por
 `paraphrase-multilingual-MiniLM-L12-v2`. Compare os cossenos entre as frases em
-português. Aumentam. Motivo: o primeiro modelo foi treinado predominantemente em
+português. **Devem aumentar** — previsão, não medição minha. Motivo: o primeiro modelo foi treinado predominantemente em
 inglês e representa português de forma mais grosseira — questão prática direta para
 qualquer RAG em português.
 
 **3. Adicione uma frase com jargão do seu domínio.** Algo como
 "o CFOP 5102 exige destaque de ICMS na nota". Compare com uma frase genérica sobre
-impostos. O cosseno será mais baixo do que a relação real justifica: o modelo não
+impostos. O cosseno deve sair mais baixo do que a relação real justifica: o modelo não
 conhece `CFOP`. É o argumento empírico para fine-tuning de embedding (Aula 08) ou
 para busca híbrida (Aula 11).
 

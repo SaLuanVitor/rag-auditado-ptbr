@@ -104,7 +104,14 @@ Julgamento de engenharia: a utilidade prática desses três níveis não é cata
 
 Esta é a parte que dá à aula seu valor prático. O paper define um padrão como uma sequência de módulos, cada um com seus operadores, e afirma que os padrões que ele catalogou _"transcend various application domains and demonstrate a high level of consistency and reusability"_.
 
-São quatro. E, para cada um, o curso já viu ao menos uma instância.
+São quatro — e aqui o paper se contradiz três vezes sobre o próprio número, o que vale registrar
+numa aula cujo tema é a taxonomia. O abstract lista quatro ("linear, conditional, branching, and
+looping"); a lista de contribuições afirma "six typical flow patterns"; e a seção V traz **cinco**
+subseções, sendo a quinta o `E. Tuning Pattern` — retriever FT, generator FT e dual FT, com RA-DIT
+como exemplo de ajuste conjunto. Esta aula cobre os quatro de **controle de fluxo**, e a razão de não
+cobrir o quinto é que ele não descreve topologia de execução, e sim treino. Mas saiba que ele existe:
+é lá que mora a diferença entre o RRR **treinado** da seção A e o `transform_query` por prompt do
+repositório. E, para cada um dos quatro, o curso já viu ao menos uma instância.
 
 ### A. Linear
 
@@ -118,7 +125,7 @@ Isto reposiciona o que a Aula 21 encontrou: o `transform_query` do Self-RAG do r
 
 Um módulo de roteamento escolhe qual fluxo a consulta atravessa. O paper define isso com uma função de roteamento que direciona para um módulo ou outro, e dá um exemplo que vale pela clareza: a tolerância a respostas geradas por LLM _"varies across questions related to serious issues, political matters, or entertainment topics"_ — e os fluxos alternativos _"often diverge in terms of retrieval sources, retrieval processes, configurations, models, and prompts"_.
 
-Cinco coisas podem divergir entre rotas, portanto, e não apenas o prompt. O curso viu duas dessas cinco: a Aula 14 roteou **prompts** por similaridade de embedding (`combat_template` / `story_template`) e a Aula 19 roteou **prompts** por classificação com LLM. Rotear fonte, processo ou modelo é a mesma estrutura aplicada a outra variável — e é aí que o padrão rende mais que o exemplo.
+Cinco coisas podem divergir entre rotas, portanto, e não apenas o prompt. O curso viu dois desses cinco eixos. **Prompt:** a Aula 14 roteou prompts por similaridade de embedding (`combat_template` / `story_template`) e a Aula 19 por classificação com LLM. E **fonte**, no `01-LogicalRouting.py` da mesma Aula 14, cujo `RouteQuery` devolve `datasource: Literal["python_docs", "js_docs", "golang_docs"]` (`05-PreRetrieval/03-QueryRouting/01-LogicalRouting.py:14`) — com a ressalva de que ali o rótulo é devolvido e nada a jusante o consome: o eixo está **declarado, não exercido**. Quem o exerce de verdade é o `02-LangChain-AdaptiveRAG.py` da Aula 26, que roteia fonte na aresta que sai do `START`. Rotear processo, configuração ou modelo é a mesma estrutura aplicada a outra variável — e é aí que o padrão rende mais que o exemplo.
 
 ### C. Branching
 
@@ -202,7 +209,7 @@ E o custo de tudo isso, para não vender arquitetura como grátis: cada módulo 
 
 Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapeamento e diagnóstico — e o produto é um artefato que serve ao seu sistema.
 
-**1. Extraia o texto do paper.** O PDF cede texto com stdlib: descomprimir cada `stream` com `zlib`, coletar os literais entre parênteses, **descartando os que tiverem menos de ~85% de caracteres ASCII imprimíveis** — este PDF tem streams de fonte que produzem lixo sem esse filtro. Foi assim que as citações desta aula foram conferidas.
+**1. Extraia o texto do paper.** O PDF cede texto com stdlib: descomprimir cada `stream` com `zlib`, coletar os literais entre parênteses, **descartando os que tiverem menos de ~85% de caracteres ASCII imprimíveis** — este PDF tem streams de fonte que produzem lixo sem esse filtro. Rode e compare com `pdftotext ModularRAG-2407.21059v1.pdf -`: você vai obter cerca de 19 mil literais e vai descobrir que este PDF quebra palavras **no meio** por kerning — `"Advanced RAG is a special case"` sai como `RA`, `G`, `is`, `a`, `special`, `case`. Sem uma etapa de rejunção que esta receita não tem, nenhuma citação longa desta aula é localizável por busca literal. As citações daqui foram conferidas com o `pdftotext`; a rota por `zlib` vale pelo que ensina sobre como um PDF guarda texto.
 
 **2. Desenhe o seu sistema como grafo de operadores.** Um nó por operador, uma aresta por transição. Depois marque em qual dos seis módulos cada nó vive. Os nós que você não conseguir atribuir a um módulo são os candidatos a estarem fazendo duas coisas.
 

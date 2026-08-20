@@ -256,8 +256,11 @@ cd RAG-from-First-Principles/03-Embedding
 python 03-BM25.py
 ```
 
-Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver uma
-**pontuação query-documento** escrita por completo, sem abstração — mas não é o único: o
+Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
+**fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
+tem variável `query` nenhuma (`grep -c query` devolve 0). Ele calcula o **vetor esparso de cada
+documento**, com o IDF do próprio corpus; pontuar uma consulta contra documentos é o que o
+`03-LangChain-BM25.py` faz — mas não é o único: o
 `calculate_similarity()` de `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145` (a
 normalização L2 nas linhas 137-138, o `torch.mm` na 141) também
 pontua query contra documento à mão, com normalização L2 e `torch.mm`. O que o `03-BM25.py` tem de
@@ -296,7 +299,10 @@ que `dense_vecs` é o que torna concreto "um vetor por token".
 
 **1. Mexa no `k1` e no `b`.** Em `03-BM25.py`, teste `k1=0.1` (saturação quase imediata — a
 frequência quase não importa) e `b=0` (sem normalização por comprimento — documentos longos
-passam a dominar). Rode e compare o ranking. Você acabou de sentir o que cada hiperparâmetro
+passam a dominar). **Não espere um ranking:** o `print` da linha 35 está fora do laço das linhas
+33-34, então a execução imprime um único vetor — o do último log. Compare os **pesos** de um termo
+entre execuções, e se quiser ver ranking de verdade rode o `03-LangChain-BM25.py`, que tem consulta.
+Você acabou de sentir o que cada hiperparâmetro
 faz — algo que a maioria dos tutoriais de BM25 não mostra, porque chamam a biblioteca com os
 padrões e seguem adiante.
 
@@ -328,7 +334,9 @@ não está separando bem o seu domínio.
   treinado e o recall cai — **sem erro, sem aviso**, que é a assinatura de falha que este curso
   inteiro ensina a caçar.
 
-  **E o detalhe muda por família, então não generalize:** na **E5**, o prefixo entra nos **dois**
+  **E o detalhe muda por família, então não generalize** — o que segue vem dos cartões de modelo no
+  Hugging Face, não de execução: `FlagEmbedding` e `sentence-transformers` não estão instalados neste
+  ambiente**:** na **E5**, o prefixo entra nos **dois**
   lados — `passage: ` na ingestão e `query: ` na consulta. Nas famílias **BGE v1/v1.5**, a instrução
   vai **só** do lado da consulta; o documento entra cru. E o **BGE-M3** — justamente o modelo que
   esta aula ensina em `04-BGE-M3.py` — **não exige instrução nenhuma**. Ou seja: nem existe uma

@@ -1899,3 +1899,95 @@ que a AULA-17 não reproduz nem invoca.
 `verify-citations --all`: **PASS**, zero inválidas, `NO_ANCHOR` em 10. Vocabulário: **0 faltando, 0
 duplicados**. Clone da Packt: **vazio, incluindo `--ignored`**, e zero violações de contrato — segunda
 rodada consecutiva desde que `pip install` passou a ser proibido nominalmente.
+
+
+---
+
+## Renota adversarial — SEXTA rodada, COMPLETA, 29 de 29
+
+Primeira nota homogênea desde a quarta rodada. As 21 aulas do lote 1-3 e as 8 do lote 4 receberam
+**o mesmo briefing**, com duas mudanças de instrumento em relação à R4:
+
+1. **Ler fonte de biblioteca passou a ser autorizado e esperado.** Na R4 três auditores saíram do
+   contrato para fazer isso, e os três melhores achados técnicos da rodada vieram daí. O contrato
+   antigo confundia *ler* com *instalar*; o novo autoriza ler as wheels já em disco e proíbe
+   instalar nominalmente.
+2. **As nove classes de defeito** que a auditoria convergiu foram escritas no briefing como lista
+   a percorrer explicitamente, em vez de deixadas ao critério de cada auditor.
+
+Toda nota é **anterior** aos consertos daquela aula, como nas rodadas anteriores.
+
+| Aula | Nota | O que pesou |
+|---|---|---|
+| [00](../AULA-00-setup-do-ambiente.md) | **5**/12 | Instrução de instalação errada em três pontos — e escrita por mim, na R6, na aula que o leitor executa primeiro. |
+| [01](../AULA-01-o-que-e-rag.md) | **8**/12 | Contagem de aulas e referência circular ao glossário. |
+| [02](../AULA-02-vetores-embeddings-similaridade.md) | **11**/12 | Das três coisas que manda "observar", só a segunda é garantida. |
+| [03](../AULA-03-primeiro-rag.md) | **9**/12 | A contagem estava errada nas duas leituras: nove aulas em seis módulos, não "oito módulos". |
+| [04](../AULA-04-carregando-texto-json-web.md) | **7**/12 | Linhas citadas eram as de abertura da chamada, não as do parâmetro; dois termos prometidos e nunca usados. |
+| [05](../AULA-05-pdf-layout-ocr-hierarquia.md) | **10**/12 | O exercício manda comparar dois scripts que olham para arquivos diferentes, um com caminho fixo no código. |
+| [06](../AULA-06-tabelas-csv-sql.md) | **9**/12 | "camelot é lento" inferido da presença de `import time`, e o exercício 4 da própria aula manda cronometrar. |
+| [07](../AULA-07-chunking.md) | **10**/12 | A ressalva honesta trazia justificativa técnica **fabricada** (`unstructured` num script que usa `pypdf`). |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | **5**/12 | CRÍTICO: `03-BM25.py` tem zero `query` e o `print` está fora do laço — não há consulta nem ranking a comparar. |
+| [09](../AULA-09-milvus-collections-schema-entidades.md) | **5**/12 | Attu anunciado como provisionado; cinco operações de partição que o "Mão na massa" manda rodar e nada explica. |
+| [10](../AULA-10-indices-ann.md) | **11**/12 | Duas doutrinas de indústria apresentadas como fato medido. |
+| [11](../AULA-11-busca-hibrida-multimodal.md) | **8**/12 | CRÍTICO meu: substituí um termo ausente do corpus por outro também ausente. |
+| [12](../AULA-12-query-construction.md) | **7**/12 | O "Mão na massa" quebra no comando 1 — falta `mkdir`, e o `02` escolhido lê de um caminho que o `01` nunca escreve. |
+| [13](../AULA-13-query-translation.md) | **10**/12 | Dois termos centrais do corpo ausentes do Vocabulário e do glossário. |
+| [14](../AULA-14-query-routing.md) | **11**/12 | Três passagens dizendo o que o conserto de Parte 2 havia removido — inclusive o checkpoint. |
+| [15](../AULA-15-small-to-big.md) | **10**/12 | "chamada de LLM por consulta" — é por nó recuperado; coincide no script porque `similarity_top_k=1`. |
+| [16](../AULA-16-hierarquia-e-raptor.md) | **12**/12 | — |
+| [17](../AULA-17-reranking.md) | **11**/12 | Excesso meu de um adjetivo ("não normalizada") que o hedge não cobria; exercícios pressupondo `k` ajustável em arquivo sem retriever. |
+| [18](../AULA-18-compressao-crag.md) | **12**/12 | Nada resistiu à checagem adversarial. O hedge do CRAG-vs-Self-RAG estava certo — e é o que a AULA-21 tentou "corrigir". |
+| [19](../AULA-19-modelo-e-prompt-engineering.md) | **11**/12 | Um `grep` citado como exaustivo que também acerta comentário de `.env.example`. |
+| [20](../AULA-20-saida-estruturada.md) | **8**/12 | Limite declarado que deixou de ser limite: a resposta está em `llama_index.core.response_synthesizers.factory`. |
+| [21](../AULA-21-self-rag.md) | **8**/12 | Abre "corrigindo" a AULA-18, cuja frase já fazia a distinção — a citação em bloco corta antes da ressalva. Exercício 6 devolve rótulo ausente do mapa de arestas. |
+| [22](../AULA-22-avaliacao.md) | **6**/12 | Resíduo da minha edição: pede "a resposta esperada" onde a AULA-01 pede a localização, e se desmente cinco linhas depois. Exercício 9 impede o arquivo de compilar. |
+| [23](../AULA-23-graphrag.md) | **5**/12 | Proveniência **fabricada**: "é como as citações desta aula foram conferidas" — a receita com `zlib` não recupera nenhuma frase de duas palavras. "Sem schema prévio" é contradito pelo Apêndice E.1. |
+| [24](../AULA-24-contextual-retrieval.md) | **5**/12 | CRÍTICO: `top_k` iguala o corpus, então `hit_rate` é 1,0 por construção nos seis retrievers. E os dois BM25 recebem listas byte-idênticas. |
+| [25](../AULA-25-modular-rag.md) | **5**/12 | Raiz da cadeia que contaminou a AULA-26: "o curso viu só roteamento de prompt", quando a AULA-14 mostra `datasource`. Proveniência fabricada, como na 23. |
+| [26](../AULA-26-agentic-adaptive-rag.md) | **5**/12 | Herdou o erro da 25. "O único caminho de correção é o `retry`" — há um segundo, que reverte a decisão do roteador sem registro. `COHERE_API_KEY` exigida e nunca usada. |
+| [27](../AULA-27-multimodal-rag.md) | **4**/12 | CRÍTICO: `mem_limit` é **teto** imposto, lido como requisito declarado em quatro lugares, inclusive no checkpoint. Exercício 6 estoura em `PermissionError`. |
+| [28](../AULA-28-projeto-final.md) | **6**/12 | Resíduo meu: "três condições" seguidas de quatro itens, por inserir a etapa 0 sem tocar no cabeçalho. Atribui normalização a `COSINE` a um dos cinco arquivos que declaram `L2`. |
+
+**Total: 234/348 = 67.2%**
+
+### Gates
+
+- **Aulas abaixo de 50%** (nota < 6): 8 — 00, 08, 09, 23, 24, 25, 26, 27.
+  Esse gate sozinho reprova "Publicável com ressalvas", que exige **nenhuma** aula abaixo de 50%.
+- Percentual na faixa 70-84% exigida: **não**.
+
+**Classificação: Requer revisão.** Por gate e por percentual, independentemente.
+
+### O que a rodada mostrou
+
+A R4 fechou em 231/348 = 66,4%. A R6 fecha em 234/348 = 67.2%. Duas rodadas
+separadas por uma rodada de consertos e um instrumento mais forte, e o resultado é o mesmo dentro
+de um ponto. A leitura honesta não é "o curso não melhorou": é que **o instrumento melhorou na
+mesma proporção**. Os consertos da R5 subiram as oito piores de 25/96 para 77/96, e a R6, com
+auditores que executam e abrem a fonte da biblioteca, encontrou nas 21 restantes defeitos que
+cinco rodadas não viam.
+
+O efeito é visível na distribuição, não na média. **Os pisos subiram** — 07 (3→10), 11 (1→8),
+16 (7→12). **Os tetos caíram** — 06 (11→9), 08 (11→5), 12 (11→7), 03 (11→9). E a Fase 9 inteira
+(23 a 28) ficou entre 4 e 6, porque é onde as aulas mais dependem de paper e de comportamento de
+biblioteca, e é exatamente aí que ler a fonte muda o veredito.
+
+### Padrão dominante: o defeito autoinfligido
+
+Dos achados de severidade alta ou crítica desta rodada, uma parte grande é de **consertos meus de
+rodadas anteriores**, em três formas que se repetem:
+
+- **Corrigi no ponto citado e não greppei os irmãos.** A AULA-14 dizia em três outras passagens o
+  que a Parte 2 havia deixado de dizer, inclusive no checkpoint. A AULA-24 tem nota de rodapé
+  cuja frase final nega o conserto que a nota acabou de fazer.
+- **Proveniência fabricada dentro de ressalva honesta.** "Não rodei porque exige `unstructured`"
+  (AULA-07) e "é como as citações desta aula foram conferidas" (AULAS 23 e 25). A ressalva é
+  verdadeira; a razão dada, não. É a classe que mais escapa, porque a forma parece honesta.
+- **Meia correção.** Acrescentei termo ao Vocabulário sem criar a entrada no glossário; citei
+  caminho de arquivo de biblioteca — **cinco vezes**, e a regra já estava escrita antes da
+  segunda. Os dois foram pegos pelos verificadores mecânicos, não por leitura.
+
+A conclusão de método: **verificador mecânico pega o que releitura não pega**, e o inverso também
+vale. Os dois defeitos que sobraram depois de aplicar os 69 consertos desta rodada foram achados
+pelos scripts, em segundos, depois de eu ter lido cada edição.

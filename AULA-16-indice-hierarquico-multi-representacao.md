@@ -121,7 +121,7 @@ from llama_index.core.schema import IndexNode, Document
 from llama_index.core.retrievers import RecursiveRetriever
 ```
 
-O `IndexNode` é o mecanismo: é um nó que **aponta para outro índice** em vez de conter texto final.
+O `IndexNode` é o mecanismo: é um nó que **aponta para outro índice** em vez de ser o texto final entregue (ele **herda** de `TextNode`, então carrega texto — o resumo que a busca de nível 1 usa).
 O `RecursiveRetriever` segue esses apontamentos — recupera no nível de cima, encontra um
 `IndexNode`, e desce recursivamente ao índice que ele referencia.
 

@@ -74,8 +74,8 @@ papel que nenhum outro cumpre: **é contra ele que você mede o recall dos demai
 você não sabe se seu HNSW está em 0,92 ou 0,99 — e essa diferença é a informação mais
 importante de um sistema de recuperação.
 
-Além disso, em acervo pequeno FLAT é mais rápido na prática: não há overhead de navegação e a
-varredura cabe em cache. É por isso que `00-SimpleRAG/05_RAG_from_Scratch_Ollama.py:30` usa
+Além disso, em acervo pequeno FLAT tende a ser mais rápido na prática: não há overhead de navegação,
+e a varredura de poucos vetores provavelmente cabe em cache — plausível, e não medido aqui. É por isso que `00-SimpleRAG/05_RAG_from_Scratch_Ollama.py:30` usa
 `faiss.IndexFlatL2` para nove documentos — ANN ali seria absurdo.
 
 ### IVF_FLAT — particionar o espaço
@@ -131,13 +131,15 @@ as de baixo são densas e refinam localmente. A busca desce as camadas aproximan
 `M` e `efConstruction` definem a qualidade do grafo — e o custo de construí-lo. `ef` é o botão
 de operação: subir `ef` aumenta recall e latência, sem reconstruir nada.
 
-HNSW costuma ter o melhor equilíbrio recall/latência, e por isso é o default de muitos
-sistemas. O que ele cobra:
+HNSW costuma ter o melhor equilíbrio recall/latência, e é o default de muitos sistemas — **doutrina
+corrente de ANN, não algo que este repositório meça:** nenhum dos cinco arquivos de `02-Indexes/`
+compara índices entre si. O que ele cobra:
 
 - **memória** — as listas de adjacência do grafo ocupam espaço além dos vetores;
 - **tempo de construção** — bem maior que inserção em FLAT ou IVF;
 - **remoção e atualização** — grafos HNSW tipicamente marcam como excluído (_tombstone_) em vez
-  de remover de fato, e degradam com muita rotatividade;
+  de remover de fato, e degradam com muita rotatividade (também doutrina geral: nenhum arquivo do
+  módulo exercita remoção ou rotatividade);
 - **filtro escalar restritivo** — o grafo foi construído sem conhecer o filtro; se poucos nós
   sobrevivem, pode não haver caminho entre eles e a navegação degrada.
 

@@ -10,9 +10,24 @@ Vinte e uma aulas produziram decisões: `chunk_size`, `k`, índice, métrica de 
 compressão, prompt, schema, três graders. Cada uma foi apresentada como um trade-off — e nenhuma foi
 **medida**.
 
-Três aulas anteriores terminaram na mesma dívida. A Aula 19 pediu para guardar a taxa de acerto do
-roteador "para a Aula 22". A Aula 21 pediu para medir a qualidade dos próprios juízes. A Aula 15
-prometeu que aqui se veria se a janela de sentenças está ajudando. É hoje.
+Dez aulas anteriores adiaram a medição para cá; quatro deixaram tarefa explícita. A Aula 01 mandou
+escrever cinco perguntas sobre um acervo seu, anotando **onde** no acervo está a resposta de cada
+uma, e disse que aquilo viraria seu conjunto de avaliação — é agora que vira. A Aula 15 prometeu que
+aqui se veria se a janela de sentenças está ajudando. A Aula 21 pediu para medir a qualidade dos
+próprios juízes — e o que esta aula entrega é um teste de **sensibilidade** ao juiz (o primeiro
+item de "Quebre de propósito"), não a calibração contra rótulo humano, que fica para o projeto
+final. A Aula 19 pediu para guardar a taxa de acerto do roteador "para a Aula 22": essa é acurácia
+de classificação — `intent == scenario` sobre N perguntas rotuladas, com a matriz de confusão ao
+lado, porque a média esconde qual rota erra —, e é a única das quatro dívidas que **esta aula não
+paga**. Fica registrada como tal em vez de prometida.
+
+**Se você fez o exercício da Aula 01, pegue aquele documento agora** — e conte que falta um campo.
+As cinco perguntas com a **localização** da resposta já bastam para as métricas de recuperação desta
+aula: `hit rate@k` e `MRR` saem de comparar ids. Não bastam para o resto do capítulo. O
+`expected_output` do DeepEval, o `CorrectnessEvaluator` e o `SemanticSimilarityEvaluator` exigem a
+**resposta de referência** — o último levanta `ValueError("Must specify both response and
+reference")` sem ela —, e o documento da Aula 01 não a tem. Escreva as cinco à mão antes de seguir.
+Sem gabarito não há medição, só impressão.
 
 A pergunta prática é uma: **como você sabe que a mudança de ontem melhorou algo?** E as três
 subperguntas que decidem se a resposta é confiável:
@@ -33,7 +48,7 @@ Toda avaliação de RAG se reduz a três perguntas encadeadas, e cada uma isola 
 
 | Pergunta                                     | Nome usual                        | O que o resultado ruim acusa                  |
 | -------------------------------------------- | --------------------------------- | --------------------------------------------- |
-| O contexto recuperado serve para a pergunta? | **context relevance** / precision | recuperação — ou ingestão, antes dela         |
+| O contexto recuperado serve para a pergunta? | **context relevance** (sem gabarito) / **context precision** (com gabarito) | recuperação — ou ingestão, antes dela         |
 | A resposta se sustenta no contexto?          | **faithfulness** / groundedness   | geração inventando                            |
 | A resposta responde à pergunta?              | **answer relevancy**              | geração desviando, ou pergunta mal recuperada |
 
@@ -339,8 +354,15 @@ As duas estratégias são as da Aula 15 — janela de sentenças contra chunk di
     )
 ```
 
-Repare no `similarity_top_k=2` **nos dois**. É o que torna a comparação uma comparação: uma variável
-muda, o resto fica igual. Sem isso você não sabe se o ganho vem da janela ou do `k`.
+Repare no `similarity_top_k=2` **nos dois**. É o controle certo sobre o **número de itens**
+recuperados — e é o máximo que este desenho permite, não uma comparação limpa. Os dois índices
+guardam unidades diferentes: `base_nodes` sai de um `SentenceSplitter()` sem argumentos, isto é
+`chunk_size=1024` tokens; os nós de janela são sentenças isoladas, expandidas para no máximo sete
+pelo `MetadataReplacementPostProcessor`. Com `k=2` nos dois, o motor base entrega ao gerador cerca de
+dez vezes mais texto que o motor de janela. Isso é inerente ao small-to-big — mas é uma segunda
+variável, do gênero exato que esta aula ensina a caçar, e qualquer diferença de `faithfulness` entre
+as duas linhas da tabela pode ser volume de contexto, não mecanismo. O `k` igual é o controle
+disponível; o orçamento de tokens não está controlado, e isso precisa entrar na leitura do resultado.
 
 Quatro avaliadores, com o juiz fixado
 (`09-Evaluation/04-LlamaIndexEvaluation.py:125-128` e `09-Evaluation/04-LlamaIndexEvaluation.py:131-136`):
@@ -368,8 +390,14 @@ E o resultado sai como tabela comparativa
     )
 ```
 
-Duas linhas, quatro colunas. É o artefato que decide se a janela da Aula 15 valeu a complexidade que
-adicionou.
+Duas linhas, uma coluna de nome e quatro de métrica. É o artefato que decide se a janela da Aula 15
+valeu a complexidade que adicionou — e ele esconde duas coisas. Primeira: as quatro colunas não estão
+na mesma escala. `correctness` é 1 a 5, `semantic_similarity` é contínuo de 0 a 1, e `faithfulness` e
+`relevancy` são binários YES/NO agregados como proporção. Média entre elas não significa nada, e essa
+é a razão mais forte para o limiar **por métrica**. Segunda: o `get_results_df` calcula
+`np.array([r.score or 0.0 for r in ...]).mean()`, e o `CorrectnessEvaluator` devolve `score=None`
+quando não consegue ler a nota que o juiz escreveu. `None` vira **zero**, indistinguível de uma nota
+zero. Uma falha de parsing do juiz derruba a linha de uma das variantes, e nada na tabela avisa.
 
 ### O gabarito é sintético — e a geração está comentada
 
@@ -440,7 +468,12 @@ benchmark diferente — um conjunto de avaliação que muda não serve para comp
 
 **Dois imports mortos**, no mesmo espírito da regra 8 do protocolo de citação: `DatasetGenerator`
 (`09-Evaluation/04-LlamaIndexEvaluation.py:18`) e `PairwiseComparisonEvaluator` (`09-Evaluation/04-LlamaIndexEvaluation.py:19`) só aparecem
-em linhas comentadas (`09-Evaluation/04-LlamaIndexEvaluation.py:111` e `09-Evaluation/04-LlamaIndexEvaluation.py:129`). O segundo é uma pena: comparação pareada — mostrar ao juiz as
+em linhas comentadas (`09-Evaluation/04-LlamaIndexEvaluation.py:111` e `09-Evaluation/04-LlamaIndexEvaluation.py:129`). Anotação de versão
+antes de ressuscitá-los: `DatasetGenerator` e `QueryResponseDataset` — o segundo usado na linha 121 —
+estão marcados `@deprecated` no `llama-index-core`, "deprecated in favor of `RagDatasetGenerator`",
+tanto na geração 0.11 quanto na 0.14. E o `09-Evaluation/requirements.txt:4` traz `llama-index-core`
+**sem pin**, o oposto do cuidado que este mesmo módulo teve com o `ragas<0.3`. O import morto, quando
+ressuscitado, ressuscita numa API que a biblioteca já pediu para você abandonar. O segundo é uma pena: comparação pareada — mostrar ao juiz as
 duas respostas e perguntar qual é melhor — é frequentemente mais estável que pedir uma nota absoluta,
 e seria o método mais adequado para o A/B que o arquivo faz.
 
@@ -517,8 +550,10 @@ mais documentos ao store (`09-Evaluation/02-Trulens.py:27-32`) e uma segunda per
 relativo correto, decida de onde vai rodar o script para que a linha 121 também resolva, e execute.
 A tabela final responde à pergunta da Aula 15: a janela de sentenças ajuda neste corpus?
 
-**9. Gere o seu gabarito e compare com o versionado.** Descomente as linhas 111–118, adicione
-`random.seed(42)` antes da linha 109, e gere um dataset novo. Compare as perguntas geradas com as do
+**9. Gere o seu gabarito e compare com o versionado.** As linhas 111-118 não podem ser simplesmente
+descomentadas: a 117 é um `await` em nível de módulo, e o arquivo deixa de **compilar** antes de
+qualquer chamada. Descomente 111-116, mova as duas últimas para dentro de `main()`, que já é
+`async`, adicione `random.seed(42)` antes da linha 109 e gere um dataset novo. Compare as perguntas geradas com as do
 JSON existente. Depois pergunte-se quais dessas perguntas um usuário real faria.
 
 ---
@@ -591,8 +626,12 @@ fidelidade péssima passar às costas de uma similaridade semântica ótima. É 
 rubrica de avaliação do agente deste projeto tem portas eliminatórias por capítulo.
 
 **Caminho absoluto no repositório.** `09-Evaluation/04-LlamaIndexEvaluation.py:47` é um dos **dois**
-caminhos absolutos ativos do repositório — o outro é
+caminhos absolutos em arquivos `.py` — o outro é
 `03-Embedding/05-MultimodalEmbedding.py:20`, que aponta um `.pth` sob `/root/AI-BOX/code/rag/rag-in-action/`.
+Nos notebooks o problema é maior: quatro `.ipynb` trazem catorze linhas de código com caminho
+absoluto, inclusive `06-Indexing/01-FromSmallChunksToLargeContext/01-NodeSentenceSlidingWindow-EvalVersion.ipynb`,
+que repete **o mesmo** caminho do `04` deste módulo — é o gêmeo em notebook do A/B da Parte 4, com o
+mesmo defeito, e a restrição a `.py` que a Parte 5 declarou não vale para esta frase.
 Os dois trazem o nome antigo do projeto (`rag-in-action`) e cada um basta para o arquivo não rodar em
 nenhuma outra máquina. Antes de concluir que um exemplo está errado, confira se ele está apenas
 apontando para o lugar errado.
@@ -626,7 +665,7 @@ Responda sem consultar:
 `ground truth` · `context precision` · `context recall` · `faithfulness` · `groundedness` ·
 `answer relevancy` · `context relevance` · `RAG triad` · `LLM-as-a-judge` · `judge model` ·
 `synthetic evaluation dataset` · `instrumentation / tracing` · `pairwise comparison` ·
-`semantic similarity` · `evaluation gate`
+`semantic similarity` · `evaluation gate` · `hit rate` · `MRR`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

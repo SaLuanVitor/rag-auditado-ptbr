@@ -4,7 +4,7 @@
 
 ---
 
-> **Nota de estrutura.** As vinte e oito aulas anteriores (00 a 27) seguiram oito seções fixas, porque todas
+> **Nota de estrutura.** As vinte e oito aulas anteriores (00 a 27) seguiram oito seções fixas — com duas exceções: a Aula 01, que não tem *Quebre de propósito* nem *Armadilhas de produção*, e a Aula 03, que não tem *Mão na massa* —, porque todas
 > liam um módulo. Esta não lê nada: ela devolve o curso a você. As seções são outras, e a mudança é
 > deliberada — anunciá-la é mais honesto que forçar o formato.
 
@@ -20,8 +20,14 @@ padrão", "testei e pareceu bom". Nenhuma sobrevive a uma segunda pergunta.
 Este curso teve um objetivo que só agora fica explícito: torná-lo capaz de responder **por que cada
 peça do seu sistema está do jeito que está** — e de mostrar o número que sustenta a resposta.
 
-Um RAG **defendido** é um que satisfaz três condições:
+Um RAG **defendido** é um que satisfaz quatro condições — a primeira é pré-requisito das outras três:
 
+0. **O acervo e as perguntas são seus.** Se você fez o exercício da Aula 01 — cinco perguntas sobre
+   um acervo real, com a localização da resposta de cada uma —, aquele documento é o **núcleo**
+   deste projeto: a Etapa 1 o expande para as 20 a 50 perguntas que a Parte 2 exige, porque cinco é
+   amostra pequena para veredito grande — a própria Parte 2 usa como advertência-mor um exemplo que
+   declarou vencedor com diferença de 0,0861 em três perguntas. Se não fez, faça primeiro: o resto do
+   roteiro pressupõe que você saiba o que o sistema precisa acertar.
 1. Cada decisão foi **tomada**, não herdada de um exemplo.
 2. Existe um **conjunto de avaliação**, e o número dele foi reportado com a sua incerteza.
 3. Você sabe **onde o sistema falha** e o que custaria consertar.
@@ -103,8 +109,8 @@ recuperação.
 | Modelo de embedding                                              | trocar de modelo sem reindexar; modelo no idioma errado; custo de embutir por API (Aula 08)         |
 | Denso, esparso ou os dois                                        | esparso mal tokenizado; ColBERT e armazenamento (Aula 08)                                           |
 
-Duas armadilhas se repetem nas Aulas 02, 07, 08 e 10 porque são, **julgamento**, as mais caras: **trocar de modelo
-exige reindexar** e **modelo no idioma errado**. O segundo não é um caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
+Duas armadilhas se repetem nas Aulas 02, 03 e 08 porque são, **julgamento**, as mais caras: **trocar de modelo
+exige reindexar** (Aulas 02 e 08) e **modelo no idioma errado** (Aulas 03 e 08). As Aulas 07 e 10 trazem as variantes vizinhas — rechunkar exige reindexar, trocar de índice exige reconstruir. O segundo não é um caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
 **27 arquivos**, em sete módulos (`00-SimpleRAG` com 11, `06-Indexing` com 7, `05-PreRetrieval` com
 5, e um cada em `02-DocChunking`, `04-VectorDB`, `07-PostRetrieval` e `10-AdvanceRAG`) — modelos com
 sufixo `-zh` sobre corpus em inglês. É resíduo sistemático da origem, não descuido pontual.
@@ -119,9 +125,12 @@ sufixo `-zh` sobre corpus em inglês. É resíduo sistemático da origem, não d
 | Métrica de distância                                 | métrica incompatível com o modelo — a armadilha citada nas Aulas 02 e 10                             |
 | Híbrido e a fusão (RRF ou ponderada)                 | duas manutenções; latência somada; pesos escolhidos por intuição (Aula 11)                           |
 
-A Aula 10 mostrou os cinco tipos de índice declarando `metric_type="L2"` e um deles normalizando os
-vetores de consulta **apenas** quando a métrica é `COSINE` — o detalhe que liga a Fase 3 de volta à
-Aula 02.
+A Aula 10 mostrou os cinco índices de `02-Indexes/` declarando `metric_type="L2"`, e um **sexto**
+arquivo — `04-VectorDB/Milvus/03-SearchAndMetrics/02-ann-diff-metrics.py` — construindo uma
+collection por métrica (`metric_types = ["L2", "IP", "COSINE"]`) e normalizando os vetores de
+consulta **apenas** quando a métrica é `COSINE` (linhas 83 e 106). É o detalhe que liga a Fase 3 de
+volta à Aula 02 — e note que não podia estar nos cinco: arquivo que declara `L2` não tem ramo
+`COSINE` para normalizar.
 
 ### Fase 4 — Pré-recuperação
 
@@ -304,9 +313,11 @@ E vale para o seu próprio código, que é onde o hábito realmente paga.
 
 ## Parte 4 — O freio, se o seu sistema tiver ciclo
 
-Um requisito, não uma sugestão. O curso encontrou quatro grafos **com aresta condicional** no repositório (`grep -rl "StateGraph("`
-devolve seis arquivos; os dois de fora são os `00-SimpleRAG/04_LangGraph_RAG*.py`, lineares e sem
-condicional):
+Um requisito, não uma sugestão. O curso encontrou quatro grafos **com aresta condicional** no repositório (`grep -rl "StateGraph("
+--include=*.py` devolve seis arquivos; os dois de fora são os `00-SimpleRAG/04_LangGraph_RAG*.py`,
+lineares e sem condicional. **Sem** o `--include` são sete, porque entra o
+`00-SimpleRAG/04_LangGraph_RAG.ipynb` — e o filtro precisa estar na citação, já que é dele que o
+número depende):
 
 | Grafo                 | Ciclos                               | Contador      |
 | --------------------- | ------------------------------------ | ------------- |

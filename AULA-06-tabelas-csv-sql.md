@@ -93,8 +93,8 @@ Três arquivos, e a progressão é de infraestrutura para uso:
 Os dois testes de conexão existem porque a maior parte do tempo perdido aqui não é RAG — é
 driver, credencial e rede. Rodá-los antes economiza depuração no lugar errado.
 
-O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (as linhas 3 a 6 são as
-instruções de criação e uso do banco, antes do `CREATE TABLE`):
+O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (as linhas 3 a 5 são
+as instruções de criação e uso do banco; a 6 é o cabeçalho que anuncia a tabela):
 
 ```sql
 CREATE TABLE game_scenes (
@@ -136,12 +136,16 @@ tables = camelot.read_pdf(pdf_path, pages="all")
 ```
 
 Especializado em tabelas e só nisso. Devolve objetos com `.df` (DataFrame do pandas), o que
-significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7),
-sinal de que o autor mede duração — camelot é lento.
+significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7) e cronometra a
+própria execução — sinal de que a duração incomodou quem escreveu. **Não é medição:** nenhum número
+de tempo aparece no repositório nem nesta aula, e é justamente isso que o exercício 4 do "Quebre de
+propósito" manda você produzir. Trate como hipótese até cronometrar.
 
-Exige dependências de sistema (Ghostscript), e é por isso que
-`91-Environment/requirements_camelot_20250413.txt` existe separado: instalar camelot junto do
-resto costuma quebrar o ambiente.
+Exige dependências de sistema (Ghostscript) — e existe um
+`91-Environment/requirements_camelot_20250413.txt` separado. **A razão do isolamento não está
+documentada no repositório;** a dependência de Ghostscript é a explicação provável, mas o mesmo
+diretório isola o `marker` num arquivo próprio sem que haja instabilidade envolvida, então a
+convenção pode ser só "uma biblioteca pesada por arquivo".
 
 ### `pdfplumber`
 
@@ -252,8 +256,9 @@ sem os nomes das colunas. Pergunte por um número. A resposta será errada ou au
 demonstração mais direta, na minha leitura, de por que representação importa mais que extração.
 
 **2. Rode `05-02` com e sem contexto.** Ative `strategy="hi_res"` na linha 20 e compare com a
-versão default. Depois compare o resultado do `05-02` com o do `05-01`: o texto ao redor muda o
-que você conseguiria responder?
+versão default. Depois compare o resultado do `05-02` com o do `05-01`. O `05-02` não responde nada — ele
+**imprime** os nós vizinhos da tabela; leia o que saiu e julgue se aquele entorno bastaria para
+responder uma pergunta sobre a tabela.
 
 **3. Pergunte um valor exato ao pipeline vetorial.** Use `04-02` e peça um número que exija
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que

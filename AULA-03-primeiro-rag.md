@@ -55,8 +55,9 @@ python 01_01_LlamaIndex_5LineCode.py
 
 ### O que está escondido nessas linhas
 
-Cada linha esconde decisões que os próximos oito módulos do curso vão abrir uma a
-uma:
+Cada linha esconde decisões que as próximas **nove aulas** vão abrir uma a uma — em seis módulos do
+repositório (`01-DataLoading`, `02-DocChunking`, `03-Embedding`, `04-VectorDB`, `07-PostRetrieval`,
+`08-Generation`):
 
 | Linha                        | Decisões implícitas                               | Aula que abre |
 | ---------------------------- | ------------------------------------------------- | ------------- |
@@ -67,8 +68,10 @@ uma:
 | `as_query_engine()`          | top-k, se há reranking, template de prompt        | 17, 19        |
 | `.query(...)`                | qual LLM, temperatura, como o contexto é montado  | 19            |
 
-Os padrões do LlamaIndex: chunk de 1024 tokens com 20 de sobreposição,
-`text-embedding-ada-002` da OpenAI, índice em memória, `top_k = 2`. Nenhum deles é
+Os padrões do LlamaIndex: chunk de 1024 tokens com 20 de sobreposição e `top_k = 2` — os três estão
+no módulo `llama_index.core.constants` (fora deste repositório), conferíveis — mais índice em memória e, **segundo a documentação
+do pacote de integração** (que não vem no `core`, então não confirmei aqui),
+`text-embedding-ada-002` da OpenAI. Nenhum deles é
 o certo para o seu caso. Todos são razoáveis para começar.
 
 **É por isso que "monta-se um RAG numa tarde".** E é por isso que ele funciona mal
@@ -89,8 +92,9 @@ decisões independentes:
 - `01_03_LlamaIndex_SwitchToOpenAICompatibleModel.py` — aponta para qualquer
   endpoint compatível com a API da OpenAI, via `CUSTOM_API_BASE_URL`.
 
-Rode `01_02` e observe: a primeira execução baixa o modelo do HuggingFace, e há
-uma pausa. Da segunda em diante, roda do cache local, sem rede e sem custo.
+Rode `01_02` duas vezes. O esperado — comportamento padrão do cache do `huggingface_hub`, não
+medição minha — é a primeira execução baixar o modelo, com pausa, e a segunda rodar do cache local,
+sem rede e sem custo.
 
 ### Duas ressalvas reais sobre este código
 

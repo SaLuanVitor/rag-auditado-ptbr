@@ -88,7 +88,8 @@ tempo (Aulas 23 a 27).
 | **Ingestão**        | ler PDF, HTML, CSV, imagem → texto + metadados | `01-DataLoading`             |
 | **Chunking**        | fatiar em pedaços recuperáveis                 | `02-DocChunking`             |
 | **Embedding**       | virar vetor                                    | `03-Embedding`               |
-| **Indexação**       | armazenar para busca rápida                    | `04-VectorDB`, `06-Indexing` |
+| **Indexação**       | armazenar para busca rápida                    | `04-VectorDB`                |
+| **Otimização de índice** | indexar de outra forma para recuperar melhor | `06-Indexing`           |
 | **Pré-recuperação** | tratar a query antes de buscar                 | `05-PreRetrieval`            |
 | **Recuperação**     | buscar top-k                                   | `04-VectorDB`                |
 | **Pós-recuperação** | reordenar, comprimir, corrigir                 | `07-PostRetrieval`           |
@@ -163,7 +164,7 @@ Ser especialista inclui recusar a ferramenta:
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
 
 ¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que
-vem antes) opõe Text2SQL a "RAG" como coisas distintas, usando "RAG" no sentido estrito de _busca
+vem antes) usa "RAG" no sentido estrito de _busca
 vetorial sobre prosa_. A Aula 12 (que vem depois) argumenta que Text2SQL bem feito **é** RAG, porque
 o que se recupera vem de fora do modelo e entra no contexto. O `GLOSSARIO.md` não decide entre as
 duas: a entrada `Query construction` registra a tese da Aula 12 **como tese** e a leitura estrita da

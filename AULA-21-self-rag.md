@@ -6,10 +6,14 @@
 
 ## Pergunta motivadora
 
-A Aula 18 fechou com uma frase que agora precisa ser cobrada:
+A Aula 18 deixou uma promessa que agora precisa ser paga. Ela está na linha 217 daquela aula, e a
+ressalva é parte da frase:
 
 > A diferença entre CRAG e Self-RAG, em uma linha: **CRAG critica o que foi recuperado; Self-RAG
-> critica também a própria resposta e decide se precisa recuperar.**
+> critica também a própria resposta e decide se precisa recuperar.** Essa é a diferença **entre os
+> dois papers**; a Aula 21 vai abrir a implementação do repositório e mostrar que ela recupera
+> sempre, sem decidir nada — leia esta frase como descrição da técnica, não do código que vem a
+> seguir.
 
 Três coisas, então: criticar o material, criticar a resposta, decidir se recupera. Esta aula abre o
 único script do diretório para ver quais das três estão implementadas — e a resposta é duas.
@@ -96,6 +100,19 @@ Isso é o grau 4 da aula anterior aplicado a **julgamento**: o valor precisa cab
 roteamento do grafo vai ler esse campo. Se a saída fosse texto livre, cada `if` do grafo seria um
 parser frágil.
 
+> ⚠️ **Mas é grau 4a, e a Aula 20 obriga a ressalva.** Os três modelos declaram `binary_score: str`
+> (`Self-RAG-FullImplementation.py:44`, `:99`, `:126`) e põem o `'yes'`/`'no'` na `description`,
+> não no tipo — `grep -c "Literal"` no arquivo devolve **0**. O que a saída estruturada garante é que
+> **existe um campo string**; o **valor** não é garantido por nada. E o roteamento é igualdade exata,
+> em três pontos (`:243`, `:316`, `:322`), sem normalização: `"Yes"`, `"yes."` ou `"relevant"` caem
+> todos no `else`.
+>
+> O efeito é pior que aleatório, porque é **assimétrico**: o `else` significa "documento irrelevante"
+> e "resposta não sustentada". Um grader que responda com maiúscula esvazia `filtered_documents` e
+> empurra o grafo para o ciclo de reescrita — sem que nada tenha dado errado na recuperação. Com
+> `Literal["yes", "no"]` o desvio viraria exceção de validação, visível, em vez de decisão de
+> roteamento errada e silenciosa.
+
 O critério é deliberadamente generoso (`Self-RAG-FullImplementation.py:53-56`):
 
 ```python
@@ -149,9 +166,10 @@ workflow.add_edge(START, "retrieve")
 Toda pergunta passa pelo índice. Aquela pergunta que não precisa de conhecimento externo — o próprio
 paper usa esse caso como exemplo do desperdício que o `Retrieve` evita — é recuperada igual.
 
-Correção honesta do que esta trilha afirmou antes: a Aula 18 disse que o Self-RAG "decide se precisa
-recuperar". Isso é verdade **do paper**. Da implementação do repositório, não é: ela critica o
-material e critica a resposta, e recupera sempre.
+Promessa paga: a Aula 18 já avisou que aquela frase descreve **os dois papers**, não este código, e
+deixou a verificação para cá. Verificado — a implementação critica o material e critica a resposta, e
+recupera sempre (`Self-RAG-FullImplementation.py:344`). O "decide se precisa recuperar" é verdade do
+paper e não da implementação, exatamente como a Aula 18 antecipou.
 
 Duas anotações de leitura:
 
@@ -165,7 +183,9 @@ tem cinco; `GradeAnswer` tem dois.
 ```
 
 O arquivo importa `pydantic` diretamente (linha 36) e deixou a alternativa antiga desligada ao lado.
-É outro episódio da confusão pydantic v1/v2, de natureza diferente do que a Aula 20 achou.
+É vestígio de migração bem-feita, não confusão: o caminho novo está ativo e o deprecado ficou
+comentado ao lado. E não confunda com o achado da Aula 20, cujo ponto era o **oposto** deste — lá o
+`-v1` do nome de arquivo não tinha relação nenhuma com versão de biblioteca.
 
 ---
 
@@ -195,8 +215,9 @@ prompt autoriza a abstenção**, que foi o assunto central da Aula 19. Não vou 
 é `print(prompt.messages[0].prompt.template)` — leia antes de confiar.
 
 **2. `model_name=` aqui, `model=` nas outras quatro.** As cinco instanciações de `ChatOpenAI` estão
-nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. Ambas funcionam por
-compatibilidade, e a mistura no mesmo arquivo é o tipo de detalhe que a regra 9 do protocolo de
+nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam — `model_name` é
+apelido de `model` na classe —, e **não confirmei isso localmente**: `langchain_openai` não está
+neste ambiente nem em disco. A mistura no mesmo arquivo é o tipo de detalhe que a regra 9 do protocolo de
 citação existe para preservar: quem copia a linha errada e depois grepa por `model=` não encontra.
 
 **3. `format_docs` é definida e nunca usada.** As linhas `Self-RAG-FullImplementation.py:83-84` definem a função, e `grep -n
@@ -307,6 +328,11 @@ A segunda encadeia os dois juízos de geração — fundamentação primeiro, ut
 (`Self-RAG-FullImplementation.py:316-330`). A ordem importa e está certa: não faz sentido perguntar
 se uma resposta é útil antes de saber se ela é inventada.
 
+E aqui fecha o problema da deriva da pergunta, algumas seções acima: **o juiz de utilidade não
+salva, porque é juiz e parte.** Ele lê `state["question"]` (`Self-RAG-FullImplementation.py:306`) e a
+repassa ao `answer_grader` (`:320`) — na segunda volta do laço, a pergunta contra a qual ele mede
+**já é a reescrita**. A deriva é invisível justamente para o único componente que poderia flagrá-la.
+
 ### Os freios que não existem
 
 **Ciclo 1 — `generate` → `generate`.** A aresta `"not supported": "generate"`
@@ -404,7 +430,7 @@ A comparação que a Aula 18 prometeu, agora com os dois arquivos abertos:
 | Critica a resposta?     | não                                                                    | sim                                                                                                  |
 | Decide **se** recupera? | não                                                                    | não (`:344` é incondicional)                                                                         |
 | Plano B quando falha    | **busca na web** (`TavilySearchResults(k=3)`, `:191`)                  | reescreve a pergunta e busca no **mesmo** índice (`:354`)                                            |
-| Topologia               | acíclica — `generate → END` (`:457`)                                   | cíclica em dois pontos (`:359`, `:361`)                                                              |
+| Topologia               | acíclica — `generate → END` (`:457`)                                   | cíclica — três ciclos simples, fechados por `:354`, `:359` e `:361`                                                              |
 | Limite de iterações     | não se aplica                                                          | **ausente**                                                                                          |
 
 A leitura que fica: os dois compartilham metade da arquitetura, e cada um resolve o que o outro
@@ -446,11 +472,20 @@ cada volta — a deriva da Parte 3 fica visível.
 lado a lado. Depois guarde a pergunta original numa chave separada do `GraphState` (`Self-RAG-FullImplementation.py:171-183`) e
 passe **sempre a original** ao reescritor. Compare os dois comportamentos.
 
-**6. Coloque o freio que falta.** Adicione um contador ao `GraphState`, incremente-o em
-`transform_query` e em `generate`, e faça as duas funções de decisão (`Self-RAG-FullImplementation.py:271` e `Self-RAG-FullImplementation.py:295`) devolverem
-`"useful"` — ou um nó novo de desistência — quando o contador passar de, digamos, três. Esse é o
-exercício que considero mais importante da aula, e é o que separa o exemplo didático de algo que
-você deixaria
+**6. Coloque o freio que falta.** Adicione um contador ao `GraphState` e incremente-o em
+`transform_query` e em `generate`. Antes de escolher o que cada decisor devolve, **olhe o mapa de
+arestas dele** — os dois não compartilham vocabulário, e é isso que este exercício ensina:
+`decide_to_generate` (`Self-RAG-FullImplementation.py:271`) só pode devolver `"transform_query"` ou
+`"generate"` (`:349-352`), e `grade_generation_v_documents_and_question` (`:295`) só `"not
+supported"`, `"useful"` ou `"not useful"` (`:358-362`). Devolver `"useful"` do primeiro não desiste
+do laço: estoura no roteamento.
+
+Então: no decisor pós-geração, devolva `"useful"` quando o contador estourar — vai direto a `END`
+com a resposta que já existe. No decisor de documentos, `"generate"` não serve, porque com
+`filtered_documents` vazio você geraria sem contexto; ali o certo é **um nó novo de desistência**,
+registrado com `add_node` e acrescentado ao dicionário de arestas, devolvendo uma resposta com
+ressalva. Esse é o exercício que considero mais importante da aula, e é o que separa o exemplo
+didático de algo que você deixaria
 atendendo requisições.
 
 **7. Meça o custo.** Conte quantas chamadas de LLM uma pergunta consome no melhor caso (recupera,
@@ -472,8 +507,11 @@ avalie utilidade **antes** de fundamentação. Uma resposta inventada e útil pa
 demonstração de que a ordem dos juízes é arquitetura, não estilo.
 
 **3. Descarte o veredito.** Em `grade_documents` (`Self-RAG-FullImplementation.py:222-249`), aceite todos os documentos
-independentemente do `binary_score`. Você acabou de transformar o Self-RAG num RAG comum — e o custo
-das chamadas de grader continua sendo pago.
+independentemente do `binary_score`. Você desligou **um** dos três juízes, não os três: como
+`filtered_documents` nunca esvazia, a aresta `grade_documents → transform_query` (`:350`) fica morta
+— mas os juízes de fundamentação e de utilidade continuam decidindo em `:355-363`, e os ciclos 1 e 3
+continuam existindo. O que sobra não é um RAG comum: é um RAG com crítica só pós-geração. E o custo
+das chamadas do grader de relevância continua sendo pago sem influenciar nada.
 
 **4. Faça o ciclo 1 girar.** Mantenha `"not supported": "generate"` (`Self-RAG-FullImplementation.py:359`) e force o grader de
 alucinação a responder `no` sempre (troque o system prompt da linha 108 por uma instrução que sempre

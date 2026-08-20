@@ -27,9 +27,15 @@ Quatro respostas para o mesmo problema, três já vistas:
 | Técnica                       | Onde age    | O que é indexado                              |
 | ----------------------------- | ----------- | --------------------------------------------- |
 | `chunk_overlap` (Aula 07)     | chunking    | trecho com as bordas repetidas                |
-| Small-to-big (Aula 15)        | recuperação | a sentença; entrega-se a janela               |
+| Small-to-big (Aula 15)        | depende¹    | depende¹                                      |
 | Multi-representação (Aula 16) | indexação   | um resumo **ao lado** do texto                |
 | **Contextual Retrieval**      | indexação   | o chunk **reescrito** com o contexto embutido |
+
+¹ A família small-to-big se divide em três, e a Aula 15 faz a distinção (`AULA-15:46-54`): **janela
+deslizante e pai-filho são decididos na indexação** — indexa-se a sentença ou o chunk filho,
+entrega-se a janela ou o pai, e trocá-los obriga a reindexar. Só a **expansão para frente e para
+trás** é decidida na recuperação: indexa-se o nó e entregam-se os vizinhos, ajustável sem reindexar.
+Nas três, o que se indexa não é o que se entrega — é isso que dá nome à família.
 
 A diferença entre as duas últimas é sutil e decide o comportamento: na multi-representação o texto original permanece intacto e ganha um vizinho; aqui o texto que vai para o índice **passou por um LLM**.
 
@@ -54,7 +60,7 @@ A primeira mantém o texto original recuperável e auditável. A segunda produz 
 
 ## Parte 1 — O par, e o que o `diff` revelou
 
-Os dois arquivos têm o mesmo assunto e **nada em comum**: `diff -u` entre eles não encontra uma única linha compartilhada no início, e os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **980**, e é o único dos dois com shebang (`#!/usr/bin/env python` na linha 1) — o que **não**
+Os dois arquivos têm o mesmo assunto e **nada de substantivo em comum**: `diff -u | grep -c '^ '` devolve catorze linhas compartilhadas, e todas as catorze são estruturais — linhas em branco, `"""`, `)`, `}` e `if __name__ == "__main__":`. Nenhuma linha de lógica sobrevive ao diff. Os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **980**, e é o único dos dois com shebang (`#!/usr/bin/env python` na linha 1) — o que **não**
 quer dizer que seja executável: `git ls-tree HEAD` devolve modo `100644` para os dois, e o
 repositório inteiro não tem um único arquivo `100755`. O `ls -l` do Git Bash mostra `-rwxr-xr-x`
 aqui, mas isso é o MSYS inferindo o bit `x` da presença do shebang, não um bit versionado. (Os dois arquivos terminam sem newline final, então `wc -l` devolve 344 e 979 — um a menos em cada. A contagem certa é `awk 'END{print NR}'`, e a versão anterior desta aula trazia o 979 de `wc -l` ao lado do 345 de `awk`, misturando os dois métodos na mesma frase.)
@@ -141,7 +147,9 @@ Este é o defeito que invalida os números, e é independente do anterior. O dat
 
 A pergunta 1 é declarada relevante ao nó 1, a 2 ao nó 2, a 3 ao nó 3 — **por posição**. Nada verifica que o nó `i` responde à pergunta `i`. Se o `SentenceSplitter` produzir os chunks em outra ordem, ou se o texto mudar, o gabarito continua "válido" e passa a apontar para outro lugar.
 
-E `hit_rate` e `mrr` medem exatamente concordância com esse gabarito. Um retriever que traga o chunk **certo** para a pergunta 1 é penalizado se o chunk certo não for o primeiro da lista. A Aula 22 tinha um nome para isso: gabarito ruim reprova sistema bom, e é a falha mais cara de uma avaliação.
+Só que há um defeito **anterior** a esse, e ele é pior: o corpus tem exatamente três nós e `adjusted_top_k = min(similarity_top_k, len(nodes))` (linha 59) com `similarity_top_k=3` por padrão, então todo retriever devolve o corpus inteiro. O ensaio da linha 36 não chega a quatro chunks com `chunk_size=256`, e se produzir dois o `while` da linha 191 completa até três. O `hit_rate` do LlamaIndex é `any(id in expected_ids for id in retrieved_ids)` (`llama_index.core.evaluation.retrieval.metrics`, linha 70 da fonte da 0.11.17) — com o corpus inteiro no top-k ele vale **1,0 para todos os seis retrievers, sempre**, gabarito certo ou errado.
+
+Quem varia é só o `mrr`, porque só o MRR olha posição — e é o glossário deste curso que está certo, não a leitura intuitiva: `hit rate` é "algum relevante apareceu no top-k", `MRR` é o que "penaliza acerto que vem em posição ruim". Ou seja: o gabarito posicional corrompe o `mrr`; o `hit_rate` já não media nada antes dele. A comparação de seis retrievers não consegue distinguir nenhum par na métrica que a tabela imprime primeiro. A Aula 22 tinha um nome para o gabarito: gabarito ruim reprova sistema bom, e é a falha mais cara de uma avaliação. Aqui há uma anterior — a métrica que não pode discriminar.
 
 ### Três fabricações de dado, no mesmo arquivo
 
@@ -346,7 +354,7 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 **2. Faça a contextualização acontecer.** Ainda no arquivo LlamaIndex: use o `llm` da linha 32 e o `CONTEXT_PROMPT_TEMPLATE` da linha 45 para gerar o contexto de verdade. Note que o template só tem `{context_str}` — para contextualizar como manda a técnica, ele precisa receber também o documento. Rode a comparação antes e depois dessa mudança.
 
-**3. Conserte o gabarito.** Leia os três chunks que o `SentenceSplitter` produz e mapeie cada uma das três perguntas ao chunk que **de fato** a responde, à mão, em vez do mapeamento posicional das linhas 266-269. Rode. Compare os `hit_rate` do gabarito posicional com os do gabarito correto — a diferença é o tamanho do erro que a Aula 22 chamou de mais caro.
+**3. Conserte o gabarito — e descubra por que isso não muda o `hit_rate`.** Primeiro imprima `len(nodes)` (o script já o faz na linha 185) e o `adjusted_top_k` (linha 59). Se `top_k == len(nodes)`, todo retriever devolve o corpus inteiro e o `hit_rate` é 1,0 em qualquer gabarito — a diferença que você mediria é exatamente 0,00. Só então mapeie à mão cada pergunta ao chunk que **de fato** a responde, no lugar do mapeamento posicional das linhas 266-269, e compare os **`mrr`**: é essa a métrica que o gabarito ruim corrompe. Para o `hit_rate` voltar a discriminar, baixe o `similarity_top_k` para 1.
 
 **4. Veja o gabarito oficial que o script joga fora.** Antes de rodar o Milvus, execute apenas o `download_data()` e abra o `evaluation_set.jsonl` baixado. Leia três queries. Compare com as quatro que o `main` fabrica na linha 896. Guarde o arquivo com outro nome antes de rodar o script inteiro.
 
@@ -368,7 +376,7 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 **4. Rode sem a chave do Cohere.** No arquivo LlamaIndex, desligue `COHERE_API_KEY` e rode. O `except` da linha 225 deixa `cohere_rerank = None`, o pipeline segue, e a tabela final continua rotulando aquela linha como `"+ Reranker"`. Um experimento sem a variável que ele diz estar testando.
 
-**5. Force a fabricação de nós.** Reduza o texto do ensaio na linha 36 até produzir menos de 3 chunks. Os nós `"Sample text N"` entram no corpus (linhas 191-194) e passam a ser candidatos de recuperação. Veja um deles aparecer num resultado.
+**5. Descubra se a fabricação de nós já está ligada.** Rode e leia o `Created N nodes` da linha 185. O ensaio das linhas 36-42 tem cerca de 1.600 caracteres — perto de 400 tokens contra `chunk_size=256` —, então N é provavelmente 2, e o `while` da linha 191 já injetou `"Sample text 3: …"` no corpus sem você fazer nada. Como o top-k iguala o corpus, esse nó fabricado aparece em **todo** resultado de **toda** consulta. Confirme imprimindo os ids recuperados. Só se N já for 3 ou mais é que faz sentido reduzir o texto para forçar o caminho.
 
 **6. Aponte o gabarito para fora do dataset.** No Milvus, mantenha `dataset[:5]` e escreva um `evaluation_set.jsonl` cujas referências apontem para o sexto documento. Todas as queries serão puladas — e o `Pass@5` sairá **0,00%**, não "sem dados". Erro de configuração vestido de resultado.
 

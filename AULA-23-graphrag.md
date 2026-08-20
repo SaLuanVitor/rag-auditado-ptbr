@@ -55,8 +55,13 @@ Distinção que a palavra "grafo" esconde, e que este repositório permite ver l
 
 - **Consultar um grafo que já existe** — é a Aula 12, com Text2Cypher sobre Neo4j. O grafo foi
   modelado por alguém, com schema, e o LLM só escreve a consulta.
-- **Construir o grafo a partir do texto, com o LLM** — é o GraphRAG. Não há schema prévio: o modelo
-  lê os documentos e extrai entidades, relações e afirmações.
+- **Construir o grafo a partir do texto, com o LLM** — é o GraphRAG. Não há schema de banco de
+  grafos nem ontologia de relações: o modelo lê os documentos e extrai entidades, relações e
+  afirmações. Mas "sem schema" não é literal — o prompt de extração do Apêndice E.1 recebe uma
+  **lista fechada de tipos de entidade** (`entity type: One of the following types: [{entity
+  types}]`, exemplificada com `ORGANIZATION,PERSON`), e a §4.1 diz que essa lista e os exemplos
+  few-shot foram **ajustados ao domínio** de cada dataset. O que o GraphRAG dispensa é a modelagem
+  prévia das *relações*; os *tipos de nó* continuam sendo decisão humana antes da primeira chamada.
 
 O primeiro tem código no repositório. O segundo não tem, e é o assunto desta aula.
 
@@ -103,10 +108,14 @@ dois não têm implementação: `01-GraphRAG/` e `03-ModularRAG/` contêm apenas
 (`find` nos dois diretórios devolve só `.env.example` e o `.pdf`). Isso vale como aviso de
 planejamento para quem estuda por este repositório: a Aula 25 vai encontrar a mesma situação.
 
-Confirmação de que a ausência é real e não um arquivo fora de lugar: `grep -rln` por `networkx`,
-`graspologic`, `leiden` ou `from graphrag` em **todos** os `.py` do repositório não retorna nada. E o
-`10-AdvanceRAG/requirements.txt` não lista nenhuma biblioteca de grafo — as dependências são
-Weaviate, LangChain, LangGraph, Milvus, LlamaIndex e Tavily.
+Confirmação de que a ausência é real e não um arquivo fora de lugar: `grep -rlni` por `graspologic`,
+`leiden` ou `from graphrag` em **todo** o repositório — qualquer extensão — não retorna nada.
+`networkx` retorna, e o retorno é instrutivo: aparece pinado em `91-Environment/requirements_*.txt` e
+usado de fato em `05-PreRetrieval/02-QueryTranslation/03-QueryClarification-BuildQueryClarificationTree.ipynb`,
+o notebook da Aula 13 — só que para **desenhar** uma árvore de clarificação (`nx.spring_layout`,
+`nx.draw_networkx_nodes`), não para construir índice de grafo. Biblioteca de grafo no repositório
+existe; GraphRAG não. E o `10-AdvanceRAG/requirements.txt` não pede nenhuma biblioteca de grafo: são
+vinte linhas de Weaviate, LangChain/LangGraph, Milvus, LlamaIndex, Tavily, `openai` e utilitários.
 
 O único `.py` do repositório que fala com um banco de grafos é o par Text2Cypher da Aula 12 —
 `05-PreRetrieval/01-QueryConstruction/Text2Cypher/03-Text2Cypher-SNOMED-v2-Succeeded.py:2` importa
@@ -126,8 +135,9 @@ A figura 1 do paper resume a arquitetura, e a legenda nomeia as três peças do 
 > claims) that have been detected, extracted, and summarized by LLM prompts tailored to the domain of
 > the dataset."_
 
-Três coisas a extrair de cada chunk, então: **entidades**, **relações** e **afirmações**. Nada disso
-vem de um schema — vem de prompt, e o paper diz que o prompt é adaptado ao domínio do dataset.
+Três coisas a extrair de cada chunk, então: **entidades**, **relações** e **afirmações**. Isso vem de
+prompt, não de modelagem de grafo — mas o prompt carrega uma lista de tipos de entidade escolhida a
+mão (Apêndice E.1), e o paper diz que ela é adaptada ao domínio do dataset.
 Julgamento: essa é a primeira fonte de custo escondido, e a menos discutida. Um extrator de entidades
 por prompt precisa ser ajustado ao domínio, e ajustá-lo exige olhar a saída.
 
@@ -165,8 +175,13 @@ entidades mais proeminentes. É uma escolha razoável e tem um custo nomeável �
 que às vezes é justamente a resposta, é o primeiro a cair. É o mesmo trade-off da compressão na Aula
 18, aplicado na indexação em vez da consulta.
 
-Comunidades de nível mais alto se resumem a partir dos resumos das de baixo. O resumo nunca lê o
-corpus outra vez — lê o nível abaixo.
+Comunidades de nível mais alto têm uma regra própria, e a ordem de preferência importa. Se **todos os
+element summaries** da comunidade — nós, arestas e claims, o mesmo material do nível folha — couberem
+na janela, é isso que o LLM resume, exatamente como no nível folha. Só **quando não cabem** o paper
+ordena as subcomunidades por tokens de element summary, decrescente, e vai **substituindo** element
+summaries (longos) por resumos de subcomunidade (curtos) até caber. Então "níveis altos resumem os
+resumos de baixo" é o caso de sobrecarga, não a regra — e em nenhum dos dois casos o corpus é lido
+outra vez.
 
 ### Como a pergunta é respondida
 
@@ -211,9 +226,13 @@ E o paper diz, na mesma seção:
 > _"Our use of directness as a validity test confirmed that vector RAG produces the most direct
 > responses across all comparisons."_
 
-`directness` foi incluída como **teste de validade** — uma métrica em que se espera que o baseline
-ganhe, para confirmar que o juiz não está apenas premiando texto longo. E o vetor ganha em todas as
-comparações. Para pergunta local, direta, o RAG das vinte e duas aulas anteriores continua sendo a
+`directness` entra como o que o paper chama de **"control criterion"** (§3.3) e depois usa como
+*validity test* (§5.1). O critério declarado é ser _"a reference against which we can judge the
+soundness of results for the other criteria"_, e — porque _"directness is effectively in opposition
+to comprehensiveness and diversity"_ — a expectativa registrada é que **nenhum método vença nos
+quatro**. Que o vetor vença nele em todas as comparações é o resultado, não a hipótese.
+**Julgamento:** é o mesmo serviço que um controle negativo presta num experimento — se o GraphRAG
+tivesse vencido também aqui, a suspeita recairia sobre o juiz. Para pergunta local, direta, o RAG das vinte e duas aulas anteriores continua sendo a
 ferramenta certa. GraphRAG não substitui; ele cobre outra classe de pergunta.
 
 Em `empowerment` — quão bem a resposta ajuda o leitor a julgar por conta própria — o paper reporta
@@ -300,8 +319,12 @@ todo dia paga a indexação todo dia, e aí a conta inverte.
 ## Parte 4 — Como o paper mede, e por que isso interessa depois da Aula 22
 
 A Aula 22 terminou dizendo que o GraphRAG é difícil de avaliar porque o que ele faz melhor não é o
-que a tríade mede. O paper confirma isso pelo caminho mais direto: ele **não** usa faithfulness,
-context precision ou context recall. Usa quatro critérios próprios, e a razão está escrita:
+que a tríade mede. O paper confirma isso pelo caminho mais direto: ele **não** usa a tríade, e a §2.4
+diz por quê — _"Some of these criteria are generic to vector RAG systems and not relevant to global
+sensemaking, such as 'context relevance', 'faithfulness', and 'answer relevance' (RAGAS, Es et al.
+2023)."_ Métrica de recuperação não mede tarefa de sumarização. (`context precision` e `context
+recall` o paper não nomeia em lugar nenhum.) Usa quatro critérios próprios — e, dispensada a tríade,
+sobra o problema do gabarito, que a §3.3 resolve com comparação pareada:
 
 > _"Given the lack of gold standard answers to our activity-based sensemaking questions, we adopt the
 > head-to-head comparison approach using an LLM evaluator"_
@@ -381,9 +404,13 @@ igual, porque é o que você faria antes de adotar o método.
 **1. Leia o paper com a tabela na mão.** Comece pela figura 1 e pela Table 2. São as duas peças que
 sustentam a decisão de adotar ou não.
 
-**2. Extraia o texto do PDF.** O PDF cede texto com stdlib: descomprimir cada `stream` com `zlib` e
-coletar os literais entre parênteses. É como as citações desta aula foram conferidas, e serve para
-buscar termos no paper sem depender de leitor gráfico.
+**2. Extraia o texto do PDF.** Use `pdftotext "GraphRAG - 2404.16130v2.pdf" -`, que joga o texto em
+stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Foi assim que as citações
+desta aula foram conferidas. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
+literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
+isso; mas neste PDF ela **não serve para buscar frases**: os espaços entre palavras são
+posicionamento, não literal, então `mutually exclusive` e `RAG fails on global questions` não
+aparecem em nenhum dos dois modos de junção. Termo isolado (`graspologic`, `Traag`, `281`) ela acha.
 
 **3. Estime o seu custo de indexação.** Pegue o número do paper — 281 minutos para ~1 milhão de
 tokens com `gpt-4-turbo` — e escale para o seu corpus. Depois multiplique pela frequência com que ele
@@ -412,7 +439,11 @@ Sem código, esta seção muda de natureza: em vez de mudanças que degradam a e
 contrafactuais sobre o desenho — cada um isolando uma peça do método para ver o que ela sustenta.
 
 **1. Tire a hierarquia.** Suponha uma única partição, sem níveis. Você perde o `C0` — e com ele os
-2,6% de tokens que tornam a consulta repetida viável. O que sobra é `TS` com passos extras.
+2,6% de tokens que tornam a consulta repetida viável, que é o argumento de escala inteiro. O que
+sobra é o nível folha, e ele **não** é "`TS` com passos extras": pela Table 2 acima, ainda é 26-33%
+mais barato que `TS` e ainda ganha dele (64% de win rate em comprehensiveness nas Notícias,
+`p<.001`). Perder a hierarquia não devolve você ao `TS`; devolve você ao ganho pequeno, pagando quase
+o preço cheio. A hierarquia é o que compra a ordem de grandeza, não o ganho de qualidade.
 
 **2. Tire a exaustividade.** Suponha que as comunidades se sobreponham ou não cubram todos os nós. A
 resposta global passa a contar informação duas vezes ou a omitir parte do corpus, e **você não tem

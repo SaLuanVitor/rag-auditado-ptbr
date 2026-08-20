@@ -52,7 +52,7 @@ collection existe para hospedar os dois.
 ## Parte 1 — A infraestrutura
 
 O `04-VectorDB/Milvus/docker-compose.yml` sobe **três serviços**, e vale entender por quê. O
-caminho inteiro importa: existe outro `docker-compose.yml` no módulo `05-MultiModalRAG`, com
+caminho inteiro importa: existe outro `docker-compose.yml` em `10-AdvanceRAG/05-MultiModalRAG/`, com
 outro conteúdo e outro tamanho.
 
 | Serviço | Imagem                                                | Papel                               |
@@ -107,9 +107,15 @@ utilizável.
 
 Database em Milvus é isolamento lógico, como em Postgres. Serve para separar ambientes
 (dev/prod) ou inquilinos. A escolha entre isolar por database e isolar por partição é a decisão de
-desenho multi-tenant, retomada nas Armadilhas de produção desta própria aula — nenhuma aula posterior
-do curso **desenvolve** particionamento (a Aula 10 o cita de passagem, numa linha, como alternativa
-para filtro muito seletivo), e prometer o assunto à Aula 10 era promessa que ela não cumpre.
+desenho multi-tenant, retomada nas Armadilhas de produção desta própria aula.
+
+> ⚠️ **E aqui há uma lacuna do material que vale saber antes de rodar.** Nenhuma aula do curso
+> **explica** particionamento em prosa — a Aula 10 o cita de passagem, numa linha, como alternativa
+> para filtro muito seletivo. Mas o `02-collection.py`, que o "Mão na massa" desta aula manda
+> executar, roda cinco operações de partição nas linhas 87-128 (`list_partitions`,
+> `create_partition`, `has_partition`, `load_partitions`/`release_partitions`, `drop_partition`).
+> Você vai executar o recurso sem que ele tenha sido apresentado. Leia essas linhas com atenção: é
+> isolamento **dentro** de uma collection, o degrau mais fino que o `database` do começo desta aula.
 
 ### `02-collection.py` — o atalho
 
@@ -125,8 +131,9 @@ campo de id, um campo de vetor, e um índice default. Uma linha, e você tem ond
 
 `dimension=5` é valor de brinquedo, escolhido para os vetores caberem legíveis na tela. Em uso
 real seria 384, 768 ou 1536 — e **precisa bater exatamente com a saída do seu modelo de
-embedding**. Divergência aqui é erro na inserção, não degradação silenciosa; é das poucas
-falhas desta fase que aparecem na hora.
+embedding**. Divergência aqui **deve** dar erro na inserção, não degradação silenciosa — é das poucas falhas
+desta fase que aparecem na hora. _Previsão, não medição: `pymilvus` não está instalado neste
+ambiente e eu não executei._
 
 ### `03-schema.py` — o controle
 
@@ -237,7 +244,9 @@ na segunda.
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
 da lição, uma em cada database.
 
-Depois de `04`, use `client.query` ou o Milvus Attu (interface web) para conferir o que ficou. **E
+Depois de `04`, use `client.query` para conferir o que ficou. (O Milvus tem uma interface web, o
+Attu, mas **este repositório não a provisiona**: o `docker-compose.yml` sobe só `etcd`, `minio` e
+`standalone`, e `attu` não aparece em nenhum arquivo do repo. Subir o Attu é trabalho seu.) **E
 não espere dez entidades:** o script insere dez, faz `upsert` em duas (ids 0 e 1, virando
 `updated_pink_8682` e `updated_red_7025`) e depois **deleta a de id 0** — linhas 47 a 64. O estado
 final tem **nove**, ids 1 a 9. O arquivo faz o ciclo completo de escrita (inserir, atualizar,

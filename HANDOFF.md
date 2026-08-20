@@ -2,16 +2,28 @@
 
 **Data:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
-**Verificação:** `verify-citations --all` = **PASS** — 1668 OK, zero inválidas. `BAD_LINE`,
-`MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 16 `SKIPPED` (glob ou elipse) e
-10 `NO_ANCHOR`, ambos conferência à mão por desenho. **Vocabulário:** 254 termos das seções
+**Verificação:** `verify-citations --all` = **PASS** — 1753 OK, zero inválidas. `BAD_LINE`,
+`MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 19 `SKIPPED` (glob ou elipse) e
+12 `NO_ANCHOR`, ambos conferência à mão por desenho. **Vocabulário:** 267 termos das seções
 "Vocabulário" conferidos contra o `GLOSSARIO.md` — **0 faltando, 0 duplicados** (a checagem de
 duplicação nasceu de nove entradas dobradas que a de ausência não via)
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
 lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
 lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
-**Renota:** ✅ **QUATRO rodadas completas, 29 de 29 cada.** Curso em **231/348 = 66,4%** (R4, a
-medição válida). Histórico: R2 = 254/348 = 73,0%; R3 = 245/348 = 70,4%; **R4 = 231/348 = 66,4%**
+**Renota:** ✅ **CINCO rodadas completas, 29 de 29 cada.** Curso em **234/348 = 67,2%** (R6, a
+medição válida e a mais recente). Histórico: R2 = 254/348 = 73,0%; R3 = 245/348 = 70,4%;
+R4 = 231/348 = 66,4%; R5 = parcial, só as oito abaixo de 50%; **R6 = 234/348 = 67,2%**
+**A R6 é a nota a citar.** Ela é a primeira homogênea desde a R4: mesmo briefing nas 29, com duas
+mudanças de instrumento — ler fonte de biblioteca passou a ser **autorizado** (o contrato antigo
+confundia *ler* com *instalar*), e as nove classes de defeito viraram lista a percorrer em vez de
+critério de cada auditor
+**⚠️ R4 e R6 empatam dentro de um ponto, e isso é o achado.** Entre elas houve uma rodada de
+consertos que subiu as oito piores de 25/96 para 77/96, e ainda assim a média do curso não se moveu.
+A leitura honesta não é "o curso não melhorou": é que **o instrumento melhorou na mesma proporção**.
+O efeito aparece na distribuição, não na média — os **pisos subiram** (07: 3→10, 11: 1→8, 16: 7→12) e
+os **tetos caíram** (06: 11→9, 08: 11→5, 12: 11→7, 03: 11→9). E a Fase 9 inteira (23 a 28) ficou
+entre 4 e 6, porque é onde as aulas mais dependem de paper e de comportamento de biblioteca — e é
+exatamente aí que ler a fonte muda o veredito
 **⚠️ TERCEIRA queda consecutiva, e não é o material piorando — é o instrumento afundando.** A R4
 recebeu 77 correções antes de medir e a nota desceu 14 pontos. Δ médio **−0,48**; 12 subiram, 13
 caíram, 4 empataram. Duas evidências de que a causa é o instrumento: **(1)** ordenei os lotes 3, 4 e
@@ -28,9 +40,16 @@ correções entre as duas rodadas e desceu para 70,4% — Δ médio **−0,31**,
 empataram. Não é contradição: **a R2 media menos.** Nas quatro aulas com dois auditores, em **4 de 4**
 o de orçamento dobrado deu nota menor e achou defeito verificável que o outro perdeu. Trate as notas
 das rodadas 1 e 2 como piso otimista, não como medida
-**Classificação:** **Requer revisão** — quatro rodadas convergindo no mesmo rótulo. Na R4 os 66,4%
-ficam **abaixo do piso de 70%** de "Publicável com ressalvas", então o percentual já decide sozinho,
-sem precisar das portas eliminatórias. Para registro: **oito aulas abaixo de 50%** — 09 (0), 11 (1),
+**Classificação:** **Requer revisão** — cinco rodadas completas convergindo no mesmo rótulo. Na R6 os
+67,2% ficam **abaixo do piso de 70%** de "Publicável com ressalvas", e o gate eliminatório reprova
+independentemente: **oito aulas abaixo de 50%** — 27 (4), 00 (5), 08 (5), 09 (5), 23 (5), 24 (5),
+25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
+**⚠️ São oito outras aulas, não as mesmas oito.** As oito da R4 (09, 11, 07, 17, 00, 14, 01, 15)
+foram consertadas e renotadas na R5, e sete delas saíram da lista. A 00 é a única que reincide — e
+reincide por um defeito que **eu** escrevi na R6, numa instrução de instalação, na aula que o leitor
+executa antes de qualquer outra. Consertar as oito piores não conserta o curso: revela as oito
+seguintes.
+Para registro histórico da R4: **oito aulas abaixo de 50%** eram 09 (0), 11 (1),
 07 (3), 17 (3), 00 (4), 14 (4), 01 (5), 15 (5). **Lacuna do registro:** para as 12 aulas dos lotes 1
 e 2 da R4 anotei só o total, não as seis dimensões, então a contagem de `−1` da R4 **não está
 estabelecida** (são 8 nas 17 com dimensão registrada). Não muda a classificação; muda o que se pode
@@ -39,8 +58,18 @@ afirmar. Quem retomar: registre as seis dimensões de toda nota, sempre
 de seções, cada um com a contagem esperada declarada. **28 defeitos, e 12 deles ALTO** — o padrão é um
 só: a entrada apagava a ressalva da aula. Um CRÍTICO: a entrada `Sliding window` contradizia a
 `Small-to-big` **duas linhas abaixo**. Cinco defeitos eram de entradas que eu inserira na quarta
-rodada. Detalhe na seção "Auditoria do GLOSSARIO.md" do GATE. Agora com **175 entradas**, 267 termos
+rodada. Detalhe na seção "Auditoria do GLOSSARIO.md" do GATE. Agora com **177 entradas**, 267 termos
 de vocabulário conferidos, 0 faltando e 0 duplicados
+**⚠️ E a auditoria entrada-por-entrada não esgotou o glossário.** A R6 encontrou mais nove entradas
+defeituosas, todas da mesma forma — a entrada endurece o que a aula ressalva: `Flow pattern` ("são
+quatro" quando o paper diz quatro no abstract, seis nas contribuições e tem cinco subseções),
+`Graph index` ("sem schema prévio", contradito pelo Apêndice E.1), `Community summary` (afirmava como
+regra o que é fallback condicional), `Claim / covariate` (schema que é da biblioteca, não do paper),
+`GraphRAG` (creditava ao grafo o que vem de ser global), `Multimodal embedding` (fechava em duas
+modalidades, e a Aula 27 existe para romper isso), `MRR`/`Hit rate` (a AULA-24 contradizia as duas
+entradas, que estavam certas) e `context relevance`/`context precision` ("diferença de fornecedor,
+não de semântica" — uma exige gabarito, a outra não). **Auditar entrada por entrada mede a entrada;
+não mede a relação dela com as 29 aulas.** Essa relação só aparece auditando a aula
 **⚠️ E os verificadores mentiam:** o `checar-vocabulario.js` reportou "0 termos faltando" durante a
 sessão inteira porque o filtro de caminho descartava **qualquer** termo com barra — `claim / covariate`,
 prometido pela Aula 23 e ausente do glossário, era jogado fora em silêncio. Cinco pontos cegos
@@ -54,12 +83,25 @@ dirigido à classe de defeito de cada aula. Confundimento declarado antes de rod
 estes dados. O que restringe a leitura: **6 dos 13 defeitos que a R5 achou foram introduzidos pelos
 meus próprios consertos**, horas antes — inclusive o único `−1` da rodada. A capacidade de
 discriminar em material novo estava intacta
-**⚠️ Não há classificação nova do curso.** Somar as 21 notas da R4 com as 8 da R5 dá 283/348 =
-81,3%, e isso mistura duas rodadas e dois briefings. Só uma sexta rodada completa, com briefing
-único nas 29, dá nota comparável
-**📌 Próximo trabalho, na ordem:** (1) **sexta rodada completa nas 29**, com briefing uniforme, para
-produzir a primeira nota homogênea desde a R4; (2) as três aulas que a R4 deixou entre 6 e 8 e a R5
-não tocou — 04 (6), 16 (7), 20 (8), 22 (8); (3) opcional: criar uma seção "Otimização de índice" no
+**Sexta rodada: feita.** 234/348 = 67,2%, briefing único nas 29, 69 consertos aplicados depois de
+medir. Registro do que ficou obsoleto: somar as 21 notas da R4 com as 8 da R5 dava 283/348 = 81,3%,
+e era mistura de duas rodadas e dois briefings — número que nunca valeu como classificação
+**⚠️ O padrão dominante da R6 é o defeito autoinfligido**, em três formas que se repetem. **(1)
+Corrigi no ponto citado e não greppei os irmãos** — a AULA-14 dizia em três outras passagens o que a
+Parte 2 deixara de dizer, inclusive no checkpoint; a nota de rodapé que escrevi na AULA-24 fecha com
+uma frase que nega o próprio conserto. **(2) Proveniência fabricada dentro de ressalva honesta** —
+"não rodei porque exige `unstructured`" (AULA-07, num script que usa `pypdf`) e "é como as citações
+desta aula foram conferidas" (AULAS 23 e 25, sobre uma receita que não recupera nenhuma frase de duas
+palavras). A ressalva é verdadeira; a razão dada, não. É a classe que mais escapa, porque a forma
+parece honesta. **(3) Meia correção** — termo acrescentado ao Vocabulário sem criar a entrada no
+glossário, e caminho de arquivo de biblioteca citado **cinco vezes**, com a regra já escrita antes da
+segunda
+**📌 Método que isso estabelece:** verificador mecânico pega o que releitura não pega, e o inverso
+também vale. Os dois defeitos que sobraram depois dos 69 consertos desta rodada foram achados pelos
+scripts, em segundos, **depois** de eu ter lido cada edição uma por uma
+**📌 Próximo trabalho, na ordem:** (1) **consertar as oito abaixo de 50% da R6** — 27, 00, 08, 09,
+23, 24, 25, 26 — sabendo que a R5 fez isso com as oito da R4 e a média do curso não se moveu, porque
+apareceram as oito seguintes; (2) **sétima rodada nas oito**, para medir os consertos; (3) opcional: criar uma seção "Otimização de índice" no
 glossário para os conceitos de Fase 5 (`Parent-child`, `Multi-representação`, `Small-to-big`,
 `Sliding window`), hoje espalhados entre Ingestão e Chunking — a auditoria apontou, e eu não
 reestruturei a taxonomia por conta própria

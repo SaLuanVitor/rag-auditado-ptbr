@@ -124,7 +124,7 @@ contra-intuitiva do curso, e também a mais elegante.
 A ideia: em vez de buscar pelo embedding da pergunta, você pede ao LLM que **escreva uma resposta
 hipotética** — que pode estar factualmente errada — e busca pelo embedding **dela**.
 
-Os imports (linhas 2 a 9) mostram o pipeline completo: `ChatPromptTemplate` e `StrOutputParser`
+Os imports (linhas 3 a 9) mostram o pipeline completo: `ChatPromptTemplate` e `StrOutputParser`
 para gerar o documento hipotético, `ChatDeepSeek` como gerador, `HuggingFaceEmbeddings` para
 embutir, `TextLoader` e `RecursiveCharacterTextSplitter` para o acervo, e `Chroma` como índice.
 
@@ -310,7 +310,8 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 
 ## Vocabulário
 
-`query rewriting` · `query decomposition` · `query expansion` · `HyDE` · `retriever`
+`query rewriting` · `query decomposition` · `query expansion` · `HyDE` · `query clarification` ·
+`multi-perspectiva` · `retriever`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

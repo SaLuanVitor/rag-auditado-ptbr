@@ -153,7 +153,9 @@ prompt — que estoura o contexto num banco com 200 tabelas e dilui a atenção 
 - a **descrição em linguagem natural**, que carrega o que o nome da coluna não diz. Em
   `90-Data/sakila/db_description.yaml`, `customer.active` é descrito como
   _"Indicator if the customer is active (1) or inactive (0)"_ — e é essa descrição, não o nome,
-  que decide se o SQL gerado escreve `active = 1` ou `active = 'true'`.
+  que **deve** decidir se o SQL gerado escreve `active = 1` ou `active = 'true'` — inferido da
+  arquitetura, não medido: nenhum dos arquivos do pipeline Sakila registra o prompt renderizado nem o
+  SQL de saída.
 
 O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
 quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a solução anterior
@@ -232,7 +234,8 @@ Um exemplo concreto do que acontece com "vídeos do canal X sobre LangChain publ
 | -------------------- | ----------------------------- |
 | "sobre LangChain"    | consulta semântica            |
 | "do canal X"         | filtro `author == "X"`        |
-| "publicados em 2024" | filtro `publish_year == 2024` |
+| "publicados em 2024" | filtro sobre `publish_date` — e **não** é direto: o campo é string
+`YYYY-MM-DD`, não um ano inteiro |
 
 **Sem self-query, "2024" entra na busca semântica** — e você recupera vídeos de 2021 que
 mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É a mesma armadilha do recorte temporal — e nenhuma aula posterior a retoma: o espaço vetorial
@@ -266,11 +269,17 @@ Para Text2SQL com SQLite (sem servidor):
 
 ```powershell
 cd ../Text2SQL
+mkdir 90-Data
 python 01-Text2SQL-CreateDatabaseTable.py
-python 02-Text2SQL-LLM-OpenAI.py
+python 02-Text2SQL-LLM-DeepSeek.py
 ```
 
-⚠️ Confira o caminho do banco na linha 3 antes de rodar — os dois arquivos `02-*` divergem, como
+⚠️ **Duas correções na receita, e as duas são do repositório, não suas.** O `mkdir` é necessário
+porque o `01-*` grava o banco numa pasta chamada `90-Data`, relativa ao diretório de trabalho, e
+essa pasta não existe dentro de `Text2SQL` — o `sqlite3` não cria diretório, então sem o `mkdir` o
+passo 1 já quebra. E o `02-*` escolhido é o **DeepSeek**, não o OpenAI: o OpenAI procura o banco numa
+pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha 3 de cada arquivo antes de rodar — os dois `02-*`
+divergem entre si, como
 a Parte 1 mostrou.
 
 O pipeline Sakila exige MySQL e Milvus rodando. Se não quiser subir os dois, **leia os quatro

@@ -1,6 +1,6 @@
 # AULA 27 — Multimodal RAG com Weaviate
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/05-MultiModalRAG/` — 4 arquivos (`ls`): 2 scripts (131 e 107 linhas), um `docker-compose.yml` e um `.env.example`
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/05-MultiModalRAG/` — 4 arquivos (`ls -A`; o `ls` simples mostra 3, porque o `.env.example` é oculto): 2 scripts (131 e 107 linhas), um `docker-compose.yml` e um `.env.example`
 
 ---
 
@@ -13,7 +13,7 @@ Então o que sobra para esta aula?
 Três coisas, e as duas primeiras são as que fazem este módulo diferente de todos os outros do repositório:
 
 1. **Mais de duas modalidades.** O vetorizador aqui aceita imagem, áudio e vídeo — e o modelo por trás dele projeta ainda mais que isso.
-2. **Infraestrutura própria com custo declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é o `mem_limit` explícito em cada serviço: o custo de rodar aparece como número, não como julgamento.
+2. **Infraestrutura própria com teto declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é um `mem_limit` explícito: dos dois serviços do arquivo, o de inferência tem teto de memória escrito (`:21`), e é a única ocorrência de `mem_limit` em todo o repositório. Note o que isso é e o que não é — teto imposto pelo autor do compose, não requisito declarado pelo modelo.
 3. **Geração multimodal.** O segundo script não termina na recuperação: ele descreve a imagem recuperada e **gera uma imagem nova**.
 
 E há a pergunta que o método deste curso obriga a fazer antes de qualquer entusiasmo: **os dois arquivos fazem o que os nomes dizem?** Um faz. O outro insere uma string de exemplo no lugar da imagem.
@@ -76,7 +76,7 @@ Quatro leituras, e cada uma é uma decisão de projeto visível.
 
 **1. O modelo é o ImageBind.** A tag da imagem Docker diz `imagebind`, e é o que dá ao módulo mais de duas modalidades. Conhecimento de domínio: o ImageBind é o modelo da Meta que alinha várias modalidades num espaço comum — imagem, texto, áudio e outras. O vetorizador que os scripts configuram declara três dessas: imagem, áudio e vídeo.
 
-**2. Doze gigabytes de memória.** `mem_limit: 12g` é o número mais concreto que este curso encontrou sobre custo de infraestrutura. Não é uma estimativa minha: está escrito no arquivo. Julgamento: isso coloca o exemplo fora do alcance de uma máquina de 8 GB e o torna desconfortável numa de 16 — e é a informação que decide se você vai rodar este módulo hoje ou só ler sobre ele.
+**2. Um teto de doze gigabytes — e leia a palavra "teto".** `mem_limit` é a chave do Compose que define o **máximo** que o contêiner pode consumir; não é o ImageBind declarando de quanto precisa. Um serviço com `mem_limit: 12g` pode consumir dois. O que está escrito no arquivo é uma decisão do autor do compose: ele julgou que 12 GB bastam, e que passar disso seria vazamento. **Julgamento:** um teto nessa casa é evidência de que o serviço opera na ordem de gigabytes, e é a única pista quantificada de custo de infraestrutura em todo o repositório — mas o consumo real não está escrito em lugar nenhum, e eu não o medi. O exercício 5 do "Mão na massa" existe exatamente para você medir antes de decidir se este módulo cabe na sua máquina.
 
 **3. Sem GPU.** `ENABLE_CUDA: '0'`. Combinado com o ImageBind e com o item anterior: a vetorização vai funcionar e vai ser lenta. Para três imagens de demonstração, tudo bem; para um acervo real, é a primeira coisa a mudar.
 
@@ -325,7 +325,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 **5. Observe os 12 GB.** Com o serviço de pé, olhe o consumo real de memória do contêiner `multi2vec-bind`. Compare com o `mem_limit` declarado. É o número que decide se este módulo cabe na sua máquina.
 
-**6. Use as imagens que ninguém usa.** Indexe `99-EN/assets/multimodal/` inteiro em vez de só o subdiretório `weaviate/`. Você passa de 3 para 9 imagens indexadas — e como três delas são duplicatas exatas das do subdiretório, verifique o que a busca faz com conteúdo idêntico e nomes diferentes.
+**6. Use as imagens que ninguém usa.** Aponte o `image_dir` do `01` para `99-EN/assets/multimodal/` em vez do subdiretório `weaviate/`. Duas coisas quebram antes de funcionar, e as duas são a lição. Primeira: o diretório-pai contém o **subdiretório `weaviate`**, e o `os.listdir` da linha 31 o devolve como se fosse arquivo — o `to_base64` chama `open()` sobre um diretório e o script morre (`PermissionError` no Windows, `IsADirectoryError` no Linux). Filtre por extensão. Segunda: o pai tem **dez** `.jpg`, não nove, porque `query_image.jpg` está lá — e é exatamente a imagem que a busca da linha 88 usa como consulta. Indexá-la faz o `near_image` encontrar a si mesmo em primeiro lugar; decida se você quer isso antes de rodar. Feito o filtro, você passa de 3 para 9 imagens (ou 10, com a de consulta), e três delas são duplicatas exatas das do subdiretório: verifique o que a busca faz com conteúdo idêntico e nomes diferentes.
 
 **7. Busque com e sem o filtro de modalidade.** Aplique o `Filter(path="mediaType")` do `02-Weaviate-Multimodal-RAG.py` (`:46`) às buscas do `01` e compare. Com um acervo só de imagens a diferença é nula — e é isso que você quer confirmar antes de acreditar que o filtro está funcionando.
 
@@ -378,7 +378,7 @@ Responda sem consultar:
 1. O que este módulo acrescenta ao que a Aula 11 já havia demonstrado sobre multimodal?
 2. Qual modelo faz a vetorização, e em que arquivo você descobre isso?
 3. Espaço vetorial único e filtro por metadado são alternativas? Onde cada um aparece neste módulo?
-4. Quantos gigabytes o serviço de inferência declara precisar, e por que esse número é diferente dos custos das aulas anteriores?
+4. Que número o compose escreve sobre memória, por que ele **não** é o mesmo que "quanto o serviço precisa", e por que ainda assim ele é diferente dos custos das aulas anteriores?
 5. O que `ENABLE_CUDA: '0'` implica para um acervo real?
 6. Quantas modalidades a coleção declara, e quantas são exercitadas?
 7. Que variável fantasma aparece nos blocos comentados do `01`, e de onde ela veio?
