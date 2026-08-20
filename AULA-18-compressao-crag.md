@@ -122,10 +122,19 @@ A diferença entre os dois cortes é de natureza, não de valor:
 | `percentile_cutoff=0.5` | **relativo** | mantém as 50% melhores sentenças, sempre    |
 | `threshold_cutoff=0.7`  | **absoluto** | mantém as que passam de 0,7 de similaridade |
 
-O percentil **sempre remove metade**, mesmo quando todas as sentenças eram relevantes. O limiar
-pode manter tudo ou **remover tudo** — e é aí que está o risco (**julgamento:** é o mais traiçoeiro
-dos três): se nenhuma sentença atinge 0,7,
-o chunk fica vazio, e o LLM recebe contexto sem conteúdo.
+O percentil remove **cerca de** metade, mesmo quando todas as sentenças eram relevantes — e o
+"cerca de" é literal: o corte é `int(len(sentenças) * 0.5)`, e num chunk de **uma** sentença isso dá
+`0`, que a implementação trata como _sem limite_ (o teste é `if similarity_top_k and …`, e zero é
+falsy). Chunk curto passa inteiro.
+
+O limiar é o mais arriscado dos três (**julgamento**), mas não pelo motivo que se espera: se nenhuma
+sentença atinge 0,7, o resultado **não** é chunk vazio chegando ao LLM — é
+`ValueError("Optimizer returned zero sentences.")`, levantado antes de qualquer geração. A falha é
+alta e barulhenta, o que é melhor que silenciosa; o risco real é a consulta quebrar em produção para
+um documento cujo vocabulário se afasta do da pergunta, e você não saber disso até acontecer.
+
+_Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
+`llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.11.17; não executei._
 
 Isso é o problema de calibração de similaridade absoluta que a Aula 02 antecipou: o valor de cosseno
 não é calibrado entre modelos nem entre domínios. Um `threshold_cutoff` copiado de exemplo é chute.
