@@ -276,6 +276,26 @@ diferença entre parecer bem e estar certo.
   por relevância.
 - **Grader do CRAG sem log.** Sem registrar o veredito por documento, você não sabe se o sistema
   está corrigindo, nem com que frequência.
+- 🔴 **A reescrita do CRAG é calculada e jogada fora — e o arquivo irmão prova que é defeito, não
+  simplificação.** Em
+  `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py:343-344`, o `transform_query` faz
+  `better_question = question_rewriter.invoke({"question": question})` e a linha seguinte devolve
+  `{"documents": documents, "question": question}` — a **pergunta original**. `grep -c
+  "better_question"` nesse arquivo devolve **1**: só a atribuição, nunca uma leitura.
+
+  Agora o mesmo trecho no Self-RAG, que a Aula 21 vai abrir
+  (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py:266-267`):
+  a atribuição é idêntica, e o retorno é `{"documents": documents, "question": better_question}`.
+  `grep -c` devolve **2**. Os dois arquivos têm a mesma função com uma palavra de diferença, e só um
+  liga o fio.
+
+  Consequência no CRAG: a chamada de LLM da reescrita é paga e descartada, e a busca na web
+  (`01-CRAG-ReflectiveRetrieval.py:367`, `web_search_tool.invoke(question)`) roda sobre a mesma
+  pergunta que já havia falhado. O caminho "corretivo" corrige menos do que o nome promete. Se você
+  copiar este grafo, capture `better_question` no retorno do nó — é uma palavra.
+
+  **Julgamento:** é o defeito mais silencioso dos que este curso catalogou, porque nada quebra —
+  o grafo roda, a aresta existe, o custo é pago, e o efeito simplesmente não acontece.
 - **CRAG com busca web sem limites.** "Buscar fora" pode virar custo e latência imprevisíveis, e
   traz conteúdo não curado para dentro da resposta. Defina quando é permitido.
 - **Assumir que compressão sempre economiza.** O compressor processa o contexto inteiro antes de
