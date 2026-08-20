@@ -31,11 +31,12 @@ quebrando, expandindo ou perguntando de volta.
 | **Clarificação**    | uma pergunta de volta ao usuário    | ambiguidade que o sistema não pode resolver sozinho |
 
 As três primeiras são automáticas. A quarta é a única que admite que **nem toda ambiguidade tem
-solução algorítmica** — e é a menos implementada em produção.
+solução algorítmica** — e, **julgamento**, a menos implementada em produção.
 
 ### O custo comum às três primeiras
 
-Cada técnica desta aula adiciona **pelo menos uma chamada de LLM antes de recuperar**. Isso
+Cada uma das **três primeiras** técnicas adiciona **pelo menos uma chamada de LLM antes de
+recuperar** — a quarta não, e a Parte 4 mostra por quê. Isso
 significa latência somada em toda consulta, e custo por consulta, não por ingestão.
 
 A consequência prática: aplicar tudo sempre é caro e lento. A decisão de qual técnica usar
@@ -117,8 +118,8 @@ parcialmente, porque as paráfrases tendem a herdar a composição em vez de sep
 
 ## Parte 3 — HyDE: a sonda geométrica
 
-`04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py` é a técnica mais contra-intuitiva do
-curso e, **julgamento**, a mais elegante.
+`04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py` é, **julgamento**, a técnica mais
+contra-intuitiva do curso, e também a mais elegante.
 
 A ideia: em vez de buscar pelo embedding da pergunta, você pede ao LLM que **escreva uma resposta
 hipotética** — que pode estar factualmente errada — e busca pelo embedding **dela**.
@@ -272,7 +273,8 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 
 ## Armadilhas de produção
 
-- **Latência somada.** Toda técnica desta aula custa uma chamada de LLM **antes** de recuperar.
+- **Latência somada.** As três primeiras técnicas custam uma chamada de LLM **antes** de recuperar
+  (a quarta cobra em outra moeda: atrito na interface).
   Em cadeia (reescreve, decompõe, HyDE) você triplica o tempo até o primeiro resultado.
 - **Reescrita que muda a intenção.** O modelo "corrige" a pergunta para algo que ele acha mais
   sensato, e você recupera resposta para outra pergunta. Registre a query original e a reescrita
@@ -301,7 +303,8 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 7. Por que a resposta hipotética pode estar errada sem invalidar a técnica?
 8. Cite três situações em que HyDE atrapalha.
 9. Por que a clarificação é a única técnica "honesta" desta aula, e qual o custo dela?
-10. Qual o custo comum a todas as quatro técnicas, e o que isso implica para a arquitetura?
+10. Qual o custo comum às três primeiras técnicas, qual o custo diferente da quarta, e o que isso
+    implica para a arquitetura?
 
 ---
 

@@ -255,7 +255,7 @@ Duas fragilidades acompanham a chamada crua:
 
 ## Parte 4 — O que "RAG" significa aqui
 
-Vale parar num ponto conceitual, porque ele fecha um fio que a Aula 24 abriu.
+Vale parar num ponto conceitual, porque ele fecha um fio que a Aula 19 abriu.
 
 O pipeline do `02` é: recuperar uma imagem → pedir a um modelo de visão que a descreva → pedir a um gerador de imagens que produza outra a partir da descrição.
 

@@ -279,7 +279,8 @@ repositório normal, lido com cuidado.
 | 13  | Um "Contextual Retrieval" cujo contexto são os 50 primeiros caracteres do próprio chunk            |
 | 14  | Um "AdaptiveRAG" que é roteamento de fonte, não retrieval adaptativo                               |
 
-O que esses catorze têm em comum é o método que os encontrou. Cinco hábitos, e nenhum é difícil:
+O que os quatorze da tabela têm em comum — e o décimo quinto, da Aula 00 — é o método que os
+encontrou. Cinco hábitos, e nenhum é difícil:
 
 1. **`ls` antes de contar.** Nenhum número de arquivos afirmado sem listar o diretório.
 2. **Abrir antes de citar.** Caminho não é evidência de conteúdo: um arquivo dentro de
@@ -301,7 +302,9 @@ E vale para o seu próprio código, que é onde o hábito realmente paga.
 
 ## Parte 4 — O freio, se o seu sistema tiver ciclo
 
-Um requisito, não uma sugestão. O curso encontrou quatro grafos no repositório:
+Um requisito, não uma sugestão. O curso encontrou quatro grafos **com aresta condicional** no repositório (`grep -rl "StateGraph("`
+devolve seis arquivos; os dois de fora são os `00-SimpleRAG/04_LangGraph_RAG*.py`, lineares e sem
+condicional):
 
 | Grafo                 | Ciclos                               | Contador      |
 | --------------------- | ------------------------------------ | ------------- |
@@ -311,8 +314,8 @@ Um requisito, não uma sugestão. O curso encontrou quatro grafos no repositóri
 | AdaptiveRAG (Aula 26) | 3                                    | ausente       |
 
 > ⚠️ **Método de contagem, porque o número depende dele.** Aqui, "ciclos" são **ciclos simples**
-> (caminhos fechados sem repetir nó). A Aula 21 agrupa dois deles em uma explicação só e chega a
-> "dois ciclos" — mesma topologia, corte diferente. Self-RAG e AdaptiveRAG têm de fato as **mesmas
+> (caminhos fechados sem repetir nó). A Aula 21 chega ao **mesmo** número — três — e registra que
+> contar por pontos de entrada em laço daria dois; mesma topologia, corte diferente. Self-RAG e AdaptiveRAG têm de fato as **mesmas
 > arestas de retorno**: `transform_query → retrieve` (`Self-RAG-FullImplementation.py:354` e
 > `02-LangChain-AdaptiveRAG.py:201`) e o condicional final que devolve para `generate` ou para
 > `transform_query` (`:355-364` e `:205-209`). Se você contar por outro critério, conte igual nas
@@ -473,8 +476,8 @@ conteúdo. O que fica é isto: **cada peça de um RAG é uma decisão com custo,
 decisão é o número que a mediu.**
 
 E o hábito, que é a parte transferível: abrir o arquivo, rodar o `diff`, grepar o uso, contar com
-`ls`, ler o que está comentado. Foi assim que este curso encontrou catorze arquivos cujo nome
-prometia mais do que o código entregava — e é assim que você vai evitar que o décimo quinto seja seu.
+`ls`, ler o que está comentado. Foi assim que este curso encontrou quinze arquivos cujo nome
+prometia mais do que o código entregava — e é assim que você vai evitar que o décimo sexto seja seu.
 
 ---
 

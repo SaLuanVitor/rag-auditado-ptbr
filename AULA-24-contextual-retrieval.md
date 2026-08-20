@@ -54,7 +54,10 @@ A primeira mantém o texto original recuperável e auditável. A segunda produz 
 
 ## Parte 1 — O par, e o que o `diff` revelou
 
-Os dois arquivos têm o mesmo assunto e **nada em comum**: `diff -u` entre eles não encontra uma única linha compartilhada no início, e os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **980**, com bit de execução e shebang. (Os dois arquivos terminam sem newline final, então `wc -l` devolve 344 e 979 — um a menos em cada. A contagem certa é `awk 'END{print NR}'`, e a versão anterior desta aula trazia o 979 de `wc -l` ao lado do 345 de `awk`, misturando os dois métodos na mesma frase.)
+Os dois arquivos têm o mesmo assunto e **nada em comum**: `diff -u` entre eles não encontra uma única linha compartilhada no início, e os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **980**, e é o único dos dois com shebang (`#!/usr/bin/env python` na linha 1) — o que **não**
+quer dizer que seja executável: `git ls-tree HEAD` devolve modo `100644` para os dois, e o
+repositório inteiro não tem um único arquivo `100755`. O `ls -l` do Git Bash mostra `-rwxr-xr-x`
+aqui, mas isso é o MSYS inferindo o bit `x` da presença do shebang, não um bit versionado. (Os dois arquivos terminam sem newline final, então `wc -l` devolve 344 e 979 — um a menos em cada. A contagem certa é `awk 'END{print NR}'`, e a versão anterior desta aula trazia o 979 de `wc -l` ao lado do 345 de `awk`, misturando os dois métodos na mesma frase.)
 
 Não são duas versões da mesma coisa. São dois trabalhos diferentes:
 
@@ -263,7 +266,9 @@ O conjunto que substitui o oficial é montado assim (`Milvus-Implementation.py:8
             })
 ```
 
-A **query são os primeiros 50 caracteres do próprio chunk que é a resposta**. Quatro perguntas, portanto (2 documentos × 2 chunks), cada uma um prefixo literal do seu alvo.
+A **query são os primeiros 50 caracteres do próprio chunk que é a resposta**. Quatro perguntas, portanto (2 documentos × 2 chunks) — supondo que os dois primeiros documentos
+tenham ao menos dois chunks cada, o que não confirmei, porque o `codebase_chunks.json` é baixado em
+tempo de execução e não está em disco aqui. Cada uma é um prefixo literal do seu alvo.
 
 Julgamento, e é o ponto central desta aula: nenhuma técnica de recuperação pode se distinguir de outra nesse teste. Buscar um texto usando a sua própria primeira metade é o caso mais fácil que existe — denso acha, esparso acha, e a contextualização não tem como ajudar porque não havia dificuldade a resolver. Os três experimentos vão reportar valores próximos, e a "melhoria" impressa no fim
 (`Milvus-Implementation.py:970-976`) será ruído.

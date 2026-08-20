@@ -142,7 +142,7 @@ imagem e texto no mesmo espaço vetorial:
 | `Milvus+Visual-BGE-MultimodalRetrieval-English.py` | o mesmo, outra variante       |
 | `Milvus+Visual-BGE-PureRetrievalProgram.py`        | só a recuperação, sem o resto |
 
-E — incomum no repositório — **três imagens de saída** versionadas:
+E — prática rara, mas não exclusiva, no repositório — **três imagens de saída** versionadas:
 
 - `search_results.jpg`
 - `search_without_filter.jpg`
@@ -263,7 +263,7 @@ similaridade.
 6. Por que o arquivo chamado `v1-Minimal` é o maior dos três? O que "minimal" descreve?
 7. O que a ordem dos argumentos de `WeightedRanker` exige que você respeite?
 8. O que significa imagem e texto estarem no mesmo espaço vetorial, e o que isso habilita?
-9. Por que o módulo multimodal versiona imagens de saída, algo que nenhum outro faz?
+9. Por que o módulo multimodal versiona imagens de saída, e onde mais o repositório faz isso?
 10. Cite três custos reais de adotar busca híbrida.
 
 ---

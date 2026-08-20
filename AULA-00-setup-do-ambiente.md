@@ -7,9 +7,8 @@
 ## Pergunta motivadora
 
 Você tem 396 arquivos à disposição (`git ls-files | wc -l`) — dos quais **189 são código** (`.py` e `.ipynb`); o resto
-é dado, PDF e imagem — e 12 arquivos de `requirements` em `91-Environment/`, dois deles em
-`archive/`, que você não vai usar
-diferentes. Qual instalar, e por que existem tantos?
+é dado, PDF e imagem — e 12 arquivos de `requirements` em `91-Environment/` — dois deles em
+`archive/`, que você não vai usar. Qual instalar, e por que existem tantos?
 
 Porque RAG tem uma dependência incômoda: modelos de embedding rodam localmente e
 querem GPU. O autor separou os ambientes por SO e por presença de GPU, e separou

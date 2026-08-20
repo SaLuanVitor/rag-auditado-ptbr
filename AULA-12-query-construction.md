@@ -137,7 +137,10 @@ central do capítulo:
 | `05-text2sql-rag-{v1-error,v2-ok,v3-agent}.py` | os três consumidores                                              |
 
 Os três arquivos de ingestão geram embeddings (OpenAI `text-embedding-3-large`) e inserem em
-collections do Milvus com `AUTOINDEX`/`COSINE` — exatamente o que as Aulas 09 e 10 construíram.
+collections do Milvus com `AUTOINDEX`/`COSINE` — o mesmo padrão de collection mais embedding que a
+Aula 09 montou, com a métrica `COSINE` que a Aula 10 discute. O `AUTOINDEX` em si não aparece em
+nenhuma das duas: é o atalho que deixa o Milvus escolher o índice, em vez dos cinco que a Aula 10
+compara.
 
 **O que está indexado não é documento de negócio. É metadado do banco.**
 
@@ -147,8 +150,10 @@ prompt — que estoura o contexto num banco com 200 tabelas e dilui a atenção 
 
 - o **DDL** das tabelas que provavelmente importam;
 - **exemplos pergunta→SQL** parecidos, que funcionam como few-shot recuperado;
-- a **descrição em linguagem natural**, que explica o que `dt_ref` significa quando o nome da
-  coluna não explica.
+- a **descrição em linguagem natural**, que carrega o que o nome da coluna não diz. Em
+  `90-Data/sakila/db_description.yaml`, `customer.active` é descrito como
+  _"Indicator if the customer is active (1) or inactive (0)"_ — e é essa descrição, não o nome,
+  que decide se o SQL gerado escreve `active = 1` ou `active = 'true'`.
 
 O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
 quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a solução anterior
@@ -230,9 +235,8 @@ Um exemplo concreto do que acontece com "vídeos do canal X sobre LangChain publ
 | "publicados em 2024" | filtro `publish_year == 2024` |
 
 **Sem self-query, "2024" entra na busca semântica** — e você recupera vídeos de 2021 que
-mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É a
-armadilha que a armadilha do recorte — e nenhuma aula posterior a retoma: o espaço vetorial captura assunto, não
-recorte.
+mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É a mesma armadilha do recorte temporal — e nenhuma aula posterior a retoma: o espaço vetorial
+captura assunto, não recorte.
 
 A qualidade do `AttributeInfo` é o que decide se funciona. A `description` de cada campo é lida
 pelo LLM para decidir quando usá-lo — descrição vaga produz filtro errado. É prompt engineering

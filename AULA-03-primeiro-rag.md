@@ -25,7 +25,7 @@ do mais alto ao mais baixo. Percorra nessa ordem:
 | `01_*` | 6 variantes LlamaIndex (dois com prefixo `01_03`) | **altíssimo** — 5 linhas, tudo implícito       |
 | `02_*` | 5 pipelines LangChain completos                   | médio-baixo — oito passos explícitos, sem LCEL |
 | `03_*` | 3 versões LCEL                                    | médio-baixo — pipeline explícito               |
-| `04_*` | LangGraph (`.py` e `.ipynb`)                      | baixo — grafo de estados                       |
+| `04_*` | LangGraph (dois `.py` — OpenAI e Ollama — e um `.ipynb`) | baixo — grafo de estados                 |
 | `05_*` | 3 variantes "from scratch"                        | **mais baixo** — sem framework de RAG          |
 
 A numeração não é arbitrária: é uma escada descendente de abstração. Você vai
@@ -94,8 +94,11 @@ uma pausa. Da segunda em diante, roda do cache local, sem rede e sem custo.
 
 ### Duas ressalvas reais sobre este código
 
-**Ressalva 1 — o modelo de embedding é chinês.** Em `01_02`, em `01_03_LlamaIndex_SwitchGenerationModel.py` e em
-`03_LangChain_LCEL_RAG_v3.py`, o embedding configurado é `BAAI/bge-small-zh` /
+**Ressalva 1 — o modelo de embedding é chinês, e o defeito é do módulo inteiro.**
+`grep -rli "bge-small-zh"` em `00-SimpleRAG/` devolve **12 dos 23 arquivos** — os três mais
+visíveis são `01_02`, `01_03_LlamaIndex_SwitchGenerationModel.py` e
+`03_LangChain_LCEL_RAG_v3.py`, mas também herdam o mesmo embedding os `01_04`, `01_05`, os quatro
+`02_0x` (`01`, `02`, `04`, `05`) e os três `04_*`. O embedding configurado é `BAAI/bge-small-zh` /
 `BAAI/bge-small-zh-v1.5`. O sufixo `zh` significa **chinês**: são modelos treinados
 para aquele idioma, resíduo da origem do livro. Como o corpus foi traduzido para
 inglês, você está embutindo texto inglês com um modelo chinês — e vai obter recall
@@ -110,7 +113,7 @@ português, `intfloat/multilingual-e5-small` ou
 `os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'`, um espelho usado quando o
 HuggingFace está bloqueado. No Brasil, isso só adiciona latência. Comente a linha.
 
-Estas duas observações valem mais que qualquer aula: **código de exemplo carrega o
+**Julgamento:** estas duas observações valem mais que a aula que as cerca — **código de exemplo carrega o
 contexto de quem o escreveu.** Ler criticamente é parte do ofício.
 
 ---
@@ -185,7 +188,7 @@ response = chat(model=os.getenv("OLLAMA_MODEL"), messages=[{"role": "user", "con
 ```
 
 **Não há chunking neste exemplo** — cada string já é um chunk. E é isso: RAG
-inteiro em sessenta linhas, sem abstração alguma.
+inteiro em 64 linhas (`awk` no `05_RAG_from_Scratch_Ollama.py`), sem abstração alguma.
 
 Três coisas para notar:
 
@@ -271,7 +274,7 @@ descrito num trecho que atravessa fronteira de chunk. Prepara a Aula 07.
 4. Onde, no exemplo sem framework, está implementada a proveniência (citação de
    fonte)?
 5. Que problema o LangGraph resolve que o pipeline LCEL linear não resolve?
-6. Qual o defeito no modelo de embedding usado em `01_02` e `03_..._v3.py`, e como
+6. Qual o defeito no modelo de embedding usado em 12 dos 23 arquivos deste módulo, e como
    você o corrigiria para um corpus em português?
 7. Por que `InMemoryVectorStore` é inadequado em produção?
 

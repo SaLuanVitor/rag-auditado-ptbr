@@ -221,7 +221,10 @@ python "04-entity(data).py"
 
 O nome do quarto arquivo tem parênteses — aspas são necessárias no PowerShell.
 
-Rode `01-database.py` **duas vezes**. A segunda deve cair no tratamento de exceção em vez de
+Comente as linhas 86 e 92 do `01-database.py` (os dois `drop_database` do fim) e **então** rode
+duas vezes. Sem comentar, o script apaga as duas databases ao terminar, e a segunda execução cria
+do zero em vez de cair no tratamento de exceção. Com elas comentadas, a segunda deve cair no
+tratamento de exceção em vez de
 estourar. É a diferença entre exemplo e script que sobrevive a um retry.
 
 Depois de `04`, use `client.query` ou o Milvus Attu (interface web) para conferir que as 10
@@ -258,16 +261,21 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   Se usar auto-id, crie um campo `source_id` e preencha sempre.
 - **Escalares esquecidos no schema.** Campo **declarado** é o que se indexa e filtra com
   eficiência; acrescentar um depois exige recriar a collection e reindexar. O Milvus tem uma saída
-  parcial — `enable_dynamic_field=True`, ligado em praticamente todo schema deste módulo, absorve o
+  parcial — `enable_dynamic_field=True`, ligado em 14 dos 20 arquivos que definem schema em `04-VectorDB/`
+  (não no `03-schema.py` desta aula, nem nos três de `HybridRetrieval/`, nem nos dois
+  `06-full-text-search-bm25-*`), absorve o
   metadado que você esqueceu, ao custo de armazenamento em JSON e de filtro menos eficiente que
   campo declarado. É mitigação, não equivalência: pense nos filtros **antes**, e é barato incluir um
   campo a mais agora.
 - 🔴 **Inserir não é publicar.** Depois do `insert`, a collection ainda precisa ser **carregada**
   para o query node: `load_collection()` (e o par `release_collection()` para devolver a memória).
-  Todo exemplo de **busca** do módulo o chama — `grep -rln "load_collection"` encontra 16 dos 27
-  `.py` de `04-VectorDB/` —, e nenhuma aula até aqui o explicava. Os 11 restantes são scripts de
-  criação e inserção, que não buscam: três dos quatro arquivos **desta aula** estão entre eles (só o
-  `02-collection.py` chama). Se a sua busca voltar vazia, esta é a
+  `grep -rln "load_collection"` encontra o nome em 16 dos 27 `.py` de `04-VectorDB/` — e a
+  conclusão fácil aqui é falsa: dos 11 restantes, **nove buscam**, usando `client.load()` ou
+  `collection.load()`, que é o mesmo carregamento com outro nome. Entre eles estão os três de
+  `HybridRetrieval/`, os três de `MultimodalRetrieval/`, o `a-working-sample.py`, o
+  `create_milvus_db.py` — e o `04-entity(data).py` **desta própria aula**, que carrega na linha 68
+  e consulta na 69. Ausência da string não é ausência do comportamento; é a mesma armadilha do
+  "import não é uso", virada do avesso. Se a sua busca voltar vazia, esta é a
   primeira hipótese, antes de qualquer suspeita sobre embedding. Dado recém-inserido também pode não
   aparecer de imediato, conforme o nível de consistência configurado.
 - 🔴 **Acervo que muda exige ingestão idempotente.** O que acontece quando um documento é

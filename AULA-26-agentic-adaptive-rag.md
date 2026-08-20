@@ -45,11 +45,12 @@ Os dois se chamam "adaptive" na literatura de blog, e o arquivo `02` deste módu
 
 ---
 
-## Parte 1 — O inventário, e o import morto mais antigo deste curso
+## Parte 1 — O inventário, e um import morto que o curso já tinha visto
 
 `ls` no diretório mostra dois scripts e **três** PNGs: `01-AgenticRAG-Graph.png` (86.250 bytes), `02-AdaptiveRAG-Flow.png` (139.564) e `02-AdaptiveRAG-Graph.png` (123.644). Não abri nenhum dos três; afirmo só o que o `ls` mostra. Note que o arquivo `02` tem **dois** diagramas, um chamado "Flow" e outro "Graph" — a diferença entre eles não se infere do nome, e conferir exigiria abri-los.
 
-E o achado mais antigo deste curso está na primeira tela do primeiro arquivo
+E o achado que a primeira auditoria deste curso já havia registrado está na primeira tela do
+primeiro arquivo
 (`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py:18`):
 
 ```python
@@ -159,7 +160,7 @@ O comentário é honesto: `Reset messages here`. O histórico é descartado e **
 
 A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura: a pergunta original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como todos os nós leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
 
-E, pela terceira vez neste curso, **o ciclo não tem contador**. Nada limita quantas vezes `agent → retrieve → grade_documents → rewrite → agent` pode girar.
+E, pela segunda vez neste curso — depois do Self-RAG da Aula 21 —, **o ciclo não tem contador**. Nada limita quantas vezes `agent → retrieve → grade_documents → rewrite → agent` pode girar.
 
 ### Duas anotações menores
 
@@ -363,7 +364,7 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` pr
 
 **Ciclo sem contador, pela terceira vez.** Três dos quatro grafos deste repositório têm laço; nenhum tem limite. **Julgamento:** é o defeito mais recorrente do repositório inteiro, e o mais fácil de corrigir.
 
-**Fonte alternativa sem controle de qualidade.** Se o índice é graduado e a web não é, você criou um caminho preferencial para material não verificado. E, como a Aula 21 observou sobre o resultado de ferramenta, o que entra no contexto entra como fato.
+**Fonte alternativa sem controle de qualidade.** Se o índice é graduado e a web não é, você criou um caminho preferencial para material não verificado. E, como a Aula 20 observou sobre o resultado de ferramenta, o que entra no contexto entra como fato.
 
 **Função de decisão que gasta.** Um lambda de aresta que dispara duas chamadas de LLM por avaliação é custo invisível: ele não aparece na lista de nós nem no diagrama do grafo. Se você conta custo por nó, vai errar a conta.
 
