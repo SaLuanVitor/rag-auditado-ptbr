@@ -60,7 +60,7 @@ Pergunta do usuário
 Resposta ancorada, com fonte citável
 ```
 
-Isso é RAG por inteiro. Todo o resto do curso — 28 aulas — é sobre **por que cada
+Isso é RAG por inteiro. Todo o resto do curso — 27 aulas, da 02 à 28 — é sobre **por que cada
 um desses três passos falha** e o que se faz a respeito.
 
 ### O que RAG realmente muda no comportamento do modelo
@@ -129,8 +129,8 @@ resposta ignora ou distorce.
 
 ### Falha de ingestão — o dado nunca entrou de forma utilizável
 
-A mais silenciosa — e, na minha experiência, a mais frequente em projetos reais. Não tenho
-número para isso; trate como julgamento, não como dado.
+**Julgamento, e as duas metades são julgamento:** a mais silenciosa e, na minha experiência, a mais
+frequente em projetos reais. Não tenho número para nenhuma das duas.
 
 - PDF digitalizado sem OCR: o "texto" indexado é vazio
 - tabela virou papa de números sem cabeçalho
@@ -154,9 +154,16 @@ Ser especialista inclui recusar a ferramenta:
 | --------------------------------------------------------------------------- | ------------------------------------------ |
 | Acervo pequeno e estável (cabe no contexto)                                 | Coloque tudo no prompt, com prompt caching |
 | Precisa de agregação global ("qual o tema recorrente em 5 mil avaliações?") | Análise em batch, ou GraphRAG (Aula 23)    |
-| Precisa de número exato de base estruturada                                 | Text2SQL contra o banco — que a Aula 12 argumenta **ainda ser RAG**, só sem busca vetorial |
+| Precisa de número exato de base estruturada                                 | Text2SQL contra o banco — que a Aula 12 argumenta **ainda ser RAG**, só sem busca vetorial¹ |
 | Precisa mudar o _comportamento_ ou o _estilo_ do modelo                     | Fine-tuning, não RAG                       |
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
+
+¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que
+vem antes) opõe Text2SQL a "RAG" como coisas distintas, usando "RAG" no sentido estrito de _busca
+vetorial sobre prosa_. A Aula 12 (que vem depois) argumenta que Text2SQL bem feito **é** RAG, porque
+o que se recupera vem de fora do modelo e entra no contexto — e o `GLOSSARIO.md` segue a Aula 12.
+As duas leituras são defensáveis e a diferença é de definição, não de fato. Quando a Aula 06 disser
+"aí sim RAG", leia "aí sim RAG vetorial".
 
 A confusão que mais encontro no mercado — julgamento, não dado: RAG ensina **fatos** ao modelo, fine-tuning
 ensina **comportamento**. Tentar ensinar fato via fine-tuning é caro e vaza; tentar

@@ -77,10 +77,13 @@ E as duas funções que organizam: `create_router()` (linha 19) e `route_questio
 
 Três coisas para notar:
 
-**1. `Literal` fecha o espaço de saída.** As rotas válidas são exatamente três, declaradas no
-tipo. O modelo não pode inventar uma quarta — e isso é a diferença entre "peço ao LLM para
-classificar" e "restrinjo o LLM a classificar". É `with_structured_output` aplicando a ideia que a Aula 20 vai
-destrinchar em graus — garantia sintática em vez de instrução. (A Aula 20 trabalha com
+**1. `Literal` declara o espaço de saída — e o Pydantic recusa o que sair dele.** As rotas válidas
+são exatamente três, declaradas no tipo. Se o modelo devolver uma quarta, você recebe uma **exceção
+de validação** em vez de uma rota inválida seguindo em silêncio — e isso é a diferença entre "peço
+ao LLM para classificar" e "restrinjo o LLM a classificar". **Mas não é impossibilidade de gerar:**
+é indução forte mais validação com erro, o que a Aula 20 chama de **grau 4a** e diz explicitamente
+que "não é garantia". Garantia de estrutura só existe no grau 4b (`json_schema` com
+`strict: true`), que nenhum arquivo deste repositório usa. (A Aula 20 trabalha com
 `bind_tools`, `response_format` e Pydantic; o `with_structured_output` em si reaparece nas Aulas
 18, 21 e 26.)
 
@@ -94,8 +97,9 @@ subestimada — **julgamento** — do roteamento lógico — **você consegue me
 o que evita atribuir ao índice uma falha que foi de rota.
 
 O exemplo usa três rotas de documentação de linguagens. A generalização óbvia: no seu sistema as
-rotas seriam `fiscal`, `juridico`, `suporte` — ou `sql`, `vetorial`, `grafo`, que é o roteamento
-que a Aula 12 pediu.
+rotas seriam `fiscal`, `juridico`, `suporte` — ou `sql`, `vetorial`, `grafo`, generalizando os três
+alvos de tradução da Aula 12 (SQL, Cypher e filtro de metadado) para uma decisão de rota. A Aula 12
+não usa a palavra "roteamento" em nenhum ponto: a ponte entre as duas aulas é minha, não dela.
 
 ---
 
@@ -199,8 +203,9 @@ python 02-SemanticRouting.py
 ```
 
 Imprima o vetor de similaridades antes do `argmax`. Ver os números lado a lado é o que revela
-quando a decisão foi confortável (0,82 contra 0,31) e quando foi um empate técnico (0,54 contra
-0,52) — e a segunda situação é a que precisa de limiar.
+quando a decisão foi confortável e quando foi um empate técnico — algo como 0,82 contra 0,31 no
+primeiro caso e 0,54 contra 0,52 no segundo (números ilustrativos: rodar isto exige chave de API, e
+eu não rodei) — e a segunda situação é a que precisa de limiar.
 
 Depois compare os dois na **mesma pergunta ambígua**. O lógico devolve um rótulo com aparência de
 certeza; o semântico devolve um argmax que você pode inspecionar. Essa diferença de
@@ -227,7 +232,7 @@ sem erro, sem aviso.
 
 **5. Implemente o limiar.** Acrescente ao `prompt_router` uma verificação: se
 `similarity.max()` estiver abaixo de um valor, devolva uma rota default em vez do argmax. É a
-correção que considero mais valiosa do exemplo, e são três linhas.
+correção que considero mais valiosa do exemplo, e cabe em poucas linhas.
 
 ---
 

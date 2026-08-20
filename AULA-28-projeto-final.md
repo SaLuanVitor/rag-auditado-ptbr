@@ -54,9 +54,10 @@ prompt é o que está visível.
 
 ### Toda decisão tem custo, e o curso nomeou cada um
 
-Vinte e sete das vinte e oito aulas fecham o conteúdo técnico numa seção de armadilhas de
-produção — a exceção é a Aula 01, que traz "Quando _não_ usar RAG" no lugar. (Fecham o conteúdo,
-não o arquivo: Checkpoint e Vocabulário vêm depois, nas 27.) Elas não são
+Vinte e sete das vinte e nove aulas fecham o conteúdo técnico numa seção de armadilhas de
+produção. As duas exceções são a Aula 01, que traz "Quando _não_ usar RAG" no lugar, e **esta**,
+que é o fecho do curso e não tem o formato das outras. (Fecham o conteúdo, não o arquivo:
+Checkpoint e Vocabulário vêm depois, nas 27.) Elas não são
 uma lista de erros dos outros: são o **preço** de cada escolha. `chunk_overlap` alto sai caro,
 reranking soma latência, multi-representação multiplica o índice, laço sem contador é dívida, e assim
 por diante.

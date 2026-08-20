@@ -203,15 +203,17 @@ maioria dos casos. Parâmetros `M` e `efConstruction`/`ef`.
 
 **DiskANN** — Índice em disco, para acervos que não caberiam em RAM.
 
-**MRR (Mean Reciprocal Rank)** — Média do inverso da posição do primeiro acerto. Mede se o
-documento certo veio no topo, não apenas se veio. Sensível à ordem, ao contrário do `hit_rate`.
-
 **Golden standard (gabarito)** — O conjunto de respostas ou documentos corretos contra o qual
 se mede. Sem ele não há `context recall` nem precisão: só impressão. Gabarito ruim reprova sistema
 bom, e é a falha mais cara de uma avaliação.
 
-**Recall@k** — Fração dos documentos verdadeiramente relevantes que apareceram nos
-top-k. A métrica de recuperação que mais importa.
+**Recall@k** — **Duas coisas diferentes com o mesmo nome, e confundi-las é o erro que a Aula 10
+alerta.** _Recall@k do índice_ (o sentido desta seção): dos vizinhos que a busca **exata** (FLAT)
+devolveria, quantos a busca **aproximada** devolveu. Mede fidelidade do índice, não relevância — e
+se mede rodando a mesma consulta nos dois e comparando. _Recall@k de recuperação_: dos documentos
+verdadeiramente relevantes, quantos apareceram no top-k. Mede o sistema contra um gabarito. Um
+índice com recall de índice de 0,99 pode ter recall de recuperação péssimo, e vice-versa: são
+independentes. Ver `Context recall`, na seção de Avaliação.
 
 **Filtered search** — Busca vetorial combinada com filtro escalar
 (`where price < 100`). Filtrar antes ou depois muda resultado e custo.
@@ -283,8 +285,11 @@ _responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A
 se parece mais com resposta do que pergunta se parece com resposta. Custa uma chamada de LLM antes
 de recuperar.
 
-**Query routing** — Direcionar a query para a fonte certa. Roteamento lógico usa
-regras/LLM; semântico usa similaridade com descrições das fontes.
+**Query routing** — Direcionar a query para o **destino** certo. Lógico usa regras ou LLM com saída
+restrita a um conjunto de rotas; semântico usa similaridade de embedding. **E o destino não é
+necessariamente uma fonte:** no exemplo do repositório (Aula 14) as rotas são dois _prompts_, não
+dois índices — o roteador escolhe **como perguntar**, não **onde buscar**. Rotear fonte e rotear
+prompt usam a mesma mecânica e resolvem problemas diferentes.
 
 **Text2SQL** — Traduzir linguagem natural em SQL. Recuperação sobre dado
 estruturado.
@@ -346,8 +351,12 @@ estrutura (JSON, objeto Pydantic).
 **Function calling / Tool use** — O modelo emite uma chamada de função estruturada
 em vez de texto livre.
 
-**Structured output** — Saída do modelo que obedece a uma estrutura declarada
-(esquema), em vez de texto livre. Garante forma, não veracidade dos valores.
+**Structured output** — Saída do modelo que obedece a uma estrutura declarada (esquema), em vez de
+texto livre. **"Garante" depende do grau** (Aula 20): pedir no prompt não garante nada; `json_object`
+garante JSON sintático e não os campos; function calling com Pydantic **induz e valida**, devolvendo
+exceção quando o modelo desobedece — não é garantia; só `json_schema` com `strict: true` restringe a
+geração, e nenhum arquivo deste repositório usa isso. Em nenhum grau há garantia sobre a
+**veracidade** dos valores.
 
 **JSON mode** — Parâmetro de API (`response_format={'type': 'json_object'}`) que
 obriga a saída a ser JSON sintaticamente válido. Não define quais chaves.

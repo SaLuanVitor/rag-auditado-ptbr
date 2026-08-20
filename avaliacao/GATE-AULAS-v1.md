@@ -1506,3 +1506,158 @@ Self-RAG distinguindo paper de implementação; entrada do CRAG registrando que 
 repositório é acíclico (quatro aulas concordam).
 AULA-15 (2) e AULA-18 (3): os dois `−1` de biblioteca, a precisão do `diff`, o checkpoint e o
 julgamento não marcado.
+
+### Lote 5 — QUARTA RODADA COMPLETA, 29 de 29 (20/08/2026)
+
+| Aula | R3 | **R4** | Δ |
+| --- | --- | --- | --- |
+| 10 — Índices ANN | 11 | **10** | −1 |
+| 22 — Avaliação | 12 | **8** | −4 |
+| 01 — O que é RAG | 11 | **5** | −6 |
+| 14 — Query routing | 11 | **4** | −7 |
+| 00 — Setup | 11 | **4** | −7 |
+
+**Lote 5: 31 contra 56.** Cinco aulas, todas na faixa 11–12 da R3, perderam 25 pontos.
+
+### Resultado da quarta rodada
+
+| | Total | % |
+| --- | --- | --- |
+| **R4 (29/29)** | **231/348** | **66,4%** |
+| R3 (29/29) | 245/348 | 70,4% |
+| R2 (29/29) | 254/348 | 73,0% |
+
+Δ **−14**; médio **−0,48**; **12 subiram, 13 caíram, 4 empataram.** A rodada recebeu 47 correções da
+R3 mais 17 do lote 3 e 13 do lote 4 antes de medir, e a nota **desceu de novo**.
+
+**É a terceira rodada consecutiva em que o instrumento mais fundo mede mais baixo: 73,0 → 70,4 →
+66,4.** A R3 já havia estabelecido a causa (uma aula por auditor, orçamento dobrado). A R4 acrescenta
+duas evidências independentes de que a queda é do instrumento e não do material:
+
+1. **A faixa alta é a que cai.** Nos lotes 3, 4 e 5 eu ordenei a seleção da mais fraca para a mais
+   forte segundo a R3. Os lotes ficaram, isoladamente: lote 3 = 54 contra 60; lote 4 = 56 contra 62;
+   lote 5 = 31 contra 56. **A queda cresce conforme a nota anterior sobe.** As aulas que a R3 dava
+   como 11 e 12 são as que a R4 mais rebaixa — 22 (12→8), 14 (11→4), 00 (11→4), 01 (11→5).
+2. **O foco por aula explica cada queda.** Em nenhum dos casos o auditor "achou defeito novo no
+   escuro": ele achou o defeito da **classe** que o prompt daquela aula mandou procurar. Alegação de
+   ausência na 20, previsão-como-observação na 07, comportamento de biblioteca na 15 e na 00,
+   coerência entre arquivos na 21, na 22 e na 14. O que mudou não foi o rigor genérico — foi apontar
+   o auditor para a classe de defeito que aquela aula tinha.
+
+### Classificação: **Requer revisão**
+
+**66,4% fica abaixo do piso de 70% de "Publicável com ressalvas", então a classificação já se decide
+pelo percentual, sem precisar das portas eliminatórias.** Para registro: **oito aulas abaixo de 50%**
+— 09 (0), 11 (1), 07 (3), 17 (3), 00 (4), 14 (4), 01 (5), 15 (5) — contra o máximo de zero.
+
+**Uma lacuna do meu registro, que não muda a classificação mas precisa ficar dita:** para as 12 aulas
+dos lotes 1 e 2 eu anotei **só o total**, não as seis dimensões. Então **a contagem de notas `−1` da
+R4 não está estabelecida**: são **8** nas 17 aulas com dimensão registrada (20, 07, 15, 22, 01, 00
+com uma cada; 14 com duas), e desconhecida nas outras 12. A porta de "no máximo uma `−1`" já falharia
+com 8, mas o número exato não é meu para afirmar. Quem retomar deve registrar as seis dimensões de
+toda nota, sempre — foi assim que a R3 fez, e é o que permite recontar sem reauditar.
+
+### O contrato somente-leitura estava barrando verificação, não risco
+
+**Três auditores desta rodada saíram do contrato para ler código de biblioteca:** dois baixaram
+wheels (`langchain`, `llama-index-core`) e um buscou a fonte do LangChain direto do GitHub. Todos
+reportaram. E os três melhores achados técnicos da rodada vieram exatamente daí:
+
+- os dois `−1` da AULA-15 (`mode="next"` e `Field(gt=0)`);
+- a contradição da AULA-14 sobre `with_structured_output`;
+- o `−1` da AULA-00 sobre o `find_dotenv()`.
+
+**A conclusão é sobre o desenho da auditoria, não sobre os auditores.** Uma aula que afirma o
+comportamento de uma biblioteca só se audita lendo a biblioteca. Enquanto o contrato proibia isso,
+toda alegação desse tipo passava como "PASS" sem ter sido olhada — por três rodadas. No lote 5 eu
+inverti: autorizei explicitamente a **leitura** dos wheels que já estavam no disco, com
+`unzip -p` para stdout, e proibi nominalmente `pip install`, `pip download`, `unzip -d` e
+`conda install` — a lacuna pela qual as duas violações passaram. **Ler não muda nada; instalar muda.**
+O prompt anterior confundia as duas coisas numa proibição só.
+
+E foi um acerto imediato: o auditor da AULA-14 leu `langchain/utils/math.py` dentro do wheel e
+descobriu que a função citada pela aula **não está implementada ali** — é um `__getattr__` que
+redireciona para `langchain_community`. A citação da aula funciona; o detalhe ela não menciona.
+
+### O `GLOSSARIO.md` é o artefato mais fraco do projeto
+
+**Cinco defeitos nele nesta sessão**, todos da mesma natureza — ele carregava a versão **sem a
+ressalva** de algo que as aulas corrigiram:
+
+| Entrada | O que estava | O que a aula ensina |
+| --- | --- | --- |
+| `Chunk` | "a decisão de maior impacto... e a mais negligenciada", como definição | a Aula 07 marca isso como **julgamento** |
+| `Self-RAG` | "o modelo decide se precisa recuperar" | a Aula 21 corrige: verdade **do paper**, não da implementação |
+| `Adaptive RAG` | entrada duplicada que **contradizia** a boa | a Aula 25 desambigua o termo |
+| `Recall@k` | só o sentido de recuperação | as Aulas 10 e 22 alertam contra confundir com o recall **do índice** |
+| `Structured output` | "Garante forma" | a Aula 20: só o grau 4b garante, e nada no repo usa |
+| `Query routing` | "similaridade com descrições **das fontes**" | a Aula 14: no exemplo as rotas são **prompts**, não índices |
+
+**O `Recall@k` foi encontrado por dois auditores independentes** (AULA-10 e AULA-22), em aulas
+diferentes, sem saber um do outro. Cinco não é coincidência e dois independentes não é ruído: **o
+glossário nunca foi reauditado enquanto as aulas eram corrigidas.** Ele é apontado por todas as 29
+aulas como fonte de definição, e ficou congelado na primeira redação. **Recomendação para a próxima
+sessão: uma passada de auditoria do `GLOSSARIO.md` contra as aulas, entrada por entrada** — não
+remendo incidental como o desta rodada.
+
+### Três falhas dos meus próprios verificadores, todas da mesma forma
+
+1. O `checar-vocabulario.js` media **ausência** e nunca **excesso**: reportava "0 faltando" com nove
+   entradas duplicadas no glossário, cinco delas inseridas por um script meu.
+2. Consertado, ele comparava **título exato** e não viu `**MRR (Mean Reciprocal Rank)**` contra
+   `**MRR (mean reciprocal rank)**` — só a capitalização diferia. Agora normaliza caixa, acento e
+   pontuação.
+3. Ao consertar um `NO_ANCHOR` que eu mesmo criei, escrevi o caminho **depois** do número da linha,
+   contra a regra que este projeto documenta.
+
+**As três são a mesma falha: comparar forma em vez de sentido** — que é exatamente o defeito do
+material que esses verificadores auditam.
+
+### E três vezes reproduzi número de relatório sem recalcular
+
+É o meu defeito mais reincidente, e a quarta rodada o pegou três vezes:
+
+1. **"13 de 29"** no commit `899e8f0`, cujo próprio corpo lista doze notas.
+2. **"for retrieval"** na AULA-25, escrito antes de abrir o paper (estava certo — o `grep` com
+   `-layout` voltar vazio é o que me obrigou a conferir; o modo simples do `pdftotext` acha a frase,
+   o `-layout` não, porque quebra em coluna).
+3. **"o `numpy` é o único com divergência de versão maior"** na AULA-00. Dos **102** pacotes pinados
+   nos dois `requirements`, seis divergem e **três** trocam o número principal (`async-timeout` 4→5,
+   `certifi` 2025→2024, `numpy` 1→2). O número "seis" do relatório estava certo; o adjetivo "único",
+   não — e eu copiei os dois.
+
+**Onde eu acertei o método:** no `−1` da AULA-00 o auditor **declarou** não ter verificado — derivou
+o algoritmo do `find_dotenv()` de memória e pediu confirmação empírica. Fui à fonte: o
+`python-dotenv` 1.1.0 está instalado nesta máquina, e `dotenv/main.py:312` faz
+`path = os.path.dirname(os.path.abspath(frame_filename))`. Ele está certo — e **incompleto**: o mesmo
+`find_dotenv()` usa `os.getcwd()` quando detecta REPL, notebook ou depurador. Como o repositório tem
+`.ipynb`, **a aula está errada para script `.py` e certa para notebook** — nuance que só apareceu
+lendo o código, e que a correção agora registra nos dois caminhos.
+
+### Correções do lote 5 — 21
+
+GLOSSARIO (4): `MRR` desduplicado, `Recall@k` com os dois sentidos, `Structured output` por grau,
+`Query routing` distinguindo rota-de-fonte de rota-de-prompt.
+AULA-14 (4): o `with_structured_output` reescrito como indução + validação com erro, citando o grau
+4a da Aula 20; a atribuição à Aula 12 desfeita (ela não usa "roteamento" em nenhum ponto — `grep -c`
+dá 0); números de exemplo marcados como ilustrativos; "são três linhas" afrouxado.
+AULA-01 (4): "28 aulas" → **27** (o curso tem 29, e a nota fala do que vem **depois** da 01);
+marcador cobrindo a frase inteira; nota de rodapé sobre a fronteira Text2SQL, avisando que a Aula 06
+usa "RAG" em sentido estrito e vem **antes** da Aula 12, que reclassifica.
+AULA-06 (2): as duas passagens que opunham "RAG" a Text2SQL sem ressalva.
+AULA-22 (1): "o único A/B controlado do repositório" → "deste módulo", porque a Aula 24 descreve seis
+retrievers comparados dois a dois e diz ser "o desenho experimental que a Aula 22 pediu".
+AULA-28 (1): **minha correção de hoje que consertou o verbo e deixou a contagem** — "vinte e sete das
+vinte e oito" com uma exceção, quando são 29 aulas e **duas** não têm a seção (a 01 e a própria 28,
+que faz a afirmação).
+AULA-00 (5): o mecanismo do `load_dotenv`; o `.venv-langchain` que era criado no Passo 1 e **nunca
+instalado**, apesar de a aula justificar os dois ambientes pelo conflito de `numpy`; os seis pacotes
+divergentes com a contagem refeita; dois comparativos sem marcador; e uma duplicação de frase que a
+minha própria edição criou e o `grep` do irmão pegou.
+
+### Estado dos verificadores no fecho
+
+`verify-citations --all`: **PASS**, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` em zero,
+`NO_ANCHOR` em **10** (era 16 no início da sessão). Vocabulário: **0 faltando, 0 duplicados**, com o
+detector normalizando caixa. Clone da Packt: **vazio, incluindo `--ignored`**, depois de **57**
+auditores nas quatro rodadas.

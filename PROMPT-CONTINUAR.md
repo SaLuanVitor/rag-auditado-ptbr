@@ -98,15 +98,25 @@ sexta e a sétima, que é a lição inteira deste projeto em miniatura):
   script meu em termos que já tinham entrada, e uma delas contradizia a entrada boa. Verificador
   que só procura ausência é cego para excesso. Ele conta as duas coisas agora.
 
-ESTADO DA AVALIAÇÃO: TRÊS rodadas completas, 29 de 29 cada. Curso em 245/348 = 70,4%
-(cenário conservador da terceira rodada).
-Classificação pela RUBRICA: REQUER REVISÃO, com as três rodadas convergindo no mesmo rótulo. Os
-70,4% cairiam em "Publicável com ressalvas" (70-84%), mas as portas eliminatórias falham — 12 notas
--1 (o máximo é uma) e CINCO aulas abaixo de 50%: AULA-03 (4/12), AULA-09 (2/12), AULA-11 (5/12),
-AULA-12 (3/12), AULA-13 (4/12). Detalhe na seção "TERCEIRA rodada, COMPLETA" do GATE.
+ESTADO DA AVALIAÇÃO: QUATRO rodadas completas, 29 de 29 cada. Curso em 231/348 = 66,4% (R4).
+Classificação pela RUBRICA: REQUER REVISÃO, quatro rodadas no mesmo rótulo. Na R4 o percentual
+decide sozinho — 66,4% fica ABAIXO do piso de 70% de "Publicável com ressalvas", sem precisar das
+portas. OITO aulas abaixo de 50%: 09 (0), 11 (1), 07 (3), 17 (3), 00 (4), 14 (4), 01 (5), 15 (5).
+Detalhe na seção "QUARTA rodada" do GATE.
 
-⚠️ E LEIA ISTO ANTES DE COMPARAR NOTAS: a terceira rodada deu nota MENOR que a segunda (70,4%
-contra 73,0%) mesmo depois de 15 correções. Não é o material que piorou — é que a terceira mediu
+LACUNA DO REGISTRO, e o próximo que anotar nota precisa não repetir: nas 12 aulas dos lotes 1 e 2
+da R4 eu anotei SÓ O TOTAL, não as seis dimensões. Resultado: a contagem de notas -1 da R4 não
+está estabelecida (são 8 nas 17 com dimensão registrada). Registre SEMPRE as seis dimensões — é o
+que permite recontar sem reauditar.
+
+⚠️ E LEIA ISTO ANTES DE COMPARAR NOTAS: a nota caiu TRÊS RODADAS SEGUIDAS — 73,0% na R2, 70,4% na
+R3, 66,4% na R4 — e cada rodada mediu depois de dezenas de correções. Na R4 a prova ficou nítida:
+ordenei os lotes do mais fraco ao mais forte pela nota da R3, e a QUEDA CRESCE conforme a nota
+anterior sobe (lote 3: 54 contra 60; lote 4: 56 contra 62; lote 5: 31 contra 56). As aulas que uma
+rodada dá como 11 ou 12 são as que a rodada seguinte mais rebaixa: a AULA-22 saiu de 12/12 para 8,
+a AULA-14 de 11 para 4. Nota alta neste projeto significa "não medida fundo ainda", não "boa".
+A terceira rodada já dava nota MENOR que a segunda (70,4% contra 73,0%) mesmo depois de 15
+correções. Não é o material que piorou — é que a terceira mediu
 mais fundo. Ela foi a primeira com UMA AULA POR AUDITOR e dez citações mínimas em vez de cinco, e nas
 quatro aulas com dois auditores, em QUATRO DE QUATRO o de orçamento dobrado deu nota menor E achou
 defeito verificável que o de par perdeu. Trate as notas das rodadas 1 e 2 como piso otimista, não

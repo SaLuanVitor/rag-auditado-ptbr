@@ -323,7 +323,7 @@ seguidos — o módulo `08-Generation/04-`, entre a Aula 21 e esta, tem um únic
 
 ---
 
-## Parte 4 — LlamaIndex: o único A/B controlado do repositório
+## Parte 4 — LlamaIndex: o A/B controlado deste módulo
 
 `09-Evaluation/04-LlamaIndexEvaluation.py` tem 182 linhas e é o arquivo que a Aula 15 prometeu: ele
 compara **duas estratégias de recuperação** com as mesmas perguntas e as mesmas métricas.

@@ -27,8 +27,8 @@ Você vai tomar três decisões, nesta ordem:
 1. **Framework:** LangChain ou LlamaIndex? — Ambos. O livro usa os dois de
    propósito, porque comparar as duas APIs no mesmo problema ensina o que é
    essencial ao RAG e o que é escolha de biblioteca.
-2. **Provedor de LLM:** API paga ou modelo local? — Esta é a decisão que mais
-   afeta seu bolso ao longo do curso.
+2. **Provedor de LLM:** API paga ou modelo local? — **Julgamento:** é a decisão que mais afeta seu
+   bolso ao longo do curso.
 3. **Isolamento:** um ambiente virtual por módulo, ou um só? — Um por família de
    framework. Detalhado abaixo.
 
@@ -85,10 +85,15 @@ python -m venv .venv-llamaindex
 ```
 
 Por que dois: `91-Environment/` mantém requirements separados por framework
-justamente porque há versões travadas que divergem entre eles. O caso mais
-grave é o `numpy`: **1.26.4** no arquivo do LangChain contra **2.2.2** no do LlamaIndex — uma
-mudança de versão maior, com quebra de compatibilidade. Um ambiente só funciona no começo e explode
-na Fase 5.
+justamente porque há versões travadas que divergem entre eles. Dos **102** pacotes pinados nos dois
+arquivos, **seis** divergem: `async-timeout` (4.0.3 / 5.0.1), `beautifulsoup4` (4.8.2 / 4.12.3),
+`certifi` (2025.1.31 / 2024.12.14 — o do LangChain é mais **novo**), `grpcio` (1.67.1 / 1.70.0),
+`six` (1.12.0 / 1.17.0) e o `numpy`: **1.26.4** contra **2.2.2**.
+
+Três dessas trocam o número principal, mas só a do `numpy` importa aqui: a 2.0 mudou a ABI, então
+**pacote compilado contra a 1.x não carrega na 2.x** — e boa parte do que este curso instala
+(`faiss`, `torch`, `pymilvus`) traz extensão compilada. É por isso que um ambiente só funciona no
+começo e explode **na Fase 5**, quando os dois frameworks passam a conviver.
 
 > Confira você mesmo, e note o que **não** diverge: `pydantic`, `openai` e `tokenizers` estão
 > travados na mesma versão nos dois arquivos. Conferir antes de repetir é o hábito que este curso
@@ -101,6 +106,16 @@ No PowerShell:
 ```powershell
 .\.venv-llamaindex\Scripts\Activate.ps1
 pip install -r 91-Environment/requirements_llamaindex_NoGPU_Mac-Win.txt
+```
+
+E o outro, que você vai precisar a partir da Aula 03 — **não pule este passo por simetria com o de
+cima**: o `.venv-langchain` criado no Passo 1 fica vazio até você rodar isto, e o conflito de
+`numpy` que justifica os dois ambientes é exatamente o que impede instalar um dentro do outro.
+
+```powershell
+deactivate
+.\.venv-langchain\Scripts\Activate.ps1
+pip install -r 91-Environment/requirements_langchain_NoGPU_Mac-Win.txt
 ```
 
 Escolha o arquivo conforme sua máquina:
@@ -162,12 +177,21 @@ Edite o `.env` e preencha **só o que você vai usar**. Para o caminho Ollama, b
 OLLAMA_MODEL=llama3
 ```
 
-Atenção a uma pegadinha real do repositório: cada módulo tem seu próprio
-`.env.example`, e `load_dotenv()` sem argumento procura o `.env` a partir do
-diretório de trabalho subindo na árvore. Se você rodar o script de dentro da pasta
-dele, o `.env` daquela pasta é encontrado. Se rodar da raiz, não é. **Rode sempre
-de dentro do diretório do módulo** — os caminhos relativos dos dados também
-dependem disso (`../99-EN/...`).
+Atenção a uma pegadinha real do repositório: cada módulo tem seu próprio `.env.example`. **Rode
+sempre de dentro do diretório do módulo** — mas pela razão certa, que não é a que parece.
+
+O motivo real são os **caminhos relativos dos dados** (`../99-EN/...`), que dependem do diretório de
+trabalho. O `load_dotenv()` **não** depende dele quando você roda um `.py`: o `find_dotenv()` começa
+a busca em `os.path.dirname(os.path.abspath(frame_filename))` — o diretório do **arquivo que
+chamou** — e sobe na árvore a partir dali. Rodar `python 00-SimpleRAG/script.py` da raiz resolve o
+mesmo diretório que rodar de dentro da pasta, e acha o mesmo `.env`.
+
+> **Onde o diretório de trabalho volta a mandar:** o `find_dotenv()` usa `os.getcwd()` em vez do
+> arquivo quando detecta REPL, notebook (`_is_interactive()`) ou depurador (`_is_debugger()`), ou
+> quando você passa `usecwd=True`. Como este repositório tem `.ipynb`, os dois comportamentos
+> aparecem no curso: **no notebook o `.env` encontrado é o da pasta de onde você abriu o Jupyter.**
+> _Conferido lendo o código do módulo `dotenv.main` (`python-dotenv` 1.1.0, instalado fora deste
+> repositório); não executei o teste. Versão diferente pode diferir._
 
 ### Passo 6 — Prova de que funciona
 

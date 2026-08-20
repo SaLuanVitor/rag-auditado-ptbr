@@ -10,18 +10,15 @@ duplicação nasceu de nove entradas dobradas que a de ausência não via)
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
 lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
 lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
-**Renota:** ✅ **três rodadas completas** + a **quarta PARCIAL em 24 de 29**. A terceira (20/08) foi
-a primeira com **uma aula por auditor e orçamento dobrado** — dez citações abertas por aula em vez
-de cinco. Total do curso na última rodada completa: **245/348 = 70,4%** (conservador; 266/348 =
-76,4% usando o auditor de par nas quatro aulas duplicadas)
-**⏳ Quarta rodada — onde ficou:** 24 auditadas, **200** pontos contra **189** da R3 nas mesmas 24
-(Δ médio +0,46; 12 subiram, 8 caíram, 4 empataram). **As cinco sem nota nesta rodada: 00, 01, 10,
-14 e 22** — continuam com a nota da R3 e são o ponto de partida de quem retoma. São justamente a
-faixa alta da R3 (11, 11, 11, 11 e 12), ou seja: a rodada ainda não mediu fundo onde a R3 diz que o
-material está melhor. Não as trate como boas — trate como **não medidas**. **Cinco aulas abaixo de
-50%:** 07 (3), 09 (0), 11 (1), 15 (5), 17 (3). **Não há classificação nova**: somar 24 notas da R4
-com 5 da R3 daria 256/348 = 73,6%, e isso mistura dois instrumentos de profundidade diferente — a
-R3 já provou que o mais fundo mede mais baixo. Ordem de grandeza, não veredicto
+**Renota:** ✅ **QUATRO rodadas completas, 29 de 29 cada.** Curso em **231/348 = 66,4%** (R4, a
+medição válida). Histórico: R2 = 254/348 = 73,0%; R3 = 245/348 = 70,4%; **R4 = 231/348 = 66,4%**
+**⚠️ TERCEIRA queda consecutiva, e não é o material piorando — é o instrumento afundando.** A R4
+recebeu 77 correções antes de medir e a nota desceu 14 pontos. Δ médio **−0,48**; 12 subiram, 13
+caíram, 4 empataram. Duas evidências de que a causa é o instrumento: **(1)** ordenei os lotes 3, 4 e
+5 do mais fraco ao mais forte pela R3, e a queda cresce conforme a nota anterior sobe — lote 3: 54
+contra 60; lote 4: 56 contra 62; **lote 5: 31 contra 56**; **(2)** cada queda veio do defeito da
+CLASSE que o prompt daquela aula mandou procurar, não de rigor genérico. **Trate as notas das
+rodadas 1, 2 e 3 como piso otimista, não como medida**
 **⚠️ Uma classe inteira de alegação está NÃO AUDITADA:** tudo o que o curso afirma sobre
 comportamento de `langchain`/`llama-index` só se confere lendo a fonte da biblioteca, e o contrato
 somente-leitura dos auditores proíbe baixá-la. Quando um auditor violou o contrato para ler, achou
@@ -31,7 +28,18 @@ correções entre as duas rodadas e desceu para 70,4% — Δ médio **−0,31**,
 empataram. Não é contradição: **a R2 media menos.** Nas quatro aulas com dois auditores, em **4 de 4**
 o de orçamento dobrado deu nota menor e achou defeito verificável que o outro perdeu. Trate as notas
 das rodadas 1 e 2 como piso otimista, não como medida
-**Classificação:** **Requer revisão**, agora com três rodadas convergindo no mesmo rótulo. Os 70,4%
+**Classificação:** **Requer revisão** — quatro rodadas convergindo no mesmo rótulo. Na R4 os 66,4%
+ficam **abaixo do piso de 70%** de "Publicável com ressalvas", então o percentual já decide sozinho,
+sem precisar das portas eliminatórias. Para registro: **oito aulas abaixo de 50%** — 09 (0), 11 (1),
+07 (3), 17 (3), 00 (4), 14 (4), 01 (5), 15 (5). **Lacuna do registro:** para as 12 aulas dos lotes 1
+e 2 da R4 anotei só o total, não as seis dimensões, então a contagem de `−1` da R4 **não está
+estabelecida** (são 8 nas 17 com dimensão registrada). Não muda a classificação; muda o que se pode
+afirmar. Quem retomar: registre as seis dimensões de toda nota, sempre
+**📌 Próximo trabalho, na ordem:** (1) **auditar o `GLOSSARIO.md` entrada por entrada** — cinco
+defeitos nele numa sessão, um deles achado por dois auditores independentes; ele nunca foi
+reauditado enquanto as aulas eram corrigidas; (2) as **oito aulas abaixo de 50%**; (3) a quinta
+rodada, já com leitura de fonte de biblioteca autorizada
+**Histórico da classificação anterior:** os 70,4% da R3
 cairiam em "Publicável com ressalvas" (70–84%), mas as duas portas eliminatórias falham: **12** notas
 `−1` (o máximo é uma) e **cinco** aulas abaixo de 50% — 03 (4/12), 09 (2/12), 11 (5/12), 12 (3/12),
 13 (4/12). As portas de "Publicável" falham por mais: 12 aulas abaixo de 70% e três com `E` < 1

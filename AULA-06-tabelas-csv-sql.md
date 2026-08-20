@@ -40,7 +40,9 @@ Antes de escolher biblioteca, responda: **a pergunta pede um número exato ou um
 
 - **Número exato** ("qual foi a receita de março?") → o caminho certo é **consulta
   estruturada**. Carregue a tabela num banco e use Text2SQL (Aula 12). RAG vetorial sobre
-  prosa devolve aproximação; SQL devolve o valor.
+  prosa devolve aproximação; SQL devolve o valor. (**"RAG" aqui e no resto desta aula quer dizer RAG
+  vetorial.** A Aula 12 argumenta que Text2SQL bem feito também é RAG — a oposição desta seção é
+  entre _busca vetorial_ e _consulta estruturada_, não entre "RAG" e "não-RAG".)
 - **Descrição ou comparação** ("como a receita evoluiu e por quê?") → aí sim RAG, porque a
   explicação está no texto ao redor da tabela, não na tabela.
 
@@ -270,8 +272,9 @@ veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, s
   Extração por página quebra a associação, e nenhuma das bibliotecas resolve isso sozinha.
 - **Células mescladas.** Comuns em relatório corporativo, e a maior fonte de grade corrompida.
   Vale inspecionar manualmente uma amostra antes de confiar na extração em lote.
-- **Usar RAG onde SQL resolve.** Pergunta sobre valor exato, agregação ou contagem pede
-  consulta estruturada. RAG vetorial devolve o trecho mais parecido, não o cálculo correto.
+- **Usar busca vetorial onde SQL resolve.** Pergunta sobre valor exato, agregação ou contagem pede
+  consulta estruturada. RAG vetorial devolve o trecho mais parecido, não o cálculo correto — e trocar
+  a busca vetorial por Text2SQL não é sair do RAG, só recuperar por outro meio (Aula 12).
 - **Colunas numéricas como texto.** `difficulty_level` embutido como prosa não permite filtrar
   por faixa. Colunas escalares devem virar metadado filtrável.
 - **Camelot instalado junto do resto.** Dependências de sistema conflitantes; use o
