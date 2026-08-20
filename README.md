@@ -105,8 +105,16 @@ que o leitor vai encontrá-los.
 
 ## Licença
 
-Ainda não definida. O material didático é original; o repositório de código que ele
-analisa é de terceiros e não está incluído aqui.
+**Duas licenças, por natureza do arquivo** — detalhe e escopo em [`LICENSE`](LICENSE):
+
+| O que                                                                     | Licença                                                                                 |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Material didático — as 29 aulas, `GLOSSARIO.md`, `FATOS.md`, `avaliacao/` | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.pt-br)                |
+| Código — `ferramentas/`, `exercicios/`                                    | [MIT](LICENSE-CODE)                                                                     |
+
+O material didático é original. O repositório de código que ele analisa é de terceiros,
+**não está incluído aqui** e segue os termos da origem — o mesmo vale para os PDFs de
+papers que vivem dentro daquele clone.
 
 ---
 

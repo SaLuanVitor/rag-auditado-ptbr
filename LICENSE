@@ -1,0 +1,48 @@
+# Licença
+
+Este repositório usa **duas licenças**, por natureza do arquivo. Prosa e software têm
+necessidades jurídicas diferentes, e uma licença só cobriria mal um dos dois.
+
+## Material didático — CC BY-SA 4.0
+
+Aplica-se a todo o conteúdo textual deste repositório:
+
+- `AULA-00-*.md` a `AULA-28-*.md` — as 29 aulas
+- `GLOSSARIO.md`, `FATOS.md`, `README.md`, `HANDOFF.md`
+- `avaliacao/` — rubricas, exames, respostas e gates
+- `agente/rag-specialist.md` — a persona do agente especialista
+
+Licenciado sob **Creative Commons Atribuição-CompartilhaIgual 4.0 Internacional**
+(CC BY-SA 4.0).
+
+- Resumo legível: https://creativecommons.org/licenses/by-sa/4.0/deed.pt-br
+- Texto legal completo: https://creativecommons.org/licenses/by-sa/4.0/legalcode.pt
+
+Em resumo, e isto **não** substitui o texto legal acima: você pode copiar, redistribuir,
+adaptar e usar comercialmente, desde que (a) dê o crédito, indique se houve alteração e
+aponte para a licença, e (b) distribua o derivado sob esta mesma licença.
+
+## Código — MIT
+
+Aplica-se a todo o software deste repositório:
+
+- `ferramentas/` — `verify-citations.js`, `gerar-fatos.js`
+- `exercicios/` — os scripts executáveis
+
+Licenciado sob a **Licença MIT**. Texto completo em [`LICENSE-CODE`](LICENSE-CODE).
+
+## O que NÃO é coberto por nenhuma das duas
+
+O repositório de código analisado pelo curso — [_RAG from First Principles_, de Jia Huang
+(Packt)](https://github.com/PacktPublishing/RAG-from-First-Principles) — **é de terceiros e
+não está incluído aqui**. O curso o cita por `arquivo:linha` e espera encontrá-lo clonado
+como pasta irmã. Os termos dele são os do repositório de origem, e nada nesta licença se
+aplica a ele.
+
+O mesmo vale para os PDFs de papers que vivem dentro daquele clone (GraphRAG, Modular RAG,
+Self-RAG, RRR): os direitos são dos respectivos autores e editoras. As citações neste curso
+são trechos curtos, atribuídos, para fins de crítica e ensino.
+
+---
+
+Copyright (c) 2026 SaLuanVitor (https://github.com/SaLuanVitor)
