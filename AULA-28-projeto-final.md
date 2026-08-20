@@ -54,8 +54,9 @@ prompt é o que está visível.
 
 ### Toda decisão tem custo, e o curso nomeou cada um
 
-Vinte e sete das vinte e oito aulas terminaram numa seção de armadilhas de produção — a exceção é a
-Aula 01, que traz "Quando _não_ usar RAG" no lugar. Elas não são
+Vinte e sete das vinte e oito aulas fecham o conteúdo técnico numa seção de armadilhas de
+produção — a exceção é a Aula 01, que traz "Quando _não_ usar RAG" no lugar. (Fecham o conteúdo,
+não o arquivo: Checkpoint e Vocabulário vêm depois, nas 27.) Elas não são
 uma lista de erros dos outros: são o **preço** de cada escolha. `chunk_overlap` alto sai caro,
 reranking soma latência, multi-representação multiplica o índice, laço sem contador é dívida, e assim
 por diante.
@@ -333,7 +334,9 @@ Se o seu projeto tiver aresta que volta, ele precisa de três coisas:
    produzir a mesma saída — e o mesmo veredito.
 3. **Um comportamento definido quando o limite estoura.** Responder com ressalva, admitir falha ou
    escalar. A ausência de escolha não é travamento — é deixar a plataforma abortar por você: o
-   `recursion_limit` padrão do LangGraph (25) devolve uma exceção onde deveria haver uma resposta.
+   `recursion_limit` padrão do LangGraph — 25 super-steps, valor da documentação da biblioteca, que
+   as Aulas 21 e 26 registram como **não confirmado neste ambiente** porque `langgraph` não está
+   instalado — devolve um `GraphRecursionError` onde deveria haver uma resposta.
 
 E um cuidado extra, que a Aula 26 encontrou na forma dura: **guarde a pergunta original.** Um laço
 que reescreve a reescrita se afasta da intenção; um laço que apaga o histórico não converge.

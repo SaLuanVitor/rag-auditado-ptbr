@@ -145,7 +145,7 @@ e o "Quebre de propósito" #1 desta mesma aula já o classificam assim. O que o 
 
 | Subtipo               | Como termina, segundo o paper                                                                                                                                            |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Iterative**         | _"typically involving a fixed number of iterations"_; o exemplo é o ITER-RETGEN, e a terminação _"is determined by a predefined number of iterations"_                   |
+| **Iterative**         | _"typically involving a fixed number of iterations for retrieval"_; o exemplo é o ITER-RETGEN, e a terminação _"is determined by a predefined number of iterations"_                   |
 | **Recursive**         | dependência clara do passo anterior, aprofundamento progressivo, estrutura de árvore, e _"a clear termination mechanism as an exit condition"_ — com profundidade máxima |
 | **Adaptive (active)** | o sistema _"can actively determine the timing of retrieval and decide when to conclude the entire process"_                                                              |
 

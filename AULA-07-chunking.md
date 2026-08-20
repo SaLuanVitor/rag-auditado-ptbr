@@ -9,8 +9,9 @@
 Você tem um documento de 40 páginas e um modelo de embedding que aceita 512 tokens. Precisa
 cortar. Onde?
 
-Parece decisão de implementação — um parâmetro a preencher. É a decisão de maior impacto em
-qualidade de resposta de todo o pipeline e, **julgamento**, a mais negligenciada. Ela determina o que é
+Parece decisão de implementação — um parâmetro a preencher. **Julgamento, e a frase inteira é
+julgamento:** é a decisão de maior impacto em qualidade de resposta de todo o pipeline, e a mais
+negligenciada. Nenhuma das duas metades é verificável por `grep`; a segunda nem em princípio. Ela determina o que é
 possível recuperar: **informação cortada ao meio não é recuperável por nenhum modelo de
 embedding, nenhum reranking e nenhum prompt.** Os capítulos seguintes só conseguem trabalhar
 com o que esta aula deixou intacto.
@@ -29,8 +30,9 @@ Escolher `chunk_size` é escolher entre dois objetivos que puxam em direções o
 | **Geração competente** | **maior**   | o LLM precisa do entorno para responder                  |
 
 O lado do embedding merece cuidado, porque a intuição engana. Um chunk grande não produz "um
-vetor com mais informação" — produz um vetor que é aproximadamente a **média** das direções
-dos assuntos que ele contém. Média de direções distintas aponta para o meio de lugar nenhum:
+vetor com mais informação" — produz um vetor que se aproxima da **média** das direções
+dos assuntos que ele contém. (Isto vale para os modelos de _mean pooling_, que são os usados neste
+curso; é a explicação corrente do fenômeno, não uma medição que eu tenha feito aqui.) Média de direções distintas aponta para o meio de lugar nenhum:
 o vetor fica equidistante de tudo e próximo de nada. É por isso que chunk grande degrada
 recuperação em vez de melhorá-la.
 
@@ -126,8 +128,12 @@ seria `["\n\n", "\n", ".", ",", " ", ""]`.
 ### O par que isola a variável
 
 `04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são, **julgamento**, o experimento
-mais bem construído do módulo. Rodando `diff` entre os dois, a diferença se resume ao
-splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também:
+mais bem construído do módulo. Rodando `diff` entre os dois, a diferença **relevante** está no
+splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também. O `diff` cru
+mostra mais que isso: um import extra de `Language`, a chamada de
+`get_separators_for_language(Language.JS)` que só existe no primeiro, comentários e nomes de
+variável diferentes (`python_docs` vs. `text_chunks`). Nada disso muda o experimento, mas você vai
+ver na tela:
 
 |                 | `04-LangChain-ChunkingForCode.py`                                                            | `04-LangChain-PlainChunkingForCode.py`                    |
 | --------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -160,7 +166,7 @@ splitter = SemanticSplitterNodeParser(
     breakpoint_percentile_threshold=90,  # linha 19
     embed_model=OpenAIEmbedding(...)     # linha 20
 )
-base_splitter = SentenceSplitter(        # linha 23 — "as a control"
+base_splitter = SentenceSplitter(        # linha 23; o "as a control" é o comentário da 22
 ```
 
 E ao final imprime a **contagem de chunks de cada um** (linhas 61 e 70), lado a lado. O
@@ -263,12 +269,15 @@ O PDF existe — confirmei em `90-Data/ComplexPDF/`, ao lado de `uber_10q_march_
 Agora rode três vezes, mudando só o `chunk_size` para 50, 100 e 250, e anote a resposta de
 cada. **Antes de rodar, escreva sua previsão.**
 
-O que você deve observar, e o mecanismo por trás:
+**Previsão do autor, não medição.** Não rodei este experimento: exige `unstructured`, chave de
+API e três chamadas de LLM, e nada abaixo é saída observada. É o que eu espero, e o motivo — que é
+exatamente o que vale comparar com a sua própria previsão. Se a sua execução divergir, a execução
+ganha.
 
 - **`chunk_size=50`** — pequeno demais para uma linha de tabela financeira. O rótulo ("Loss
-  from operations") e o valor caem em chunks diferentes. O sistema recupera um pedaço com o
-  rótulo e sem o número, ou com o número e sem o rótulo. A resposta erra ou se recusa.
-- **`chunk_size=250`** — cabe a linha inteira, com rótulo, valor e coluna do ano juntos.
+  from operations") e o valor devem cair em chunks diferentes, e o sistema recupera um pedaço com o
+  rótulo e sem o número, ou o inverso. Espero resposta errada ou recusa.
+- **`chunk_size=250`** — deve caber a linha inteira, com rótulo, valor e coluna do ano juntos.
 - **Entre os dois** existe um limiar, e ele não é uma propriedade do modelo nem da biblioteca:
   é uma propriedade **daquela tabela**. Num documento com linhas mais longas, o limiar seria
   outro.

@@ -2,16 +2,25 @@
 
 **Data:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
-**Verificação:** `verify-citations --all` = **PASS** — 1646 OK, zero inválidas. `BAD_LINE`,
+**Verificação:** `verify-citations --all` = **PASS** — 1658 OK, zero inválidas. `BAD_LINE`,
 `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 16 `SKIPPED` (glob ou elipse) e
-20 `NO_ANCHOR`, ambos conferência à mão por desenho
+16 `NO_ANCHOR`, ambos conferência à mão por desenho. **Vocabulário:** 254 termos das seções
+"Vocabulário" conferidos contra o `GLOSSARIO.md` — **0 faltando, 0 duplicados** (a checagem de
+duplicação nasceu de nove entradas dobradas que a de ausência não via)
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
 lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
 lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
-**Renota:** ✅ **TRÊS rodadas completas.** A terceira (20/08) foi a primeira com **uma aula por
-auditor e orçamento dobrado** — dez citações abertas por aula em vez de cinco. Total do curso
-**245/348 = 70,4%** (cenário conservador; 266/348 = 76,4% usando o auditor de par nas quatro aulas
-duplicadas)
+**Renota:** ✅ **três rodadas completas** + a **quarta PARCIAL em 18 de 29**. A terceira (20/08) foi
+a primeira com **uma aula por auditor e orçamento dobrado** — dez citações abertas por aula em vez
+de cinco. Total do curso na última rodada completa: **245/348 = 70,4%** (conservador; 266/348 =
+76,4% usando o auditor de par nas quatro aulas duplicadas)
+**⏳ Quarta rodada — onde ficou:** 18 auditadas, **144** pontos contra **127** da R3 nas mesmas 18
+(Δ médio +0,94; 9 subiram, 5 caíram, 4 empataram). **As onze sem nota nesta rodada: 00, 01, 02, 08,
+10, 14, 15, 18, 19, 21, 22** — continuam com a nota da R3, e são o ponto de partida de quem
+retoma. Quatro aulas seguem abaixo de 50%: 07 (3), 09 (0), 11 (1), 17 (3). **Não há classificação
+nova**: somar 18 notas da R4 com 11 da R3 daria 262/348 = 75,3%, e isso mistura dois instrumentos
+de profundidade diferente — a R3 já provou que o mais fundo mede mais baixo. Ordem de grandeza, não
+veredicto
 **⚠️ A nota CAIU, e é o achado principal:** a R2 dava 254/348 = 73,0%. O material recebeu 15
 correções entre as duas rodadas e desceu para 70,4% — Δ médio **−0,31**, 11 subiram, 13 caíram, 5
 empataram. Não é contradição: **a R2 media menos.** Nas quatro aulas com dois auditores, em **4 de 4**
@@ -25,8 +34,11 @@ cairiam em "Publicável com ressalvas" (70–84%), mas as duas portas eliminató
 **Distância até "com ressalvas":** zerar as 12 notas `−1` e tirar cinco aulas de baixo dos 50%
 **Licença:** definida em 20/08 — **CC BY-SA 4.0** para o material didático, **MIT** para o código
 (`ferramentas/`, `exercicios/`). Escopo em `LICENSE`; texto do MIT em `LICENSE-CODE`
-**Git:** **um commit**, `6658768`, na branch `main`, **sincronizado com `origin/main`** — nada
-pendente de push. Repo público em https://github.com/SaLuanVitor/rag-auditado-ptbr
+**Git:** branch `main`, repo público em https://github.com/SaLuanVitor/rag-auditado-ptbr.
+**Este bloco não afirma contagem nem hash de propósito** — um cabeçalho que afirma o próprio estado
+de git fica falso no instante em que é commitado, e "afirmação escrita quando era verdadeira e nunca
+revisitada" é a classe de defeito dominante deste projeto. Confira você:
+`git log --oneline | awk 'END{print NR}'` e `git status -sb`
 **Convenção deste repo:** os commits **não** levam trailer `Co-Authored-By: Claude`. Decisão do
 autor, vale só aqui
 **Sincronizado:** 2026-08-20 — o bloco Git deste cabeçalho estava obsoleto (afirmava quatro commits

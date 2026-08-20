@@ -13,7 +13,7 @@ Então o que sobra para esta aula?
 Três coisas, e as duas primeiras são as que fazem este módulo diferente de todos os outros do repositório:
 
 1. **Mais de duas modalidades.** O vetorizador aqui aceita imagem, áudio e vídeo — e o modelo por trás dele projeta ainda mais que isso.
-2. **Infraestrutura própria com custo declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é o `mem_limit` explícito **em bytes** em cada serviço: o custo de rodar aparece como número, não como julgamento.
+2. **Infraestrutura própria com custo declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é o `mem_limit` explícito em cada serviço: o custo de rodar aparece como número, não como julgamento.
 3. **Geração multimodal.** O segundo script não termina na recuperação: ele descreve a imagem recuperada e **gera uma imagem nova**.
 
 E há a pergunta que o método deste curso obriga a fazer antes de qualquer entusiasmo: **os dois arquivos fazem o que os nomes dizem?** Um faz. O outro insere uma string de exemplo no lugar da imagem.
@@ -42,7 +42,8 @@ O repositório usa **as duas**, e é a combinação que faz sentido: o espaço �
 ### Multimodal cobra infraestrutura, não só API
 
 O custo aqui é **um serviço de inferência que você hospeda**, e é a primeira vez no curso que o
-requisito de memória vem **quantificado em bytes**: `mem_limit: 12g` é ocorrência única no
+requisito de memória vem **quantificado no próprio arquivo**: `mem_limit: 12g` — doze gigabytes,
+com o sufixo de unidade do Compose, não um número em bytes — é ocorrência única no
 repositório (`grep -rn "mem_limit"` nos `.yml` devolve só
 `10-AdvanceRAG/05-MultiModalRAG/docker-compose.yml:21`). Infraestrutura hospedada em si não é
 novidade — a Aula 09 já subiu Milvus com etcd e MinIO, como a Parte 1 abaixo registra —, mas lá o

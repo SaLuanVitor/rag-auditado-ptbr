@@ -156,8 +156,9 @@ extração sozinha não dá.
 
 ### Unstructured, em três degraus
 
-Os três arquivos `05-*` usam `partition_pdf`, e o `diff` entre eles revela uma escada de
-parâmetros:
+Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. O `diff` entre eles
+**não** mostra isso de forma limpa — é dominado por um docstring de troubleshooting e por blocos de
+`os.chdir`; a escada aparece quando você compara só as chamadas:
 
 | Arquivo                                                    | `strategy`               | `infer_table_structure` |
 | ---------------------------------------------------------- | ------------------------ | ----------------------- |
@@ -167,7 +168,9 @@ parâmetros:
 
 O `infer_table_structure=True` do `05-03` é o parâmetro que faz o Unstructured tentar
 reconstruir a **grade** da tabela, e não apenas detectar que há uma. Com ele, o elemento
-`Table` ganha uma representação em HTML no metadado — linhas e células preservadas.
+`Table` ganha uma representação em HTML no metadado (`metadata.text_as_html`, segundo a
+documentação do Unstructured — nenhum dos três scripts imprime esse campo, então aqui não é
+comportamento observado) — linhas e células preservadas.
 
 E o `05-02` merece atenção pelo nome: **WithContext**. Ele extrai a tabela _junto com o texto
 ao redor_ — o parágrafo que a introduz, a legenda. É a resposta ao terceiro problema do modelo
@@ -229,7 +232,8 @@ python 05-03-unstructured-TableExtractionInferTableStructure.py
 ```
 
 Compare os elementos `Table` dos dois. Com `infer_table_structure=True`, procure a
-representação em HTML no metadado — é a grade preservada.
+representação em HTML no metadado — é a grade preservada, com a ressalva de documentação da
+Parte 3.
 
 ```powershell
 python 04-02-pdfplumber-ExtractPDFTableAndQA.py

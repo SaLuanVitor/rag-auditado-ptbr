@@ -1224,3 +1224,158 @@ solta que já existia. O verificador pegou o meu erro no mesmo passe.
 `git status --short --ignored` no clone: vazio.
 47 correções aplicadas em dois lotes (32 para as notas -1, 15 para os ALTO/MÉDIO/BAIXO), cada uma
 verificada na fonte por mim, com `grep` de irmãos no curso inteiro.
+
+## Renota adversarial — QUARTA rodada, PARCIAL em 18 de 29 (20/08/2026)
+
+**Esta seção está incompleta, e o número é 18.** As onze aulas **sem** nota nesta rodada são
+**00, 01, 02, 08, 10, 14, 15, 18, 19, 21 e 22**. Elas continuam com a nota da R3. Quem retomar
+começa por elas.
+
+**Primeiro, uma contagem minha que estava errada.** O commit `899e8f0` diz "quarta rodada lotes 1-2
+(13/29)" e o corpo dele lista **doze** notas. São 12, não 13. Na mesma mensagem eu também escrevi
+"16 pendentes" quando eram 17. Afirmei uma contagem sem contar, no commit que documenta que esse é
+o meu modo de errar — e a regra que existe justamente para isso ("CONTE as notas registradas no
+GATE antes de afirmar quantas aulas foram auditadas") eu apliquei ao material e não a mim.
+
+**Desenho:** igual ao da R3 — `general-purpose` em `sonnet`, somente-leitura, nota anterior não
+revelada, proibição explícita de abrir este arquivo, o `HANDOFF.md` e o `PROMPT-CONTINUAR.md`, uma
+aula por auditor, mínimo de dez citações abertas e conferidas por conteúdo. Quatro frentes novas,
+cada uma nascida de um defeito medido:
+
+1. **"Comportamento provado não é mecanismo provado."** Se a aula diz que X faz Y **via** Z, o Z se
+   confere separadamente. Nasceu de eu ter provado que nove arquivos buscam e inventado *como*.
+2. **"Limite declarado que não se justifica."** Se a aula diz "não dá para saber", procure a
+   resposta no mesmo diretório. Hedgear demais também é erro, e viola a regra 10 da persona deste
+   curso.
+3. **"Grepe o padrão, não a frase."** "quatorze" e "14" são a mesma alegação em formas diferentes;
+   ordinal reusado para duas coisas é contradição.
+4. **"O marcador cobre a alegação inteira ou só a última cláusula?"** Quarta versão desta regra —
+   cada versão anterior morreu num caso que ela não cobria.
+
+E a cláusula de contrato que já provou funcionar duas rodadas seguidas: **"se criar arquivo por
+acidente, reporte e DEIXE LÁ."** Zero remoções nesta rodada. O clone terminou vazio, incluindo
+`--ignored`, depois de 47 auditores no total.
+
+### Notas das 18, e a comparação com a R3
+
+| Aula | R3 | **R4** | Δ |
+| --- | --- | --- | --- |
+| 03 — Primeiro RAG | 4 | **11** | +7 |
+| 12 — Query construction | 3 | **11** | +8 |
+| 13 — Query translation | 4 | **11** | +7 |
+| 24 — Contextual Retrieval | 9 | **11** | +2 |
+| 26 — Agentic e Adaptive | 8 | **11** | +3 |
+| 25 — Modular RAG | 12 | **11** | −1 |
+| 27 — Multimodal | 11 | **11** | 0 |
+| 06 — Tabelas, CSV, SQL | 10 | **11** | +1 |
+| 28 — Projeto final | 10 | **10** | 0 |
+| 23 — GraphRAG | 7 | **9** | +2 |
+| 05 — PDF, layout, OCR | 6 | **9** | +3 |
+| 20 — Saída estruturada | 8 | **8** | 0 |
+| 16 — Índice hierárquico | 6 | **7** | +1 |
+| 04 — Texto, JSON, web | 6 | **6** | 0 |
+| 17 — Reranking | 7 | **3** | −4 |
+| 07 — Chunking | 9 | **3** | −6 |
+| 11 — Híbrida e multimodal | 5 | **1** | −4 |
+| 09 — Milvus, schema | 2 | **0** | −2 |
+
+Somado por script: **R4 = 144, R3 = 127 nas mesmas 18.** Δ médio **+0,94**; 9 subiram, 5 caíram,
+4 empataram. **Quatro aulas seguem abaixo de 50%**: 07 (3), 09 (0), 11 (1), 17 (3).
+
+**Não há classificação nesta seção, e é de propósito.** Somar as 18 medidas na R4 com as 11 ainda
+na nota da R3 dá 262/348 = 75,3%, e esse número **não é uma medição** — mistura dois instrumentos
+de profundidade diferente, e a R3 já provou que o instrumento mais fundo mede mais baixo. Serve de
+ordem de grandeza, não de veredito. A classificação sai quando as 29 fecharem no mesmo desenho.
+
+### Dimensões do lote 3
+
+| Aula | E | C | H | O | D | A | Total |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 25 — Modular RAG | 2 | 2 | 2 | 1 | 2 | 2 | **11/12** |
+| 27 — Multimodal | 2 | 1 | 2 | 2 | 2 | 2 | **11/12** |
+| 06 — Tabelas, CSV, SQL | 2 | 2 | 1 | 2 | 2 | 2 | **11/12** |
+| 28 — Projeto final | 2 | 2 | 1 | 1 | 2 | 2 | **10/12** |
+| 20 — Saída estruturada | 2 | **−1** | 2 | 1 | 2 | 2 | **8/12** |
+| 07 — Chunking | 1 | 1 | **−1** | 0 | 1 | 1 | **3/12** |
+
+**Erro meu na escolha do lote.** Anunciei que escolhi 25, 27 e 28 porque "carregavam `−1` na R3".
+A tabela da R3 diz o contrário: **25 tinha 12/12 com as seis dimensões em 2**, 27 tinha 11 e 28
+tinha 10, nenhuma com `−1`. Os dez `−1` da R3 estavam em 26, 17, 23, 05, 16, 11, 03, 13, 12 e 09 —
+todas já cobertas nos lotes 1 e 2. A metade que eu acertei foi a dimensão zerada: 06 tinha `E`=0,
+07 tinha `H`=0 e 20 tinha `C`=0, e as três eram a faixa do meio. O lote foi defensável; a razão que
+eu dei para ele, não.
+
+### Os dois `−1` do lote 3
+
+**AULA-20, `C` = −1 — alegação de ausência com número errado.** A aula afirmava que "as **duas**
+ocorrências de `strict` são comentários sem relação com decodificação". `grep -rn "strict"
+--include="*.py"` no repositório devolve **três**, e a terceira —
+`04-VectorDB/Milvus/03-SearchAndMetrics/05-group-search.py:76: strict_group_size=True` — **não é
+comentário**, é parâmetro nomeado real de outra API. A conclusão de fundo (nenhum arquivo do módulo
+usa decodificação restrita) sobrevive; o número, não. Este foi o foco que eu dei ao auditor, e ele
+encontrou uma instância **nova** — não a que a R3 já tinha apontado.
+
+**AULA-07, `H` = −1 — previsão vestida de observação.** A aula manda o leitor escrever a própria
+previsão e em seguida despeja, em tom declarativo, "o que você deve observar" com três `chunk_size`:
+"a resposta erra ou se recusa". Não há saída de execução, e a aula usa "confirmei" quatro parágrafos
+antes, quando de fato verificou algo — o que torna o tom declarativo aqui indistinguível de medição.
+Corrigido com o rótulo explícito **"Previsão do autor, não medição"**, o motivo pelo qual não rodei,
+e a regra de que a execução do leitor ganha da minha previsão.
+
+### O defeito que estava no instrumento, não no material
+
+O auditor da AULA-25 achou uma entrada duplicada de **Adaptive RAG** no `GLOSSARIO.md`: a de
+`:506` desambigua o termo com cuidado, e a de `:650`, de uma linha, **contradiz** a primeira. Em vez
+de conferir só a que ele nomeou, varri todas — a lição de grepar os irmãos, aplicada ao instrumento.
+
+**Nove entradas duplicadas. Cinco delas eu criei hoje**, com o `glossario.js`, inserindo termo que
+já tinha entrada: `RAG (Retrieval-Augmented Generation)`, `OCR`, `ANN`, `Top-p` e `HyDE`. As outras
+quatro eram um bloco-resumo no fim de "Paradigmas avançados" que repetia `Agentic RAG`,
+`Adaptive RAG`, `Modular RAG` e `Contextual Retrieval` em versões de uma linha.
+
+**E o `checar-vocabulario.js` reportava 0 faltando — verdade que escondia as nove.** Ele media
+ausência e nunca mediu excesso. Medir só uma direção do erro não é medir. O verificador agora conta
+duplicação também, e as duas contagens saem juntas: **254 termos conferidos, 177 entradas, 0
+faltando, 0 duplicadas.**
+
+Resolução das nove: ficou sempre a definição mais informativa. O `Top-p` foi o caso interessante —
+minha versão rica tinha caído em *Recuperação* e a fina estava em *Pós-recuperação e geração*, a
+seção certa; então não foi apagar a antiga, foi mover o texto bom para o lugar certo, ao lado de
+`temperature`. Nenhum dos 11 termos envolvidos se perdeu (conferido por script, um a um).
+
+### Correções aplicadas no lote 3 — 17
+
+14 no primeiro passe, 3 de `MÉDIO`/`BAIXO` no mesmo dia, em vez de virarem dívida:
+
+| Aula | Defeito | Correção |
+| --- | --- | --- |
+| 07 | marcador cobria só a segunda cláusula | marcador na frase inteira, com "nenhuma das duas metades é verificável" |
+| 07 | previsão como observação | rótulo "Previsão do autor, não medição" + motivo |
+| 07 | "o `diff` se resume ao splitter" | "a diferença **relevante**", e o que o `diff` cru mostra além disso |
+| 07 | `# linha 23 — "as a control"` | o comentário está na **22**; citação corrigida |
+| 07 | "média das direções" como certeza | delimitado a modelos de _mean pooling_, e declarado como explicação corrente |
+| GLOSSARIO | o mesmo superlativo da 07, **sem marcador**, como definição | reescrito em torno do que o chunk decide, remetendo o julgamento à aula |
+| 20 | "as duas ocorrências de `strict`" | são **três**, e a terceira é parâmetro real |
+| 20 | tabela põe `04-Pydantic-v1.py` no grau 2, texto diz que não chama LLM | nota de rodapé: "em espírito, não em fato" |
+| 27 | `mem_limit` "em bytes" | o arquivo grava `12g` — gigabytes com sufixo do Compose |
+| 28 | perde o hedge que as Aulas 21 e 26 carregam sobre o **mesmo** fato | hedge restaurado e `GraphRecursionError` nomeado |
+| 28 | "27 das 28 aulas **terminaram** numa seção" | "fecham o conteúdo técnico" — Checkpoint e Vocabulário vêm depois nas 27 |
+| 06 | HTML no metadado afirmado como fato, em **dois** lugares | `metadata.text_as_html`, "segundo a documentação", nos dois |
+| 06 | "o `diff` revela uma escada" | o `diff` cru é dominado por docstring e `os.chdir`; a escada aparece nas chamadas |
+| 25 | citação truncada sem marcador | completada: "fixed number of iterations **for retrieval**" |
+
+A da AULA-06 é o caso a guardar: **a alegação estava em dois lugares (`:170` e `:232`), não um.**
+Grepei o irmão antes de corrigir, e por isso as duas foram. Nas rodadas anteriores esse é
+exatamente o defeito que eu produzi nove vezes.
+
+E na última — a citação truncada da AULA-25 — eu escrevi "for retrieval" a partir do relatório do
+auditor **antes** de abrir o paper. O `grep` com `-layout` voltou vazio, o que me obrigou a
+conferir: o modo simples do `pdftotext` acha a frase, o `-layout` não, porque quebra em coluna. A
+citação estava certa, mas eu a tinha escrito sem prova por alguns minutos. Reproduzir número de
+relatório sem recalcular é o meu defeito mais reincidente nesta auditoria.
+
+### Estado dos verificadores
+
+`verify-citations --all`: **PASS**, 1658 OK, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` todos
+em zero, `SKIPPED` 16, `NO_ANCHOR` 16. Vocabulário: 254 conferidos, 0 faltando, 0 duplicados.
+Clone da Packt: vazio, incluindo `--ignored`.

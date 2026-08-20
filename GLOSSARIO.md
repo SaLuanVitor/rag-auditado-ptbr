@@ -11,11 +11,6 @@ baixo e o vocabulário se construa em camadas.
 
 ## Fundamentos
 
-**RAG (Retrieval-Augmented Generation)** — Geração aumentada por recuperação.
-Arquitetura em que, antes de responder, o sistema busca trechos relevantes num
-acervo próprio e os injeta no prompt do LLM. O modelo passa a responder com base
-em documentos, não só no que memorizou no treino.
-
 **Hallucination** — Alucinação. Resposta do LLM factualmente errada mas
 apresentada com confiança. Não é bug: é o comportamento esperado de um modelo que
 prevê o token mais provável, sem checar verdade. RAG reduz, não elimina.
@@ -57,9 +52,6 @@ página, autor). Os metadados são o que viabiliza filtragem depois — subestim
 **Parsing** — Extrair texto estruturado de um formato bruto. Um PDF não "tem
 texto": tem instruções de desenho, e o parser reconstrói a leitura.
 
-**OCR (Optical Character Recognition)** — Reconhecimento de caracteres em imagem.
-Necessário quando o PDF é digitalização, não texto nativo.
-
 **Layout analysis** — Detecção da estrutura visual da página (título, parágrafo,
 tabela, cabeçalho). Preserva hierarquia que o texto corrido perde.
 
@@ -88,9 +80,10 @@ procura.
 
 ## Chunking
 
-**Chunk** — Pedaço de documento que é indexado e recuperado como unidade. A
-decisão de tamanho de chunk é a de maior impacto em qualidade de resposta, e a
-mais negligenciada.
+**Chunk** — Pedaço de documento que é indexado e recuperado como unidade. O tamanho do chunk
+decide o que pode ser recuperado junto: rótulo e valor no mesmo pedaço, ou em pedaços diferentes.
+(A Aula 07 sustenta que é a decisão de maior impacto do pipeline, e o faz marcando isso como
+julgamento — não é fato de glossário.)
 
 **Chunk size** — Tamanho do chunk, em caracteres ou tokens.
 
@@ -196,10 +189,6 @@ schema.
 
 **Schema** — Definição dos campos, tipos e dimensão do vetor.
 
-**ANN (Approximate Nearest Neighbor)** — Vizinho mais próximo aproximado. Troca um
-pouco de recall por ganho enorme de velocidade. É o que torna busca vetorial
-viável em escala.
-
 **FLAT** — Busca exaustiva, exata. Recall perfeito, custo linear. Ótima como
 verdade de referência para medir os índices aproximados.
 
@@ -257,10 +246,6 @@ método padrão de fusão.
 código a executa. É o que separa um agente de um pipeline: no agente, a decisão de agir é do
 modelo.
 
-**Top-p (nucleus sampling)** — Amostragem que considera só os tokens cuja probabilidade acumulada
-chega a `p`. Alternativa à temperatura para controlar variedade. Para avaliação, o que se quer é
-decodificação determinística, não ajuste fino de variedade.
-
 **LangGraph** — Biblioteca do ecossistema LangChain para descrever o pipeline como grafo de estado:
 nós que transformam o estado, arestas condicionais que decidem o caminho. É o que permite laço e
 desvio, e por isso é a base do CRAG, do Self-RAG e dos exemplos agentic.
@@ -286,10 +271,6 @@ diversidade, evitando k resultados quase idênticos.
 
 **Query decomposition** — Quebrar pergunta composta em subperguntas, recuperar
 para cada uma.
-
-**HyDE (Hypothetical Document Embeddings)** — O LLM inventa uma resposta
-hipotética e você busca pelo embedding dela. Funciona porque resposta se parece
-mais com documento do que pergunta se parece.
 
 **Query expansion** — Enriquecer a query com sinônimos e termos relacionados.
 
@@ -355,8 +336,9 @@ que se usa para comparar prompts sem ruído.
 **Temperature** — Achata ou concentra a distribuição antes da amostragem. Mais alta,
 mais variação; mais baixa, mais repetição.
 
-**Top-p (nucleus sampling)** — Amostrar apenas dentro da menor fatia de tokens cuja
-probabilidade acumulada atinge `p`.
+**Top-p (nucleus sampling)** — Amostragem que considera só os tokens cuja probabilidade acumulada
+chega a `p`. Alternativa à temperatura para controlar variedade. Para avaliação, o que se quer é
+decodificação determinística, não ajuste fino de variedade.
 
 **Output parser** — Componente que valida e converte a saída do modelo em
 estrutura (JSON, objeto Pydantic).
@@ -641,14 +623,5 @@ existem os juízes e não existe o escalonador.
 
 **GraphRAG** — Constrói grafo de entidades e relações a partir do corpus.
 Responde perguntas de síntese global que busca vetorial não alcança.
-
-**Contextual Retrieval** — Prefixa cada chunk com um resumo do documento inteiro
-antes de indexar, devolvendo ao chunk o contexto que o corte tirou.
-
-**Agentic RAG** — Um agente decide iterativamente o que buscar, avalia e refina.
-
-**Adaptive RAG** — Escolhe a estratégia conforme a complexidade da pergunta.
-
-**Modular RAG** — Enxerga RAG como módulos recombináveis, não pipeline fixo.
 
 **Multimodal RAG** — Recupera e gera sobre texto e imagem juntos.

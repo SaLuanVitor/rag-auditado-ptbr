@@ -34,9 +34,14 @@ forçar o modelo a inventar.
 | Grau | Mecanismo            | O que garante                | O que não garante                | No módulo                                               |
 | ---- | -------------------- | ---------------------------- | -------------------------------- | ------------------------------------------------------- |
 | 1    | pedir no prompt      | nada                         | nada                             | `01`, e 4 dos 5 blocos de `02`                          |
-| 2    | validar depois       | que você **detecte** o erro  | que ele não aconteça             | `01` (`parser.parse`), `04-Pydantic-v1.py`              |
+| 2    | validar depois       | que você **detecte** o erro  | que ele não aconteça             | `01` (`parser.parse`); `04-Pydantic-v1.py` só em espírito¹ |
 | 3    | obrigar na API       | JSON sintaticamente válido   | campos, tipos, semântica         | `03-JSON-Output.py:34`                                  |
 | 4    | schema como contrato | estrutura e tipos dos campos | que os valores sejam verdadeiros | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
+
+¹ **Em espírito, não em fato:** o grau 2 pressupõe saída de LLM sendo conferida, e o
+`04-Pydantic-v1.py` não chama LLM nenhum (Parte 3) — valida um dicionário fixo. Ele demonstra o
+_mecanismo_ de validação posterior sem que haja geração alguma antes. Fica na tabela porque é onde
+se aprende o mecanismo, não porque seja um caso de grau 2.
 
 > ⚠️ **O grau 4 tem dois degraus, e o repositório só mostra o de baixo.**
 > **4a — schema validado depois:** function calling e `OpenAIPydanticProgram` **induzem** fortemente
@@ -47,7 +52,7 @@ forçar o modelo a inventar.
 "strict": true}` restringe a geração ao schema, e violação de estrutura deixa de ser possível.
 > Custo: o schema fica limitado ao subconjunto que o provedor suporta, e a latência do primeiro
 > token aumenta. Nenhum arquivo deste módulo usa 4b — `grep` por `json_schema` no repositório não
-> encontra nada, e as duas ocorrências de `strict` são comentários sem relação com decodificação
+> encontra nada, e nenhuma das **três** ocorrências de `strict` tem relação com decodificação
 > restrita (`02-DocChunking/05-LlamaIndex-SemanticChunking.py:47` e
 > `Self-RAG-FullImplementation.py:54`). Ao ler a tabela acima, leia o grau 4 como **4a**.
 
