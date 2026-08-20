@@ -268,7 +268,7 @@ exibir a média de uma amostra.
 
 ---
 
-## Parte 3 — DeepEval: vinte linhas, e o único com gabarito explícito
+## Parte 3 — DeepEval: vinte e uma linhas, e o único com gabarito explícito
 
 `09-Evaluation/03-DeepEval.py` tem 21 linhas e é o exemplo mais enxuto do módulo — e o único que
 carrega uma resposta de referência escrita à mão
@@ -315,8 +315,11 @@ gate de CI. Este exemplo para no diagnóstico.
 
 **Sem `load_dotenv()`.** `grep -rn "load_dotenv" 09-Evaluation/` encontra apenas
 `01-RAGAS.py:2-3` e `04-LlamaIndexEvaluation.py:8,25`. O `09-Evaluation/.env.example:2` afirma que
-todo script do diretório carrega o `.env` — falso para o `02` e para o `03`, quarto módulo seguido em
-que essa mesma frase não corresponde ao código.
+todo script do diretório carrega o `.env` — falso para o `02` e para o `03`. Não é a primeira vez que
+essa frase não corresponde ao código, e a auditoria consolidada da Aula 27 mede o alcance: a frase
+aparece em 30 `.env.example` e é falsa em 15 dos 23 testáveis. Não é uma sequência de módulos
+seguidos — o módulo `08-Generation/04-`, entre a Aula 21 e esta, tem um único script e ele **chama**
+`load_dotenv()` (`Self-RAG-FullImplementation.py:5-6`).
 
 ---
 
@@ -587,9 +590,12 @@ conta que precisa ser feita antes, não descoberta na fatura.
 fidelidade péssima passar às costas de uma similaridade semântica ótima. É a mesma razão pela qual a
 rubrica de avaliação do agente deste projeto tem portas eliminatórias por capítulo.
 
-**Caminho absoluto no repositório.** `09-Evaluation/04-LlamaIndexEvaluation.py:47` é o único do repo
-inteiro, e é o suficiente para o arquivo não rodar em nenhuma outra máquina. Antes de concluir que um
-exemplo está errado, confira se ele está apenas apontando para o lugar errado.
+**Caminho absoluto no repositório.** `09-Evaluation/04-LlamaIndexEvaluation.py:47` é um dos **dois**
+caminhos absolutos ativos do repositório — o outro é
+`03-Embedding/05-MultimodalEmbedding.py:20`, que aponta um `.pth` sob `/root/AI-BOX/code/rag/rag-in-action/`.
+Os dois trazem o nome antigo do projeto (`rag-in-action`) e cada um basta para o arquivo não rodar em
+nenhuma outra máquina. Antes de concluir que um exemplo está errado, confira se ele está apenas
+apontando para o lugar errado.
 
 ---
 

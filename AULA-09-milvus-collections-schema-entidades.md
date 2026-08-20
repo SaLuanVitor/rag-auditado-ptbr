@@ -105,8 +105,9 @@ existe levanta erro, e o arquivo trata isso — detalhe pequeno que separa exemp
 utilizável.
 
 Database em Milvus é isolamento lógico, como em Postgres. Serve para separar ambientes
-(dev/prod) ou inquilinos, e conecta com a estratégia de particionamento multi-tenant que a
-Aula 10 vai discutir.
+(dev/prod) ou inquilinos. A escolha entre isolar por database e isolar por partição é a decisão de
+desenho multi-tenant, retomada nas Armadilhas de produção desta própria aula — nenhuma aula posterior
+do curso trata particionamento, e prometer isso à Aula 10 era promessa que ela não cumpre.
 
 ### `02-collection.py` — o atalho
 
@@ -262,8 +263,10 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   campo a mais agora.
 - 🔴 **Inserir não é publicar.** Depois do `insert`, a collection ainda precisa ser **carregada**
   para o query node: `load_collection()` (e o par `release_collection()` para devolver a memória).
-  Todo exemplo do módulo o chama — `grep -rn "load_collection"` encontra 16 arquivos em
-  `04-VectorDB/` —, e nenhuma aula até aqui o explicava. Se a sua busca voltar vazia, esta é a
+  Todo exemplo de **busca** do módulo o chama — `grep -rln "load_collection"` encontra 16 dos 27
+  `.py` de `04-VectorDB/` —, e nenhuma aula até aqui o explicava. Os 11 restantes são scripts de
+  criação e inserção, que não buscam: três dos quatro arquivos **desta aula** estão entre eles (só o
+  `02-collection.py` chama). Se a sua busca voltar vazia, esta é a
   primeira hipótese, antes de qualquer suspeita sobre embedding. Dado recém-inserido também pode não
   aparecer de imediato, conforme o nível de consistência configurado.
 - 🔴 **Acervo que muda exige ingestão idempotente.** O que acontece quando um documento é

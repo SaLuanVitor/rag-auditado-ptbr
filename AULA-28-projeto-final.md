@@ -54,7 +54,8 @@ prompt é o que está visível.
 
 ### Toda decisão tem custo, e o curso nomeou cada um
 
-Vinte e seis das vinte e sete aulas terminaram numa seção de armadilhas de produção. Elas não são
+Vinte e sete das vinte e oito aulas terminaram numa seção de armadilhas de produção — a exceção é a
+Aula 01, que traz "Quando _não_ usar RAG" no lugar. Elas não são
 uma lista de erros dos outros: são o **preço** de cada escolha. `chunk_overlap` alto sai caro,
 reranking soma latência, multi-representação multiplica o índice, laço sem contador é dívida, e assim
 por diante.
@@ -101,8 +102,10 @@ recuperação.
 | Denso, esparso ou os dois                                        | esparso mal tokenizado; ColBERT e armazenamento (Aula 08)                                           |
 
 Duas armadilhas se repetem nas Aulas 02, 07, 08 e 10 porque são as mais caras: **trocar de modelo
-exige reindexar** e **modelo no idioma errado**. O curso encontrou o segundo três vezes no próprio
-repositório — modelos com sufixo `-zh` sobre corpus em inglês.
+exige reindexar** e **modelo no idioma errado**. O segundo não é um caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
+**27 arquivos**, em sete módulos (`00-SimpleRAG` com 11, `06-Indexing` com 7, `05-PreRetrieval` com
+5, e um cada em `02-DocChunking`, `04-VectorDB`, `07-PostRetrieval` e `10-AdvanceRAG`) — modelos com
+sufixo `-zh` sobre corpus em inglês. É resíduo sistemático da origem, não descuido pontual.
 
 ### Fase 3 — Armazenamento e busca
 
@@ -166,8 +169,9 @@ lembrança que a Aula 17 registra: reranking não recupera — ele reordena o qu
 | Laço de autocrítica: existe?                | laço sem contador é dívida; regerar sem mudar a entrada (Aula 21)                           |
 
 Quatro trabalhos do prompt, e a Aula 19 mostrou o exemplo do repositório que cobre três: delimitar a
-fonte, **autorizar a abstenção**, fixar o formato, fixar o tom. A abstenção é uma frase, e é a que
-faltava.
+fonte, fixar o formato, fixar o tom. O quarto — **autorizar a abstenção** — é o que faltava, e é uma
+frase: a Aula 19 registra que os exemplos do módulo cobrem "formato com cuidado e abstenção com
+nada".
 
 ### Fase 8 — Avaliação
 
@@ -251,9 +255,12 @@ tabela acima: qual estágio o número acusa?
 
 ## Parte 3 — O hábito que vale mais que as técnicas
 
-Este curso catalogou **quatorze** casos, no mesmo repositório, em que o nome de um arquivo ou
-diretório prometia o que o código não fazia. Não é um repositório ruim: é um repositório normal, lido
-com cuidado.
+Este curso catalogou **quinze** casos, no mesmo repositório, em que o nome de um arquivo ou
+diretório prometia o que o código não fazia. Quatorze estão na tabela abaixo; o décimo quinto é o
+primeiro que o curso encontrou e está na Aula 00 — o par `01_02`/`01_03` de `00-SimpleRAG/`, cujo
+nome promete trocar uma variável e cujo
+`00-SimpleRAG/01_03_LlamaIndex_SwitchGenerationModel.py:9` troca duas. Não é um repositório ruim: é um
+repositório normal, lido com cuidado.
 
 | #   | O caso, em uma linha                                                                               |
 | --- | -------------------------------------------------------------------------------------------------- |

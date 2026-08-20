@@ -110,7 +110,7 @@ São quatro. E, para cada um, o curso já viu ao menos uma instância.
 
 O caso mais simples: os módulos executam em ordem fixa. O exemplo canônico que o paper usa é o **RRR** — Rewrite-Retrieve-Read —, e vale notar que é o mesmo paper que está em `08-Generation/04-DynamicGenerationOptimizationStrategies/` e que a Aula 21 leu.
 
-O paper acrescenta um detalhe sobre o RRR que a Aula 21 não tinha: o módulo de reescrita é _"a smaller trainable language model fine-tuned on T5-large"_, otimizado como um processo de decisão de Markov em que _"the output of the LLM serving as the reward"_, e o retriever usa BM25.
+O paper acrescenta um detalhe sobre o RRR que a Aula 21 não tinha: o módulo de reescrita é _"a smaller trainable language model fine-tuned on T5-large"_, otimizado como um processo de decisão de Markov em que _"the final output of the LLM serving as the reward"_, e o retriever usa BM25.
 
 Isto reposiciona o que a Aula 21 encontrou: o `transform_query` do Self-RAG do repositório é reescrita **por prompt**, com `gpt-3.5-turbo`. O RRR original **treina** o reescritor com a resposta final como recompensa. Mesmo padrão de fluxo, esforço de engenharia em outra ordem de magnitude.
 
@@ -208,7 +208,7 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 **3. Classifique o seu fluxo.** Linear, condicional, ramificado ou com laço? Se tiver laço, escreva onde estão o limite, a mudança de estado e a saída de emergência. Se algum dos três não existir, você tem o defeito da Aula 21 no seu código.
 
-**4. Reescreva um exemplo do repositório na notação do paper.** Comece pelo mais fácil: o pipeline de `00-SimpleRAG` é o Naive RAG que o paper formaliza. Depois faça o CRAG da Aula 18 — cinco nós, uma aresta condicional, acíclico — e o Self-RAG da Aula 21 — quatro nós, duas condicionais, dois ciclos. A diferença entre as duas notações é a diferença entre os dois sistemas.
+**4. Reescreva um exemplo do repositório na notação do paper.** Comece pelo mais fácil: o pipeline de `00-SimpleRAG` é o Naive RAG que o paper formaliza. Depois faça o CRAG da Aula 18 — cinco nós, uma aresta condicional, acíclico — e o Self-RAG da Aula 21 — quatro nós, duas condicionais, três ciclos simples (a mesma convenção da Parte 4 e da Aula 21; se você contar pontos de entrada em laço, são dois — o que não vale é trocar de convenção entre duas passagens). A diferença entre as duas notações é a diferença entre os dois sistemas.
 
 **5. Localize os cinco eixos de divergência de rota.** O paper diz que rotas divergem em fonte, processo, configuração, modelo e prompt. Pegue o roteamento da Aula 14, que divergia só em prompt, e escreva o que mudaria em cada um dos outros quatro eixos para o seu domínio.
 

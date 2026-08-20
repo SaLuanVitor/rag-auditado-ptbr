@@ -1,6 +1,6 @@
 # AULA 26 — Agentic RAG e Adaptive RAG com LangGraph
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/04-AgenticRAG/` — 6 arquivos (`ls`): 2 scripts (234 e 242 linhas), 3 PNGs e um `.env.example`
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/04-AgenticRAG/` — 6 arquivos (`ls`): 2 scripts (235 e 243 linhas), 3 PNGs e um `.env.example`
 
 ---
 
@@ -15,7 +15,7 @@ A Aula 25 nos deu a régua para responder, e ela tem dois eixos:
 1. **Quem decide** — o código, por regra escrita à mão, ou o **modelo**?
 2. **O que se decide** — qual prompt usar, qual fonte consultar, ou se vale continuar?
 
-Os dois arquivos deste módulo respondem de formas diferentes, e nenhum dos dois é o que o nome sugere. É a última aula do curso que lê código do repositório, e ela vai usar tudo o que as vinte e cinco anteriores construíram — inclusive o hábito de conferir o nome contra o arquivo.
+Os dois arquivos deste módulo respondem de formas diferentes, e nenhum dos dois é o que o nome sugere. É a última aula do curso que lê um grafo LangGraph — a Aula 27 ainda lê código, os dois scripts Weaviate —, e ela vai usar tudo o que as vinte e cinco anteriores construíram — inclusive o hábito de conferir o nome contra o arquivo.
 
 ---
 
@@ -407,5 +407,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 > Este foi o último grafo do curso, e o defeito que ele repete pela terceira vez é o mesmo que a Aula
 > 25 mostrou estar especificado na literatura. A Aula 27 fecha a Fase 9 com
-> `10-AdvanceRAG/05-MultiModalRAG/` — dois scripts Weaviate e um `docker-compose.yml`, a primeira vez
-> em todo o curso que um exemplo traz a sua própria infraestrutura.
+> `10-AdvanceRAG/05-MultiModalRAG/` — dois scripts Weaviate e um `docker-compose.yml`, a segunda vez
+> em todo o curso que um exemplo traz a sua própria infraestrutura: a primeira foi o Milvus da Aula 09
+> (`04-VectorDB/Milvus/docker-compose.yml`). O que a Aula 27 traz de novo é o requisito de memória
+> **quantificado em bytes**.

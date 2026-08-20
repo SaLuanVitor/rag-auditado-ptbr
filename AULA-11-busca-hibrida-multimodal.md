@@ -76,7 +76,7 @@ tipo, shape, índices de coluna e dados das primeiras posições, com `hasattr` 
 formatos diferentes de matriz esparsa do `scipy`.
 
 Ou seja, "minimal" descreve a **estratégia de fusão** (uma só, sem alternativas), não o tamanho
-do arquivo. Se você abrir esperando o exemplo curto, vai se surpreender — e é o quinto caso
+do arquivo. Se você abrir esperando o exemplo curto, vai se surpreender — e é mais um caso
 deste curso em que o nome do arquivo promete algo diferente do que o código faz.
 
 Esse bloco de inspeção, aliás, é a parte mais didática do `v1`: ele **mostra o que é um vetor

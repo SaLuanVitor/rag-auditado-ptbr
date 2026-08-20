@@ -63,7 +63,7 @@ Multi-representação **não é** busca híbrida (Aula 11). Vale enunciar sem am
 Um resumo gerado é **conteúdo novo**: ele contém a síntese que o texto original não enuncia. Um
 índice BM25 não é conteúdo novo — é outra forma de procurar o mesmo texto.
 
-> ⚠️ Confundir os dois foi a alucinação mais grave registrada nas avaliações deste curso: eu
+> ⚠️ Confundir os dois produziu uma das três alucinações registradas no gate v1 do agente: eu
 > afirmei que `03-BuildingMultiRepresentationIndex/01-HybridRetrievalWithEnsembleRetriever.py`
 > combinava multi-representação com híbrido. Ele é **hybrid retrieval puro**. O arquivo está
 > naquela pasta, e o caminho não é evidência do conteúdo. Registro em

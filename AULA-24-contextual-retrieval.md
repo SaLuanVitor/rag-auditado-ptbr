@@ -1,6 +1,6 @@
 # AULA 24 — Contextual Retrieval
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/02-ContextRetrieval/` — 2 scripts e um `.env.example`; 1.323 linhas de código, das quais 979 num único arquivo
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/02-ContextRetrieval/` — 2 scripts e um `.env.example`; 1.325 linhas de código, das quais 980 num único arquivo
 
 ---
 
@@ -54,7 +54,7 @@ A primeira mantém o texto original recuperável e auditável. A segunda produz 
 
 ## Parte 1 — O par, e o que o `diff` revelou
 
-Os dois arquivos têm o mesmo assunto e **nada em comum**: `diff -u` entre eles não encontra uma única linha compartilhada no início, e os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **979**, com bit de execução e shebang.
+Os dois arquivos têm o mesmo assunto e **nada em comum**: `diff -u` entre eles não encontra uma única linha compartilhada no início, e os tamanhos já contam a história — `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py` tem 345 linhas; `10-AdvanceRAG/02-ContextRetrieval/Milvus-Implementation.py` tem **980**, com bit de execução e shebang. (Os dois arquivos terminam sem newline final, então `wc -l` devolve 344 e 979 — um a menos em cada. A contagem certa é `awk 'END{print NR}'`, e a versão anterior desta aula trazia o 979 de `wc -l` ao lado do 345 de `awk`, misturando os dois métodos na mesma frase.)
 
 Não são duas versões da mesma coisa. São dois trabalhos diferentes:
 

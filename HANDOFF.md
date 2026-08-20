@@ -1,19 +1,33 @@
 # HANDOFF — Curso RAG PT-BR e agente `@rag-specialist`
 
-**Data:** 2026-08-19
+**Data:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
-**Verificação:** `verify-citations --all` = **PASS** — 1592 OK, zero inválidas. `BAD_LINE`,
+**Verificação:** `verify-citations --all` = **PASS** — 1622 OK, zero inválidas. `BAD_LINE`,
 `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 16 `SKIPPED` (glob ou elipse) e
 20 `NO_ANCHOR`, ambos conferência à mão por desenho
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
-lotes A-D em 19/08. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é
-a renota — não há mais lacuna de cobertura
-**Renota:** **9 de 29** feitas em 19/08 (subtotal 86/108 contra 55/108 antes, Δ médio +3,44); dez
-lotes morreram por limite de sessão da API e 20 aulas seguem com nota pré-correção
-**Git:** commitado até `84b1c77e`; quatro commits locais em `developer`, **push pendente** (@devops)
-**Sincronizado:** 2026-08-19 — dez afirmações obsoletas deste documento foram corrigidas; o GATE
-foi recontado (afirmava 29/29 quando eram 21) e os lotes A-D fecharam a cobertura em 29/29 de
-verdade. O que mudou e por quê está na seção 14
+lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
+lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
+**Renota:** ✅ **29 de 29 — COMPLETA.** As 9 de 19/08 mais as 20 de 20/08 (lotes B, E, G, I, J, K, L,
+M, N, O, todos concluídos). Total do curso **251/348 = 72,1%**. A rodada de 20/08 deu 165/240 = 68,8%
+contra 155/240 antes: Δ médio **+0,50**, 10 subiram, 8 caíram, 2 empataram — o +3,44 da rodada
+parcial **não se sustentou** com a amostra completa
+**Classificação:** **Requer revisão.** Os 72,1% cairiam na faixa de "Publicável com ressalvas"
+(70–84%), mas as duas portas eliminatórias dessa faixa falham: **18** notas `−1` (o máximo é uma) e
+**quatro** aulas abaixo de 50% (00, 25, 26, 28). Vale para a versão que os auditores leram — os 15
+defeitos que produziram as `−1` de 20/08 foram corrigidos no mesmo dia, e somar correção à própria
+nota é a autoavaliação que a rubrica proíbe
+**Distância até "com ressalvas":** zerar as `−1` e tirar quatro aulas de baixo dos 50%
+**Licença:** definida em 20/08 — **CC BY-SA 4.0** para o material didático, **MIT** para o código
+(`ferramentas/`, `exercicios/`). Escopo em `LICENSE`; texto do MIT em `LICENSE-CODE`
+**Git:** **um commit**, `6658768`, na branch `main`, **sincronizado com `origin/main`** — nada
+pendente de push. Repo público em https://github.com/SaLuanVitor/rag-auditado-ptbr
+**Convenção deste repo:** os commits **não** levam trailer `Co-Authored-By: Claude`. Decisão do
+autor, vale só aqui
+**Sincronizado:** 2026-08-20 — o bloco Git deste cabeçalho estava obsoleto (afirmava quatro commits
+locais em `developer` e push pendente; o histórico foi refeito em um commit único em `main`, já
+publicado) e a contagem de citações estava em 1592. Corrigidos contra os três comandos da seção 14.
+A sincronização anterior, de 19/08, está na seção 14
 **Para quem retoma:** este documento é autossuficiente. Leia-o inteiro antes do primeiro comando.
 
 ---
@@ -306,7 +320,11 @@ material de leitura crítica.
 - **Código morto:** `Self-RAG-FullImplementation.py:282` é `state["question"]` sozinha, valor
   descartado. E o caminho no bloco comentado (`:372`) aponta para um diretório que não existe mais
   ("08-Response Generation-Generation/..."), de onde veio o `graph.png`.
-- **`09-Evaluation/04-LlamaIndexEvaluation.py:47` tem o ÚNICO caminho absoluto do repositório** —
+- **`09-Evaluation/04-LlamaIndexEvaluation.py:47` tem um dos DOIS caminhos absolutos do repositório**
+  (corrigido em 20/08 — este item afirmava "o ÚNICO", e a prova apresentada era um `grep` por
+  `/home/huangj2`, que provava algo mais estreito que a alegação. O outro é
+  `03-Embedding/05-MultimodalEmbedding.py:20`, um `.pth` sob `/root/AI-BOX/code/rag/rag-in-action/`;
+  os dois carregam o nome antigo do projeto) —
   o valor de `pdf_path` é um absoluto sob `/home/huangj2` + `Documents/rag-in-action/` seguido de
   `90-Data/ComplexPDF/IPCC_AR6_WGII_Chapter03.pdf` (grep por `/home/huangj2` retorna só esta linha). O PDF existe no repo em `90-Data/ComplexPDF/`. Pior: a linha
   `:121` usa caminho relativo **à raiz do repo** — os dois caminhos do mesmo arquivo são incoerentes
@@ -637,9 +655,18 @@ não pelo verificador.
   reescrita como trabalho de leitura, estimativa de custo e construção do baseline `TS` com o que as
   Fases 7 e 8 já ensinaram. Se um exercício executável for desejado depois, o caminho honesto é
   implementar um mini-GraphRAG **novo** em `exercicios/`, não alegar que o repo tem um.
-- **Commitado, sem push.** O trabalho está em quatro commits locais na branch `developer`
-  (`fc78a38b`, `56094cc3`, `84b1c77e`, `3c30f75e`); o working tree do curso está limpo. Falta o
-  **push**, que é autoridade exclusiva do `@devops` (Constitution, Artigo II).
+- ~~**Commitado, sem push.**~~ **FECHADO.** O histórico foi refeito em **um commit** (`6658768`) na
+  branch `main`, já publicado em https://github.com/SaLuanVitor/rag-auditado-ptbr. `git status -sb`
+  em 20/08 dá `main...origin/main` sem divergência. Os hashes `fc78a38b`, `56094cc3`, `84b1c77e` e
+  `3c30f75e` que este documento citava **não existem mais** neste repositório.
+- **Certificados no repositório** — o autor mencionou querer certificados aqui. Nenhum foi
+  encontrado em disco (a varredura só achou bundles de CA de biblioteca Python). Adiado por decisão
+  do autor em 20/08: quando retomar, a primeira pergunta é **onde os arquivos estão** — ou se o
+  pedido era o repositório **emitir** certificado de conclusão, que é feature a projetar, não
+  arquivo a mover.
+- **Working tree sujo em 20/08:** `PROMPT-CONTINUAR.md` modificado e `exercicios/__pycache__/` sem
+  rastreamento. O `__pycache__` é lixo de execução e merece entrada no `.gitignore`, que hoje não o
+  cobre.
 
 ---
 
@@ -683,9 +710,10 @@ ocorrências encontradas, mas o método de revisão que os produziu não mudou.
 
 ### Pendente
 
-1. **Renota adversarial das 29 aulas corrigidas.** As notas do gate são anteriores às correções e
-   **não** foram recalculadas — auto-atribuir nota ao material que o próprio autor acabou de
-   corrigir é a autoavaliação que a RUBRICA proíbe.
+1. ~~**Renota adversarial das 29 aulas corrigidas.**~~ **FECHADA em 20/08/2026** — as 29 têm renota
+   independente. O que fica aberto no mesmo lugar: as notas de 20/08 são, por sua vez, anteriores às
+   correções de 20/08, e recalculá-las eu mesmo seria a autoavaliação que a RUBRICA proíbe. Uma
+   terceira rodada é o que mediria o efeito das correções desta sessão.
 2. ~~**Primeira auditoria das 8 aulas sem nota.**~~ **FECHADO em 19/08/2026.** Os lotes A-D deram
    nota independente a 08, 15, 16, 19, 20, 21, 22 e 23 — `sonnet`, somente-leitura, duas aulas por
    lote. Cobertura da auditoria: **29 de 29**. Notas e achados na seção "Lotes A-D" do
@@ -696,12 +724,13 @@ ocorrências encontradas, mas o método de revisão que os produziu não mudou.
    material, dois eram bugs da ferramenta (índice de basename com raízes sobrepostas; basename nu
    casando na raiz do AIOX) e onze eram redação ambígua. `--all` em **PASS**. Segue aberto apenas
    o item de superlativo não marcado como julgamento, que é trabalho de auditor.
-4. **Nenhuma classificação de publicação é declarada** e não deve ser. A renota está **9 de 29**:
-   as nove subiram de 55/108 para 86/108, mas as outras 20 seguem com nota pré-correção, e duas
-   delas (AULA-03 = 0/12, AULA-25 = 4/12) estão abaixo da porta de 50% que a rubrica exige até para
-   "publicável com ressalvas". Detalhe na seção "Renota adversarial — rodada PARCIAL" do
-   `avaliacao/GATE-AULAS-v1.md`.
-   sessão, por confiança no resumo do gate; a contagem o reabriu.
+4. **Classificação declarada em 20/08: "Requer revisão".** Com a renota completa (29 de 29), o curso
+   está em **251/348 = 72,1%**. O percentual cairia em "Publicável com ressalvas" (70–84%), mas as
+   duas portas eliminatórias dessa faixa falham: **18** notas `−1` contra o máximo de uma, e
+   **quatro** aulas abaixo de 50% (00 = 5/12, 25 = 4/12, 26 = 3/12, 28 = 4/12). A rubrica é explícita
+   em que as portas ganham do percentual. A AULA-03, que antes era 0/12 e bloqueava, foi a maior alta
+   da rodada (12/12); as que bloqueiam agora são outras. Cálculo e portas na seção "Renota
+   adversarial — rodada COMPLETA de 20/08/2026" do `avaliacao/GATE-AULAS-v1.md`.
 5. **Commitado até `84b1c77e`, sem push.** As correções desta rodada foram commitadas em
    `84b1c77e`; restam quatro commits locais na branch `developer` sem correspondente no remote. O
    push depende de `@devops` (Constitution, Artigo II).
@@ -759,35 +788,33 @@ defeitos confirmados**.
 
 ## PRÓXIMA SESSÃO — três tarefas, nesta ordem
 
-### 1. Terminar a renota — faltam 20 aulas
+### 1. ~~Terminar a renota~~ — FECHADA em 20/08/2026
 
-**9 de 29 estão renotadas.** Cinco lotes concluíram em 19/08; **dez morreram por limite de sessão
-da API**. Relançar exatamente estes, mesmo desenho (`general-purpose`, `sonnet`, somente-leitura,
-duas aulas por lote):
+**29 de 29 renotadas.** Os dez lotes que faltavam (B, E, G, I, J, K, L, M, N, O) rodaram e todos os
+dez concluíram. Notas, achados, correções e o cálculo da classificação estão na seção
+**"Renota adversarial — rodada COMPLETA de 20/08/2026"** do `avaliacao/GATE-AULAS-v1.md`.
 
-- Lote B (08 + 09)
-- Lote E (15 + 04)
-- Lote G (19 + 01)
-- Lote I (21 + 00)
-- Lote J (22 + 02)
-- Lote K (23 + 14)
-- Lote L (24 + 03)
-- Lote M (26 + 25)
-- Lote N (27 + 16)
-- Lote O (28 + 11)
+O prompt usado está reproduzível a partir daquela seção; as três coisas que não podiam faltar
+faltaram em zero dos dez lotes: nota anterior não revelada (com proibição explícita de abrir o
+GATE), `--all` declarado em PASS com as quatro frentes onde o trabalho de fato está, e `pdftotext`
+para stdout com as violações anteriores nomeadas.
 
-**O prompt dos lotes está reproduzível a partir da seção "Renota adversarial" do GATE**, e três
-coisas nele não podem faltar:
+### 1b. O que a renota completa deixou aberto
 
-1. **Não revelar a nota anterior ao auditor.** Foi a decisão que deu sentido à comparação. As notas
-   antigas estão no GATE; instrua a ignorar se topar com uma.
-2. **Dizer que o `--all` está em PASS** e que reconferir caminho e range não rende nota — o trabalho
-   é conteúdo da linha citada, contradição interna, superlativo não marcado e coerência externa.
-3. **`pdftotext arquivo.pdf -` para stdout, nunca com arquivo de saída.** Duas violações do contrato
-   somente-leitura já aconteceram por `>` acidental, ambas autodenunciadas.
+**Dois auditores por aula, nas que divergem muito.** Segue valendo, e agora há critério medido para
+escolher onde: as maiores oscilações entre rodadas são **AULA-24** (12 → 7), **AULA-03** (0 → 12),
+**AULA-26** (7 → 3) e **AULA-13** (−1 → 10 na rodada parcial). Com um auditor por aula a nota é
+sinal, não gate — e a divergência medida entre dois auditores sobre a mesma aula chega a 12 pontos.
 
-Vale considerar **dois auditores por aula** nas que divergirem muito: a rodada parcial mediu Δ de
-+11 (AULA-13) a −2 (AULA-10), e com um auditor por aula a nota é sinal, não gate.
+**Superlativo sem `Julgamento:` é a dívida que sobra.** Pelo menos 18 instâncias foram apontadas na
+rodada de 20/08 e **não** foram todas corrigidas — só as que produziram `−1`. É trabalho mecânico:
+varrer "o único", "o melhor", "o mais", "a primeira vez", "sempre", "nunca" nas 29 aulas e decidir,
+uma a uma, entre prefixar e remover.
+
+**Uma regressão de auditoria ficou documentada e vale como regra nova:** o lote 10 de 19/08 mandou
+remover a palavra "final" de uma citação do paper Modular RAG alegando que o paper não a tinha. O
+paper **tem**. A correção foi aplicada e degradou uma citação correta; o lote M de 20/08 pegou.
+Regra: **achado de auditor sobre citação literal também se confere na fonte antes de aplicar.**
 
 ### 2. ~~Triagem dos `BAD_ANCHOR`~~ — FECHADA
 
@@ -798,21 +825,30 @@ Uma regra prática que saiu dela: **a janela de ancoragem só olha para trás**,
 arquivo tem de vir antes do número da linha, ou na mesma linha. Citar "a linha 106 de `arquivo.py`"
 não ancora; "`arquivo.py`, na linha 106" ancora.
 
-### 3. Push — @devops
+### 3. ~~Push — @devops~~ — FECHADA
 
-**O commit já aconteceu:** `84b1c77e fix(rag): corrige 40+ defeitos apontados por auditoria
-adversarial das 29 aulas`. Falta o push.
+O repositório está publicado: **um commit**, `6658768`, na branch `main`, e
+`git status -sb` dá `main...origin/main` sem divergência.
+Público em https://github.com/SaLuanVitor/rag-auditado-ptbr, autoria só do autor.
 
-Estado da branch `developer`: quatro commits locais sem correspondente no remote —
-`fc78a38b`, `56094cc3`, `84b1c77e`, `3c30f75e`. O upstream configurado é `origin/main` e não
-existe `origin/developer`; **decidir a branch de destino é parte da tarefa**.
+Os quatro commits em `developer` que esta seção descrevia (`fc78a38b`, `56094cc3`, `84b1c77e`,
+`3c30f75e`) **não existem mais** — o histórico foi refeito num commit único. Push segue sendo
+autoridade exclusiva do `@devops` (Constitution, Artigo II) para o que vier depois.
 
-**O push é exclusivo do @devops** (Constitution, Artigo II), junto com os quality gates.
+**Convenção deste repositório:** commits **não** levam trailer `Co-Authored-By: Claude`. Decisão do
+autor, vale só aqui.
 
-### Estado verificado ao encerrar
+### Estado verificado em 20/08/2026
 
-`verify-citations --all`: 1 268 OK, `BAD_LINE`/`MISPLACED`/`NOT_FOUND` = **0**.
-`git status --short` no clone da Packt: **vazio** — contrato preservado do começo ao fim.
+`verify-citations --all`: **1612 OK**, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` = **0**,
+16 `SKIPPED` e 20 `NO_ANCHOR` (conferência à mão por desenho) — **PASS**.
+`git status --short` no clone da Packt: **vazio** — contrato preservado.
+`git log --oneline`: um commit, `6658768`.
+
+Cobertura da auditoria **recontada por script**, não lida do resumo: as 29 aulas têm nota
+registrada no GATE (13 no gate v1 · 4 na rodada v2 · 3 no lote 10 · 6 nos lotes 12/14/16 · 2 no
+lote 13 · 2 no lote 15 · 8 nos lotes A-D). Nenhuma aula de 00 a 28 sem nota. A renota estava em
+**9 de 29** ao começar esta sessão — a seção "As 9 notas" do GATE tem exatamente nove linhas.
 
 ---
 

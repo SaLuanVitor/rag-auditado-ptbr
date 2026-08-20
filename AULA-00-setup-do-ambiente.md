@@ -120,8 +120,9 @@ dependências pinadas — a instalação demora, `torch` é grande.
 Existem ainda requirements especializados que você só instala quando a aula pedir:
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06) e
 `requirements_marker_20250413.txt`, que **nenhuma aula usa**: `grep -rn "import marker"` no
-repositório inteiro não encontra nada, e a única menção ao `marker_single` está numa tabela do
-`README.md` da Packt, sobre a geração de um asset traduzido. Não instale.
+repositório inteiro não encontra nada, e as duas menções ao `marker_single` estão em tabelas de
+`README.md` e de `99-EN/README.md` — a mesma linha, repetida nos dois —, sobre a geração de um asset
+traduzido. Não instale.
 
 ### Passo 3 — Alternativa mais leve para começar
 

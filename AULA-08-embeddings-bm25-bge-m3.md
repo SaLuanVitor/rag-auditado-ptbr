@@ -256,8 +256,12 @@ cd RAG-from-First-Principles/03-Embedding
 python 03-BM25.py
 ```
 
-Comece por aqui, não pelo `01`. É o único arquivo do curso inteiro em que você vê um algoritmo de
-**pontuação query-documento** escrito por completo, sem abstração. O outro algoritmo escrito à
+Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver uma
+**pontuação query-documento** escrita por completo, sem abstração — mas não é o único: o
+`calculate_similarity()` de `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-134` também
+pontua query contra documento à mão, com normalização L2 e `torch.mm`. O que o `03-BM25.py` tem de
+particular é a fórmula clássica inteira — IDF, saturação por `k1` e normalização de comprimento por
+`b` — num só lugar. O outro algoritmo escrito à
 mão no repositório é o `reciprocal_rank_fusion` de
 `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` — mas ele refunde posições de listas já
 recuperadas, em vez de pontuar relevância; são estágios diferentes do pipeline. Leia a saída

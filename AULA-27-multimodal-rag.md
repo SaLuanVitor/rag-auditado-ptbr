@@ -1,6 +1,6 @@
 # AULA 27 — Multimodal RAG com Weaviate
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/05-MultiModalRAG/` — 4 arquivos (`ls`): 2 scripts (130 e 106 linhas), um `docker-compose.yml` e um `.env.example`
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/05-MultiModalRAG/` — 4 arquivos (`ls`): 2 scripts (131 e 107 linhas), um `docker-compose.yml` e um `.env.example`
 
 ---
 
@@ -41,7 +41,13 @@ O repositório usa **as duas**, e é a combinação que faz sentido: o espaço �
 
 ### Multimodal cobra infraestrutura, não só API
 
-Nas vinte e seis aulas anteriores, todo custo era chamada de API ou tempo de indexação. Aqui aparece uma terceira categoria: **um serviço de inferência que você hospeda**, com requisito de memória declarado. É um tipo de custo que não some quando o corpus para de crescer — ele fica de pé enquanto o sistema existir.
+O custo aqui é **um serviço de inferência que você hospeda**, e é a primeira vez no curso que o
+requisito de memória vem **quantificado em bytes**: `mem_limit: 12g` é ocorrência única no
+repositório (`grep -rn "mem_limit"` nos `.yml` devolve só
+`10-AdvanceRAG/05-MultiModalRAG/docker-compose.yml:21`). Infraestrutura hospedada em si não é
+novidade — a Aula 09 já subiu Milvus com etcd e MinIO, como a Parte 1 abaixo registra —, mas lá o
+custo era em contêineres a manter, não em memória com número. É um tipo de custo que não some
+quando o corpus para de crescer: ele fica de pé enquanto o sistema existir.
 
 ---
 
@@ -255,7 +261,7 @@ O pipeline do `02` é: recuperar uma imagem → pedir a um modelo de visão que 
 
 Onde está a **augmented generation**? A descrição não é fundamentada em documento nenhum: ela vem do modelo de visão **olhando a imagem**. O texto gerado não afirma fatos sobre um acervo; ele descreve um pixel. E a imagem final não cita fonte alguma.
 
-Isso não desqualifica o exemplo — mas nomeia o que ele é. Assim como na Aula 24, onde o índice guardava **exemplos** para o modelo copiar a forma, aqui a recuperação serve para **escolher o material de entrada**, não para trazer conhecimento que o modelo não tem. É um uso legítimo e distinto do "R" do RAG, e confundi-lo com fundamentação leva a esperar do sistema uma garantia que ele não oferece.
+Isso não desqualifica o exemplo — mas nomeia o que ele é. Assim como na Aula 19, onde o índice guardava **exemplos** para o modelo copiar a forma, aqui a recuperação serve para **escolher o material de entrada**, não para trazer conhecimento que o modelo não tem. É um uso legítimo e distinto do "R" do RAG, e confundi-lo com fundamentação leva a esperar do sistema uma garantia que ele não oferece.
 
 O que seria multimodal RAG no sentido pleno: recuperar imagem **e** o texto que a acompanha — legenda, laudo, seção do manual —, montar um contexto com os dois e gerar uma resposta que cite ambos. O módulo tem a peça mais difícil disso (o espaço comum) e não monta o contexto misto.
 
@@ -267,7 +273,7 @@ O que seria multimodal RAG no sentido pleno: recuperar imagem **e** o texto que 
 
 |                                 | `01-Weaviate-Multimodal-Search.py`            | `02-Weaviate-Multimodal-RAG.py`                 |
 | ------------------------------- | --------------------------------------------- | ----------------------------------------------- |
-| Linhas                          | 130                                           | 106                                             |
+| Linhas                          | 131                                           | 107                                             |
 | Coleção                         | `Monkey` (`:11-14`)                           | `Animals` (`:20`)                               |
 | Dado indexado                   | 3 imagens reais do repo (`:30-40`)            | **placeholder literal** (`:33`)                 |
 | Modalidades declaradas / usadas | 3 / 1                                         | 3 / 1 (e a única é falsa)                       |

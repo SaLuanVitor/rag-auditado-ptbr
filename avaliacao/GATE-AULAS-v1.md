@@ -811,3 +811,181 @@ apagado.
 
 **O contrato que importa foi preservado:** `git status --short` no clone da Packt volta vazio,
 depois de 19 auditores lerem lá dentro.
+
+---
+
+## Renota adversarial — rodada COMPLETA de 20/08/2026
+
+**Estado: 29 de 29 aulas renotadas.** Os dez lotes que morreram por limite de sessão da API em 19/08
+foram relançados e todos os dez concluíram — `general-purpose` em `sonnet`, somente-leitura, duas
+aulas por lote, instruídos a refutar. Nenhum auditor recebeu a nota anterior da aula que avaliou, e
+o prompt proibia explicitamente abrir este arquivo. Os dez foram informados de que o `--all` estava
+em PASS e de que reconferir caminho e range não rendia nota — o trabalho era conteúdo da linha
+citada, contradição interna, superlativo não marcado e coerência externa.
+
+### As 20 notas desta rodada, contra a nota anterior mais recente
+
+| Aula                             | E   | C   | H   | O   | D   | A   | Renota    | Antes | Δ       | Lote |
+| -------------------------------- | --- | --- | --- | --- | --- | --- | --------- | ----- | ------- | ---- |
+| 00 — Setup do ambiente           | −1  | 2   | 1   | −1  | 2   | 2   | **5/12**  | 3/12  | **+2**  | I    |
+| 01 — O que é RAG                 | 2   | 2   | 2   | 1   | 2   | 2   | **11/12** | 9/12  | **+2**  | G    |
+| 02 — Vetores e similaridade      | 2   | 2   | 1   | 1   | 2   | 2   | **10/12** | 8/12  | **+2**  | J    |
+| 03 — Primeiro RAG                | 2   | 2   | 2   | 2   | 2   | 2   | **12/12** | 0/12  | **+12** | L    |
+| 04 — Texto, JSON, web            | 1   | 2   | 1   | 2   | 2   | 2   | **10/12** | 5/12  | **+5**  | E    |
+| 08 — Embeddings, BM25, BGE-M3    | 2   | 2   | −1  | 2   | 2   | 2   | **9/12**  | 11/12 | **−2**  | B    |
+| 09 — Milvus, schema, entidades   | 2   | 2   | −1  | −1  | 2   | 2   | **6/12**  | 7/12  | **−1**  | B    |
+| 11 — Híbrida e multimodal        | 2   | 2   | 1   | −1  | 2   | 2   | **8/12**  | 9/12  | **−1**  | O    |
+| 14 — Query routing               | 2   | 2   | 1   | 2   | 2   | 1   | **10/12** | 10/12 | 0       | K    |
+| 15 — Small-to-big                | 2   | 2   | 1   | 2   | 2   | 2   | **11/12** | 10/12 | **+1**  | E    |
+| 16 — Índice hierárquico          | 2   | 2   | 0   | 2   | 2   | 2   | **10/12** | 9/12  | **+1**  | N    |
+| 19 — Modelo e prompt engineering | 1   | 2   | 2   | 2   | 2   | 2   | **11/12** | 10/12 | **+1**  | G    |
+| 21 — Self-RAG                    | 2   | 2   | 1   | 2   | 2   | 2   | **11/12** | 10/12 | **+1**  | I    |
+| 22 — Avaliação                   | 2   | 2   | −1  | 0   | 2   | 2   | **7/12**  | 8/12  | **−1**  | J    |
+| 23 — GraphRAG                    | 1   | 2   | 1   | 2   | 2   | 2   | **10/12** | 12/12 | **−2**  | K    |
+| 24 — Contextual Retrieval        | 0   | 2   | 1   | 0   | 2   | 2   | **7/12**  | 12/12 | **−5**  | L    |
+| 25 — Modular RAG                 | −1  | 2   | 0   | −1  | 2   | 2   | **4/12**  | 4/12  | 0       | M    |
+| 26 — Agentic e Adaptive RAG      | −1  | 2   | −1  | −1  | 2   | 2   | **3/12**  | 7/12  | **−4**  | M    |
+| 27 — Multimodal RAG              | 1   | 2   | 0   | −1  | 2   | 2   | **6/12**  | 4/12  | **+2**  | N    |
+| 28 — Projeto final               | −1  | 2   | 0   | −1  | 2   | 2   | **4/12**  | 7/12  | **−3**  | O    |
+
+**Subtotal das 20: 165/240 = 68,8%**, contra **155/240 = 64,6%** antes.
+Δ total **+10**, Δ médio **+0,50**; **10 subiram, 8 caíram, 2 empataram**.
+
+Somas e percentuais calculados por script a partir das seis dimensões de cada aula — nenhum número
+desta seção foi somado à mão, porque somar à mão é a classe de defeito que esta auditoria mais
+encontra.
+
+### O Δ médio da rodada parcial não se sustentou
+
+A rodada parcial mediu **+3,44** em 9 aulas. Com as 29 fechadas, o Δ médio das 20 novas é **+0,50** —
+sete vezes menor. As 9 que concluíram primeiro em 19/08 não eram amostra representativa: entre elas
+estavam a AULA-13 (+11) e a AULA-12 (+7), os dois maiores ganhos daquela rodada.
+
+**Julgamento, marcado como julgamento:** o Δ médio agregado não mede a qualidade das correções. Ele
+mistura melhoria real com variação entre avaliadores, e esta auditoria já mediu que a variação entre
+dois auditores sobre a mesma aula chega a 12 pontos. O que o número diz é mais modesto e mais útil:
+depois de duas rodadas adversariais completas, o material está em 72,1% e **não** numa trajetória de
+ganho estável.
+
+### Erro de aritmética num relatório de auditor, registrado sem reescrever a nota
+
+O auditor do lote N deu à AULA-16 as dimensões `E2 C2 H0 O2 D2 A2` e escreveu **"Total: 8/12"**. A
+soma das seis dimensões é **10**. As dimensões são o julgamento do auditor; o total é aritmética.
+Usei **10/12**, que é a soma das dimensões que ele atribuiu, e registro a divergência aqui em vez de
+apagá-la — reescrever as dimensões seria a autoavaliação que a rubrica proíbe, e esconder um erro de
+soma num relatório que audita erros de soma seria pior.
+
+### Uma correção de rodada anterior estava ERRADA e introduziu o defeito
+
+Este é o achado mais importante da rodada, e é sobre o método, não sobre o material.
+
+O **lote 10 de 19/08** registrou nesta auditoria: "citação entre aspas dizia `the final output of the
+LLM serving as the reward`; o paper não tem a palavra final → palavra removida da citação". A
+AULA-25 foi editada, e a palavra saiu.
+
+O auditor do lote M refutou. Fui ao PDF (`pdftotext ModularRAG-2407.21059v1.pdf -`, saída para
+stdout): o paper diz **"with the final output of the LLM serving as the reward"**. A palavra está
+lá. A correção de 19/08 **degradou uma citação que estava correta**, e o defeito que o lote M
+encontrou foi criado por uma auditoria anterior.
+
+Restaurada em 20/08. A lição operacional: **achado de auditor sobre citação literal também se
+confere na fonte antes de aplicar.** O viés desta avaliação é contra o material, e isso é correto
+para atribuir nota — mas não autoriza aplicar correção sem verificar. É a primeira regressão
+documentada desta auditoria.
+
+### As notas −1 desta rodada, e o que aconteceu com cada uma
+
+Quinze notas `−1` nas 20 aulas. Todas verificadas por mim na fonte antes de qualquer correção; todas
+corrigidas em 20/08.
+
+| Aula | Dim | Defeito                                                                                                   | Verificação minha                                                                                              |
+| ---- | --- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 00   | E   | "a única menção ao `marker_single` está numa tabela do `README.md`"                                        | `grep -rn` devolve **duas** — a mesma linha em `README.md:173` e `99-EN/README.md:90`                           |
+| 00   | O   | "a Aula 28 cataloga outros catorze" contra a AULA-28 dizendo "catalogou quatorze casos"                    | os dois números não fechavam; a tabela tem 14 e não inclui este caso. Total real **15**                         |
+| 08   | H   | "é o único arquivo do curso inteiro em que você vê um algoritmo de pontuação query-documento por completo" | `03-CoBERT-Reranking.py:106-134` também pontua query contra documento à mão, com L2 e `torch.mm`                |
+| 09   | H   | "Todo exemplo do módulo o chama", seguido de "o grep encontra 16 arquivos"                                 | `04-VectorDB/` tem **27** `.py` e 16 chamam. E **três dos quatro** arquivos da própria aula não chamam          |
+| 09   | O   | "conecta com a estratégia de particionamento multi-tenant que a Aula 10 vai discutir"                      | busca por multi-tenant e partition na AULA-10: **zero**. Nenhuma aula posterior trata particionamento           |
+| 11   | O   | "é o quinto caso deste curso em que o nome promete algo diferente"                                         | a tabela da AULA-28 não é cronológica; o ordinal não se sustenta em nenhuma numeração. Removido                 |
+| 22   | H   | "`04-LlamaIndexEvaluation.py:47` é o único do repo inteiro"                                                | são **dois** — `03-Embedding/05-MultimodalEmbedding.py:20` aponta um `.pth` sob `/root/AI-BOX/`                 |
+| 25   | E   | citação do paper sem a palavra "final"                                                                     | o paper **tem** "final" — regressão do lote 10, ver a seção acima                                              |
+| 25   | O   | "três ciclos simples" na Parte 4 contra "dois ciclos" na Mão na massa, mesmo grafo                          | contradição confirmada; e a AULA-21 já proibia trocar de convenção entre passagens                              |
+| 26   | E   | cabeçalho "2 scripts (234 e 242 linhas)"                                                                   | `awk` dá **235 e 243**; os dois terminam sem newline final, e 234/242 são os valores de `wc -l`                 |
+| 26   | H   | "É a última aula do curso que lê código do repositório"                                                    | a AULA-27 lê e cita os dois scripts Weaviate — 21 menções por `grep -c`                                         |
+| 26   | O   | "a primeira vez em todo o curso que um exemplo traz a sua própria infraestrutura"                           | a própria AULA-27 diz "**segunda** vez"; a primeira é o Milvus da AULA-09                                       |
+| 27   | O   | cabeçalho e tabela dizem "130 e 106 linhas", e a **mesma aula cita `:131` e `:107`** como linhas reais      | `awk` dá **131 e 107**. A aula citava uma linha que ela própria declarava não existir                           |
+| 28   | E   | "Vinte e seis das vinte e sete aulas terminaram numa seção de armadilhas de produção"                      | script sobre as 28 anteriores: **27 de 28** têm a seção; a exceção é a AULA-01                                  |
+| 28   | O   | "cobre três: delimitar a fonte, autorizar a abstenção, fixar o formato, fixar o tom"                       | lista quatro dizendo três, e põe entre os cobertos exatamente o que a frase seguinte diz que faltava            |
+
+Além dessas, dois achados de contagem sem `−1` que valem mais que a nota:
+
+- **AULA-24, `E`=0 e `O`=0.** "1.323 linhas de código, das quais 979 num único arquivo" — e a linha 57
+  usava **dois métodos de contagem na mesma frase**: 345 (`awk`, correto) para o LlamaIndex e 979
+  (`wc -l`, subcontado) para o Milvus. Os valores certos são 345, **980** e **1.325**. Corrigido com a
+  armadilha explicada no texto, não só consertada.
+- **AULA-28, o "-zh" contado errado nos dois sentidos.** A aula dizia "três vezes"; o auditor contou
+  "duas". Contei por script: a busca por modelos `bge*-zh` nos `.py` devolve **27 arquivos**, em sete
+  módulos (`00-SimpleRAG` 11, `06-Indexing` 7, `05-PreRetrieval` 5, e um cada em `02-DocChunking`,
+  `04-VectorDB`, `07-PostRetrieval` e `10-AdvanceRAG`). Não é caso isolado — é resíduo sistemático da
+  origem chinesa do repositório, e o número certo está uma ordem de magnitude acima do que aula e
+  auditor supunham.
+
+### O padrão desta rodada
+
+Nos dez lotes, os auditores abriram e conferiram por conteúdo mais de **250 citações**
+`arquivo:linha`. Acharam **um** erro de range (AULA-04, faixa começando na 6 onde a chamada comentada
+começa na 5). Todo o resto que caiu foi:
+
+- **Contagem de linha por `wc -l` onde cabia `awk`** — AULA-24, AULA-26, AULA-27 e a AULA-22 (título
+  "vinte linhas" contra 21 no corpo e na tabela). Quatro aulas, e em três delas o número errado
+  convivia com o número certo no mesmo documento.
+- **Alegação de unicidade ou primazia não conferida** — "o único do repo inteiro", "o único arquivo do
+  curso inteiro", "todo exemplo do módulo", "a última aula que lê código", "a primeira vez em todo o
+  curso". Nenhuma exigia mais que um `grep` para cair.
+- **Superlativo de valor sem o prefixo `Julgamento:`** — pelo menos 18 instâncias somadas entre as 20
+  aulas ("a melhor sequência didática do módulo", "o arquivo mais importante desta aula", "o teste
+  mais barato de todo o pipeline RAG", "a lição mais rentável do curso"). As mesmas aulas prefixam
+  corretamente em outros pontos: é aplicação desigual da própria disciplina.
+- **Promessa a outra aula que a aula referida não cumpre** — AULA-09 para a AULA-10 (particionamento),
+  AULA-27 para a AULA-24 (índice de exemplos, que é da AULA-19), AULA-01 para a AULA-28 (o documento
+  que a Etapa 1 manda reescrever do zero).
+
+**Nenhum dos quatro tipos é detectável por `verify-citations.js`.** O `--all` estava em PASS antes e
+depois da rodada, e terminou em **1622 OK** com `BAD_LINE`, `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR`
+em zero.
+
+### Classificação de publicação — agora dá para calcular, e as portas reprovam
+
+Com as 29 renotadas: **251/348 = 72,1%**.
+
+O percentual cai na faixa **70–84%**, de "Publicável com ressalvas". As duas portas dessa faixa são
+eliminatórias, e **as duas falham**:
+
+| Porta de "Publicável com ressalvas" | Exigido           | Medido                                      |
+| ----------------------------------- | ----------------- | ------------------------------------------- |
+| Notas `−1` no curso                 | no máximo **uma** | **18**                                      |
+| Aulas abaixo de 50%                 | **nenhuma**       | **quatro** — 00 (5), 25 (4), 26 (3), 28 (4) |
+
+As portas de "Publicável" (≥ 85%) falham por margem maior: 18 notas `−1` contra zero exigidas, **12**
+aulas abaixo de 70% contra nenhuma, e **7** aulas com `E` abaixo de 1 contra `E` ≥ 1 em todas.
+
+**A classificação que a rubrica sustenta é "Requer revisão".** O percentual sozinho diria outra
+coisa; a rubrica é explícita em que as portas ganham — "90% com duas alucinações é com ressalvas, não
+publicável" —, e aqui são dezoito.
+
+**E esta classificação descreve a versão que os auditores leram, não a que está em disco.** Os quinze
+defeitos que produziram as `−1` desta rodada foram corrigidos em 20/08, todos verificados por mim na
+fonte antes da edição. Somar as correções à nota seria a autoavaliação que a rubrica proíbe. O que
+mudou em relação a 19/08 é que agora existem **duas rodadas adversariais completas** sobre as 29
+aulas, e a distância até "com ressalvas" é nomeável: zerar as `−1` e tirar quatro aulas de baixo dos
+50%.
+
+### Contrato somente-leitura
+
+Um auditor (lote K) tentou um redirecionamento por hábito de shell; o comando falhou com
+*Permission denied*, nada foi escrito, e ele reportou de todo modo na primeira linha do relatório.
+Nenhum dos dez criou arquivo temporário — os três prompts que mencionavam `pdftotext` traziam a
+proibição com as violações anteriores nomeadas, e nenhuma se repetiu.
+
+Verificado ao encerrar: `git status --short` no clone da Packt volta **vazio**, e
+`git status --short --ignored` também — nem arquivo ignorado sobrou, depois de 29 auditores lerem lá
+dentro ao longo das duas rodadas.

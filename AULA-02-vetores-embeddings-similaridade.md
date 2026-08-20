@@ -145,7 +145,7 @@ script:
 
 1. gera embeddings de um punhado de frases em português
 2. mostra a dimensão do vetor e um recorte dos primeiros valores
-3. calcula cosseno, produto interno e L2 entre todos os pares
+3. calcula cosseno, produto interno e L2 entre a consulta e cada frase
 4. ranqueia as frases contra uma consulta pelas três métricas, lado a lado
 5. demonstra o caso da negação
 6. demonstra a falha com código de produto
