@@ -79,7 +79,7 @@ Ou seja, "minimal" descreve a **estratégia de fusão** (uma só, sem alternativ
 do arquivo. Se você abrir esperando o exemplo curto, vai se surpreender — e é mais um caso
 deste curso em que o nome do arquivo promete algo diferente do que o código faz.
 
-Esse bloco de inspeção, aliás, é a parte mais didática do `v1`: ele **mostra o que é um vetor
+Esse bloco de inspeção, aliás, é, **julgamento**, a parte mais didática do `v1`: ele **mostra o que é um vetor
 esparso** na prática — pares de índice e valor, em vez de uma lista densa de floats. Vale ler
 antes de tratá-lo como abstração.
 

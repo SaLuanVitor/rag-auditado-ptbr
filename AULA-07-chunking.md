@@ -132,8 +132,9 @@ mais bem construído do módulo. Rodando `diff` entre os dois, a diferença **re
 splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também. O `diff` cru
 mostra mais que isso: um import extra de `Language`, a chamada de
 `get_separators_for_language(Language.JS)` que só existe no primeiro, comentários e nomes de
-variável diferentes (`python_docs` vs. `text_chunks`). Nada disso muda o experimento, mas você vai
-ver na tela:
+variável diferentes (`python_docs` vs. `text_chunks`). Nada disso muda o experimento. A tabela
+abaixo é leitura da **configuração** dos dois arquivos, não do que eles imprimem — na tela saem os
+chunks (`Content:` e `Metadata:`), não estes parâmetros:
 
 |                 | `04-LangChain-ChunkingForCode.py`                                                            | `04-LangChain-PlainChunkingForCode.py`                    |
 | --------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -359,7 +360,7 @@ código, e ninguém vai apontá-la.
 ## Vocabulário
 
 `chunk` · `chunk size` · `chunk overlap` · `fixed-size chunking` · `recursive chunking` ·
-`semantic chunking` · `sliding window` · `token`
+`semantic chunking` · `token`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

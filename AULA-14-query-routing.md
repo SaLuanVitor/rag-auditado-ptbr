@@ -92,9 +92,9 @@ não é documentação — é instrução, exatamente como o `AttributeInfo` do 
 Descrição vaga produz roteamento errado, e o sintoma aparece longe da causa.
 
 **3. É testável.** Dado que a saída é um de três rótulos, você pode escrever um teste: pergunta X
-deve rotear para `python_docs`. Isso é raro no resto do pipeline RAG e é a vantagem prática mais
-subestimada — **julgamento** — do roteamento lógico — **você consegue medir o roteador separadamente do retriever**,
-o que evita atribuir ao índice uma falha que foi de rota.
+deve rotear para `python_docs`. Isso é raro no resto do pipeline RAG e é, **julgamento**, a vantagem prática mais subestimada do
+roteamento lógico: **você consegue medir o roteador separadamente do retriever**, o que evita
+atribuir ao índice uma falha que foi de rota.
 
 O exemplo usa três rotas de documentação de linguagens. A generalização óbvia: no seu sistema as
 rotas seriam `fiscal`, `juridico`, `suporte` — ou `sql`, `vetorial`, `grafo`, generalizando os três
@@ -195,8 +195,10 @@ python 01-LogicalRouting.py
 ```
 
 Teste com perguntas de três tipos: uma claramente de uma rota, uma ambígua entre duas, e uma que
-não pertence a nenhuma das três. Observe o que acontece no terceiro caso — o `Literal` obriga uma
-das três, então algo é escolhido.
+não pertence a nenhuma das três. Observe o que acontece no terceiro caso — e note que o `Literal`
+**não** garante nada: o esperado é o modelo espremer a pergunta numa das três rotas, roteando errado
+em silêncio; o caso menos provável é ele tentar sair do schema e a chamada estourar em exceção de
+validação do Pydantic. Os dois desfechos são ruins de formas diferentes.
 
 ```powershell
 python 02-SemanticRouting.py
@@ -220,8 +222,9 @@ observabilidade é, **julgamento**, um argumento a favor do semântico que raram
 que aquele texto é prompt, não comentário.
 
 **2. Pergunte fora do escopo ao roteador lógico.** "Qual a capital da França?" Com três rotas de
-documentação de linguagens, o `Literal` força uma escolha. Observe qual — e conclua que **falta
-uma rota de fallback**.
+documentação de linguagens, o `Literal` não abre uma quarta opção — mas também não obriga o modelo
+a nada: ou ele espreme a pergunta numa das três, ou tenta fugir do schema e o Pydantic recusa.
+Observe qual dos dois acontece — e conclua que **falta uma rota de fallback**.
 
 **3. Roteie uma negação no semântico.** Pergunte algo com "não" e observe o argmax. A rota
 escolhida tende a ser a do assunto negado. É a Aula 02 cobrando de novo, agora no roteador.
@@ -260,11 +263,12 @@ correção que considero mais valiosa do exemplo, e cabe em poucas linhas.
 1. Qual problema criado pelas Aulas 12 e 13 o roteamento resolve?
 2. Que informação o roteamento lógico usa para decidir? E o semântico?
 3. Por que o roteador lógico é testável e o semântico não é, com a mesma facilidade?
-4. O que `Literal` garante em `01-LogicalRouting.py`, e o que ele impede?
+4. O que o `Literal` **induz** e o que o Pydantic **valida** em `01-LogicalRouting.py`? Por que isso
+   não é garantia de que só as três rotas declaradas possam sair do modelo?
 5. Por que a descrição do `Field` é prompt e não documentação?
 6. O que o `02-SemanticRouting.py` roteia — índices ou prompts? Por que a distinção importa?
 7. Cite quatro situações em que o roteamento semântico falha.
-8. Qual o problema do `argmax` sem limiar, e qual a correção de três linhas?
+8. Qual o problema do `argmax` sem limiar, e qual a correção que cabe em poucas linhas?
 9. Por que decisões de permissão não devem ficar na camada semântica?
 10. Por que logar a rota escolhida é pré-requisito de diagnóstico?
 

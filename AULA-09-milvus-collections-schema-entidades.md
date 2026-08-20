@@ -107,7 +107,8 @@ utilizável.
 Database em Milvus é isolamento lógico, como em Postgres. Serve para separar ambientes
 (dev/prod) ou inquilinos. A escolha entre isolar por database e isolar por partição é a decisão de
 desenho multi-tenant, retomada nas Armadilhas de produção desta própria aula — nenhuma aula posterior
-do curso trata particionamento, e prometer isso à Aula 10 era promessa que ela não cumpre.
+do curso **desenvolve** particionamento (a Aula 10 o cita de passagem, numa linha, como alternativa
+para filtro muito seletivo), e prometer o assunto à Aula 10 era promessa que ela não cumpre.
 
 ### `02-collection.py` — o atalho
 
@@ -232,8 +233,11 @@ na segunda.
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
 da lição, uma em cada database.
 
-Depois de `04`, use `client.query` ou o Milvus Attu (interface web) para conferir que as 10
-entidades estão lá. Ver o dado inserido fecha o ciclo.
+Depois de `04`, use `client.query` ou o Milvus Attu (interface web) para conferir o que ficou. **E
+não espere dez entidades:** o script insere dez, faz `upsert` em duas (ids 0 e 1, virando
+`updated_pink_8682` e `updated_red_7025`) e depois **deleta a de id 0** — linhas 47 a 64. O estado
+final tem **nove**, ids 1 a 9. O arquivo faz o ciclo completo de escrita (inserir, atualizar,
+remover) e é isso que vale ver, não só a inserção.
 
 ---
 
@@ -244,8 +248,11 @@ dos vetores, deixando-o com 4 dimensões numa collection de 5. O erro aparece na
 bom que apareça. Compare com o truncamento silencioso do embedding da Aula 07: aqui o sistema
 avisa, lá não.
 
-**2. Troque `auto_id=False` por `True`.** Em `03-schema.py`, ative o auto-id e tente inserir
-fornecendo o `id` mesmo assim. Observe o conflito. Depois pense: se o Milvus gera o id, como
+**2. Troque `auto_id=False` por `True`.** Em `03-schema.py`, ative o auto-id — e note que este
+exercício exige uma linha sua: **o arquivo não tem `insert` nenhum** (`grep -c insert` devolve 0), só
+cria o schema, descreve e dropa. Acrescente um `client.insert(collection_name=collection_name,
+data=[{"id": 1, "text_vector": [...], ...}])` antes do `drop_collection` da linha 144, fornecendo o
+`id` mesmo assim. Observe o conflito. Depois pense: se o Milvus gera o id, como
 você descobre a qual documento do seu sistema aquele resultado corresponde?
 
 **3. Declare `VARCHAR` com `max_length` pequeno.** Ponha `max_length=10` num campo e insira um
@@ -285,7 +292,7 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   68 antes de consultar na 69. Aqui a lição é direta: ausência da string não é ausência do
   comportamento — a mesma armadilha do "import não é uso", virada do avesso.
 
-  **Os outros cinco não carregam nada, e é mais interessante:** `a-working-sample.py`,
+  **Os outros cinco não carregam nada, e — julgamento — é o caso mais interessante:** `a-working-sample.py`,
   `create_milvus_db.py` e os três de `MultimodalRetrieval/` chamam `client.search()` sem nenhuma
   chamada de load, porque não falam com o servidor desta aula — instanciam `MilvusClient` com um
   caminho de arquivo local (`MilvusClient(db_path)`, `MilvusClient(uri="./wukong_images.db")`), que

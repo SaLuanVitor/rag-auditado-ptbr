@@ -58,8 +58,11 @@ que você vai ver rodando nos scripts `01_0x` é o `BAAI/bge-small-zh`, não o `
 que só aparece nos `05_RAG_from_Scratch_*`. Você vai querer um modelo bom quando estiver
 julgando qualidade de resposta.
 
-Uma nuance que vale saber desde já: **embedding e geração são decisões
-independentes**. Você pode embutir localmente e gerar via API. Os scripts
+Uma nuance que vale saber desde já: **embedding e geração são decisões independentes**, e cada uma
+pesa numa etapa diferente. O modelo de **embedding** entra duas vezes: na indexação, quando os
+documentos viram vetores, e na recuperação, quando a pergunta vira vetor para buscar — trocá-lo
+obriga a reindexar tudo. O modelo de **geração** entra só no fim, ao sintetizar a resposta a partir
+do que foi recuperado, e trocá-lo não mexe no índice. Você pode embutir localmente e gerar via API. Os scripts
 `01_02_LlamaIndex_SwitchEmbeddingModel.py` e
 `01_03_LlamaIndex_SwitchGenerationModel.py` parecem existir para isolar essas duas trocas — mas
 não isolam. Abra o `01_03` na **linha 9**: ele define `Settings.embed_model` com o mesmo
@@ -73,12 +76,14 @@ controlado.
 
 ### Passo 1 — Python e ambientes virtuais
 
-Use Python 3.10 ou 3.11. Os requirements pinam versões de 2025 que não têm wheels
-para 3.13 em várias dependências (`faiss-cpu`, `torch`).
+Use Python 3.10, 3.11 ou 3.12 — **não 3.13**. O bloqueio é uma dependência transitiva:
+`onnxruntime==1.19.2`, que entra pelo `chromadb` e publica wheel só até cp312. O `torch==2.6.0` e o
+`faiss-cpu==1.10.0` **já têm** wheel para 3.13, então não são o motivo (conferido na PyPI, release
+por release, para `win_amd64`).
 
 Crie dois ambientes na raiz do clone:
 
-```bash
+```powershell
 cd ../RAG-from-First-Principles
 python -m venv .venv-langchain
 python -m venv .venv-llamaindex
@@ -130,7 +135,10 @@ Você está no Windows 11, então os dois `NoGPU_Mac-Win`. São 274 e 130 linhas
 dependências pinadas — a instalação demora, `torch` é grande.
 
 Existem ainda requirements especializados que você só instala quando a aula pedir:
-`requirements_camelot_20250413.txt` (extração de tabelas, Aula 06) e
+`requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
+`requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
+acrescenta o que os exemplos de LangGraph precisam (`langchain-deepseek`, `langgraph-prebuilt`) e não
+está nos `NoGPU_Mac-Win` — instale quando chegar nos `04_LangGraph_RAG*.py` de `00-SimpleRAG/`; e
 `requirements_marker_20250413.txt`, que **nenhuma aula usa**: `grep -rn "import marker"` no
 repositório inteiro não encontra nada, e as duas menções ao `marker_single` estão em tabelas de
 `README.md` e de `99-EN/README.md` — a mesma linha, repetida nos dois —, sobre a geração de um asset
@@ -163,7 +171,8 @@ apenas conversam com esse servidor.
 
 ### Passo 5 — O arquivo `.env`
 
-O `.gitignore` do repositório contém exatamente uma linha: `.env`. Isso é
+O `.gitignore` **da raiz** do repositório contém exatamente uma linha: `.env` (há também um
+`.idea/.gitignore` gerado pela IDE, com seis linhas que não interessam aqui). Isso é
 deliberado — chave de API nunca entra em commit.
 
 ```powershell

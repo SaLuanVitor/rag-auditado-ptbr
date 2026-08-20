@@ -104,7 +104,9 @@ Aula 11 prometeu a aritmética. Aqui está, e ela explica a escolha de projeto:
 | 2º      | 1      | 1/61 ≈ 0,016393     |
 | 3º      | 2      | 1/62 ≈ 0,016129     |
 
-A diferença entre 1º e 2º é de **1,67%**. Com `k` pequeno — digamos 1 — o 1º valeria 1,0 e o 2º
+A diferença entre 1º e 2º é de **1,64%** — tomando como base o escore do primeiro, que é a mesma
+convenção usada logo abaixo. (Pela outra convenção, sobre o escore do segundo, dá 1,67%; declare qual
+você usa antes de comparar os dois casos.) Com `k` pequeno — digamos 1 — o 1º valeria 1,0 e o 2º
 0,5: uma diferença de 50%.
 
 Isso é uma **aposta deliberada**: com `k=60`, um único retriever muito confiante não domina a
@@ -160,9 +162,11 @@ Duas observações que só a leitura do arquivo dá:
 2. **Não é um checkpoint ColBERT treinado.** É BERT base, e o comentário do autor na linha 35 admite
    que pode ser substituído por _"a model fine-tuned specifically for ColBERT"_.
 
-Ou seja: o arquivo guarda um vetor por token, mas **não** faz late interaction — guardar um vetor por token e
-comparar token a token —, não ColBERT em qualidade de produção. Quem rodar esperando resultado de
-ColBERT vai se decepcionar, e a decepção seria com a expectativa, não com o código.
+Ou seja: o arquivo guarda um vetor por token, mas **não** faz a comparação que caracteriza late
+interaction — o `calculate_similarity()` reduz os vetores por _mean pooling_ antes de comparar, e o
+próprio arquivo avisa que o ColBERT de verdade usaria a operação MaxSim. É demonstração do formato,
+não ColBERT em qualidade de produção. Quem rodar esperando resultado de ColBERT vai se decepcionar,
+e a decepção seria com a expectativa, não com o código.
 
 A conexão com a Aula 08: o BGE-M3 emite `colbert_vecs` justamente para isso. Late interaction fica
 entre bi-encoder e cross-encoder — mais preciso que o primeiro, mais barato que o segundo, e com
@@ -200,8 +204,10 @@ abstração — um compressor recebe documentos e devolve menos ou reordenados. 
 
 ## Parte 3 — Recência: o reranker sem modelo de relevância
 
-`06-RecencyWeightedReranking.py` é o único que não julga relevância. Ele importa `datetime` e
-`faiss` (linhas 1–4) e reordena por **sinal temporal**.
+`06-RecencyWeightedReranking.py` é o único que não lida com relevância de jeito nenhum — nem julgando
+pares, como o cross-encoder, o CoBERT, o Cohere e o RankLLM, nem fundindo posições de listas já
+julgadas por outra coisa, como o RRF. Ele importa `datetime` e `faiss` (linhas 1–4) e reordena por
+**sinal temporal puro**.
 
 ### Como combinar tempo com similaridade
 
@@ -215,6 +221,15 @@ Somar diretamente está errado por três razões:
 
 A forma correta é um **decaimento exponencial normalizado**: com o fator em [0,1], você combina de
 forma comensurável — `score = similaridade × decaimento`, ou uma média ponderada com α ajustável.
+
+> 🔴 **E é exatamente o que a biblioteca deste arquivo NÃO faz.** O
+> `TimeWeightedVectorStoreRetriever` produz a ordem real, e o seu `_get_combined_score` — no módulo
+> `langchain.retrievers.time_weighted_retriever`, fora deste repositório — faz
+> `score = (1.0 - decay_rate) ** hours_passed`
+> e depois `score += vector_relevance`: **soma** o decaimento exponencial à similaridade não
+> normalizada. Nem multiplicação, nem α — é o padrão de somar escalas incomensuráveis que o ponto 1
+> acima chama de errado. As duas formas "corretas" do parágrafo anterior são o que **deveria** ser
+> feito, não o que roda. _Conferido lendo a fonte do `langchain` 0.3.0; não executei._
 
 > ⚠️ **E aqui o arquivo ensina uma lição que não pretendia.** A linha 26 traz
 > `time_decay_factor = exp(-decay_rate * time_since_last_access)` — mas ela está **dentro do
