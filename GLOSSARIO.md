@@ -29,10 +29,6 @@ entregá-los ao modelo como contexto, para que a resposta se apoie neles em vez 
 treino. Três passos: recuperar, aumentar o prompt, gerar. Reduz alucinação; não a elimina, porque
 contexto ruim produz alucinação com aparência de fundamentação.
 
-**Abstention** — A capacidade de o modelo dizer "não sei" ou "não encontrei" em vez de responder.
-É instrução de prompt, não propriedade do modelo: se o prompt não autoriza, ele tende a preencher.
-Troca falso-negativo por falso-positivo, e é a decisão de produto por trás de todo RAG confiável.
-
 **Corpus** — Acervo de documentos que alimenta o sistema.
 
 **Knowledge cutoff** — Data-limite do conhecimento do modelo. Um dos motivos de
@@ -45,9 +41,10 @@ existir RAG: informação posterior ao cutoff só chega via recuperação.
 **Loader / Reader** — Componente que lê um formato de arquivo e produz objetos
 `Document`. `TextLoader`, `JSONLoader`, `PyPDFLoader`, `SimpleDirectoryReader`.
 
-**Document** — Objeto que carrega `page_content` (o texto) e `metadata` (fonte,
-página, autor). Os metadados são o que viabiliza filtragem depois — subestimá-los
-é erro clássico.
+**Document** — Objeto que carrega `page_content` (o texto) e `metadata` (fonte, página, autor). Os
+metadados são o que viabiliza filtragem, citação da fonte e diagnóstico depois. A Aula 04 sustenta,
+**marcando como julgamento**, que a assimetria de atenção entre os dois campos é o erro de iniciante
+mais caro da ingestão — todo mundo cuida do `page_content`, quase ninguém do `metadata`.
 
 **Parsing** — Extrair texto estruturado de um formato bruto. Um PDF não "tem
 texto": tem instruções de desenho, e o parser reconstrói a leitura.
@@ -64,11 +61,11 @@ digitalizado e não tem camada de texto. Custa tempo e introduz erro de leitura;
 
 **Partition** — Função do Unstructured que quebra o documento em elementos.
 
-**Parent-child** — Estratégia em que se indexa o filho pequeno (preciso na busca)
-mas se entrega o pai grande (rico em contexto) ao LLM.
-
-**Vector store** — Sinônimo de _vector database_ no vocabulário do LangChain e do LlamaIndex.
-A mesma coisa: onde os vetores ficam e por onde a busca por vizinhos acontece.
+**Parent-child** — Estratégia de **indexação** (Aula 15) em que se indexa o filho pequeno (preciso
+na busca) mas se entrega o pai grande (rico em contexto) ao LLM. **Não confundir com os arquivos de
+ingestão que trazem "Parent-Child" no nome** (Aulas 04 e 05): aqueles reconstroem hierarquia
+documental a partir dos metadados do parser, sem embedding, índice nem recuperação. Mesmo nome,
+mecanismo diferente — e as duas aulas fazem essa ressalva explicitamente, porque a confusão é fácil.
 
 **Multi-representação** — Estratégia em que o **mesmo** conteúdo é indexado de mais de uma forma —
 texto integral, resumo, pergunta hipotética — para que consultas de naturezas diferentes encontrem
@@ -99,8 +96,10 @@ relevante seja cortada exatamente na fronteira.
 **Semantic chunking** — Corta onde o significado muda, medindo distância de
 embedding entre sentenças vizinhas. Mais caro, mais coerente.
 
-**Sliding window** — Janela deslizante. Cada sentença é indexada com suas
-vizinhas como contexto.
+**Sliding window** — Janela deslizante. Cada sentença é indexada e buscada **sozinha** — embedding
+preciso, um assunto só; as vizinhas ficam guardadas no metadado `window` e só substituem o conteúdo
+do nó **depois** da recuperação, para dar contexto ao LLM. O que se busca não é o que se entrega, e
+por isso pertence à família do `Small-to-big`.
 
 **Small-to-big** — Recuperar por unidade pequena e precisa, entregar ao LLM
 uma unidade maior. Nome da família que inclui sliding window, pai-filho e
@@ -111,13 +110,16 @@ entrega.
 
 ## Embeddings
 
-**Assimetria consulta/passagem** — Modelos de recuperação modernos são treinados em
-pares consulta–passagem, não em pares de textos parecidos. Famílias como E5 exigem os
-prefixos `query: ` e `passage: `; BGE pede instrução no lado da consulta. Sem eles, o
-recall cai sem erro nem aviso.
+**Assimetria consulta/passagem** — Modelos de recuperação modernos são treinados em pares
+consulta–passagem, não em pares de textos parecidos. **E o detalhe muda por família — não
+generalize:** a E5 quer prefixo nos **dois** lados (`passage: ` na ingestão, `query: ` na consulta);
+a BGE v1/v1.5 quer instrução **só** na consulta; e o **BGE-M3**, justamente o modelo que este curso
+ensina, **não exige instrução nenhuma**. Sem o que o cartão do modelo pede, o recall cai sem erro nem
+aviso — e a instrução real é ler o cartão antes de embutir.
 
-**Anisotropia** — Embeddings de texto ocupam um cone estreito do espaço: pares sem
-relação pontuam bem acima de 0. Consequência prática: score de cosseno não é
+**Anisotropia** — Embeddings de texto ocupam um cone estreito do espaço: pares sem relação
+**costumam** pontuar bem acima de 0 — e o piso é propriedade do modelo, não uma constante, então
+meça no seu corpus em vez de copiar número de exemplo. Consequência prática: score de cosseno não é
 probabilidade nem é comparável entre modelos, e qualquer limiar se encontra medindo a
 distribuição de pares relevantes e irrelevantes no seu corpus.
 
@@ -140,14 +142,19 @@ pré-computar o índice. É o que todo vector DB usa.
 preciso e muito mais lento — por isso serve para reranking dos top-k, não para
 busca no acervo inteiro.
 
-**BM25** — Função de ranqueamento léxica clássica (família TF-IDF). Baseline forte
-e injustamente esquecida: em muitos domínios técnicos ela vence embedding puro.
+**BM25** — Função de ranqueamento léxica clássica (família TF-IDF), de 1994. **Não compete com
+embedding:** as duas famílias falham em conjuntos **disjuntos** de casos, e é esse fato — não
+nostalgia — que sustenta a busca híbrida. O BM25 acerta identificador e jargão raro (`SKU-88213-B`,
+`CFOP 5102`) onde o denso erra.
 
 **BGE-M3** — Modelo que emite representação densa, esparsa e multi-vetorial de uma
 vez. Base natural para busca híbrida.
 
-**ColBERT** — Late interaction: guarda um vetor por token e compara token a token.
-Precisão próxima de cross-encoder com custo menor.
+**ColBERT** — Late interaction: guarda um vetor por token e compara token a token, obtendo precisão
+próxima de um cross-encoder com custo de **comparação** bem menor — e custo de **armazenamento** bem
+maior, porque são dezenas de vetores por chunk em vez de um. **No repositório do curso a técnica não
+está completa:** o `03-CoBERT-Reranking.py` faz _mean pooling_ antes de comparar, e o próprio arquivo
+avisa que o ColBERT de verdade usaria a operação MaxSim (Aulas 08 e 17).
 
 **Multimodal embedding** — Texto e imagem no mesmo espaço vetorial, permitindo
 buscar imagem por texto.
@@ -182,6 +189,9 @@ escala. FLAT é o exato (sem aproximação); IVF, HNSW e DiskANN são aproximado
 **Vector database** — Banco especializado em busca por vizinhos mais próximos em
 espaço vetorial. Milvus, Weaviate, Qdrant, pgvector, Pinecone.
 
+**Vector store** — Sinônimo de _vector database_ no vocabulário do LangChain e do LlamaIndex.
+A mesma coisa: onde os vetores ficam e por onde a busca por vizinhos acontece.
+
 **Collection** — Equivalente a uma tabela: conjunto de entidades com o mesmo
 schema.
 
@@ -202,10 +212,6 @@ perde precisão.
 maioria dos casos. Parâmetros `M` e `efConstruction`/`ef`.
 
 **DiskANN** — Índice em disco, para acervos que não caberiam em RAM.
-
-**Golden standard (gabarito)** — O conjunto de respostas ou documentos corretos contra o qual
-se mede. Sem ele não há `context recall` nem precisão: só impressão. Gabarito ruim reprova sistema
-bom, e é a falha mais cara de uma avaliação.
 
 **Recall@k** — **Duas coisas diferentes com o mesmo nome, e confundi-las é o erro que a Aula 10
 alerta.** _Recall@k do índice_ (o sentido desta seção): dos vizinhos que a busca **exata** (FLAT)
@@ -240,30 +246,18 @@ um ranker no servidor; no LangChain é o `EnsembleRetriever`, que funde no clien
 **Hybrid search** — Combina densa e esparsa. Quase sempre melhor que qualquer uma
 isolada, porque as duas falham em situações diferentes.
 
-**RRF (Reciprocal Rank Fusion)** — Fusão de rankings por soma de
-`1/(k + posição)`. Não exige que os scores sejam comparáveis entre si — daí ser o
-método padrão de fusão.
-
-**Tool calling** — O modelo emite uma chamada de função estruturada em vez de texto livre, e o
-código a executa. É o que separa um agente de um pipeline: no agente, a decisão de agir é do
-modelo.
-
-**LangGraph** — Biblioteca do ecossistema LangChain para descrever o pipeline como grafo de estado:
-nós que transformam o estado, arestas condicionais que decidem o caminho. É o que permite laço e
-desvio, e por isso é a base do CRAG, do Self-RAG e dos exemplos agentic.
-
-**Vision model** — Modelo que recebe imagem como entrada e devolve texto. Num RAG multimodal ele
-normalmente entra depois da recuperação, para descrever o que foi recuperado.
-
-**Text-to-image** — O inverso: texto entra, imagem sai. Aparece em pipelines multimodais como
-etapa de saída, e o que ela gera não é fundamentado em fonte nenhuma — vale lembrar disso antes de
-chamar o conjunto de "RAG".
+**RRF (Reciprocal Rank Fusion)** — Fusão de rankings por soma de `1/(k + posição)`. Não exige que
+os scores sejam comparáveis entre si, e é isso que ele troca pelo controle direto da mistura: a
+Aula 11 põe os dois lado a lado sem eleger vencedor — "RRF é mais robusto e menos ajustável;
+Weighted é mais ajustável e mais frágil".
 
 **Reranking** — Reordenar os top-k com um modelo mais caro e preciso. Melhor
 relação custo/ganho de todo o pipeline RAG.
 
-**MMR (Maximal Marginal Relevance)** — Seleção que equilibra relevância e
-diversidade, evitando k resultados quase idênticos.
+**MMR (Maximal Marginal Relevance)** — _Fora do escopo do curso._ Seleção que equilibra relevância
+e diversidade, evitando k resultados quase idênticos. **Nenhuma das 29 aulas usa ou menciona MMR** —
+fica aqui como referência de vocabulário, e o caminho que o curso de fato ensina para diversidade é
+outro: pedir ao prompt, não ao decodificador (Aula 19).
 
 ---
 
@@ -274,11 +268,17 @@ diversidade, evitando k resultados quase idênticos.
 **Query decomposition** — Quebrar pergunta composta em subperguntas, recuperar
 para cada uma.
 
-**Query expansion** — Enriquecer a query com sinônimos e termos relacionados.
+**Query expansion** — Ampliar a consulta para encurtar a distância pergunta↔documento. **No curso, a
+única técnica de expansão é o HyDE:** a Aula 13 põe "Expansão (HyDE)" na mesma célula da tabela, e o
+único arquivo do módulo é o de geração de documento hipotético. Expansão por sinônimo ou tesauro,
+comum na recuperação clássica, não aparece em nenhuma aula.
 
 **Query construction** — Traduzir a pergunta em linguagem natural para a linguagem de consulta da
-fonte: SQL, Cypher, filtro de metadado. Não é busca vetorial, e ainda é RAG — o que se recupera
-vem de fora do modelo e entra no contexto.
+fonte: SQL, Cypher, filtro de metadado. Não é busca vetorial. **Se ainda é "RAG" depende da
+definição, e o curso trata isso como fronteira aberta:** a Aula 12 **argumenta** que Text2SQL bem
+feito é RAG, porque o que se recupera vem de fora do modelo e entra no contexto — é a tese daquele
+módulo, não um fato assentado; a Aula 06 usa "RAG" no sentido estrito de busca vetorial e opõe os
+dois. A nota de fronteira da Aula 01 registra as duas leituras.
 
 **HyDE (Hypothetical Document Embeddings)** — Gerar com o LLM um documento hipotético que
 _responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A intuição: resposta
@@ -315,9 +315,11 @@ no meio de um contexto longo. Argumento direto a favor de reranking e compressã
 
 **Few-shot** — Incluir exemplos de resposta no prompt para fixar formato e tom.
 
-**Abstention (abstenção)** — Autorizar explicitamente o modelo a dizer que o contexto
-não responde à pergunta. Uma frase no prompt; muda o comportamento na falta de
-evidência. Custo: aumenta a recusa em casos em que o contexto serviria.
+**Abstention (abstenção)** — A capacidade de o modelo dizer "não sei" ou "não encontrei" em vez de
+responder. É instrução de prompt, não propriedade do modelo: se o prompt não autoriza, ele tende a
+preencher. **Troca falso-positivo (inventar) por falso-negativo (recusar onde o contexto servia)** —
+nessa direção, não na inversa. Onde calibrar depende do dano relativo entre as duas falhas, e essa é
+decisão de produto, não de prompt.
 
 **Prompt routing** — Escolher qual template de prompt usar conforme a pergunta. Pode
 ser por similaridade de embedding ou por classificação com LLM.
@@ -345,11 +347,28 @@ mais variação; mais baixa, mais repetição.
 chega a `p`. Alternativa à temperatura para controlar variedade. Para avaliação, o que se quer é
 decodificação determinística, não ajuste fino de variedade.
 
-**Output parser** — Componente que valida e converte a saída do modelo em
-estrutura (JSON, objeto Pydantic).
+**LangGraph** — Biblioteca do ecossistema LangChain para descrever o pipeline como grafo de estado:
+nós que transformam o estado, arestas condicionais que decidem o caminho. É o que permite laço e
+desvio, e por isso é a base do CRAG, do Self-RAG e dos exemplos agentic.
 
-**Function calling / Tool use** — O modelo emite uma chamada de função estruturada
-em vez de texto livre.
+**Vision model** — Modelo que recebe imagem como entrada e devolve texto. Num RAG multimodal ele
+normalmente entra depois da recuperação, para descrever o que foi recuperado.
+
+**Text-to-image** — O inverso: texto entra, imagem sai. Aparece em pipelines multimodais como
+etapa de saída, e o que ela gera não é fundamentado em fonte nenhuma — vale lembrar disso antes de
+chamar o conjunto de "RAG".
+
+**Output parser** — Componente com **dois** trabalhos independentes: _instruir_ (gerar a descrição do
+formato esperado, para entrar no prompt) e _parsear_ (converter e validar a saída em estrutura — JSON,
+objeto Pydantic). O repositório deste curso só usa a segunda metade, e a Aula 20 nomeia a
+consequência: sem a primeira, o modelo nunca soube o que se esperava dele, e o parser vira detector
+de erro em vez de prevenção.
+
+**Function calling / Tool calling / Tool use** — O modelo emite uma chamada de função estruturada em
+vez de texto livre. O código **pode** executá-la — mas usá-lo só para extrair um objeto, sem função
+nenhuma para executar, é **prática corrente**, e é o que os dois exemplos deste repositório fazem
+(Aula 20). É o que separa um agente de um pipeline quando a execução existe: no agente, a decisão de
+agir é do modelo (Aula 26).
 
 **Structured output** — Saída do modelo que obedece a uma estrutura declarada (esquema), em vez de
 texto livre. **"Garante" depende do grau** (Aula 20): pedir no prompt não garante nada; `json_object`
@@ -383,9 +402,11 @@ refinando-a a cada passo.
 **Tree summarize** — Agregar em árvore: resumir grupos de chunks e depois resumir os
 resumos, até uma resposta.
 
-**CRAG (Corrective RAG)** — Avalia a qualidade do que foi recuperado e corrige o
-curso — refaz busca, busca na web — quando o material é ruim. Na implementação do repositório
-(Aula 18) o grafo é **acíclico**: corrige uma vez e segue para a geração, sem voltar a avaliar.
+**CRAG (Corrective RAG)** — Avalia a qualidade do que foi recuperado e corrige o curso quando o
+material é ruim. **No paper**, a correção inclui reformular a pergunta e/ou buscar na web. **Na
+implementação deste repositório** (Aula 18) a reformulação é calculada e **descartada** — a busca na
+web roda sobre a pergunta original —, não existe nó que volte a consultar o índice local, e o grafo é
+**acíclico**: corrige uma vez e segue para a geração, sem voltar a avaliar.
 
 **Self-RAG** — **No paper**, o modelo decide se precisa recuperar, critica o que recuperou e
 critica a própria resposta. **Na implementação de referência deste curso** (Aula 21) as duas
@@ -405,9 +426,11 @@ implementação emulada por prompt, cada um vira um grader externo.
 da recuperação, no lugar do `retrieve-then-read` direto. Paper de Ma et al. (EMNLP
 2023), presente no repositório.
 
-**Grader / critic** — Componente que emite juízo binário ou graduado sobre um artefato
-do pipeline (documento, resposta). Quando é um LLM, tem os mesmos modos de falha do
-gerador que ele julga.
+**Grader / critic** — Componente que emite juízo binário ou graduado sobre um artefato do pipeline
+(documento, resposta). Quando é um LLM, tem os mesmos modos de falha do gerador que ele julga.
+Diferente do `Judge model` da seção de Avaliação: o grader roda **dentro do pipeline em produção** e
+decide uma aresta condicional; o judge model roda **offline**, sobre um conjunto de avaliação, e não
+decide o próximo passo do grafo.
 
 **Conditional edge** — Aresta de grafo cujo destino é decidido em tempo de execução por
 uma função que lê o estado. É o que permite ciclo e correção num pipeline.
@@ -423,15 +446,25 @@ exemplos do repositório.
 
 ## Avaliação
 
-**Ground truth** — Conjunto de perguntas com resposta correta conhecida. Sem ele
-você não está medindo, está achando.
+**Golden standard (gabarito)** — O conjunto de respostas ou documentos corretos contra o qual
+se mede. Sem ele não há `context recall` nem precisão: só impressão. Gabarito ruim reprova sistema
+bom — e isso é, **julgamento** da Aula 22, a falha mais cara de uma avaliação, porque manda você
+consertar o que não está quebrado. Usado no curso para o gabarito de **recuperação** (qual documento
+era o certo); para o de **geração** (qual resposta era a certa), ver `Ground truth`.
+
+**Ground truth** — Conjunto de perguntas com resposta correta conhecida. Sem ele você não está
+medindo, está achando. É o gabarito do lado da **geração**; para o lado da **recuperação**, ver
+`Golden standard`.
 
 **Faithfulness** — A resposta é sustentada pelo contexto recuperado? Mede
 alucinação.
 
 **Answer relevancy** — A resposta responde à pergunta feita?
 
-**Context precision** — Dos trechos recuperados, quantos eram de fato relevantes?
+**Context precision** — Dos trechos recuperados, quantos eram de fato relevantes? É a primeira
+pergunta da tríade, e `context relevance` é **outro nome para a mesma pergunta** — a Aula 22 põe os
+dois na mesma linha da tabela. A diferença é de fornecedor, não de semântica: o RAGAS chama de
+`context precision`, o TruLens de `context relevance`.
 
 **Context recall** — Do que era relevante, quanto foi recuperado?
 
@@ -447,8 +480,9 @@ diferente.
 **Groundedness** — Mesmo conceito de `faithfulness` sob outro nome: a resposta é
 sustentada pelo contexto. Termo usado pelo TruLens.
 
-**Context relevance** — O contexto recuperado é relevante para a pergunta. Mede
-recuperação sem exigir gabarito.
+**Context relevance** — O contexto recuperado é relevante para a pergunta. **Mesmo lugar da tríade
+que `context precision`** (a Aula 22 trata os dois nomes como equivalentes); é o termo do TruLens,
+que atribui a nota por contexto via LLM.
 
 **Judge model** — O modelo que atribui as notas. Costuma ser mais forte que o avaliado.
 Se não for fixado explicitamente, uma atualização da biblioteca muda a sua série
@@ -465,8 +499,22 @@ exemplo) sem alterar o código de negócio.
 **Pairwise comparison** — Mostrar duas respostas ao juiz e perguntar qual é melhor, em
 vez de pedir nota absoluta. Costuma ser mais estável que pontuação direta.
 
-**Semantic similarity** — Comparar embeddings da resposta e da referência. Barato e
-determinístico; cego a inversão de sentido com vocabulário parecido.
+**Semantic similarity** — Comparar embeddings da resposta e da referência. Barato e determinístico;
+cego a inversão de sentido com vocabulário parecido — o que é propriedade conhecida de embedding
+(Aula 02), não um resultado medido neste curso.
+
+**Hit rate** — Fração das consultas em que algum documento relevante apareceu no top-k.
+
+**MRR (mean reciprocal rank)** — Média do inverso da posição do primeiro acerto.
+Diferente de `hit_rate`, penaliza acerto que vem em posição ruim.
+
+**Pass@K** — Fração das consultas cujo alvo está entre os K primeiros resultados. Nome
+usado no módulo de Contextual Retrieval do repositório, onde é calculado como a média
+das frações de chunks corretos recuperados.
+
+**Exact match** — Casamento literal de texto entre o recuperado e o gabarito. Barato e
+frágil: qualquer reescrita do texto indexado o zera — razão pela qual a avaliação deve
+comparar o campo original, não o contextualizado.
 
 **Evaluation gate** — Limiar por métrica que reprova uma mudança automaticamente. Um
 limiar sobre a média das métricas deixa passar falha localizada.
@@ -498,7 +546,7 @@ ferramentas e emite (ou não) uma chamada. Distingue-se do grafo condicional, em
 produz um dado e o código decide. Modo de falha próprio: o agente decide não usar a
 ferramenta e responde de memória.
 
-**Adaptive RAG** — Termo ambíguo. No paper Modular RAG é o subtipo de laço em que o
+**Adaptive RAG / adaptive (active) retrieval** — Termo ambíguo. No paper Modular RAG é o subtipo de laço em que o
 sistema decide **quando** recuperar (FLARE, Self-RAG). No uso corrente de blog — e no
 exemplo do repositório — é decidir **onde** buscar, o que é o padrão _conditional_.
 
@@ -574,19 +622,6 @@ ao lado dele é o que mantém auditoria e comparação com gabarito possíveis.
 onde o documento inteiro entra no prompt de cada chunk, deixa de ser otimização e passa a
 ser requisito de viabilidade.
 
-**Hit rate** — Fração das consultas em que algum documento relevante apareceu no top-k.
-
-**MRR (mean reciprocal rank)** — Média do inverso da posição do primeiro acerto.
-Diferente de `hit_rate`, penaliza acerto que vem em posição ruim.
-
-**Pass@K** — Fração das consultas cujo alvo está entre os K primeiros resultados. Nome
-usado no módulo de Contextual Retrieval do repositório, onde é calculado como a média
-das frações de chunks corretos recuperados.
-
-**Exact match** — Casamento literal de texto entre o recuperado e o gabarito. Barato e
-frágil: qualquer reescrita do texto indexado o zera — razão pela qual a avaliação deve
-comparar o campo original, não o contextualizado.
-
 **Global question** — Pergunta cuja resposta é propriedade do corpus inteiro ("quais
 os temas principais?") e não está escrita em nenhum trecho. Top-k não a alcança:
 aumentar `k` amplia a amostra, não produz cobertura.
@@ -617,8 +652,15 @@ no baseline `TS`, os próprios chunks de texto.
 paper GraphRAG, julgados por comparação pareada. `directness` entra como teste de
 validade: é o critério em que o RAG vetorial vence.
 
-**Entity extraction** — Extrair entidades e relações do texto para construir o grafo. É a etapa
-mais cara da indexação do GraphRAG, porque roda um LLM sobre o corpus inteiro.
+**Entity extraction** — Extrair entidades, relações **e afirmações** do texto para construir o grafo,
+a partir de prompt e não de schema. A Aula 23 a chama, **marcando como julgamento**, de a primeira
+fonte de custo escondido da indexação do GraphRAG — e a menos discutida —, porque roda um LLM sobre o
+corpus inteiro. Não é o mesmo que dizer que é a etapa mais cara das três: o paper dá só o custo
+agregado da indexação (281 minutos), sem decompor por etapa.
+
+**Claim / covariate** — A terceira coisa que a extração puxa de cada chunk, além de entidades e
+relações: uma afirmação atribuída a uma entidade, com sujeito, objeto e período de validade. É o que
+permite ao grafo responder sobre o que foi dito, e não só sobre quem se relaciona com quem.
 
 **Leiden** — Algoritmo de detecção de comunidades em grafo, usado hierarquicamente pelo GraphRAG
 para particionar o grafo em níveis. Cada nível é uma partição mutuamente exclusiva e coletivamente
@@ -632,7 +674,8 @@ refina a consulta da anterior. O freio é a condição.
 
 **Judge module** — O componente que decide se o laço continua. No paper Modular RAG ele vem
 acompanhado de um `scheduling module`, que é quem de fato para; nos exemplos deste repositório
-existem os juízes e não existe o escalonador.
+existem os juízes e não existe o escalonador. É a mesma peça de código que a seção de
+Pós-recuperação chama de `grader`, sob o vocabulário do paper.
 
 **GraphRAG** — Constrói grafo de entidades e relações a partir do corpus.
 Responde perguntas de síntese global que busca vetorial não alcança.

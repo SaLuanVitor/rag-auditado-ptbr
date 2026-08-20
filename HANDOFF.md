@@ -35,10 +35,23 @@ sem precisar das portas eliminatórias. Para registro: **oito aulas abaixo de 50
 e 2 da R4 anotei só o total, não as seis dimensões, então a contagem de `−1` da R4 **não está
 estabelecida** (são 8 nas 17 com dimensão registrada). Não muda a classificação; muda o que se pode
 afirmar. Quem retomar: registre as seis dimensões de toda nota, sempre
-**📌 Próximo trabalho, na ordem:** (1) **auditar o `GLOSSARIO.md` entrada por entrada** — cinco
-defeitos nele numa sessão, um deles achado por dois auditores independentes; ele nunca foi
-reauditado enquanto as aulas eram corrigidas; (2) as **oito aulas abaixo de 50%**; (3) a quinta
-rodada, já com leitura de fonte de biblioteca autorizada
+**Glossário:** ✅ **auditado entrada por entrada, 174 de 174** (20/08). Seis auditores, um por grupo
+de seções, cada um com a contagem esperada declarada. **28 defeitos, e 12 deles ALTO** — o padrão é um
+só: a entrada apagava a ressalva da aula. Um CRÍTICO: a entrada `Sliding window` contradizia a
+`Small-to-big` **duas linhas abaixo**. Cinco defeitos eram de entradas que eu inserira na quarta
+rodada. Detalhe na seção "Auditoria do GLOSSARIO.md" do GATE. Agora com **175 entradas**, 267 termos
+de vocabulário conferidos, 0 faltando e 0 duplicados
+**⚠️ E os verificadores mentiam:** o `checar-vocabulario.js` reportou "0 termos faltando" durante a
+sessão inteira porque o filtro de caminho descartava **qualquer** termo com barra — `claim / covariate`,
+prometido pela Aula 23 e ausente do glossário, era jogado fora em silêncio. Cinco pontos cegos
+corrigidos, todos da mesma forma: comparar forma em vez de sentido. Filtro de ruído é afirmação sobre
+o que não importa, e afirmação não verificada é a falha dominante deste projeto
+**📌 Próximo trabalho, na ordem:** (1) as **oito aulas abaixo de 50%** — 09 (0), 11 (1), 07 (3),
+17 (3), 00 (4), 14 (4), 01 (5), 15 (5); (2) a quinta rodada, já com leitura de fonte de biblioteca
+autorizada desde o início; (3) opcional: criar uma seção "Otimização de índice" no glossário para os
+conceitos de Fase 5 (`Parent-child`, `Multi-representação`, `Small-to-big`, `Sliding window`), hoje
+espalhados entre Ingestão e Chunking — a auditoria apontou, e eu não reestruturei a taxonomia por
+conta própria
 **Histórico da classificação anterior:** os 70,4% da R3
 cairiam em "Publicável com ressalvas" (70–84%), mas as duas portas eliminatórias falham: **12** notas
 `−1` (o máximo é uma) e **cinco** aulas abaixo de 50% — 03 (4/12), 09 (2/12), 11 (5/12), 12 (3/12),

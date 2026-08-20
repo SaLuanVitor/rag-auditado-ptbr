@@ -1661,3 +1661,133 @@ minha própria edição criou e o `grep` do irmão pegou.
 `NO_ANCHOR` em **10** (era 16 no início da sessão). Vocabulário: **0 faltando, 0 duplicados**, com o
 detector normalizando caixa. Clone da Packt: **vazio, incluindo `--ignored`**, depois de **57**
 auditores nas quatro rodadas.
+
+## Auditoria do GLOSSARIO.md — entrada por entrada, 174 de 174 (20/08/2026)
+
+Este arquivo é apontado pelas 29 aulas como fonte de definição e **nunca havia sido reauditado
+enquanto as aulas eram corrigidas**. A quarta rodada de renota achou cinco defeitos nele por
+acidente, um deles por dois auditores independentes; isso motivou uma passada dedicada.
+
+**Desenho:** seis auditores `general-purpose` em `sonnet`, somente-leitura, um por grupo de seções,
+com a **contagem esperada de entradas declarada** para cada um conferir cobertura em vez de supor.
+Leitura de fonte de biblioteca autorizada (wheels já no disco, `unzip -p` para stdout);
+`pip install`/`pip download`/`unzip -d`/`conda install` proibidos nominalmente. Cada auditor tinha
+de entregar **uma linha de tabela por entrada** — sem isso o relatório não valeria.
+
+**A pergunta era relacional, não textual.** O defeito do glossário não está dentro da entrada: está
+na relação entre a entrada e a aula que corrigiu o conceito. Auditor que só lê o glossário não acha
+nada. Por isso cada um recebeu cinco perguntas por entrada: qual aula ensina isto; a entrada
+concorda com a aula **inclusive no grau de certeza**; a afirmação é verdadeira; está na seção certa;
+é duplicata em substância de outra.
+
+### Resultado
+
+| Seção(ões) | Entradas | OK | CRÍTICO | ALTO | MÉDIO | BAIXO |
+| --- | --- | --- | --- | --- | --- | --- |
+| Fundamentos · Ingestão · Chunking | 24 | 20 | 1 | 1 | 2 | — |
+| Embeddings · Similaridade | 17 | 13 | — | 3 | 1 | — |
+| Vector DB e índices · Recuperação | 23 | 21 | — | 1 | 1 | — |
+| Pré-recuperação · Avaliação | 26 | 19 | — | 5 | 1 | 1 |
+| Pós-recuperação e geração | 37 | 32 | — | 1 | 4 | — |
+| Paradigmas avançados | 47 | 41 | — | 1 | 4 | 1 |
+| **Total** | **174** | **146** | **1** | **12** | **13** | **2** |
+
+**28 defeitos em 174 entradas (146 passaram sem ressalva), e o padrão é monótono: em quase todos, o glossário apaga a ressalva
+da aula.** Não é uma coleção de erros variados — é uma única falha repetida vinte e oito vezes. É o
+que se espera de um artefato escrito uma vez e nunca revisitado enquanto a fonte mudava.
+
+### O CRÍTICO: o glossário se contradizia em duas linhas consecutivas
+
+A entrada `Sliding window` dizia "cada sentença é indexada **com suas vizinhas** como contexto". A
+Aula 15 mostra o contrário: cada nó guarda **uma** sentença como conteúdo indexado, as vizinhas ficam
+no metadado `window`, e o `MetadataReplacementPostProcessor` só as traz **depois** da recuperação. E a
+entrada `Small-to-big`, **duas linhas abaixo**, enuncia corretamente o princípio que a primeira
+violava: "o que se indexa não precisa ser o que se entrega".
+
+Nenhum auditor de aula única veria isso. Só quem lê o glossário como documento vê duas entradas
+vizinhas dizendo o oposto.
+
+### Cinco defeitos eram meus, criados nesta mesma sessão
+
+As entradas que eu inseri durante a quarta rodada trouxeram consigo o defeito que a rodada
+perseguia:
+
+| Entrada | O que eu escrevi | O que a fonte diz |
+| --- | --- | --- |
+| `Golden standard` | "e é a falha mais cara de uma avaliação" | a Aula 22 escreve "essa é, **julgamento**, a falha mais cara" — **eu apaguei o marcador ao copiar** |
+| `Abstention` | "troca falso-negativo por falso-positivo" | **invertido**: autorizar abstenção faz o modelo recusar onde o contexto servia, logo você **ganha** falso negativo |
+| `Function calling` | "e o código a executa" | a Aula 20: "usá-lo apenas para extrair um objeto, sem função nenhuma para executar, **é prática corrente**" — e nenhum dos dois exemplos do módulo executa função |
+| `Entity extraction` | "é a etapa **mais cara** da indexação" | a Aula 23 diz, marcando como julgamento, "a **primeira** fonte de custo escondido, e a **menos discutida**" — o paper dá só o custo agregado (281 min), sem decompor |
+| `Anisotropia` | "pares sem relação pontuam bem acima de 0" | a Aula 02, **que eu hedgeei nesta mesma sessão**, diz "costumam" e "o piso é propriedade do modelo — meça no seu" |
+
+A última é a mais instrutiva: eu corrigi a aula e deixei o glossário afirmando a versão antiga. A
+correção durou duas horas antes de virar incoerência.
+
+### Passada estrutural — feita por mim, antes de distribuir
+
+Antes dos auditores, construí o mapa **termo → aulas que o mencionam** e varri duplicata e
+posicionamento. Os defeitos encontrados eram todos das entradas que eu inserira horas antes,
+**ancoradas pelo vizinho conveniente e não pela semântica da seção**:
+
+- **Cinco entradas na seção errada:** `Golden standard` (avaliação, estava em índices), `LangGraph`,
+  `Vision model`, `Text-to-image` (geração, estavam em Recuperação) e `Vector store` (banco vetorial,
+  estava em Ingestão).
+- **Duas duplicatas semânticas**, que nenhum detector automático vê porque comparam título e não
+  sentido: `Tool calling` × `Function calling / Tool use`, e `Abstention` × `Abstention (abstenção)`.
+  Nos dois casos a minha entrada era a mais completa **e** estava na seção errada, e a antiga era
+  mais fina e estava no lugar certo — então a correção foi fundir: texto bom, posição certa.
+- **Uma entrada órfã:** `MMR (Maximal Marginal Relevance)` não aparece em nenhuma das 29 aulas. O
+  auditor da seção C confirmou independentemente e apontou o motivo: o curso resolve diversidade por
+  prompt (Aula 19), não por MMR. Marcada como fora do escopo, não removida.
+- **Uma entrada faltante:** `claim / covariate`, prometida no vocabulário da Aula 23 e ausente.
+  Criada.
+- **Quatro métricas fora de lugar:** `Hit rate`, `MRR`, `Pass@K` e `Exact match` estavam no fim de
+  "Paradigmas avançados". Métrica não é paradigma; foram para "Avaliação", onde o vocabulário
+  equivalente já morava.
+
+174 → 175 entradas (duas duplicatas fundidas, uma criada, uma que já tinha sido fundida antes).
+
+### Cinco falhas dos meus verificadores, e a pior delas
+
+Esta auditoria expôs **cinco** pontos cegos nos meus próprios instrumentos, e os cinco são a mesma
+falha: **comparar forma em vez de sentido** — que é exatamente o defeito do material que eles
+auditam.
+
+1. O `checar-vocabulario.js` media **ausência** e nunca **excesso**: dizia "0 faltando" com nove
+   entradas duplicadas.
+2. Consertado, comparava **título exato** e não viu `**MRR (Mean Reciprocal Rank)**` contra
+   `**MRR (mean reciprocal rank)**`. Passou a normalizar caixa, acento e pontuação.
+3. O mapa termo→aulas tratava título com barra como **string única**, e devolveu **10 entradas
+   órfãs das quais 7 eram falsas** (`Loader / Reader`, `RAGAS / TruLens / DeepEval`…). Passou a
+   tratar barra como alternativa: 10 → 3.
+4. **A pior, porque falseou o número da sessão inteira:** o filtro de caminho do
+   `checar-vocabulario.js` (`!/[\/]/`) descartava **qualquer** termo com barra, tratando-o como path.
+   `claim / covariate` — prometido pela Aula 23, ausente do glossário — foi jogado fora em silêncio,
+   e o verificador reportou **"0 faltando" durante toda a sessão**. O filtro que exclui ruído estava
+   excluindo sinal. A distinção que faltava: caminho real não tem espaço em volta da barra.
+5. Mesmo problema no filtro de parêntese (`!/[()]/`), que descartava `QFS (query-focused
+   summarization)`, `RRF (Reciprocal Rank Fusion)`, `CRAG (Corrective RAG)` e outros três como se
+   fossem chamada de código. Distinção que faltava: chamada tem `(` colado no identificador.
+
+Com os dois filtros estreitados o verificador passou a conferir **267 termos em vez de 254**, e
+achou **2 ausências reais** — `claim / covariate` e `adaptive (active) retrieval` (este coberto em
+substância pela entrada `Adaptive RAG`, que passou a carregar o termo no título).
+
+**A lição, que vale além deste arquivo:** um filtro de ruído é uma afirmação sobre o que não importa,
+e afirmação não verificada é a classe de defeito dominante deste projeto. Eu escrevi cinco filtros e
+não medi nenhum. Medi-los custou um comando.
+
+### Nota de contrato
+
+Um relatório terminou colando `M GLOSSARIO.md` como se fosse o `git status` do clone da Packt. Esse
+arquivo **não existe** no clone — o auditor rodou o comando no diretório errado e rotulou errado.
+Conferido: o clone terminou **vazio, incluindo `--ignored`**. Os outros cinco relataram corretamente.
+Nenhuma violação de contrato nesta rodada — a primeira em que os prompts trazem `pip install`
+proibido nominalmente.
+
+### Estado no fecho
+
+`verify-citations --all`: **PASS**, zero inválidas, `NO_ANCHOR` em 10. Vocabulário: **267 termos
+conferidos, 0 faltando, 0 duplicados** (textual e normalizado). Duplicata semântica por contenção:
+**0** confirmadas — o gerador de candidatos devolve 18, e ler mostra que 16 são conceitos legítimos
+onde um termo contém outro (`Chunk` em `Chunk size`, `FLAT` em `IVF_FLAT`). Clone da Packt: vazio.
