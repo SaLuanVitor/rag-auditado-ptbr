@@ -202,7 +202,7 @@ model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=False)   # linha 4
 passage_embeddings = model.encode(               # linha 8
 ```
 
-O `encode` pede as três saídas — `return_dense=True`, `return_sparse=True`,
+O `encode` pede as três saídas — na ordem do arquivo, `return_sparse=True`, `return_dense=True`,
 `return_colbert_vecs=True` — e o resultado traz `dense_vecs`, os pesos lexicais (`sparse`) e os
 `colbert_vecs`.
 

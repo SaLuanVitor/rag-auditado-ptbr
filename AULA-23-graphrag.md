@@ -266,7 +266,8 @@ E as três leituras que o paper tira dela:
 
 > _"For a modest drop in performance compared with other global methods, root-level GraphRAG offers a
 > highly efficient method for the iterative question answering that characterizes sensemaking
-> activity, while retaining advantages in comprehensiveness (72% win rate) and diversity"_
+> activity, while retaining advantages in comprehensiveness (72% win rate) and diversity (62% win
+> rate) over vector RAG"_
 
 Junte com a seção anterior e a tese fica precisa — em três partes, porque a versão de uma frase
 erra:

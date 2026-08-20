@@ -344,7 +344,8 @@ limite de iteração no seu código, o caso ruim não é resposta errada — é 
 meio do caminho.
 
 > ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25**
-> super-steps, e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
+> super-steps — valor da documentação da biblioteca, que não pude confirmar localmente porque
+> `langgraph` não está instalado neste ambiente — e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
 > confusa. O contador que falta no estado da aplicação não serve para evitar laço infinito;

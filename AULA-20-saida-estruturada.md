@@ -491,7 +491,11 @@ em camadas diferentes, e a do schema é, **julgamento**, a mais forte das duas.
 ## Mão na massa
 
 Este módulo precisa de chave: `DEEPSEEK_API_KEY` para os arquivos 01, 03 e os dois `05`;
-`OPENAI_API_KEY` para o `02` e o `04-v2` (`08-Generation/03-ControllingFormatViaOutputParsing/.env.example:4-9`).
+`OPENAI_API_KEY` — o `08-Generation/03-ControllingFormatViaOutputParsing/.env.example:8-9` diz
+apenas "used by some of the function-calling/output-parsing examples in this folder", sem nomear
+quais. O `04-v2` precisa dela de forma verificável (importa `OpenAIPydanticProgram`, linha 3). Para
+o `02`, é inferência de conhecimento de domínio — o LlamaIndex usa OpenAI para embeddings por
+default —, não leitura do arquivo, e não a verifiquei por execução.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 
 **1. Restrições de schema, sem LLM.** Rode `04-Pydantic-v1.py`. Depois viole cada restrição da

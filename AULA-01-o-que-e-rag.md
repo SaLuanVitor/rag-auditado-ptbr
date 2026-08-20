@@ -154,7 +154,7 @@ Ser especialista inclui recusar a ferramenta:
 | --------------------------------------------------------------------------- | ------------------------------------------ |
 | Acervo pequeno e estável (cabe no contexto)                                 | Coloque tudo no prompt, com prompt caching |
 | Precisa de agregação global ("qual o tema recorrente em 5 mil avaliações?") | Análise em batch, ou GraphRAG (Aula 23)    |
-| Precisa de número exato de base estruturada                                 | Text2SQL contra o banco (Aula 12)          |
+| Precisa de número exato de base estruturada                                 | Text2SQL contra o banco — que a Aula 12 argumenta **ainda ser RAG**, só sem busca vetorial |
 | Precisa mudar o _comportamento_ ou o _estilo_ do modelo                     | Fine-tuning, não RAG                       |
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
 

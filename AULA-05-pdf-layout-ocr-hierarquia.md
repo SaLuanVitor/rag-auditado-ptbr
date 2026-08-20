@@ -44,6 +44,14 @@ O módulo está organizado por quanto de estrutura cada abordagem preserva:
 
 ```
 texto corrido  →  elementos tipados  →  hierarquia  →  layout com coordenadas
+
+(A escada ordena o **grau de estrutura que você obtém**, não a ordem dos arquivos: o
+`05-LangChain-Unstrucured-PDF-ExtractDocumentStructure.py` já sobe dois degraus de uma vez — tem
+reconstrução pai-filho por `parent_id`/`element_id` nas linhas 109-133 e uma função
+`analyze_layout()` na 53. Sobre esta última, um limite declarado: a linha 7 do arquivo tem
+`# coordinates=True,` **comentada**, e sem instalar o `unstructured` não dá para saber se a
+estratégia `hi_res` já traz `coordinates` no metadado de todo modo. Se não trouxer, a análise de
+layout roda sobre metadado vazio.)
    PyPDF            partition()         parent-child      caixas na página
    PyMuPDF          Unstructured        Title→Text        fitz + matplotlib
 ```

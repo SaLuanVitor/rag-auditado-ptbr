@@ -2,7 +2,7 @@
 
 **Data:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
-**Verificação:** `verify-citations --all` = **PASS** — 1635 OK, zero inválidas. `BAD_LINE`,
+**Verificação:** `verify-citations --all` = **PASS** — 1646 OK, zero inválidas. `BAD_LINE`,
 `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 16 `SKIPPED` (glob ou elipse) e
 20 `NO_ANCHOR`, ambos conferência à mão por desenho
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos

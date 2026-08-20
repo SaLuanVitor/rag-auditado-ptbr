@@ -1178,8 +1178,49 @@ O arquivo está fora dos dois repositórios. Clone da Packt: **vazio**, inclusiv
 29 auditores. Um segundo auditor tentou um `>`, o shell recusou com *Permission denied*, e ele
 reportou de todo modo.
 
+### Segundo lote de correções: os achados que não carregavam `−1`
+
+As 32 primeiras correções desta rodada atacaram as 12 notas `−1`. **Ficaram de fora dois ALTO e nove
+MÉDIO/BAIXO** — e deixá-los seria repetir, na mesma sessão, o Padrão 2 que a seção acima documenta:
+três defeitos da R2 voltaram na R3 porque só as `−1` foram corrigidas, e os auditores gastaram
+orçamento reachando os mesmos três. Aplicada a regra: **corrija os MÉDIO também.** Mais 15 correções.
+
+**Os dois ALTO, e os dois ficaram melhores que o relatório do auditor:**
+
+- **AULA-05 — degrau da escada mal atribuído.** O auditor observou que o
+  `05-LangChain-Unstrucured-PDF-ExtractDocumentStructure.py` já faz layout por coordenadas e
+  hierarquia, degraus que a aula reserva para os arquivos `08-*` e `09-*`. Verificando: a
+  reconstrução pai-filho existe mesmo (`:109-133`) e a função `analyze_layout()` existe (`:53`) —
+  **mas a linha 7 do arquivo tem `# coordinates=True,` comentada.** Sem instalar o `unstructured` não
+  dá para saber se a estratégia `hi_res` já traz `coordinates` no metadado de todo modo. Corrigido
+  com o limite declarado em vez de trocar uma afirmação por outra não verificada.
+- **AULA-15 — `parent_docs`/`child_docs` são código morto.** `grep -c` devolve **1** para cada: só a
+  atribuição. O que popula os stores é `retriever.add_documents(documents)` (`:52`), que resplita
+  `documents` com os splitters do construtor (`:45-50`), não as listas das linhas 34-35. A aula
+  apresentava as duas variáveis como "a arquitetura de armazenamento" e o exercício mandava
+  **contá-las**. Corrigidos os dois: a ressalva e o exercício, que agora conta o que o retriever
+  guardou de fato.
+
+**Os MÉDIO e BAIXO:** promessa de vocabulário não cumprida em três aulas — `MMR` e `top-k` saíram do
+vocabulário da AULA-13 e `MMR` do da AULA-17, porque nenhuma das duas os expõe no corpo; e
+**`multi-representação`, o termo central da AULA-16, entrou no `GLOSSARIO.md`**, que o prometia e não
+o tinha. Mais: a atribuição de responsabilidade na AULA-18 (`grade_documents` produz o veredito,
+`decide_to_generate` roteia), o hedge que faltava no `recursion_limit` da AULA-21, a citação
+truncada da AULA-23, a linha de gravação vs. leitura na AULA-24, a ordem dos parâmetros na AULA-08,
+a atribuição do `.env.example` na AULA-20, a tensão Text2SQL-é-ou-não-é-RAG entre a AULA-01 e a
+AULA-12, e um "para para" na AULA-18.
+
+**Efeito colateral que vale registrar:** duas das minhas correções introduziram referência de linha
+sem arquivo antes, e o `NO_ANCHOR` subiu de 20 para 22. Reancoradas com o caminho completo, o número
+caiu para **18** — duas abaixo da linha de base, porque a reancoragem resolveu também uma referência
+solta que já existia. O verificador pegou o meu erro no mesmo passe.
+
+`verify-citations --all` ao fim das duas rodadas de correção: **PASS, 1646 OK**, com `BAD_LINE`,
+`MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` em zero.
+
 ### Estado ao encerrar
 
-`verify-citations --all`: **PASS**, 1635 OK, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` em zero.
+`verify-citations --all`: **PASS**, 1646 OK, `BAD_LINE`/`MISPLACED`/`NOT_FOUND`/`BAD_ANCHOR` em zero.
 `git status --short --ignored` no clone: vazio.
-32 correções aplicadas, cada uma verificada na fonte por mim, com `grep` de irmãos no curso inteiro.
+47 correções aplicadas em dois lotes (32 para as notas -1, 15 para os ALTO/MÉDIO/BAIXO), cada uma
+verificada na fonte por mim, com `grep` de irmãos no curso inteiro.

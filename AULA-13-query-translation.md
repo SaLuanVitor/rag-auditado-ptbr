@@ -310,8 +310,7 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 
 ## Vocabulário
 
-`query rewriting` · `query decomposition` · `query expansion` · `HyDE` · `MMR` ·
-`top-k` · `retriever`
+`query rewriting` · `query decomposition` · `query expansion` · `HyDE` · `retriever`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

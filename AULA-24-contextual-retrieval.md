@@ -188,7 +188,9 @@ Documento inteiro em `<document>`, chunk em `<chunk>`, e a instrução de enriqu
 
 A chamada usa `gpt-3.5-turbo` com `temperature=0` e `max_tokens=1000` (`Milvus-Implementation.py:447-455`), e o resultado é o texto que vai ser embutido (`:458`).
 
-**Uma diferença em relação ao método original, que vale conhecer:** o prompt pede que a resposta **contenha o chunk completo** enriquecido — ou seja, uma reescrita. A formulação original da Anthropic gera um contexto curto para ser **prefixado** ao chunk, preservando o original. Conhecimento de domínio, não leitura deste arquivo: reescrever é mais fluido e mais arriscado, porque o texto indexado passa a ser produção do modelo. A boa decisão que este arquivo toma é guardar **os dois** campos, `content` e `contextualized_content` (`Milvus-Implementation.py:540`), o que mantém o original recuperável.
+**Uma diferença em relação ao método original, que vale conhecer:** o prompt pede que a resposta **contenha o chunk completo** enriquecido — ou seja, uma reescrita. A formulação original da Anthropic gera um contexto curto para ser **prefixado** ao chunk, preservando o original. Conhecimento de domínio, não leitura deste arquivo: reescrever é mais fluido e mais arriscado, porque o texto indexado passa a ser produção do modelo. A boa decisão que este arquivo toma é guardar **os dois** campos, `content` e `contextualized_content` — a gravação está em
+`Milvus-Implementation.py:476-480`, e a linha 540 mostra os dois sendo lidos de volta em
+`output_fields` —, o que mantém o original recuperável.
 
 **A troca de provedor está documentada e reversível.** O cabeçalho avisa (`Milvus-Implementation.py:19-22`) que a versão original usava Claude e que o código do Claude foi comentado — e ele está lá, em `Milvus-Implementation.py:462-468`, com `claude-3-haiku-20240307`. Julgamento: manter a alternativa comentada ao lado, com a razão declarada, é melhor que apagá-la.
 

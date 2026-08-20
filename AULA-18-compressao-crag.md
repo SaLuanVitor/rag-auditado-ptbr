@@ -186,8 +186,10 @@ saídas possíveis:
 | **nenhum relevante**    | **buscar fora** — reformular e/ou recorrer à web |
 | ambíguo                 | combinar: usar o que serve, complementar o resto |
 
-> ⚠️ **A terceira linha é do paper, não deste arquivo.** `grade_documents` (linhas 296–321) só
-> implementa **dois** ramos: zero documentos aprovados → busca na web; um ou mais aprovados → gera
+> ⚠️ **A terceira linha é do paper, não deste arquivo.** O `grade_documents` de
+> `01-CRAG-ReflectiveRetrieval.py:296-321` só produz
+> **dois** resultados possíveis — e quem roteia com base neles é `decide_to_generate` (`:383-411`),
+> passada como função de decisão em `add_conditional_edges` (441-448): zero documentos aprovados → busca na web; um ou mais aprovados → gera
 > direto com os que sobraram. Não existe caminho que "complemente o resto" — o ambíguo desaparece
 > dentro do ramo "relevantes", e o que foi reprovado é simplesmente descartado. Ao ler o código,
 > espere duas saídas.
@@ -334,4 +336,4 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Próxima:** [AULA 19 — Escolha de modelo e prompt engineering para RAG](AULA-19-modelo-e-prompt-engineering.md)
 
 > **Fase 6 concluída.** As Aulas 17 e 18 cobrem `07-PostRetrieval/`: reordenar, remover e corrigir.
-> O CRAG introduziu a **ramificação condicional** — e a Fase 7 vai levá-la ao ciclo de fato, para para que o modelo critique a própria resposta.
+> O CRAG introduziu a **ramificação condicional** — e a Fase 7 vai levá-la ao ciclo de fato, para que o modelo critique a própria resposta.

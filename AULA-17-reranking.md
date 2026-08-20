@@ -89,7 +89,7 @@ O score, na linha 140, e o acúmulo na 141:
 ```
 
 A docstring da linha 106 registra que **60 é "an empirical value"** — valor empírico, não derivado.
-E o cabeçalho da linha 27 mais a docstring da 113 descrevem a fórmula.
+E o item 4 do docstring, na linha 27, mais a docstring da 113 descrevem a fórmula.
 
 ### O que o `k` faz, com números
 
@@ -336,7 +336,7 @@ observou o não determinismo — e o problema que ele cria para comparar configu
 ## Vocabulário
 
 `reranking` · `RRF (Reciprocal Rank Fusion)` · `cross-encoder` · `bi-encoder` · `ColBERT` ·
-`MMR` · `top-k` · `context precision` · `lost in the middle`
+`top-k` · `context precision` · `lost in the middle`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

@@ -138,6 +138,13 @@ parent_docs = parent_splitter.split_documents(documents)
 child_docs = child_splitter.split_documents(documents)
 ```
 
+> ⚠️ **As duas variáveis acima são código morto, e é bom saber disso antes de copiar o arquivo.**
+> `grep -c` devolve **1** para `parent_docs` e **1** para `child_docs`: só a atribuição, nunca uma
+> leitura. O que popula o `vectorstore` e o `docstore` é `retriever.add_documents(documents)` (linha
+> 52), que **resplita `documents`** internamente com os splitters passados ao construtor (45-50) —
+> não usa as listas das linhas 34-35. O resultado numérico é o mesmo, porque os splitters são os
+> mesmos; o que muda é o que você precisa entender para adaptar o código.
+
 **E a arquitetura de armazenamento** (linhas 37–38):
 
 ```python
@@ -238,7 +245,10 @@ Ver a substituição acontecer é o que torna o small-to-big concreto.
 python 02-ParentChildTextChunkRetrieval.py
 ```
 
-Conte quantos `child_docs` e quantos `parent_docs` foram gerados — a razão entre eles é
+Conte quantos filhos e quantos pais o retriever guardou de fato — `len(list(store.yield_keys()))`
+para os pais, e o número de vetores no `vectorstore` para os filhos. (Não conte `parent_docs` e
+`child_docs` de `02-ParentChildTextChunkRetrieval.py:34-35`: são código morto, como a ressalva acima
+explica.) A razão entre eles é
 aproximadamente 1000/200 = 5. Depois faça uma query e observe: quantos filhos casaram, e quantos
 pais distintos voltaram? A diferença é a deduplicação em ação.
 

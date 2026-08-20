@@ -62,6 +62,12 @@ tabela, cabeçalho). Preserva hierarquia que o texto corrido perde.
 **Parent-child** — Estratégia em que se indexa o filho pequeno (preciso na busca)
 mas se entrega o pai grande (rico em contexto) ao LLM.
 
+**Multi-representação** — Estratégia em que o **mesmo** conteúdo é indexado de mais de uma forma —
+texto integral, resumo, pergunta hipotética — para que consultas de naturezas diferentes encontrem
+o mesmo documento por caminhos diferentes. Não confundir com busca híbrida, que procura o mesmo
+texto por dois mecanismos (denso e esparso); aqui o que muda é **o que se indexa**, não como se
+procura.
+
 ---
 
 ## Chunking
