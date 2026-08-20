@@ -54,12 +54,10 @@ usado por `01_03_LlamaIndex_SwitchToOpenAICompatibleModel.py`.
 
 **Recomendação para este curso:** faça as Fases 0 a 2 com **Ollama**, custo zero, e
 deixe a API paga para quando chegar em geração e avaliação (Fases 7 e 8), onde a
-qualidade do modelo realmente muda o que você observa. Embedding local é
-excelente hoje. **Julgamento:** para acompanhar este curso, um bi-encoder pequeno basta — e o
+qualidade do modelo realmente muda o que você observa. **Julgamento:** embedding local está bom hoje, e geração local ainda não. Para acompanhar este curso, um bi-encoder pequeno basta — e o
 que você vai ver rodando nos scripts `01_0x` é o `BAAI/bge-small-zh`, não o `all-MiniLM-L6-v2`,
-que só aparece nos `05_RAG_from_Scratch_*`. Geração local é
-mediana, e você vai querer um modelo bom quando estiver julgando qualidade de
-resposta.
+que só aparece nos `05_RAG_from_Scratch_*`. Você vai querer um modelo bom quando estiver
+julgando qualidade de resposta.
 
 Uma nuance que vale saber desde já: **embedding e geração são decisões
 independentes**. Você pode embutir localmente e gerar via API. Os scripts

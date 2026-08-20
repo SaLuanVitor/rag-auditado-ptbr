@@ -66,7 +66,7 @@ E **falha** onde palavra-chave é imbatível:
 
 Esta tabela é o argumento inteiro a favor de **busca híbrida** (Aula 11). Não é que
 uma abordagem é melhor: elas falham em conjuntos disjuntos de casos. Guarde isso —
-é a lição mais rentável do curso.
+**Julgamento:** é uma das lições mais rentáveis do curso.
 
 O caso da negação merece destaque, porque surpreende: o embedding de "contrato com
 cláusula de multa" e o de "contrato sem cláusula de multa" são **muito parecidos**,

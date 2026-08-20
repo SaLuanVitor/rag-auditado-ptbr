@@ -21,7 +21,7 @@ A pergunta desta aula é onde colocar a garantia de formato:
 3. Na **API do provedor** — obrigar o formato na chamada.
 4. No **schema como contrato** — declarar a estrutura e deixar a plataforma cobrá-la.
 
-Os sete arquivos deste módulo dão exemplo de cada uma. E a lição mais importante não é qual escolher
+Os sete arquivos deste módulo dão exemplo de cada uma. E a lição que considero mais importante não é qual escolher
 — é que **nenhuma delas garante que o conteúdo esteja certo**. Duas delas, como veremos, chegam a
 forçar o modelo a inventar.
 
@@ -302,7 +302,7 @@ Via JSON Schema escrito à mão (`08-Generation/03-ControllingFormatViaOutputPar
 ```
 
 O segundo é o que viaja no protocolo; o primeiro é gerado a partir da classe. Ver os dois lado a
-lado é a melhor forma de entender que `bind_tools` não é mágica — é um serializador de schema.
+lado é, **julgamento**, a forma mais direta de entender que `bind_tools` não é mágica — é um serializador de schema.
 
 Preserve a leitura literal da descrição da ferramenta
 (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:26`), com os erros de digitação do repositório:

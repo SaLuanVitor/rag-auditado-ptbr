@@ -531,7 +531,7 @@ mudar, você descobriu que a sua conclusão era propriedade do juiz, não do sis
 
 **2. Compare com `k` diferente.** No mesmo arquivo, deixe `similarity_top_k=2` num motor e `=5` no
 outro (`09-Evaluation/04-LlamaIndexEvaluation.py:147-151`). A tabela final continua saindo, bonita e sem sentido — duas variáveis mudaram.
-É o erro experimental mais comum e o mais fácil de não notar.
+**Julgamento:** é o erro experimental mais comum, e o mais fácil de não notar.
 
 **3. Meça fidelidade contra o contexto errado.** Em `01-RAGAS.py`, troque os `contexts` da terceira
 pergunta (`09-Evaluation/01-RAGAS.py:39-42`) pelos da primeira e rode o `Faithfulness`. Observe a nota cair — e note que
@@ -550,7 +550,7 @@ um contexto. A agregação não é decoração.
 
 **7. Sabote o gabarito.** Em `03-DeepEval.py`, troque `expected_output` (`09-Evaluation/03-DeepEval.py:8`) por algo verdadeiro
 mas irrelevante ("A loja abre às 9h"). Veja `ContextualPrecisionMetric` desabar com o sistema
-intacto. Gabarito ruim reprova sistema bom — e essa é a falha mais cara de uma avaliação, porque ela
+intacto. Gabarito ruim reprova sistema bom — e essa é, **julgamento**, a falha mais cara de uma avaliação, porque ela
 manda você consertar o que não está quebrado.
 
 ---
@@ -560,7 +560,7 @@ manda você consertar o que não está quebrado.
 **Otimizar antes de medir.** É a regra da persona deste curso e a razão desta aula existir. Sem
 conjunto de avaliação, cada mudança é troca de configuração seguida de impressão.
 
-**Confundir fidelidade com verdade.** `faithfulness` alto sobre contexto errado é o pior resultado
+**Confundir fidelidade com verdade.** **Julgamento:** `faithfulness` alto sobre contexto errado é o pior resultado
 possível: o sistema está coerente e errado, e a métrica aplaude. Só métrica de recuperação — com
 gabarito — pega isso.
 

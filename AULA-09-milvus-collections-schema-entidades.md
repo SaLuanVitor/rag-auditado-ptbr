@@ -167,7 +167,7 @@ mostrando **binary vector** como alternativa: vetores de bits, muito menores e c
 distância de Hamming. Servem quando o volume é enorme e a precisão pode ceder — o mesmo
 trade-off do `IVF_PQ` que a Aula 10 vai detalhar, num lugar diferente do pipeline.
 
-O `03-schema.py` é o arquivo mais importante desta aula. Os outros três mostram como usar; este
+**Julgamento:** o `03-schema.py` é o arquivo mais importante desta aula. Os outros três mostram como usar; este
 mostra o que você está escolhendo quando não escolhe.
 
 ### `04-entity(data).py` — os dados
@@ -191,7 +191,7 @@ res = client.insert(collection_name="quick_setup", data=data)   # linha 40
 São **10 entidades**, cada uma com três campos: `id`, `vector` de 5 dimensões, e `color` — uma
 string como `"pink_8682"`.
 
-O campo `color` parece decorativo e é o mais instrutivo da aula. Ele é o **campo escalar** que
+O campo `color` parece decorativo e é, **julgamento**, o mais instrutivo da aula. Ele é o **campo escalar** que
 não participa da busca vetorial e existe para ser filtrado. Quando a Aula 10 mostrar filtered
 search com expressões como `color like "red%"`, é este campo que estará em jogo.
 
@@ -250,7 +250,8 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
 
 ## Armadilhas de produção
 
-- **Dimensão divergente do modelo.** O erro mais comum ao subir de protótipo para Milvus.
+- **Dimensão divergente do modelo.** Julgamento: é o erro mais comum ao subir de protótipo para
+  Milvus.
   Guarde o nome do modelo de embedding junto com a collection — trocar de modelo exige
   reindexar, e sem esse registro ninguém lembra qual modelo gerou aquele índice.
 - **`auto_id=True` sem referência externa.** Você perde a ponte entre o índice e a sua base.

@@ -118,7 +118,7 @@ parcialmente, porque as paráfrases tendem a herdar a composição em vez de sep
 ## Parte 3 — HyDE: a sonda geométrica
 
 `04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py` é a técnica mais contra-intuitiva do
-curso, e a mais elegante.
+curso e, **julgamento**, a mais elegante.
 
 A ideia: em vez de buscar pelo embedding da pergunta, você pede ao LLM que **escreva uma resposta
 hipotética** — que pode estar factualmente errada — e busca pelo embedding **dela**.
@@ -192,7 +192,7 @@ um ramo da árvore até restar uma consulta específica.
 >
 > Ou seja: este é o gerador de perguntas de clarificação, não o diálogo. Ele produz **o que
 > perguntar**; quem pergunta, espera e poda é o sistema que você escreveria em volta dele. E note a
-> ironia, que é o achado mais instrutivo desta aula: o arquivo que ilustra "não resolver a
+> ironia, que é, **julgamento**, o achado mais instrutivo desta aula: o arquivo que ilustra "não resolver a
 > ambiguidade sozinho" resolve a ambiguidade sozinho, por `if`.
 
 Por que isso importa: as três técnicas anteriores **assumem** que a intenção é recuperável do

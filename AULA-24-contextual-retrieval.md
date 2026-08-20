@@ -14,7 +14,7 @@ Este é o problema do isolamento semântico, e a Aula 07 já o encontrou: o chun
 
 A resposta desta aula é outra: **reescrever o chunk, antes de indexar, para que ele carregue o próprio contexto.** O LLM lê o documento inteiro e o chunk, e produz uma versão do chunk que se explica sozinha.
 
-E aqui há uma segunda pergunta, que a Aula 22 nos deu o direito de fazer: **como esses dois arquivos sabem que a técnica funcionou?** A resposta, nos dois, é o assunto mais instrutivo da aula.
+E aqui há uma segunda pergunta, que a Aula 22 nos deu o direito de fazer: **como esses dois arquivos sabem que a técnica funcionou?** A resposta, nos dois, é o assunto que considero mais instrutivo da aula.
 
 ---
 
@@ -148,7 +148,7 @@ Elas merecem uma lista, porque o padrão é o mesmo — evitar que o script queb
 2. **Nó de amostra no BM25.** Se não houver `TextNode` válido, cria um com o texto `"Sample Text"` (`LlamaIndex-Implementation.py:78`).
 3. **Zero como resultado.** Se a avaliação falhar, `display_results` devolve uma linha com `hit_rate` e `mrr` iguais a `0.0` e uma nota `"Evaluation Failed"` (`LlamaIndex-Implementation.py:140-145`). O erro entra na tabela final como **desempenho ruim**.
 
-O terceiro é o mais perigoso dos três em produção: uma falha de API vira um número na comparação, e quem lê a tabela conclui que o retriever é pior.
+O terceiro é, **julgamento**, o mais perigoso dos três em produção: uma falha de API vira um número na comparação, e quem lê a tabela conclui que o retriever é pior.
 
 Há ainda um caminho silencioso no reranker: `CohereRerank` é criado com `api_key=os.environ.get("COHERE_API_KEY", "your-api-key")` (`LlamaIndex-Implementation.py:220`), dentro de um `try` cujo `except` faz `cohere_rerank = None` (`:225-227`). Sem a chave, o pipeline segue **sem reranking** — e o nome do retriever na tabela continua sendo `"Embedding + BM25 + Reranker Retriever"`.
 

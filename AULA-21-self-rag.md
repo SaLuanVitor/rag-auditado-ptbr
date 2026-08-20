@@ -374,7 +374,7 @@ componente, no nível do módulo: um documento graduado (`Self-RAG-FullImplement
 alucinação (`Self-RAG-FullImplementation.py:118`), o de resposta (`Self-RAG-FullImplementation.py:145`) e o reescritor (`Self-RAG-FullImplementation.py:166`). Note que três dessas chamadas
 não guardam nem imprimem o resultado — `Self-RAG-FullImplementation.py:118`, `Self-RAG-FullImplementation.py:145` e `Self-RAG-FullImplementation.py:166` invocam e descartam.
 
-Isso reposiciona o arquivo: como **catálogo de componentes** ele é excelente, e é assim que esta aula
+Isso reposiciona o arquivo: como **catálogo de componentes** ele serve bem, e é assim que esta aula
 o usa. Como demonstração do comportamento reflexivo, ele não roda — o aluno tem que descomentar as
 linhas 379–390 para ver o ciclo acontecer, e isso está na Mão na massa.
 
@@ -448,7 +448,8 @@ passe **sempre a original** ao reescritor. Compare os dois comportamentos.
 **6. Coloque o freio que falta.** Adicione um contador ao `GraphState`, incremente-o em
 `transform_query` e em `generate`, e faça as duas funções de decisão (`Self-RAG-FullImplementation.py:271` e `Self-RAG-FullImplementation.py:295`) devolverem
 `"useful"` — ou um nó novo de desistência — quando o contador passar de, digamos, três. Esse é o
-exercício mais importante da aula, e é o que separa o exemplo didático de algo que você deixaria
+exercício que considero mais importante da aula, e é o que separa o exemplo didático de algo que
+você deixaria
 atendendo requisições.
 
 **7. Meça o custo.** Conte quantas chamadas de LLM uma pergunta consome no melhor caso (recupera,
@@ -488,7 +489,7 @@ desta.
 
 ## Armadilhas de produção
 
-**Laço sem contador não é resiliência, é dívida.** É a ausência mais grave deste exemplo. Todo grafo
+**Laço sem contador não é resiliência, é dívida.** **Julgamento:** é a ausência mais grave deste exemplo. Todo grafo
 com aresta que volta precisa de um limite e de um comportamento definido para quando o limite for
 atingido.
 
@@ -500,7 +501,7 @@ prompt. Nenhuma das três acontece aqui.
 reprovar uma boa. Três juízes multiplicam a chance de um deles errar — e um erro do juiz custa uma
 volta inteira. Não há, neste desenho, nada medindo a qualidade dos juízes; medir isso é a Aula 22.
 
-**Binário esconde o meio.** Uma resposta parcialmente fundamentada — a mais comum em corpus real —
+**Binário esconde o meio.** Uma resposta parcialmente fundamentada — a mais comum em corpus real, no meu julgamento —
 tem que virar `yes` ou `no`. O paper tem `partially supported` justamente porque essa é a categoria
 que mais aparece.
 

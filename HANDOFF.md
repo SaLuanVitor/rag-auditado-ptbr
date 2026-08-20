@@ -806,10 +806,31 @@ escolher onde: as maiores oscilações entre rodadas são **AULA-24** (12 → 7)
 **AULA-26** (7 → 3) e **AULA-13** (−1 → 10 na rodada parcial). Com um auditor por aula a nota é
 sinal, não gate — e a divergência medida entre dois auditores sobre a mesma aula chega a 12 pontos.
 
-**Superlativo sem `Julgamento:` é a dívida que sobra.** Pelo menos 18 instâncias foram apontadas na
-rodada de 20/08 e **não** foram todas corrigidas — só as que produziram `−1`. É trabalho mecânico:
-varrer "o único", "o melhor", "o mais", "a primeira vez", "sempre", "nunca" nas 29 aulas e decidir,
-uma a uma, entre prefixar e remover.
+~~**Superlativo sem `Julgamento:` é a dívida que sobra.**~~ **FECHADA em 20/08/2026.** Varredura por
+script nas 29 aulas: 154 candidatos não marcados, triados um a um, **64 corrigidos** em 26 arquivos.
+Resíduo de **94**, e ele é legítimo por triagem — comparativo delimitado e verificável ("o único dos
+cinco que documenta as métricas", "o único A/B controlado do repositório", conferidos por `grep`),
+conhecimento de domínio ("1536 não é melhor que 384; é mais caro"), pergunta de Checkpoint (não é
+afirmação), termo técnico que o regex confunde com superlativo (**espaço único** na AULA-27 é espaço
+compartilhado, não "o único espaço"), e negativa ("não escolhe o melhor documento").
+
+O que foi corrigido, por saída:
+- **Prefixado com `Julgamento:`** onde a frase se sustenta como opinião assumida — "o arquivo mais
+  importante desta aula", "a ausência mais grave deste exemplo", "o erro experimental mais comum".
+- **Marcado inline** com "**julgamento**" ou hedge de primeira pessoa onde prefixar quebraria a
+  leitura — "é, **julgamento**, o mais legível dos três", "o exercício que considero mais valioso".
+- **Reescrito como descrição** onde o superlativo não acrescentava nada — "é a melhor sequência
+  didática do módulo" virou "é a mais gradual"; "o caso interessante e o mais caro" virou "o caso
+  mais caro dos três, e o que exige decisão"; "o efeito é o pior possível" virou "é dos piores",
+  porque "pior caso possível" é o exemplo que a própria RUBRICA usa do padrão a marcar.
+- **Corrigido um marcador mal posicionado:** na AULA-00 o `**Julgamento:**` estava *entre* duas
+  avaliações não marcadas ("embedding local é excelente", "geração local é mediana"), cobrindo
+  nenhuma das duas. Agora cobre as duas.
+
+Método, porque importa: as edições foram aplicadas por script com **trava de casamento único** — cada
+substituição precisava casar exatamente uma vez, e qualquer divergência abortava a execução inteira
+sem escrever nada. A trava disparou duas vezes na primeira tentativa (os arquivos são CRLF, e um
+trecho da AULA-27 diferia do esperado), o que evitou edição às cegas.
 
 **Uma regressão de auditoria ficou documentada e vale como regra nova:** o lote 10 de 19/08 mandou
 remover a palavra "final" de uma citação do paper Modular RAG alegando que o paper não a tinha. O

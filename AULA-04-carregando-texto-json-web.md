@@ -14,7 +14,8 @@ JSON pode virar uma string única e inútil ou vinte documentos com metadados ap
 dependendo de qual loader você escolhe — e essa escolha acontece antes de qualquer embedding,
 antes de qualquer chunk, antes de qualquer decisão que os capítulos seguintes vão tomar.
 
-Esta é a primeira das três origens de falha da Aula 01, e a mais silenciosa: **falha de
+Esta é a primeira das três origens de falha da Aula 01 e, como lá, a mais silenciosa — julgamento,
+não medição: **falha de
 ingestão não gera erro.** Gera um acervo que o sistema simplesmente não conhece.
 
 ---
@@ -30,7 +31,8 @@ Todo loader do LangChain devolve uma lista de objetos `Document`, e cada um tem 
 | `page_content` | o texto                                         | vira embedding, vira chunk, vai ao LLM      |
 | `metadata`     | fonte, página, categoria, o que o loader souber | **viabiliza filtro, citação e diagnóstico** |
 
-A assimetria de atenção entre os dois campos é o erro de iniciante mais caro desta fase.
+**Julgamento:** a assimetria de atenção entre os dois campos é o erro de iniciante mais caro
+desta fase.
 Todo mundo cuida do `page_content`; quase ninguém cuida do `metadata`. E é o `metadata` que
 permite responder "só documentos de 2024", citar a fonte na resposta, e — no dia em que algo
 der errado — descobrir de onde veio o trecho ruim.
@@ -67,7 +69,7 @@ pode montar de qualquer fonte, inclusive de um banco ou de uma API que loader ne
 
 ### A escada do `DirectoryLoader`
 
-Os quatro arquivos `03-*` são a mesma chamada, ganhando um parâmetro de cada vez. É a melhor
+Os quatro arquivos `03-*` são a mesma chamada, ganhando um parâmetro de cada vez. **Julgamento:** é a mais gradual
 sequência didática do módulo:
 
 | Arquivo                                                      | Chamada                                                             | O que acrescenta                   |
@@ -97,7 +99,7 @@ versus quantos `Document` voltaram. A diferença é o seu problema silencioso.
 ## Parte 2 — Dados estruturados
 
 `01-DataLoading/02-StructuredDocumentLoading/` tem **6 arquivos**, e os dois primeiros formam
-o contraste mais instrutivo de toda a Fase 1.
+um contraste que vale ler com atenção.
 
 ### JSON como texto contra JSON como estrutura
 

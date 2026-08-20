@@ -359,7 +359,8 @@ global e o seu RAG vai falhar nela em silêncio:
    isso: o que veio está fielmente resumido, e o que faltou não aparece em nenhuma métrica que só
    olha o que veio.
 
-O terceiro é o mais perigoso, e é a razão pela qual `context recall` exige gabarito: só ele mede
+O terceiro é, **julgamento**, o mais perigoso, e é a razão pela qual `context recall` exige
+gabarito: só ele mede
 ausência.
 
 Julgamento, para quem tem esse problema e não vai construir um grafo: antes de GraphRAG há degraus

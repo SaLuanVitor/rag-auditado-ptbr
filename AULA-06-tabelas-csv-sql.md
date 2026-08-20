@@ -16,7 +16,7 @@ consegue conectar à pergunta "qual foi a receita do segundo trimestre?".
 
 Este é o segundo módulo mais numeroso da Fase 1: **12 arquivos** — mais que os 11 de texto
 simples, menos que os 13 de PDF da Aula 05.
-Não é acaso. É o reconhecimento de que tabela é onde a ingestão mais falha.
+Não é acaso. **Julgamento:** é o reconhecimento de que tabela é onde a ingestão mais falha.
 
 ---
 
@@ -61,7 +61,7 @@ ativa:
 | 3 (linha 29, comentada)     | `CSVLoader(file_path=file_path, source_column="Name")` | define qual coluna vira o `source` no metadado      |
 | 4 (linhas 39–40, **ativa**) | `UnstructuredCSVLoader(file_path=file_path)`           | trata o CSV como tabela, não como linhas            |
 
-A parte 3 é a mais importante e a que passa despercebida. `source_column="Name"` faz o
+**Julgamento:** a parte 3 é a mais importante, e é a que passa despercebida. `source_column="Name"` faz o
 metadado `source` de cada documento apontar para o nome do personagem em vez do caminho do
 arquivo. Consequência prática: quando o sistema citar a fonte, ele diz _qual registro_, não
 _qual arquivo_. Isso é rastreabilidade em nível de linha, decidida com um parâmetro na
@@ -242,7 +242,7 @@ O único que vai da tabela até a resposta. Faça uma pergunta cujo valor você 
 
 **1. Serialize sem cabeçalho.** Pegue uma tabela extraída e monte os chunks só com os valores,
 sem os nomes das colunas. Pergunte por um número. A resposta será errada ou ausente — e é a
-demonstração mais direta de por que representação importa mais que extração.
+demonstração mais direta, na minha leitura, de por que representação importa mais que extração.
 
 **2. Rode `05-02` com e sem contexto.** Ative `strategy="hi_res"` na linha 20 e compare com a
 versão default. Depois compare o resultado do `05-02` com o do `05-01`: o texto ao redor muda o
@@ -272,7 +272,7 @@ veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, s
 - **Camelot instalado junto do resto.** Dependências de sistema conflitantes; use o
   requirements dedicado.
 - **Confiar em extração sem amostragem.** Extraia, e **olhe** dez tabelas do seu acervo antes
-  de rodar em cem mil. É a inspeção mais barata e a mais pulada.
+  de rodar em cem mil. **Julgamento:** é a inspeção mais barata e a mais pulada.
 
 ---
 

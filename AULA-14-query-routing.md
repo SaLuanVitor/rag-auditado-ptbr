@@ -227,7 +227,7 @@ sem erro, sem aviso.
 
 **5. Implemente o limiar.** Acrescente ao `prompt_router` uma verificação: se
 `similarity.max()` estiver abaixo de um valor, devolva uma rota default em vez do argmax. É a
-correção mais valiosa do exemplo, e são três linhas.
+correção que considero mais valiosa do exemplo, e são três linhas.
 
 ---
 
@@ -241,7 +241,7 @@ correção mais valiosa do exemplo, e são três linhas.
 - **Decisão de segurança no roteador semântico.** Permissão e escopo de acesso não são direções
   no espaço vetorial. Isso é camada lógica, ou melhor ainda, filtro no índice.
 - **Roteador sem conjunto de teste.** O lógico é testável — aproveite. Uma planilha de
-  pergunta → rota esperada é o teste mais barato de todo o pipeline RAG.
+  pergunta → rota esperada é, **julgamento**, o teste mais barato de todo o pipeline RAG.
 - **Rotas que crescem sem revisão.** Cada rota nova aumenta a chance de sobreposição com as
   existentes. Ao adicionar, releia as vizinhas.
 - **Latência do roteador.** O lógico gasta uma chamada de LLM antes de qualquer coisa. O

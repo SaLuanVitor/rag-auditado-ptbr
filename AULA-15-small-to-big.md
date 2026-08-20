@@ -90,7 +90,7 @@ configura o parser de janela. O `SentenceWindowNodeParser` da linha 34 não rece
 granularidade dele vem do tokenizador de sentenças interno. A linha 15 alimenta os `base_nodes`
 (`01-NodeSentenceSlidingWindow.py:42`) e o `base_query_engine`
 (`01-NodeSentenceSlidingWindow.py:54`), que é o **baseline de comparação** que o script roda em
-paralelo e imprime junto. São dois pipelines no mesmo arquivo, e confundi-los é o erro mais fácil
+paralelo e imprime junto. São dois pipelines no mesmo arquivo, e confundi-los é, **julgamento**, o erro mais fácil
 de cometer aqui.
 
 O que a janela dispensa, isso sim: onde ela é o mecanismo, cada nó carrega as vizinhas no
@@ -118,7 +118,7 @@ avaliação acoplada — útil para medir se a janela está ajudando, e antecipa
 
 ## Parte 2 — Pai-filho: o parent-child de verdade
 
-`02-ParentChildTextChunkRetrieval.py` é o arquivo mais importante desta aula, e o que fecha uma
+`02-ParentChildTextChunkRetrieval.py` é o arquivo que resolve a confusão central desta aula, e o que fecha uma
 confusão que atravessou o curso.
 
 **Dois splitters, dois tamanhos** (linhas 22–23 e 28–29):
@@ -215,7 +215,7 @@ A vantagem desta abordagem sobre as duas anteriores: **é ajustável sem reindex
 `num_nodes` de 2 para 4 é mudar um parâmetro de consulta. Trocar `window_size` ou o `chunk_size`
 do pai exige reconstruir o índice inteiro.
 
-O `Auto` é o caso interessante e o mais caro: expandir só quando necessário economiza tokens de
+O `Auto` é o caso mais caro dos três, e o que exige decisão: expandir só quando necessário economiza tokens de
 contexto (e ajuda com o _lost in the middle_ da Aula 01), mas troca uma decisão determinística por
 uma probabilística no caminho da consulta. Julgamento: eu começaria com o fixo, mediria, e só iria
 para o `Auto` se o desperdício de contexto fosse mensurável.

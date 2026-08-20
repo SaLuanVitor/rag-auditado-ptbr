@@ -14,7 +14,8 @@ precisa virar resposta. Três perguntas nascem aqui:
 3. Quando o problema **não é** prompt — e o reflexo de mexer no prompt está atrasando o
    diagnóstico?
 
-A terceira é a mais importante, e é a que esta aula vai insistir em separar das outras duas. A
+**Julgamento:** a terceira é a mais importante, e é a que esta aula vai insistir em separar das
+outras duas. A
 Aula 03 deixou uma dívida: uma única frase no template (_"I cannot find relevant information in the
 provided context."_) é a diferença entre um RAG que admite ignorância e um que inventa. Essa dívida
 se paga aqui — e o exemplo principal deste módulo é justamente um que **não tem** essa frase.
@@ -449,7 +450,7 @@ Consequências, em ordem de gravidade:
    precisa usar o `intent` do roteador para escolher a base de casos — e aí o erro de roteamento
    passa a custar recuperação errada, não só template errado.
 
-Este é o exercício de leitura crítica mais valioso do módulo: o arquivo demonstra a técnica e ao
+Este é, **julgamento**, o exercício de leitura crítica mais valioso do módulo: o arquivo demonstra a técnica e ao
 mesmo tempo demonstra como um teste pode passar sem exercitar o que ele parece exercitar.
 
 ### Custo de recuperação escondido numa função

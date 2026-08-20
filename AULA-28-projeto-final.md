@@ -49,7 +49,7 @@ graders e nenhuma métrica não é.
 | 9 · Avançado             | quando a pergunta não é de recuperação, e o que a literatura nomeia |
 
 Guarde a ordem: ela é a ordem de **diagnóstico**. Quando o sistema responde mal, a investigação
-desce essa tabela de cima para baixo, e o erro mais comum de todos é começar pela Fase 7 porque o
+desce essa tabela de cima para baixo, e o erro mais comum, **julgamento**, é começar pela Fase 7 porque o
 prompt é o que está visível.
 
 ### Toda decisão tem custo, e o curso nomeou cada um
@@ -101,7 +101,7 @@ recuperação.
 | Modelo de embedding                                              | trocar de modelo sem reindexar; modelo no idioma errado; custo de embutir por API (Aula 08)         |
 | Denso, esparso ou os dois                                        | esparso mal tokenizado; ColBERT e armazenamento (Aula 08)                                           |
 
-Duas armadilhas se repetem nas Aulas 02, 07, 08 e 10 porque são as mais caras: **trocar de modelo
+Duas armadilhas se repetem nas Aulas 02, 07, 08 e 10 porque são, **julgamento**, as mais caras: **trocar de modelo
 exige reindexar** e **modelo no idioma errado**. O segundo não é um caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
 **27 arquivos**, em sete módulos (`00-SimpleRAG` com 11, `06-Indexing` com 7, `05-PreRetrieval` com
 5, e um cada em `02-DocChunking`, `04-VectorDB`, `07-PostRetrieval` e `10-AdvanceRAG`) — modelos com
@@ -227,7 +227,7 @@ O mínimo são três, uma por estágio, e a Aula 22 mostrou por que uma só não
 | Geração     | `faithfulness`                                             | o modelo inventando               |
 | Geração     | `answer relevancy`                                         | prompt desviando                  |
 
-Fidelidade alta com recall baixo é o caso mais perigoso: o sistema está **coerente e incompleto**, e
+Fidelidade alta com recall baixo é, **julgamento**, o caso mais perigoso: o sistema está **coerente e incompleto**, e
 só a métrica de recuperação enxerga isso.
 
 **Comece pela primeira linha da tabela.** Se o seu gabarito anota qual trecho sustenta cada resposta,

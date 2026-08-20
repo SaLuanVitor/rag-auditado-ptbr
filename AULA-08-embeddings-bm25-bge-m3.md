@@ -303,7 +303,7 @@ usa vírgula como separador de campo, o ranking degrada. Fixa que BM25 é tão b
 tokenização.
 
 **3. Consulte por identificador.** No `03-LangChain-BM25.py`, faça uma consulta com um código
-ou nome próprio raro. Compare BM25 e Chroma. É a demonstração mais rápida do ponto cego do
+ou nome próprio raro. Compare BM25 e Chroma. **Julgamento:** é a demonstração mais rápida do ponto cego do
 denso — o mesmo que o exercício da Aula 02 mostrou com `SKU-88213-B`.
 
 **4. Mude `n_clusters`.** Em `02-jina-embeddings-v3-clustering.py`, teste 2 e 6 em vez de 3.

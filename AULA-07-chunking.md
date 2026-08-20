@@ -10,7 +10,7 @@ Você tem um documento de 40 páginas e um modelo de embedding que aceita 512 to
 cortar. Onde?
 
 Parece decisão de implementação — um parâmetro a preencher. É a decisão de maior impacto em
-qualidade de resposta de todo o pipeline, e a mais negligenciada. Ela determina o que é
+qualidade de resposta de todo o pipeline e, **julgamento**, a mais negligenciada. Ela determina o que é
 possível recuperar: **informação cortada ao meio não é recuperável por nenhum modelo de
 embedding, nenhum reranking e nenhum prompt.** Os capítulos seguintes só conseguem trabalhar
 com o que esta aula deixou intacto.
@@ -64,7 +64,7 @@ O texto decide onde ser cortado.
 Note a progressão: 1 e 2 são **sintáticos** (olham caracteres), 3 é **sintático com
 conhecimento de domínio** (sabe o que é uma função), 4 é **semântico** (usa embeddings para
 decidir). O custo sobe junto: o semântico faz chamadas de embedding durante a _ingestão_, o
-que em acervo grande é o item mais caro do pipeline.
+que em acervo grande costuma ser o item mais caro do pipeline.
 
 ---
 
@@ -235,7 +235,7 @@ descomente as linhas 12–13 e troque o `embed_model` da linha 20.
 
 ### Passo 4 — O experimento que fecha a aula
 
-`03_LlamaIndex-ChunkSizeAffectsAccuracy.py` é o mais importante do módulo. Ele indexa uma
+**Julgamento:** `03_LlamaIndex-ChunkSizeAffectsAccuracy.py` é o mais importante do módulo. Ele indexa uma
 página de um relatório financeiro da Uber e faz uma pergunta **numérica**:
 
 ```python
@@ -297,7 +297,7 @@ contagem com a do `base_splitter`. Em que ponto os chunks ficam grandes demais p
 embedding útil?
 
 **4. Corrija os comentários errados.** Edite mentalmente as linhas 7 e 8 do arquivo `01` para
-que digam a verdade. É trivial — e é o exercício de leitura crítica mais valioso do módulo,
+que digam a verdade. É trivial — e é, **julgamento**, o exercício de leitura crítica mais valioso do módulo,
 porque a próxima divergência entre comentário e código que você encontrar estará no seu
 código, e ninguém vai apontá-la.
 

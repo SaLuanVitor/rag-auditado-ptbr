@@ -170,7 +170,7 @@ Duas anotações finais sobre o `01`:
 
 ## Parte 3 — O arquivo `02`: o pipeline que insere um texto no lugar da imagem
 
-`10-AdvanceRAG/05-MultiModalRAG/02-Weaviate-Multimodal-RAG.py` tem 107 linhas e a ambição mais alta do módulo: recuperar imagem, descrevê-la com um modelo de visão e **gerar uma imagem nova**.
+`10-AdvanceRAG/05-MultiModalRAG/02-Weaviate-Multimodal-RAG.py` tem 107 linhas e a maior ambição dos dois scripts do módulo: recuperar imagem, descrevê-la com um modelo de visão e **gerar uma imagem nova**.
 
 E ele começa com um aviso do autor (`02-Weaviate-Multimodal-RAG.py:1-2`):
 
@@ -358,7 +358,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 **Acesso anônimo publicado.** A configuração de desenvolvimento não é a de produção, e a diferença aqui é uma linha do compose.
 
-**Coleção recriada em produção.** O `01` deleta e recria a coleção a cada execução (`:12-13`). Excelente para exemplo, catastrófico se o script vazar para um ambiente com dados.
+**Coleção recriada em produção.** O `01` deleta e recria a coleção a cada execução (`:12-13`). Adequado para exemplo, catastrófico se o script vazar para um ambiente com dados.
 
 **Conexão não fechada.** O cliente Weaviate v4 mantém recursos abertos; o `02` termina sem fechar. Em processo de vida longa, isso acumula.
 

@@ -158,7 +158,7 @@ Ser especialista inclui recusar a ferramenta:
 | Precisa mudar o _comportamento_ ou o _estilo_ do modelo                     | Fine-tuning, não RAG                       |
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
 
-A confusão mais frequente do mercado: RAG ensina **fatos** ao modelo, fine-tuning
+A confusão que mais encontro no mercado — julgamento, não dado: RAG ensina **fatos** ao modelo, fine-tuning
 ensina **comportamento**. Tentar ensinar fato via fine-tuning é caro e vaza; tentar
 ensinar estilo via RAG não funciona.
 

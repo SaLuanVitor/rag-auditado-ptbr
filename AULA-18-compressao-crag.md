@@ -14,7 +14,7 @@ A Aula 17 reordenou o que voltou. Sobram duas perguntas que o reranking não res
 A primeira é compressão: remover o que não ajuda. A segunda é correção: perceber que a recuperação
 falhou e **fazer algo a respeito** — em vez de gerar uma resposta sobre material ruim.
 
-A segunda é a mais importante das duas, e a menos implementada.
+**Julgamento:** a segunda é a mais importante das duas, e é a menos implementada.
 
 ---
 
@@ -101,7 +101,7 @@ padrão que atravessa este repositório.
 
 ## Parte 3 — Otimização por embedding de sentença
 
-`02-Compression/03-SentenceEmbeddingOptimizer-Compression.py` é o mais didático do trio, porque
+`02-Compression/03-SentenceEmbeddingOptimizer-Compression.py` é, **julgamento**, o mais didático do trio, porque
 mostra o **mesmo mecanismo com dois critérios de corte** (linhas 13 e 18):
 
 ```python
@@ -138,7 +138,8 @@ experimento controlado do módulo.
 
 ## Parte 4 — CRAG: a recuperação que se corrige
 
-`03-Correction/01-CRAG-ReflectiveRetrieval.py` é o arquivo mais importante da Fase 6.
+**Julgamento:** `03-Correction/01-CRAG-ReflectiveRetrieval.py` é o arquivo mais importante da
+Fase 6.
 
 O comentário da linha 68 nomeia o componente central sem rodeios: _"Part 2: Retrieval grader — the
 core component of CRAG"_.

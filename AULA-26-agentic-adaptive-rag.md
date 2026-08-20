@@ -69,7 +69,7 @@ Não é o único. **Sete imports estão mortos** neste arquivo — sete **símbo
 | `Annotated`, `Literal`, `List` | `:3`  |
 | `pprint`                       | `:4`  |
 
-O `TavilySearchResults` é o mais informativo: busca na web está importada e o arquivo **não faz** busca na web. Quem lê a lista de imports para deduzir a arquitetura conclui que este agente tem duas ferramentas. Ele tem uma.
+O `TavilySearchResults` é o mais informativo dos sete: busca na web está importada e o arquivo **não faz** busca na web. Quem lê a lista de imports para deduzir a arquitetura conclui que este agente tem duas ferramentas. Ele tem uma.
 
 E o `10-AdvanceRAG/04-AgenticRAG/.env.example:2` afirma que todo script carrega o `.env` via `load_dotenv()` — aqui no caso extremo, porque **nenhum dos dois** carrega. `grep -c "load_dotenv"` nos dois arquivos devolve **zero** e **zero**. Em vez disso, os dois pedem as chaves interativamente com `getpass` (`01-LangChain-AgenticRAG.py:21-24` e `02-LangChain-AdaptiveRAG.py:23-29`) — o que impede execução não interativa.
 
@@ -361,7 +361,7 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` pr
 
 **Laço que perde informação.** Resetar o estado a cada volta parece limpeza e é perda. Guarde a pergunta original, e faça as decisões seguintes contra ela.
 
-**Ciclo sem contador, pela terceira vez.** Três dos quatro grafos deste repositório têm laço; nenhum tem limite. É o defeito mais recorrente do repositório inteiro, e o mais fácil de corrigir.
+**Ciclo sem contador, pela terceira vez.** Três dos quatro grafos deste repositório têm laço; nenhum tem limite. **Julgamento:** é o defeito mais recorrente do repositório inteiro, e o mais fácil de corrigir.
 
 **Fonte alternativa sem controle de qualidade.** Se o índice é graduado e a web não é, você criou um caminho preferencial para material não verificado. E, como a Aula 21 observou sobre o resultado de ferramenta, o que entra no contexto entra como fato.
 

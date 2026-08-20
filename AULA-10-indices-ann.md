@@ -167,7 +167,7 @@ collections = {metric: f"ann_search_demo_{metric.lower()}" for metric in metric_
 **Uma collection por métrica** — porque a métrica é propriedade do índice, não da consulta. Não
 se compara métricas na mesma collection; constrói-se uma para cada.
 
-E o detalhe mais instrutivo do arquivo, na linha 106:
+E o detalhe que considero mais instrutivo do arquivo, na linha 106:
 
 ```python
 search_vectors = normalized_query_vectors if metric_type == "COSINE" else query_vectors
@@ -319,7 +319,8 @@ python 03-filtered-search.py
 python 04-range-search.py
 ```
 
-O `02` é o mais importante: veja como o mesmo dado ranqueia diferente sob L2, IP e COSINE.
+**Julgamento:** o `02` é o mais importante — veja como o mesmo dado ranqueia diferente sob L2,
+IP e COSINE.
 
 ---
 
@@ -352,7 +353,7 @@ que `radius`, contra a nota da linha 100. Veja o que acontece — e por que a no
 
 - **Métrica incompatível com o modelo de embedding.** Silencioso, e degrada tudo. Registre a
   métrica junto com o nome do modelo na documentação da collection.
-- **Ajustar `nprobe` sem olhar `nlist`.** É a causa mais comum de "meu IVF ficou rápido e parou
+- **Ajustar `nprobe` sem olhar `nlist`.** **Julgamento:** é a causa mais comum de "meu IVF ficou rápido e parou
   de achar as coisas".
 - **Não medir recall.** Sem comparar contra FLAT, você não sabe o quanto seu índice erra — e
   vai atribuir a resposta ruim ao prompt.

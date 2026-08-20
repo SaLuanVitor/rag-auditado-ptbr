@@ -213,7 +213,7 @@ python 98-TwoTierIndex-FAISS.py
 ```
 
 Abra o arquivo e localize a linha 58. Confirme você mesmo que `indices` não é usado depois. Este é
-o exercício de leitura crítica mais valioso do módulo.
+o exercício de leitura crítica que considero mais valioso do módulo.
 
 ```powershell
 cd ../03-BuildingMultiRepresentationIndex

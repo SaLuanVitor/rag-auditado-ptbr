@@ -201,7 +201,7 @@ a matéria-prima que _permitiria_ fazer small-to-big depois. Mesmo nome, mecanis
 | `02-Unstructured-ReadPPT.py`    | `partition_ppt(filename=".../black_myth_wukong_slides.pptx")` (linhas 14–16)                            |
 | `03-LLM-ReadImagesAndText.py`   | **modelo multimodal** — `convert_from_path` + `base64` + `OpenAI`, com `model="gpt-4o-mini"` (linha 35) |
 
-O `03` é a abordagem mais recente e a mais poderosa: rasteriza a página, codifica em base64,
+O `03` é a abordagem mais recente e, **julgamento**, a mais poderosa: rasteriza a página, codifica em base64,
 manda para um modelo de visão e pede a **descrição do conteúdo**. Depois embrulha o resultado
 num `Document` (linha 59; a 56 é só o import).
 

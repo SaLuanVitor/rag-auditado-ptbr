@@ -150,7 +150,7 @@ prompt — que estoura o contexto num banco com 200 tabelas e dilui a atenção 
 - a **descrição em linguagem natural**, que explica o que `dt_ref` significa quando o nome da
   coluna não explica.
 
-O `03-ingest-q2sql.py` é o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
+O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
 quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a solução anterior
 como exemplo. **O sistema melhora à medida que consultas corretas são acumuladas** — e isso é
 uma decisão de arquitetura, não um truque de prompt.
@@ -173,13 +173,13 @@ A diferença é onde o schema vem:
 | `v1-Failed`    | `schema_description` **escrito à mão** como string literal (a partir da linha 16) |
 | `v2-Succeeded` | `get_database_schema()` (linha 15) — **introspecciona o banco**                   |
 
-Esta é a lição mais transferível da aula. Um schema escrito à mão:
+**Julgamento:** esta é a lição mais transferível da aula. Um schema escrito à mão:
 
 - envelhece — o banco muda, a string não;
 - omite relações que ninguém lembrou de documentar;
 - erra nome de propriedade por descuido de digitação.
 
-E o efeito é o pior possível: o LLM gera Cypher **sintaticamente válido** referenciando uma
+E o efeito é dos piores: o LLM gera Cypher **sintaticamente válido** referenciando uma
 relação que não existe. O erro não é "o modelo não sabe Cypher" — é "o modelo foi informado
 errado e obedeceu".
 
@@ -195,7 +195,7 @@ no `diff` (o `extract_sql` ausente), e este não tem.
 
 ## Parte 4 — Filtro de metadado e self-query
 
-`BuildingMetadataFilter/` tem dois arquivos, e o segundo é o mais sofisticado do módulo:
+`BuildingMetadataFilter/` tem dois arquivos, e o segundo é, **julgamento**, o mais sofisticado do módulo:
 
 **`01-LoadYoutubeExample.py`** — carrega transcrições com
 `YoutubeLoader.from_youtube_url(...)` (linhas 1 e 4). O ponto é o **metadado que vem de
@@ -292,7 +292,7 @@ vezes. A diferença entre "quase sempre funciona" e "sempre funciona" é o assun
 
 **2. Estrague o schema de propósito.** No `Text2Cypher/v2-Succeeded`, substitua a chamada de
 introspecção por uma string com um nome de relação errado. Veja o Cypher gerado: sintaticamente
-impecável, semanticamente impossível. É o modo de falha mais importante desta aula.
+impecável, semanticamente impossível. **Julgamento:** é o modo de falha mais importante desta aula.
 
 **3. Piore uma `description` do `AttributeInfo`.** Troque a descrição de um campo por algo vago
 ("informação sobre o vídeo") e repita uma pergunta com recorte. O filtro deixa de ser gerado ou
@@ -313,7 +313,7 @@ desta aula, medido.
   somente-leitura, allowlist de operações, verificação de que as tabelas existem, e timeout. O
   exemplo não faz nada disso.
 - **Junção errada retorna número plausível.** Nenhuma exceção, nenhum aviso. É o risco que torna
-  Text2SQL a parte mais perigosa de um RAG — erra com aparência de exatidão.
+  Text2SQL, **no meu julgamento**, a parte mais perigosa de um RAG — erra com aparência de exatidão.
 - **Schema no prompt em vez de recuperado.** Estoura o contexto em banco grande e dilui a
   atenção. Indexe o DDL, como o pipeline Sakila faz.
 - **Schema escrito à mão.** Envelhece silenciosamente. Introspeccione.
@@ -324,7 +324,7 @@ desta aula, medido.
   prompt e itere.
 - **Recorte temporal virando busca semântica.** "2024" no texto da query recupera menções ao ano
   em vez de documentos do ano.
-- **Não acumular pares pergunta→SQL.** Você joga fora o ativo mais valioso do sistema. Toda
+- **Não acumular pares pergunta→SQL.** Você joga fora o que considero o ativo mais valioso do sistema. Toda
   consulta validada deveria voltar para o índice.
 
 ---

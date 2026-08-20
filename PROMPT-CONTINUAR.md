@@ -87,24 +87,27 @@ uma) e quatro aulas abaixo de 50%: AULA-00 (5/12), AULA-25 (4/12), AULA-26 (3/12
 Vale para a versão que os auditores leram: os 15 defeitos que produziram as -1 de 20/08 foram
 corrigidos no mesmo dia. Detalhe na seção "Renota adversarial — rodada COMPLETA de 20/08/2026".
 
-TAREFA 1 — VARREDURA DE SUPERLATIVOS. Mecânica, você mesmo, sem auditor.
-É a dívida que sobra e a mais barata de pagar. Os auditores de 20/08 apontaram pelo menos 18
-instâncias de superlativo de valor sem o prefixo "Julgamento:", e SÓ as que produziram nota -1 foram
-corrigidas. Exemplos que ficaram: "a melhor sequência didática do módulo" (AULA-04), "o arquivo mais
-importante desta aula" (AULA-15 e AULA-09), "o teste mais barato de todo o pipeline RAG" (AULA-14),
-"a lição mais rentável do curso" (AULA-02), "Embedding local é excelente hoje" (AULA-00).
-Varra as 29 aulas por: "o único", "o melhor", "o pior", "o mais", "a primeira vez", "pela primeira
-vez", "sempre", "nunca", "todo(a)", "excelente", "mediano".
-Para cada, decida entre TRÊS saídas, nesta ordem de preferência:
+TAREFA 1 — ~~VARREDURA DE SUPERLATIVOS~~. FECHADA em 20/08/2026.
+Varredura por script nas 29 aulas: 154 candidatos não marcados, triados um a um, 64 corrigidos em 26
+arquivos, resíduo de 94 — e o resíduo é legítimo por triagem (comparativo delimitado e verificável,
+conhecimento de domínio, pergunta de Checkpoint, e "espaço único" da AULA-27, que é termo técnico e
+não superlativo). Detalhe do que foi corrigido e por qual das três saídas está no HANDOFF, seção 1b.
+
+Se precisar refazer ou estender a varredura, o método que funcionou:
   1. Se é alegação de FATO (unicidade, primazia, contagem) — CONFIRA por grep/ls/script. Se cai,
      corrija o fato. Foi assim que "o único caminho absoluto do repo" virou "um dos dois", e
      "três vezes" para o modelo -zh virou 27 arquivos em sete módulos.
-  2. Se é JULGAMENTO de valor — prefixe com "Julgamento:" ou reescreva como descrição.
+  2. Se é JULGAMENTO de valor — prefixe com "Julgamento:", marque inline, ou reescreva como
+     descrição. Prefixar 60 vezes deixa o texto ilegível; escolha por trecho.
   3. Se não sustenta nem como fato nem como julgamento útil — remova.
-Não faça isso por busca-e-substitui cega: cada caso exige ler a frase.
+Aplique por script com TRAVA DE CASAMENTO ÚNICO: cada substituição precisa casar exatamente uma vez,
+e qualquer divergência aborta a execução sem escrever nada. A trava disparou duas vezes na primeira
+tentativa (os .md são CRLF, e um trecho diferia do esperado) e evitou edição às cegas. Nunca faça
+busca-e-substitui cega: cada caso exige ler a frase.
 
-TAREFA 2 — TERCEIRA RODADA DE RENOTA, depois da Tarefa 1.
-Só ela mede o efeito das correções de 20/08 e da varredura. Mesmo desenho: general-purpose em
+TAREFA 2 — TERCEIRA RODADA DE RENOTA. É a próxima, e agora é a primeira da fila.
+Só ela mede o efeito das correções de 20/08 e da varredura de superlativos. Mesmo desenho:
+general-purpose em
 sonnet, somente-leitura, 2 aulas por lote, nota anterior NÃO revelada, proibido abrir o
 GATE-AULAS-v1.md.
 Três coisas que NÃO podem faltar no prompt de cada auditor:

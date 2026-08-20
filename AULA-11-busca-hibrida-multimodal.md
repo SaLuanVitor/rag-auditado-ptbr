@@ -85,7 +85,7 @@ antes de tratá-lo como abstração.
 
 ### O mecanismo, no `v2`
 
-O `v2-Detailed` é o mais legível dos três. A sequência:
+O `v2-Detailed` é, **julgamento**, o mais legível dos três. A sequência:
 
 ```python
 from pymilvus import AnnSearchRequest, WeightedRanker      # linha 99
