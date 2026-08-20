@@ -1791,3 +1791,111 @@ proibido nominalmente.
 conferidos, 0 faltando, 0 duplicados** (textual e normalizado). Duplicata semântica por contenção:
 **0** confirmadas — o gerador de candidatos devolve 18, e ler mostra que 16 são conceitos legítimos
 onde um termo contém outro (`Chunk` em `Chunk size`, `FLAT` em `IVF_FLAT`). Clone da Packt: vazio.
+
+## QUINTA rodada — as oito aulas abaixo de 50%, renotadas (20/08/2026)
+
+**Objetivo:** medir o efeito dos 23 consertos aplicados nas oito aulas que a R4 deixou abaixo de
+50%. Rodada **cega**: nota anterior escondida, lista de consertos escondida, `GATE`/`HANDOFF`/
+`PROMPT-CONTINUAR` proibidos.
+
+### Uma mudança de instrumento, declarada antes de rodar
+
+A R4 deu a cada auditor um **foco específico** da classe de defeito daquela aula. A R5 usou um
+**briefing uniforme** nas oito — as nove classes de defeito que a sessão produziu, na mesma ordem
+para todas. Motivo: um foco dirigido apontaria para terreno já consertado, e o auditor gastaria
+orçamento confirmando conserto em vez de procurar o que sobrou.
+
+**Isso é um confundimento, e ele não se resolve com estes dados.** Duas coisas mudaram ao mesmo
+tempo: o material foi corrigido e o briefing deixou de dar o mapa. Um briefing sem mapa pode achar
+menos por não saber onde cavar — inflando a nota — ou mais, por não ter viés. O que se pode afirmar
+está na seção "o que restringe a leitura", abaixo.
+
+Novidade no briefing, nascida de um erro da própria sessão: **as duas formas de marcador de
+julgamento** do curso (`**Julgamento:**` no início e `é, **julgamento**,` inline) foram declaradas
+convenção estabelecida, com instrução explícita de não gastar achado nisso. Na rodada anterior dois
+auditores deram veredictos **opostos** sobre a mesma convenção, cada um alegando que a forma do outro
+a violava.
+
+### Resultado
+
+| Aula | R4 | **R5** | Δ |
+| --- | --- | --- | --- |
+| 14 — Query routing | 4 | **11** | +7 |
+| 17 — Reranking | 3 | **11** | +8 |
+| 09 — Milvus, schema | 0 | **10** | +10 |
+| 01 — O que é RAG | 5 | **10** | +5 |
+| 00 — Setup | 4 | **10** | +6 |
+| 11 — Híbrida e multimodal | 1 | **9** | +8 |
+| 15 — Small-to-big | 5 | **9** | +4 |
+| 07 — Chunking | 3 | **7** | +4 |
+| **Total** | **25/96** | **77/96** | **+52** |
+
+**26,0% → 80,2%.** Δ médio **+6,50**. **Nenhuma das oito ficou abaixo de 50%** (eram oito de oito) e
+**uma única nota `−1`** na rodada (eram seis notas `−1` entre as oito na R4).
+
+**Não há classificação nova do curso.** Somar as 21 notas da R4 com estas 8 da R5 dá 283/348 = 81,3%,
+e esse número mistura duas rodadas e dois briefings. Não é medição homogênea e não vai para o
+cabeçalho.
+
+### O que restringe a leitura do +52
+
+**A rodada não foi leniente, e há prova disso: 6 dos 13 defeitos que ela achou foram introduzidos
+pelos meus próprios consertos, horas antes.** Ou seja, a capacidade de discriminar em material novo
+estava intacta — ela pegou exatamente o que não existia na R4. E o único `−1` da rodada é um deles.
+
+| Defeito achado na R5 | Origem |
+| --- | --- |
+| `−1` na AULA-07: "exige `unstructured`" | **meu conserto de hoje** — justificativa **fabricada**; o script usa `PDFReader`/`pypdf`, e `unstructured` é de outro módulo |
+| CRÍTICO na AULA-15: "mas a aula descrevia o mecanismo errado" | **meu conserto de hoje** — nota sobre a versão anterior que ficou no texto publicado, onde se autonega |
+| ALTO na AULA-01: "o `GLOSSARIO.md` segue a Aula 12" | **meu conserto de hoje** — referência **circular** que eu criei: horas depois reescrevi a entrada do glossário para tratar o ponto como fronteira aberta, apontando de volta para esta nota |
+| ALTO na AULA-00: `.idea/.gitignore` "com seis linhas" | **meu conserto de hoje** — o arquivo tem **dez** (6 padrões + 4 comentários); peguei o "6" do relatório anterior sem contar |
+| MÉDIO na AULA-14: previsão de comportamento sem ressalva | **meu conserto de hoje** — introduzi uma previsão não marcada ao consertar uma alegação de garantia, no arquivo que hedgeia números três parágrafos depois |
+| BAIXO na AULA-00: pacotes atribuídos ao "par" de requirements | **meu conserto de hoje** — só o arquivo LangChain tem `langchain-deepseek`/`langgraph-prebuilt`; `grep -c` no do LlamaIndex dá 0 |
+
+**Quinta vez na sessão que reproduzi número de relatório sem recalcular** (o "seis linhas"), e essa
+correção entrou no commit onde eu documentei que esse é o meu modo de errar.
+
+Os outros sete defeitos são do material e não passaram por rodada anterior nenhuma:
+
+- **AULA-09:** `sparse vector` prometido no vocabulário e ausente do corpo (o corpo trata
+  `FLOAT_VECTOR` e `BINARY_VECTOR`); e `tenant_id`, `ano`, `categoria`, `preço` apresentados junto à
+  referência ao DDL de `game_scenes`, cujas colunas reais são `difficulty_level`, `boss_name`,
+  `created_at`.
+- **AULA-11:** o exercício 1 manda consultar por identificador (`SKU-`, código de erro) contra um
+  corpus — `battle_scenes.json`, cinco registros — que **não tem identificador no texto indexado**: o
+  campo `id` (`COMBAT_001`) nunca entra nos documentos, montados de `title`, `description`,
+  `combat_details` e `scene_info`. O exercício não podia entregar o que prometia.
+- **AULA-17:** os exercícios 2 e 3 pressupõem recuperação com `k` ajustável, e os dois arquivos
+  citados **não têm recuperação nenhuma** — `grep -c "retriever\|k="` devolve zero, e os documentos
+  são lista Python fixa de três.
+- **AULA-07:** o rodapé diz "Anterior: AULA 03" enquanto o rodapé da AULA-06 diz "Próxima: AULA 07".
+- **AULA-01:** "duas a três ordens de magnitude" sem marcador, num arquivo que marca julgamento em
+  vários outros pontos.
+
+### O achado que corrige uma decisão minha
+
+A R4 apontou a expressão `color like "red%"` da AULA-09 como inventada, e **eu rejeitei** — porque as
+cores daquele arquivo são literalmente `red_7025`, `red_4794`, `red_9392`, e a justificativa do
+auditor estava errada. A R5 apontou a **mesma linha** com raciocínio diferente e correto: a frase diz
+"quando a Aula 10 **mostrar** filtered search com expressões como `color like "red%"`", e a Aula 10
+mostra `color like "color_%"`. O defeito é de **atribuição**, não de expressão.
+
+**Rejeitar o raciocínio errado não me autorizava a manter a linha.** Corrigido citando o filtro real
+e registrando que a expressão vale para os dados daquele arquivo, em outra collection.
+
+### Consertos: 13 dos 19 achados
+
+Seis ficaram de fora com motivo, não por esquecimento: `metadata filter` no vocabulário da AULA-09
+(o conceito **está** no corpo, em 13 menções a filtro e escalar); duas generalizações retóricas de
+abertura na AULA-01 e na AULA-00 ("todo o resto do curso é sobre por que cada passo falha", "o resto
+é dado, PDF e imagem"); a assimetria de callback nominal entre a AULA-01 e a AULA-22, que não é
+contradição; o shim `langchain_core.pydantic_v1` já obsoleto no exemplo da AULA-14, que o próprio
+auditor classificou como tangencial ao ensinamento; e o `print` do `06-RecencyWeightedReranking.py`
+que diz "~39% de decaimento" onde a fórmula do arquivo dá 50% — **defeito do repositório da Packt**,
+que a AULA-17 não reproduz nem invoca.
+
+### Estado no fecho
+
+`verify-citations --all`: **PASS**, zero inválidas, `NO_ANCHOR` em 10. Vocabulário: **0 faltando, 0
+duplicados**. Clone da Packt: **vazio, incluindo `--ignored`**, e zero violações de contrato — segunda
+rodada consecutiva desde que `pip install` passou a ser proibido nominalmente.

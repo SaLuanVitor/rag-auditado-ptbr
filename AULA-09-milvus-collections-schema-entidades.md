@@ -40,8 +40,9 @@ escala**, e escolhê-lo é decisão de arquitetura, não otimização tardia.
 ### Vetor e escalar convivem
 
 Este é o ponto que a Aula 06 antecipou com o DDL de `game_scenes`: uma entity tem o **vetor**
-(para busca semântica) e **campos escalares** (para filtro). `tenant_id`, `ano`, `categoria`,
-`preço` são escalares, e é sobre eles que a filtered search da Aula 10 opera.
+(para busca semântica) e **campos escalares** (para filtro). Naquele DDL os escalares são
+`difficulty_level`, `boss_name` e `created_at`; no seu sistema seriam coisas como `tenant_id`, ano ou
+categoria. É sobre campos desse tipo que a filtered search da Aula 10 opera.
 
 Guardar tudo como texto embutido perde o filtro. Guardar só escalares perde a semântica. A
 collection existe para hospedar os dois.
@@ -194,7 +195,10 @@ string como `"pink_8682"`.
 
 O campo `color` parece decorativo e é, **julgamento**, o mais instrutivo da aula. Ele é o **campo escalar** que
 não participa da busca vetorial e existe para ser filtrado. Quando a Aula 10 mostrar filtered
-search com expressões como `color like "red%"`, é este campo que estará em jogo.
+search — com o filtro real do `03-filtered-search.py`, `color like "color_%" and likes > 500` —, é
+este tipo de campo que estará em jogo. (As cores deste arquivo são `red_7025`, `pink_8682` e afins,
+numa collection diferente; `color like "red%"` filtraria aqui, mas não é a expressão que a Aula 10
+usa.)
 
 Note também que a inserção é uma **lista de dicionários** — não há SQL, não há `INSERT INTO`.
 Cada dicionário é uma entity, e as chaves precisam corresponder aos campos declarados. O nome
@@ -336,7 +340,7 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
 
 ## Vocabulário
 
-`vector database` · `collection` · `entity` · `schema` · `dense vector` · `sparse vector` ·
+`vector database` · `collection` · `entity` · `schema` · `dense vector` ·
 `metadata filter` · `ANN`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).

@@ -270,8 +270,9 @@ O PDF existe — confirmei em `90-Data/ComplexPDF/`, ao lado de `uber_10q_march_
 Agora rode três vezes, mudando só o `chunk_size` para 50, 100 e 250, e anote a resposta de
 cada. **Antes de rodar, escreva sua previsão.**
 
-**Previsão do autor, não medição.** Não rodei este experimento: exige `unstructured`, chave de
-API e três chamadas de LLM, e nada abaixo é saída observada. É o que eu espero, e o motivo — que é
+**Previsão do autor, não medição.** Não rodei este experimento: exige chave de API da OpenAI e três
+chamadas de LLM (o script usa `PDFReader`, do `pypdf` — não o `unstructured`, que é de outro módulo),
+e nada abaixo é saída observada. É o que eu espero, e o motivo — que é
 exatamente o que vale comparar com a sua própria previsão. Se a sua execução divergir, a execução
 ganha.
 
@@ -366,7 +367,8 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 ---
 
-**Anterior:** [AULA 03 — Seu primeiro RAG](AULA-03-primeiro-rag.md)
+**Anterior:** [AULA 06 — Tabelas, CSV e SQL](AULA-06-tabelas-csv-sql.md) — na ordem de leitura do
+curso. Na ordem de **dependência**, esta aula só precisa das Aulas 00 a 03 (ver nota abaixo)
 **Próxima:** [AULA 08 — Embeddings na prática, BM25 esparso e BGE-M3 híbrido](AULA-08-embeddings-bm25-bge-m3.md)
 
 > **Nota de ordem:** esta aula foi escrita antes das Aulas 04 a 06 (ingestão), por ser o

@@ -46,12 +46,23 @@ sessão inteira porque o filtro de caminho descartava **qualquer** termo com bar
 prometido pela Aula 23 e ausente do glossário, era jogado fora em silêncio. Cinco pontos cegos
 corrigidos, todos da mesma forma: comparar forma em vez de sentido. Filtro de ruído é afirmação sobre
 o que não importa, e afirmação não verificada é a falha dominante deste projeto
-**📌 Próximo trabalho, na ordem:** (1) as **oito aulas abaixo de 50%** — 09 (0), 11 (1), 07 (3),
-17 (3), 00 (4), 14 (4), 01 (5), 15 (5); (2) a quinta rodada, já com leitura de fonte de biblioteca
-autorizada desde o início; (3) opcional: criar uma seção "Otimização de índice" no glossário para os
-conceitos de Fase 5 (`Parent-child`, `Multi-representação`, `Small-to-big`, `Sliding window`), hoje
-espalhados entre Ingestão e Chunking — a auditoria apontou, e eu não reestruturei a taxonomia por
-conta própria
+**Oito aulas abaixo de 50%:** ✅ **consertadas e renotadas.** 23 consertos aplicados, depois **quinta
+rodada cega** nas oito: **25/96 → 77/96 (26,0% → 80,2%)**, Δ médio +6,50, **nenhuma abaixo de 50%** e
+**uma única nota `−1`** (eram seis). Detalhe na seção "QUINTA rodada" do GATE
+**⚠️ E o +52 não é medição limpa dos consertos:** o briefing da R5 é **uniforme** onde o da R4 era
+dirigido à classe de defeito de cada aula. Confundimento declarado antes de rodar e irresolúvel com
+estes dados. O que restringe a leitura: **6 dos 13 defeitos que a R5 achou foram introduzidos pelos
+meus próprios consertos**, horas antes — inclusive o único `−1` da rodada. A capacidade de
+discriminar em material novo estava intacta
+**⚠️ Não há classificação nova do curso.** Somar as 21 notas da R4 com as 8 da R5 dá 283/348 =
+81,3%, e isso mistura duas rodadas e dois briefings. Só uma sexta rodada completa, com briefing
+único nas 29, dá nota comparável
+**📌 Próximo trabalho, na ordem:** (1) **sexta rodada completa nas 29**, com briefing uniforme, para
+produzir a primeira nota homogênea desde a R4; (2) as três aulas que a R4 deixou entre 6 e 8 e a R5
+não tocou — 04 (6), 16 (7), 20 (8), 22 (8); (3) opcional: criar uma seção "Otimização de índice" no
+glossário para os conceitos de Fase 5 (`Parent-child`, `Multi-representação`, `Small-to-big`,
+`Sliding window`), hoje espalhados entre Ingestão e Chunking — a auditoria apontou, e eu não
+reestruturei a taxonomia por conta própria
 **Histórico da classificação anterior:** os 70,4% da R3
 cairiam em "Publicável com ressalvas" (70–84%), mas as duas portas eliminatórias falham: **12** notas
 `−1` (o máximo é uma) e **cinco** aulas abaixo de 50% — 03 (4/12), 09 (2/12), 11 (5/12), 12 (3/12),

@@ -109,6 +109,13 @@ da R4 eu anotei SÓ O TOTAL, não as seis dimensões. Resultado: a contagem de n
 está estabelecida (são 8 nas 17 com dimensão registrada). Registre SEMPRE as seis dimensões — é o
 que permite recontar sem reauditar.
 
+⚠️ A QUINTA RODADA QUEBROU A SEQUÊNCIA DE QUEDAS, e vale entender por quê antes de comemorar: ela
+renotou SÓ as oito aulas abaixo de 50%, DEPOIS de 23 consertos, e com briefing UNIFORME onde a R4
+usava briefing dirigido. Resultado 25/96 -> 77/96. Mas 6 dos 13 defeitos que ela achou foram
+introduzidos pelos MEUS consertos horas antes, incluindo o único -1 -- ou seja, a rodada continuava
+discriminando. O confundimento (conserto + briefing mudaram juntos) é real e não se resolve com
+esses dados. NÃO some as 21 notas da R4 com as 8 da R5 e chame de nota do curso.
+
 ⚠️ E LEIA ISTO ANTES DE COMPARAR NOTAS: a nota caiu TRÊS RODADAS SEGUIDAS — 73,0% na R2, 70,4% na
 R3, 66,4% na R4 — e cada rodada mediu depois de dezenas de correções. Na R4 a prova ficou nítida:
 ordenei os lotes do mais fraco ao mais forte pela nota da R3, e a QUEDA CRESCE conforme a nota

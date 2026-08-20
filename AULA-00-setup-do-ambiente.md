@@ -137,7 +137,8 @@ dependências pinadas — a instalação demora, `torch` é grande.
 Existem ainda requirements especializados que você só instala quando a aula pedir:
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
 `requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
-acrescenta o que os exemplos de LangGraph precisam (`langchain-deepseek`, `langgraph-prebuilt`) e não
+acrescenta o que os exemplos de cada framework precisam além do `NoGPU_Mac-Win` — no do LangChain,
+`langchain-deepseek` e `langgraph-prebuilt`; no do LlamaIndex, os equivalentes daquele ecossistema — e não
 está nos `NoGPU_Mac-Win` — instale quando chegar nos `04_LangGraph_RAG*.py` de `00-SimpleRAG/`; e
 `requirements_marker_20250413.txt`, que **nenhuma aula usa**: `grep -rn "import marker"` no
 repositório inteiro não encontra nada, e as duas menções ao `marker_single` estão em tabelas de
@@ -172,7 +173,8 @@ apenas conversam com esse servidor.
 ### Passo 5 — O arquivo `.env`
 
 O `.gitignore` **da raiz** do repositório contém exatamente uma linha: `.env` (há também um
-`.idea/.gitignore` gerado pela IDE, com seis linhas que não interessam aqui). Isso é
+`.idea/.gitignore` gerado pela IDE, com dez linhas — seis padrões e quatro comentários — que não
+interessam aqui). Isso é
 deliberado — chave de API nunca entra em commit.
 
 ```powershell

@@ -27,7 +27,8 @@ páginas. Sua base de conhecimento tem 50 mil documentos. Não há janela que re
 
 **2. Limite de custo e latência.** Mesmo que caiba, você paga por token de entrada
 em _toda_ chamada. Enviar 200 mil tokens para responder "qual o prazo de garantia?"
-é desperdício de duas a três ordens de magnitude. Além disso, prompt gigante é
+é desperdício de duas a três ordens de magnitude — estimativa de ordem de grandeza, não medição:
+compare o tamanho da pergunta e da resposta úteis com os 200 mil tokens enviados. Além disso, prompt gigante é
 prompt lento.
 
 **3. Limite temporal.** O modelo tem um `knowledge cutoff`. Informação criada depois
@@ -164,7 +165,9 @@ Ser especialista inclui recusar a ferramenta:
 ¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que
 vem antes) opõe Text2SQL a "RAG" como coisas distintas, usando "RAG" no sentido estrito de _busca
 vetorial sobre prosa_. A Aula 12 (que vem depois) argumenta que Text2SQL bem feito **é** RAG, porque
-o que se recupera vem de fora do modelo e entra no contexto — e o `GLOSSARIO.md` segue a Aula 12.
+o que se recupera vem de fora do modelo e entra no contexto. O `GLOSSARIO.md` não decide entre as
+duas: a entrada `Query construction` registra a tese da Aula 12 **como tese** e a leitura estrita da
+Aula 06 ao lado dela.
 As duas leituras são defensáveis e a diferença é de definição, não de fato. Quando a Aula 06 disser
 "aí sim RAG", leia "aí sim RAG vetorial".
 

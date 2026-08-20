@@ -196,9 +196,11 @@ python 01-LogicalRouting.py
 
 Teste com perguntas de três tipos: uma claramente de uma rota, uma ambígua entre duas, e uma que
 não pertence a nenhuma das três. Observe o que acontece no terceiro caso — e note que o `Literal`
-**não** garante nada: o esperado é o modelo espremer a pergunta numa das três rotas, roteando errado
-em silêncio; o caso menos provável é ele tentar sair do schema e a chamada estourar em exceção de
-validação do Pydantic. Os dois desfechos são ruins de formas diferentes.
+**não** garante nada. Há dois desfechos possíveis, ruins de formas diferentes: o modelo espreme a
+pergunta numa das três rotas, roteando errado em silêncio, ou tenta sair do schema e a chamada
+estoura em exceção de validação do Pydantic. **Qual dos dois é mais frequente eu não medi** — rodar
+exige chave de API. Registre o que aconteceu no seu caso, porque é isso que decide se você precisa de
+uma rota de fallback ou de um tratamento de exceção.
 
 ```powershell
 python 02-SemanticRouting.py

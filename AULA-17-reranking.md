@@ -296,12 +296,16 @@ similaridade — ver os dois números lado a lado é o que torna a combinação 
 cada lista domina; com `k=1000`, todas as posições ficam quase equivalentes e a fusão vira contagem
 de aparições. Você acabou de sentir o que o parâmetro controla.
 
-**2. Rerank sem recuperar largo.** Recupere `k=3` e reordene esses 3. O reranking não tem o que
-consertar — ele só reordena o que veio. Isso mostra que **os dois estágios são interdependentes**:
-recuperar estreito anula o ganho de reordenar.
+**2 e 3. Os dois lados do `k` — e note que estes dois exercícios exigem código seu.** O
+`02-CrossEncoder-Reranking.py` e o `03-CoBERT-Reranking.py` **não têm recuperação**: os documentos
+são uma lista Python fixa de três, sem `retriever` nem parâmetro `k` (`grep -c "retriever\|k="` devolve
+zero nos dois). Para fazer o experimento, ligue um dos dois a um índice — o `03-LangChain-BM25.py` da
+Aula 08 serve de ponto de partida — e então varie o `k`.
 
-**3. Recupere largo demais.** Vá para `k=100` e reordene. Meça o tempo. O cross-encoder faz 100
-forward passes — e a latência mostra por que o estágio de recuperação precisa ser barato.
+Com `k=3`, o reranking não tem o que consertar: ele só reordena o que veio, e recuperar estreito
+anula o ganho de reordenar. Com `k=100`, meça o tempo: o cross-encoder faz 100 forward passes, e a
+latência mostra por que o estágio de recuperação precisa ser barato. **Os dois estágios são
+interdependentes**, e é isso que os dois extremos tornam visível.
 
 **4. Prove que a fórmula do arquivo não é a que ordena.** No `06`, troque o `decay_factor` de
 `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:150` por `1.0` — combinação de recência anulada — e
