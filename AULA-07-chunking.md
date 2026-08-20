@@ -64,7 +64,7 @@ O texto decide onde ser cortado.
 Note a progressão: 1 e 2 são **sintáticos** (olham caracteres), 3 é **sintático com
 conhecimento de domínio** (sabe o que é uma função), 4 é **semântico** (usa embeddings para
 decidir). O custo sobe junto: o semântico faz chamadas de embedding durante a _ingestão_, o
-que em acervo grande costuma ser o item mais caro do pipeline.
+que em acervo grande costuma ser, **julgamento**, o item mais caro do pipeline.
 
 ---
 
@@ -125,7 +125,7 @@ seria `["\n\n", "\n", ".", ",", " ", ""]`.
 
 ### O par que isola a variável
 
-`04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são o experimento
+`04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são, **julgamento**, o experimento
 mais bem construído do módulo. Rodando `diff` entre os dois, a diferença se resume ao
 splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também:
 

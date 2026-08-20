@@ -27,9 +27,10 @@ acervo  →  [retriever: barato, k=20]  →  [reranker: caro, k=20→5]  →  LL
            bi-encoder, índice ANN         cross-encoder ou LLM
 ```
 
-O desenho de dois estágios existe porque a Aula 08 estabeleceu duas restrições:
+O desenho de dois estágios existe por duas restrições, que esta aula estabelece agora — a Aula 08
+apresentou bi-encoder e cross-encoder, mas não tratou de indexabilidade:
 
-- **Bi-encoder é indexável, cross-encoder não** (Aula 08). Não há vetor de documento para guardar
+- **Bi-encoder é indexável, cross-encoder não.** Não há vetor de documento para guardar
   num cross-encoder — ele julga pares. Logo, N forward passes por query, impossível no acervo
   inteiro.
 - **Contexto longo degrada a geração** (o _lost in the middle_ da Aula 01). Entregar 20 chunks é
@@ -71,7 +72,8 @@ terceira coisa — ponderação por sinal externo, sem julgar relevância.
 ## Parte 1 — RRF, da fórmula à aritmética
 
 `01-RRF-Reranking.py` implementa Reciprocal Rank Fusion **sem biblioteca**, e é o segundo arquivo
-do curso (depois do BM25 da Aula 08) em que você vê um algoritmo de recuperação por inteiro.
+do curso em que você vê um algoritmo de recuperação por inteiro — depois do BM25 e do
+`calculate_similarity()` do CoBERT, os dois que a Aula 08 mostra.
 
 A assinatura, na linha 98:
 
@@ -138,7 +140,7 @@ com `AutoModelForSequenceClassification` (linha 40).
 
 A classe do `transformers` já revela o mecanismo: é **classificação de par**, não geração de
 embedding. O modelo recebe query e documento concatenados e emite um score de relevância. Não
-existe "o vetor do documento" — e é exatamente por isso que ele não serve para indexar (Aula 08) e
+existe "o vetor do documento" — e é exatamente por isso que ele não serve para indexar e
 serve muito bem para reordenar 20 candidatos.
 
 O `ms-marco` no nome indica o dataset de treino: MS MARCO, de ranking de passagens. Reranker
@@ -182,7 +184,7 @@ comum e barato — o esparso é rápido e inspecionável, o reranker corrige a o
 Aqui o reranker é um LLM: ele recebe a query e a lista de documentos e **devolve a ordem**. Não há
 score por par; há uma permutação.
 
-Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é o mais caro e o
+Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é, **julgamento**, o mais caro e o
 mais lento dos cinco, e é **não determinístico** — a mesma lista pode sair ordenada diferente.
 Julgamento: reservaria para top-k pequeno em domínio onde a ordem importa muito, e mediria contra o
 cross-encoder antes de assumir que compensa.

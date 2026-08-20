@@ -297,6 +297,6 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Anterior:** [AULA 15 — Small-to-big](AULA-15-small-to-big.md)
 **Próxima:** [AULA 17 — Reranking: RRF, cross-encoder, ColBERT, Cohere, RankLLM e recência](AULA-17-reranking.md)
 
-> **Fase 5 concluída.** As Aulas 15 e 16 cobrem `06-Indexing/`: desacoplar índice de entrega, subir
+> **Fase 5 concluída.** As Aulas 15 e 16 cobrem os três primeiros subdiretórios de `06-Indexing/`: desacoplar índice de entrega, subir
 > um nível de busca, e indexar o mesmo conteúdo de várias formas. A Fase 6 muda de estágio — não
 > mais como buscar, mas o que fazer com o que voltou.

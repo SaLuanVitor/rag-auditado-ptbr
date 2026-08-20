@@ -211,8 +211,8 @@ cometeu na primeira avaliação do agente `@rag-specialist` — registrada em
 [`avaliacao/GATE-RAG-SPECIALIST-v2.md`](avaliacao/GATE-RAG-SPECIALIST-v2.md).)
 
 Note também o que estes dois **não** são. O `07-text-match.py` usa `TEXT_MATCH` como **filtro
-dentro** de uma busca vetorial — `client.search(..., anns_field="vector", ...)` nas linhas 59, 75
-e 91 —, o mesmo padrão do filtro escalar de `03-filtered-search.py`, não um substituto da busca.
+dentro** de uma busca vetorial — `client.search(..., anns_field="vector", ..., filter=...)` na linha 112, com o `filter` definido
+na 107 (as linhas 59, 75 e 91 do mesmo arquivo são buscas vetoriais puras, sem `filter`) —, o mesmo padrão do filtro escalar de `03-filtered-search.py`, não um substituto da busca.
 Já em `09-metadata-query.py`, só os passos finais (`.get()`, `.query()`, `.query_iterator()`) são
 consulta sem vetor. Um vector DB moderno acumula os dois papéis, e é isso que permite o roteamento
 de fonte que a Aula 12 pediu, sem trocar de banco.

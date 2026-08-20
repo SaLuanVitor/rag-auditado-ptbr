@@ -14,8 +14,9 @@ JSON pode virar uma string única e inútil ou vinte documentos com metadados ap
 dependendo de qual loader você escolhe — e essa escolha acontece antes de qualquer embedding,
 antes de qualquer chunk, antes de qualquer decisão que os capítulos seguintes vão tomar.
 
-Esta é a primeira das três origens de falha da Aula 01 e, como lá, a mais silenciosa — julgamento,
-não medição: **falha de
+Esta é a origem de falha que a Aula 01 põe **em primeiro lugar na ordem de diagnóstico** (é a
+terceira na ordem em que aquela aula as apresenta) e, como lá, a mais silenciosa — julgamento, não
+medição: **falha de
 ingestão não gera erro.** Gera um acervo que o sistema simplesmente não conhece.
 
 ---
@@ -69,7 +70,12 @@ pode montar de qualquer fonte, inclusive de um banco ou de uma API que loader ne
 
 ### A escada do `DirectoryLoader`
 
-Os quatro arquivos `03-*` são a mesma chamada, ganhando um parâmetro de cada vez. **Julgamento:** é a mais gradual
+Os quatro arquivos `03-*` são a mesma chamada com o `DirectoryLoader` configurado de formas
+diferentes — e **não** é uma escada aditiva, apesar de parecer. O `diff` mostra troca, não
+acumulação: `03-01`→`03-02` acrescenta três parâmetros de uma vez (`glob`, `use_multithreading`,
+`show_progress`); `03-02`→`03-03` acrescenta `loader_cls` e **remove** os dois últimos;
+`03-03`→`03-04` acrescenta `silent_errors` e **remove** o `glob`, de modo que o último arquivo da
+série já não filtra por Markdown. **Julgamento:** ainda é a sequência mais gradual
 sequência didática do módulo:
 
 | Arquivo                                                      | Chamada                                                             | O que acrescenta                   |
@@ -159,7 +165,7 @@ diferença no mesmo arquivo.
 
 `03-LangChain-WebBaseLoader.py` carrega
 `page_url = "https://en.wikipedia.org/wiki/Black_Myth:_Wukong"` (linha 4). O arquivo traz a
-versão ingênua **comentada** nas linhas 6 a 11, e a versão boa ativa a partir da linha 15:
+versão ingênua **comentada** nas linhas 5 a 11, e a versão boa ativa a partir da linha 15:
 
 ```python
 loader = WebBaseLoader(
@@ -278,7 +284,7 @@ prova de que o ganho do `JSONLoader` está no esquema, não na classe.
   uma vez. Verifique o `metadata` do primeiro documento **sempre**, logo após carregar.
 - **`silent_errors` sem contagem.** Silenciar erro sem contar o que ficou de fora é criar um
   acervo incompleto sem registro.
-- **JSON achatado.** É a falha desta aula que mais aparece em produção, porque não dá erro:
+- **JSON achatado.** **Julgamento:** é a falha desta aula que mais aparece em produção, porque não dá erro:
   alguém aponta o `TextLoader` para um `.json`, o pipeline roda, e a recuperação fica ruim
   sem explicação.
 - **Scraping como fonte permanente.** Site muda, bloqueia, muda de layout. Se o conteúdo

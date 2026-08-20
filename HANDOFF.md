@@ -2,22 +2,27 @@
 
 **Data:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
-**Verificação:** `verify-citations --all` = **PASS** — 1622 OK, zero inválidas. `BAD_LINE`,
+**Verificação:** `verify-citations --all` = **PASS** — 1635 OK, zero inválidas. `BAD_LINE`,
 `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 16 `SKIPPED` (glob ou elipse) e
 20 `NO_ANCHOR`, ambos conferência à mão por desenho
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
 lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
 lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
-**Renota:** ✅ **29 de 29 — COMPLETA.** As 9 de 19/08 mais as 20 de 20/08 (lotes B, E, G, I, J, K, L,
-M, N, O, todos concluídos). Total do curso **251/348 = 72,1%**. A rodada de 20/08 deu 165/240 = 68,8%
-contra 155/240 antes: Δ médio **+0,50**, 10 subiram, 8 caíram, 2 empataram — o +3,44 da rodada
-parcial **não se sustentou** com a amostra completa
-**Classificação:** **Requer revisão.** Os 72,1% cairiam na faixa de "Publicável com ressalvas"
-(70–84%), mas as duas portas eliminatórias dessa faixa falham: **18** notas `−1` (o máximo é uma) e
-**quatro** aulas abaixo de 50% (00, 25, 26, 28). Vale para a versão que os auditores leram — os 15
-defeitos que produziram as `−1` de 20/08 foram corrigidos no mesmo dia, e somar correção à própria
-nota é a autoavaliação que a rubrica proíbe
-**Distância até "com ressalvas":** zerar as `−1` e tirar quatro aulas de baixo dos 50%
+**Renota:** ✅ **TRÊS rodadas completas.** A terceira (20/08) foi a primeira com **uma aula por
+auditor e orçamento dobrado** — dez citações abertas por aula em vez de cinco. Total do curso
+**245/348 = 70,4%** (cenário conservador; 266/348 = 76,4% usando o auditor de par nas quatro aulas
+duplicadas)
+**⚠️ A nota CAIU, e é o achado principal:** a R2 dava 254/348 = 73,0%. O material recebeu 15
+correções entre as duas rodadas e desceu para 70,4% — Δ médio **−0,31**, 11 subiram, 13 caíram, 5
+empataram. Não é contradição: **a R2 media menos.** Nas quatro aulas com dois auditores, em **4 de 4**
+o de orçamento dobrado deu nota menor e achou defeito verificável que o outro perdeu. Trate as notas
+das rodadas 1 e 2 como piso otimista, não como medida
+**Classificação:** **Requer revisão**, agora com três rodadas convergindo no mesmo rótulo. Os 70,4%
+cairiam em "Publicável com ressalvas" (70–84%), mas as duas portas eliminatórias falham: **12** notas
+`−1` (o máximo é uma) e **cinco** aulas abaixo de 50% — 03 (4/12), 09 (2/12), 11 (5/12), 12 (3/12),
+13 (4/12). As portas de "Publicável" falham por mais: 12 aulas abaixo de 70% e três com `E` < 1
+(06, 12, 24). Vale para a versão que os auditores leram; as 32 correções vieram depois
+**Distância até "com ressalvas":** zerar as 12 notas `−1` e tirar cinco aulas de baixo dos 50%
 **Licença:** definida em 20/08 — **CC BY-SA 4.0** para o material didático, **MIT** para o código
 (`ferramentas/`, `exercicios/`). Escopo em `LICENSE`; texto do MIT em `LICENSE-CODE`
 **Git:** **um commit**, `6658768`, na branch `main`, **sincronizado com `origin/main`** — nada

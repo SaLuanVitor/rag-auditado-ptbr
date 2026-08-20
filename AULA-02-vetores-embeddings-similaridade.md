@@ -64,9 +64,9 @@ E **falha** onde palavra-chave é imbatível:
 | Termo técnico ausente do treino                 | acerta        | erra                |
 | Negação ("contratos **sem** cláusula de multa") | parcial       | erra feio           |
 
-Esta tabela é o argumento inteiro a favor de **busca híbrida** (Aula 11). Não é que
-uma abordagem é melhor: elas falham em conjuntos disjuntos de casos. Guarde isso —
-**Julgamento:** é uma das lições mais rentáveis do curso.
+**Julgamento:** esta tabela é o argumento central a favor de **busca híbrida** (Aula 11), e é uma
+das lições mais rentáveis do curso. O fato por trás dela, esse sim verificável: não é que uma
+abordagem seja melhor — elas falham em conjuntos disjuntos de casos.
 
 O caso da negação merece destaque, porque surpreende: o embedding de "contrato com
 cláusula de multa" e o de "contrato sem cláusula de multa" são **muito parecidos**,
@@ -112,7 +112,7 @@ IP a escolha eficiente.
 você trocar cosseno por L2 e esquecer de inverter a ordenação, seu retriever passa
 a devolver os documentos _menos_ relevantes — e não vai lançar erro nenhum.
 
-Este é o bug mais insidioso de RAG iniciante. Ele não quebra: ele piora.
+**Julgamento:** é um dos bugs mais insidiosos de RAG iniciante. Ele não quebra: ele piora.
 
 ### A ligação com o índice do vector DB
 

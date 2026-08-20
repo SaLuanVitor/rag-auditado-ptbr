@@ -46,8 +46,10 @@ forçar o modelo a inventar.
 > **4b — schema imposto na decodificação:** `response_format={"type": "json_schema", …,
 "strict": true}` restringe a geração ao schema, e violação de estrutura deixa de ser possível.
 > Custo: o schema fica limitado ao subconjunto que o provedor suporta, e a latência do primeiro
-> token aumenta. Nenhum arquivo deste módulo usa 4b — `grep` por `json_schema` e `strict` no
-> repositório não encontra nada. Ao ler a tabela acima, leia o grau 4 como **4a**.
+> token aumenta. Nenhum arquivo deste módulo usa 4b — `grep` por `json_schema` no repositório não
+> encontra nada, e as duas ocorrências de `strict` são comentários sem relação com decodificação
+> restrita (`02-DocChunking/05-LlamaIndex-SemanticChunking.py:47` e
+> `Self-RAG-FullImplementation.py:54`). Ao ler a tabela acima, leia o grau 4 como **4a**.
 
 A coluna que importa é a terceira. Subir de grau reduz uma classe de falha e deixa a próxima
 intacta:
@@ -482,7 +484,7 @@ Duas mitigações, com o custo de cada uma:
 
 E a ligação com a Aula 19: autorizar a abstenção em prosa (_"se o contexto não responde, diga
 isso"_) não tem efeito sobre um campo que o schema marca como obrigatório. As duas garantias operam
-em camadas diferentes, e a do schema é a mais forte das duas.
+em camadas diferentes, e a do schema é, **julgamento**, a mais forte das duas.
 
 ---
 
@@ -638,6 +640,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Próxima:** [AULA 21 — Self-RAG e estratégias dinâmicas de geração](AULA-21-self-rag.md)
 
 > As Aulas 19 e 20 trataram de como pedir e como cobrar. A Aula 21 inverte o sujeito: em
-> `08-Generation/04-DynamicGenerationOptimizationStrategies/` o modelo decide se precisa recuperar,
-> critica o que recuperou e critica a própria resposta — e os dois papers dessa decisão (Self-RAG e
+> `08-Generation/04-DynamicGenerationOptimizationStrategies/` o modelo critica o que recuperou e
+> critica a própria resposta — e, **no paper**, decide se precisa recuperar; a implementação do
+> repositório recupera sempre (`add_edge(START, "retrieve")` incondicional), como a Aula 21 mostra — e os dois papers dessa decisão (Self-RAG e
 > RRR) estão no diretório, em PDF.

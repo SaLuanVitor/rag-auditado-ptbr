@@ -167,7 +167,7 @@ o que "elementos tipados" significa.
 e `PIL.Image` — linhas 1 a 4. Ele **renderiza a página como imagem e desenha polígonos** sobre
 as regiões detectadas.
 
-É o exercício mais subestimado do módulo. Depurar ingestão de PDF lendo texto extraído é
+**Julgamento:** é o exercício mais subestimado do módulo. Depurar ingestão de PDF lendo texto extraído é
 adivinhação; **ver as caixas desenhadas sobre a página** mostra na hora que a coluna da direita
 foi lida antes da esquerda, ou que a tabela virou um bloco só. Quando um PDF der problema no
 seu projeto, comece por aqui.
@@ -198,7 +198,7 @@ a matéria-prima que _permitiria_ fazer small-to-big depois. Mesmo nome, mecanis
 | Arquivo                         | Abordagem                                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `01-Unstructured-ReadImages.py` | `UnstructuredImageLoader` (linha 1) — OCR embrulhado                                                    |
-| `02-Unstructured-ReadPPT.py`    | `partition_ppt(filename=".../black_myth_wukong_slides.pptx")` (linhas 14–16)                            |
+| `02-Unstructured-ReadPPT.py`    | `partition_ppt(filename=".../black_myth_wukong_slides.pptx")` (a chamada está sozinha na linha 16; a 14 é o import)                            |
 | `03-LLM-ReadImagesAndText.py`   | **modelo multimodal** — `convert_from_path` + `base64` + `OpenAI`, com `model="gpt-4o-mini"` (linha 35) |
 
 O `03` é a abordagem mais recente e, **julgamento**, a mais poderosa: rasteriza a página, codifica em base64,
@@ -226,7 +226,9 @@ python 02-UsingPyMuPDF.py
 ```
 
 Compare as duas saídas para o mesmo arquivo. Quebras de linha, espaçamento e ordem podem
-divergir — e essas divergências viram fronteiras de chunk diferentes na Aula 07.
+divergir — e a mesma página extraída por dois deles vira dois textos com fronteiras diferentes
+quando você for chunkar. A Aula 07 trata de fronteiras de chunk, mas **não** retoma o efeito da
+escolha de extrator sobre elas: é dívida aberta do curso, não promessa cumprida.
 
 ```powershell
 python 06-Unstrctured-ParsePDFWithPartitionFunction-v2.py

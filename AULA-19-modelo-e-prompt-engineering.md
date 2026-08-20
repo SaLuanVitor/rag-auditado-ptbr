@@ -107,7 +107,9 @@ outputs = model.generate(
 
 Três leituras que importam mais que a API:
 
-**1. `device_map="auto"` é o único lugar onde hardware aparece.** Sem GPU, a carga cai para CPU e
+**1. `device_map="auto"` é o único lugar onde hardware é _configurado_.** (Ele reaparece na
+linha 21, em `.to(model.device)`, mas ali é consequência da escolha feita aqui, não uma segunda
+decisão.) Sem GPU, a carga cai para CPU e
 a geração fica lenta o suficiente para mudar sua percepção do exemplo. Custo nomeado: um modelo de
 0,6 B roda em CPU; os de 7 B para cima, na prática, não — não sem quantização, que este exemplo não
 cobre.
@@ -260,7 +262,7 @@ docs = db.similarity_search(query)
 retrieved_content = docs[0].page_content
 ```
 
-Um documento de 779 caracteres com `chunk_size=1000` produz **um chunk**. A busca por similaridade
+Um documento de 779 caracteres (o arquivo é ASCII puro, então bytes e caracteres coincidem aqui) com `chunk_size=1000` produz **um chunk**. A busca por similaridade
 sobre um índice de um elemento devolve esse elemento. `docs[0]` é o documento inteiro.
 
 Ou seja: neste exemplo, `retrieved_content` não é resultado de recuperação — é o arquivo. O

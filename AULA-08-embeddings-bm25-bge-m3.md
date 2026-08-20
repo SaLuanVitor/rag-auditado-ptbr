@@ -239,7 +239,7 @@ que é a Aula 11.
 from visual_bge.modeling import Visualized_BGE   # linha 11
 ```
 
-As linhas 2 a 6 trazem um aviso do próprio autor sobre a instalação do `visual_bge`, com link
+As linhas 2 a 7 trazem um aviso do próprio autor sobre a instalação do `visual_bge`, com link
 para o README do FlagEmbedding — a dependência é chata de instalar, e ele avisa.
 
 O que "mesmo espaço" significa: o embedding de uma foto de um gato e o embedding do texto
@@ -258,11 +258,12 @@ python 03-BM25.py
 
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver uma
 **pontuação query-documento** escrita por completo, sem abstração — mas não é o único: o
-`calculate_similarity()` de `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-134` também
+`calculate_similarity()` de `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145` (a
+normalização L2 nas linhas 137-138, o `torch.mm` na 141) também
 pontua query contra documento à mão, com normalização L2 e `torch.mm`. O que o `03-BM25.py` tem de
 particular é a fórmula clássica inteira — IDF, saturação por `k1` e normalização de comprimento por
-`b` — num só lugar. O outro algoritmo escrito à
-mão no repositório é o `reciprocal_rank_fusion` de
+`b` — num só lugar. O outro algoritmo que **decide ranking**
+escrito à mão no repositório é o `reciprocal_rank_fusion` de
 `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` — mas ele refunde posições de listas já
 recuperadas, em vez de pontuar relevância; são estágios diferentes do pipeline. Leia a saída
 junto com a fórmula da linha 29.

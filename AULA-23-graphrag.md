@@ -90,9 +90,10 @@ E o `.env.example` diz exatamente o que é (`10-AdvanceRAG/01-GraphRAG/.env.exam
 
 Duas leituras, e as duas importam.
 
-**A favor do repositório: aqui a documentação está correta.** Depois de quatro módulos em que a
-frase _"Every script here loads this file via load_dotenv()"_ era falsa, este `.env.example` declara
-com precisão que não há script. E o `10-AdvanceRAG/.env.example:5-13` lista as chaves como usadas
+**A favor do repositório: aqui a documentação está correta.** Depois de vários módulos em que a
+frase _"Every script here loads this file via load_dotenv()"_ era falsa — sem ser uma sequência
+ininterrupta: o `08-Generation/04-`, coberto pela Aula 21, tem um único script e ele **chama**
+`load_dotenv()` —, este `.env.example` declara com precisão que não há script. E o `10-AdvanceRAG/.env.example:5-13` lista as chaves como usadas
 "across 02-ContextRetrieval, 04-AgenticRAG, 05-MultiModalRAG" — omitindo o `01` e o `03`
 corretamente.
 
@@ -121,7 +122,7 @@ for julgamento, está marcado.
 
 A figura 1 do paper resume a arquitetura, e a legenda nomeia as três peças do índice:
 
-> _"This graph index spans nodes (e.g., entities), edges (e.g., relationships) and covariates (e.g.,
+> _"This graph index spans nodes (e.g., entities), edges (e.g., relationships), and covariates (e.g.,
 > claims) that have been detected, extracted, and summarized by LLM prompts tailored to the domain of
 > the dataset."_
 

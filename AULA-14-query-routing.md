@@ -90,7 +90,7 @@ Descrição vaga produz roteamento errado, e o sintoma aparece longe da causa.
 
 **3. É testável.** Dado que a saída é um de três rótulos, você pode escrever um teste: pergunta X
 deve rotear para `python_docs`. Isso é raro no resto do pipeline RAG e é a vantagem prática mais
-subestimada do roteamento lógico — **você consegue medir o roteador separadamente do retriever**,
+subestimada — **julgamento** — do roteamento lógico — **você consegue medir o roteador separadamente do retriever**,
 o que evita atribuir ao índice uma falha que foi de rota.
 
 O exemplo usa três rotas de documentação de linguagens. A generalização óbvia: no seu sistema as
@@ -204,7 +204,7 @@ quando a decisão foi confortável (0,82 contra 0,31) e quando foi um empate té
 
 Depois compare os dois na **mesma pergunta ambígua**. O lógico devolve um rótulo com aparência de
 certeza; o semântico devolve um argmax que você pode inspecionar. Essa diferença de
-observabilidade é um argumento a favor do semântico que raramente se menciona.
+observabilidade é, **julgamento**, um argumento a favor do semântico que raramente se menciona.
 
 ---
 

@@ -91,7 +91,8 @@ Três arquivos, e a progressão é de infraestrutura para uso:
 Os dois testes de conexão existem porque a maior parte do tempo perdido aqui não é RAG — é
 driver, credencial e rede. Rodá-los antes economiza depuração no lugar errado.
 
-O `02-01` traz, em comentário nas linhas 3 a 14, o **DDL da tabela de exemplo**:
+O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (as linhas 3 a 6 são as
+instruções de criação e uso do banco, antes do `CREATE TABLE`):
 
 ```sql
 CREATE TABLE game_scenes (
@@ -147,7 +148,7 @@ Dois arquivos, e o segundo fecha o ciclo:
 - `04-01-pdfplumber-ExtractPDFTable.py` — extração pura (linha 1: `import pdfplumber`)
 - `04-02-pdfplumber-ExtractPDFTableAndQA.py` — extração **mais RAG**: importa `pdfplumber`,
   `pandas`, e do LlamaIndex o `VectorStoreIndex` e o `Document` (linhas 1–4), montando um
-  query engine (linha 40)
+  query engine (linha 41; a 40 é o comentário)
 
 O `04-02` é o único arquivo do módulo que vai da tabela até a pergunta respondida. É o que
 você deve ler para entender **como uma tabela extraída vira algo recuperável** — o passo que a
