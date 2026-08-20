@@ -989,3 +989,148 @@ proibição com as violações anteriores nomeadas, e nenhuma se repetiu.
 Verificado ao encerrar: `git status --short` no clone da Packt volta **vazio**, e
 `git status --short --ignored` também — nem arquivo ignorado sobrou, depois de 29 auditores lerem lá
 dentro ao longo das duas rodadas.
+
+---
+
+## Renota adversarial — TERCEIRA rodada, PARCIAL (20/08/2026)
+
+> ⚠️ **ESTA SEÇÃO ESTÁ INCOMPLETA. 13 de 29 aulas renotadas.** Não some estes números como se
+> fossem o curso, e não declare classificação a partir deles. As 16 que faltam estão listadas ao
+> fim da seção. O limite de sessão da API derrubou 8 auditores da segunda onda; os que voltaram
+> estão registrados aqui.
+
+**Desenho:** `general-purpose` em `sonnet`, somente-leitura, nota anterior **não** revelada, e
+proibição explícita de abrir este arquivo, o `HANDOFF.md` e o `PROMPT-CONTINUAR.md`. A rodada mede o
+efeito de duas coisas feitas em 20/08: as 15 correções de defeito da rodada anterior e as 64
+marcações de superlativo.
+
+Três coisas mudaram no prompt em relação à rodada anterior, cada uma por defeito medido nela:
+
+1. **O que conta como julgamento marcado ficou explícito** — prefixo `Julgamento:`, marcação inline
+   ou hedge de primeira pessoa, todos válidos. Sem isso os auditores penalizariam a convenção usada
+   na varredura de superlativos, e a rodada mediria a minha notação em vez do material. E **marcador
+   mal posicionado** passou a ser falha nomeada: cobrir metade da frase e deixar a outra nua.
+2. **Somar as seis dimensões por script antes de escrever o total** — na rodada anterior um relatório
+   deu `E2 C2 H0 O2 D2 A2` e escreveu "Total: 8/12".
+3. **A regra da regressão, generalizada:** _ausência de uma string não é ausência do comportamento._
+   É o erro que eu mesmo cometi (ver "As três regressões" abaixo), virado em ferramenta de auditoria.
+
+### As notas — 13 de 29
+
+| Aula | R3 | R2 | Δ | Auditores |
+| ---- | --- | --- | --- | --- |
+| 22 — Avaliação | **12/12** | 7/12 | **+5** | 1 |
+| 25 — Modular RAG | **12/12** | 4/12 | **+8** | 1 |
+| 00 — Setup | **11/12** | 5/12 | **+6** | 1 |
+| 01 — O que é RAG | **11/12** | 11/12 | 0 | 1 |
+| 27 — Multimodal | **11/12** | 6/12 | **+5** | 1 |
+| 28 — Projeto final | **10/12** | 4/12 | **+6** | 1 |
+| 11 — Híbrida e multimodal | **5/12** | 8/12 | **−3** | 1 |
+| 12 — Query construction | **3/12** | 11/12 | **−8** | 1 |
+| 09 — Milvus, schema | **2/12** | 6/12 | **−4** | 1 |
+
+**Quatro aulas com dois auditores independentes**, escolhidas por serem as de maior oscilação medida
+entre rodadas:
+
+| Aula | Auditor de par (5 citações mín.) | Auditor solo (10 citações mín.) | Δ entre eles |
+| ---- | --- | --- | --- |
+| 24 — Contextual Retrieval | **12/12** (par) | **9/12** | 3 |
+| 26 — Agentic e Adaptive | **12/12** (par) | **8/12** | 4 |
+| 03 — Primeiro RAG | **11/12** (par) | **4/12** | 7 |
+| 13 — Query translation | **11/12** (par) | **4/12** | 7 |
+
+### O achado de método desta rodada: divergência é orçamento, não severidade
+
+**Em quatro de quatro pares, o auditor com orçamento dobrado deu nota menor _e_ achou defeito
+verificável que o outro não viu.** Não é variação entre avaliadores — a direção é consistente e a
+causa é identificável: aos solos foi dado mínimo de dez citações abertas e instrução de ler os
+arquivos inteiros; aos de par, cinco e as linhas citadas.
+
+O caso mais claro é a AULA-13: o auditor de par escreveu "não encontrei achados CRÍTICO, ALTO ou
+MÉDIO" e deu 11/12; o solo achou uma contradição de escopo em **quatro** formulações do mesmo
+arquivo — e essa contradição **já estava registrada como aberta** na seção anterior deste gate, desde
+19/08. Registrar não é corrigir, e a rodada anterior tratou o registro como desfecho.
+
+**Julgamento, marcado como julgamento:** se isto se sustentar, a nota de auditor único com orçamento
+de meia aula é **sistematicamente otimista**, e as rodadas anteriores — todas de pares — superestimam
+o material em vez de subestimá-lo. Consequência prática para a próxima rodada: uma aula por auditor,
+orçamento dobrado, ao custo do dobro de auditores.
+
+### As três regressões que EU introduzi em 20/08
+
+As três têm a mesma forma: **editei no ponto que o auditor citou e não procurei os irmãos da
+afirmação.** O auditor aponta uma linha; eu conserto aquela linha; a afirmação vive em três lugares
+e dois seguem errados.
+
+| Aula | O que corrigi | O que deixei |
+| ---- | --- | --- |
+| 09 | "todo exemplo do módulo" → "todo exemplo de **busca**" | a nova afirmação, que também era falsa |
+| 28 | Parte 3 → "quinze casos" | o fecho, ainda em "catorze", reusando "décimo quinto" |
+| 27 | "Aula 24" → "Aula 19" numa frase | "a Aula 24 abriu", quatro linhas antes |
+
+A da AULA-09 é a pior e a mais instrutiva. Eu escrevi que os 11 arquivos sem a string
+`load_collection` "são scripts de criação e inserção, que não buscam". **Nove dos onze buscam**, via
+`client.load()` / `collection.load()` — sinônimo funcional que o meu `grep` não pegava. E um deles é
+o `04-entity(data).py` da própria aula, que carrega na linha 68 e consulta na 69: bastava abrir.
+
+Raciocinei da **string** em vez do **comportamento**. O `grep` provava "16 arquivos contêm o literal";
+eu concluí "os outros 11 não buscam", que ele nunca provou. É a regra 8 do curso — _"import não é
+uso; ler o que está escrito não é ler o que roda"_ — virada do avesso: **ausência de string não é
+ausência de comportamento.**
+
+E a regra que eu escrevi em 19/08 depois da primeira regressão era estreita demais. Ela dizia
+"achado de auditor sobre citação literal se confere na fonte antes de aplicar" — cobria o que o
+auditor alega, não o que eu escrevo em troca. **A afirmação que substitui também é uma afirmação, e
+precisa da mesma prova.**
+
+Passo mecânico que passou a fazer parte do processo, e que teria pegado dois dos três casos:
+**depois de corrigir uma referência cruzada, grepar o arquivo pela aula citada.** Feito nesta rodada:
+as 7 menções restantes à Aula 21 na AULA-26 e a menção restante à Aula 24 na AULA-27 foram conferidas
+uma a uma e são legítimas.
+
+### As alucinações e alegações falsas desta rodada, todas verificadas por mim na fonte
+
+| Aula | Defeito | Verificação |
+| ---- | --- | --- |
+| 12 | `dt_ref` como exemplo de coluna que precisa de descrição | **FABRICADO** — `grep -rn "dt_ref"` no repositório inteiro devolve zero. Trocado por `customer.active`, real, cuja descrição carrega a codificação 1/0 que o nome não diz |
+| 12 | "collections com `AUTOINDEX`/`COSINE` — exatamente o que as Aulas 09 e 10 construíram" | `grep -c -i autoindex` nas duas aulas: **0 e 0** |
+| 26 | "como a Aula 21 observou sobre o resultado de ferramenta" | a AULA-21 tem **zero** ocorrências de "ferramenta" e de "fato"; a frase é da `AULA-20:522`. O Self-RAG nem usa tool-calling |
+| 24 | "com bit de execução e shebang" | `git ls-tree HEAD` dá **`100644`** nos dois, e o repositório não tem **um único** `100755`. O `-rwxr-xr-x` do `ls -l` é o MSYS inferindo o bit `x` do shebang — o shebang é ao mesmo tempo o fato verdadeiro da frase e a causa do falso |
+| 03 | embedding chinês "em `01_02`, `01_03` e `03_v3`" | **12 dos 23** arquivos de `00-SimpleRAG/`. Número que eu já tinha contado em 20/08 ao corrigir a AULA-28 e não propaguei |
+| 03 | grupo `04_*` = "`.py` e `.ipynb`" | **três** arquivos — há um segundo `.py`, o `_Ollama`. A aula sabe procurar prefixo duplicado (fez para `01_03`) e não aplicou aqui |
+| 03 | "RAG inteiro em sessenta linhas" | **64** (`awk`) |
+| 11 | "versiona imagens de saída, algo que **nenhum outro** faz" | `graph.png`, `self-rag.png` e os três PNGs de `04-AgenticRAG/` estão versionados, e o `02-LangChain-AdaptiveRAG.py` grava PNG em código **ativo** |
+| 09 | "rode `01-database.py` duas vezes, a segunda cai na exceção" | o script faz `drop_database` nas linhas 86 e 92, **no fim**; a segunda execução cria do zero. O exercício manda observar o que o script desfaz |
+| 09 | "`enable_dynamic_field` em praticamente todo schema do módulo" | **14 de 20** = 70%, incluindo o `03-schema.py` **desta aula** entre os que não têm |
+| 28 | "o curso encontrou quatro grafos no repositório" | `grep -rl "StateGraph("` devolve **seis**; os dois de fora são lineares. Qualificado para "com aresta condicional" |
+| 13 | custo comum em quatro formulações incompatíveis | a Parte 4 da própria aula prova que a quarta técnica tem **zero** chamadas de LLM |
+| 26 | "pela terceira vez neste curso" | naquele ponto do texto só o Self-RAG precede — é a segunda |
+
+Todas corrigidas em 20/08, commit `c12288c`.
+
+### Contrato somente-leitura: uma violação dupla, autodenunciada
+
+O auditor do lote 25+26 gravou dois arquivos em `E:\tmp\` com `>` e depois usou `rm -f` para
+removê-los. **As duas ações eram proibidas** — o contrato veda criar *e* remover. Ele reportou as
+duas na primeira linha do relatório, que é o comportamento correto.
+
+Verificado: clone da Packt **vazio**, inclusive `--ignored`; `E:\tmp\` segue com os arquivos
+preexistentes do operador. O que falhou foi o **prompt**: ele proibia criar e proibia remover, mas
+não dizia o que fazer *depois* de criar por acidente — e o instinto de limpar leva à segunda
+violação. Cláusula acrescentada aos prompts seguintes: **se criou por acidente, reporte e deixe lá.**
+
+Um segundo auditor tentou um `>` e o shell recusou com *Permission denied*; nada foi escrito, e ele
+reportou de todo modo.
+
+### As 16 aulas que faltam nesta rodada
+
+**02, 04, 05, 06, 07, 08, 10, 14, 15, 16, 17, 18, 19, 20, 21, 23.**
+
+Oito delas (02, 04, 05, 06, 07, 08, 10, 14) tiveram auditor lançado e morto por limite de sessão da
+API — a janela reseta às 00:20 e às 13:20 (America/Bahia). O limite é de **sessão**, não de
+concorrência: 10 auditores simultâneos passaram, e mais 9 na mesma janela esgotaram a cota. Lançar em
+lotes de cinco reduz o custo de uma queda.
+
+**Nenhuma classificação de publicação é declarada nesta seção, e declarar seria o erro que a AULA-22
+deste curso ensina a não cometer:** veredito grande sobre amostra pequena. Com 13 de 29 e quatro
+aulas com duas notas divergentes, o que existe é sinal, não gate.
