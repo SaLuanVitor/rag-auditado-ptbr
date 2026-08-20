@@ -221,11 +221,16 @@ python "04-entity(data).py"
 
 O nome do quarto arquivo tem parênteses — aspas são necessárias no PowerShell.
 
-Comente as linhas 86 e 92 do `01-database.py` (os dois `drop_database` do fim) e **então** rode
-duas vezes. Sem comentar, o script apaga as duas databases ao terminar, e a segunda execução cria
-do zero em vez de cair no tratamento de exceção. Com elas comentadas, a segunda deve cair no
-tratamento de exceção em vez de
-estourar. É a diferença entre exemplo e script que sobrevive a um retry.
+Este exercício exige duas edições, e a segunda é o achado. Comente as duas chamadas de
+`drop_database` do fim de `01-database.py`, nas linhas 86 e 92 — sem isso, o script apaga as duas databases ao
+terminar e a segunda execução cria do zero, sem exercitar nada. **E envolva também a criação de
+`my_database_2` (linhas 40-43) num `try/except exceptions.AlreadyExistError`**: só o
+`my_database_1` tem esse tratamento, nas linhas 31-35. Com as duas edições, a segunda execução cai
+no `except` nas duas databases; com apenas a primeira, ela cai no `except` da primeira e **estoura**
+na segunda.
+
+É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
+da lição, uma em cada database.
 
 Depois de `04`, use `client.query` ou o Milvus Attu (interface web) para conferir que as 10
 entidades estão lá. Ver o dado inserido fecha o ciclo.
@@ -261,8 +266,10 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   Se usar auto-id, crie um campo `source_id` e preencha sempre.
 - **Escalares esquecidos no schema.** Campo **declarado** é o que se indexa e filtra com
   eficiência; acrescentar um depois exige recriar a collection e reindexar. O Milvus tem uma saída
-  parcial — `enable_dynamic_field=True`, ligado em 14 dos 20 arquivos que definem schema em `04-VectorDB/`
-  (não no `03-schema.py` desta aula, nem nos três de `HybridRetrieval/`, nem nos dois
+  parcial — `enable_dynamic_field=True`, ligado em 15 dos 21 arquivos que definem schema explícito em
+  `04-VectorDB/` (`grep -rln "enable_dynamic_field"` acha o parâmetro em 17 arquivos no módulo,
+  todos com valor `True`; 15 deles estão entre os 21 que constroem schema à mão — não o
+  `03-schema.py` desta aula, nem os três de `HybridRetrieval/`, nem os dois
   `06-full-text-search-bm25-*`), absorve o
   metadado que você esqueceu, ao custo de armazenamento em JSON e de filtro menos eficiente que
   campo declarado. É mitigação, não equivalência: pense nos filtros **antes**, e é barato incluir um
@@ -270,12 +277,22 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
 - 🔴 **Inserir não é publicar.** Depois do `insert`, a collection ainda precisa ser **carregada**
   para o query node: `load_collection()` (e o par `release_collection()` para devolver a memória).
   `grep -rln "load_collection"` encontra o nome em 16 dos 27 `.py` de `04-VectorDB/` — e a
-  conclusão fácil aqui é falsa: dos 11 restantes, **nove buscam**, usando `client.load()` ou
-  `collection.load()`, que é o mesmo carregamento com outro nome. Entre eles estão os três de
-  `HybridRetrieval/`, os três de `MultimodalRetrieval/`, o `a-working-sample.py`, o
-  `create_milvus_db.py` — e o `04-entity(data).py` **desta própria aula**, que carrega na linha 68
-  e consulta na 69. Ausência da string não é ausência do comportamento; é a mesma armadilha do
-  "import não é uso", virada do avesso. Se a sua busca voltar vazia, esta é a
+  conclusão fácil aqui é falsa: dos 11 restantes, **nove buscam** — e por dois caminhos
+  diferentes, que vale separar.
+
+  **Quatro carregam a collection com outro nome:** os três de `HybridRetrieval/` usam
+  `collection.load()`, e o `04-entity(data).py` **desta própria aula** usa `client.load()` na linha
+  68 antes de consultar na 69. Aqui a lição é direta: ausência da string não é ausência do
+  comportamento — a mesma armadilha do "import não é uso", virada do avesso.
+
+  **Os outros cinco não carregam nada, e é mais interessante:** `a-working-sample.py`,
+  `create_milvus_db.py` e os três de `MultimodalRetrieval/` chamam `client.search()` sem nenhuma
+  chamada de load, porque não falam com o servidor desta aula — instanciam `MilvusClient` com um
+  caminho de arquivo local (`MilvusClient(db_path)`, `MilvusClient(uri="./wukong_images.db")`), que
+  é **Milvus Lite**, o modo embutido. **Limite declarado:** se o Lite dispensa o load explícito ou
+  se esses cinco arquivos simplesmente omitem uma etapa necessária, eu não sei — confirmar exige
+  rodar, e `pymilvus` não está instalado neste ambiente. O que está verificado é que eles buscam,
+  e que não chamam load. Se a sua busca voltar vazia, esta é a
   primeira hipótese, antes de qualquer suspeita sobre embedding. Dado recém-inserido também pode não
   aparecer de imediato, conforme o nível de consistência configurado.
 - 🔴 **Acervo que muda exige ingestão idempotente.** O que acontece quando um documento é

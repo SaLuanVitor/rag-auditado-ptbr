@@ -239,9 +239,14 @@ ninguém faz.
 depender dele. Compare o resultado com a versão original. Você acabou de transformar um segundo
 nível decorativo em funcional.
 
-**4. Remova o docstore do multi-representação.** Sem ele, o retriever devolve o resumo em vez do
-documento. Compare a resposta do LLM nos dois casos: responder a partir de um resumo é responder a
-partir de uma paráfrase, com a perda que isso implica.
+**4. Remova o docstore do multi-representação.** Sem ele, o retriever devolve **lista vazia** — e
+não o resumo, que seria a suposição intuitiva. O `MultiVectorRetriever` busca no vetorstore, junta
+os ids e faz `docstore.mget(ids)`; sem docstore populado o `mget` devolve `None` para cada id, e a
+compreensão de lista que vem depois filtra todos. Some tudo, silenciosamente.
+
+Isso é mais instrutivo que o resumo teria sido: **o resumo nunca é entregue ao LLM em nenhum
+caminho.** Ele existe só para ser encontrado. Confirmado lendo a fonte do `MultiVectorRetriever`,
+não por execução — `langchain` não está instalado neste ambiente.
 
 **5. Adicione uma segunda representação.** Ao lado dos resumos, indexe palavras-chave extraídas dos
 mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índice passou a ter.

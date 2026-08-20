@@ -48,10 +48,14 @@ texto corrido  →  elementos tipados  →  hierarquia  →  layout com coordena
 (A escada ordena o **grau de estrutura que você obtém**, não a ordem dos arquivos: o
 `05-LangChain-Unstrucured-PDF-ExtractDocumentStructure.py` já sobe dois degraus de uma vez — tem
 reconstrução pai-filho por `parent_id`/`element_id` nas linhas 109-133 e uma função
-`analyze_layout()` na 53. Sobre esta última, um limite declarado: a linha 7 do arquivo tem
-`# coordinates=True,` **comentada**, e sem instalar o `unstructured` não dá para saber se a
-estratégia `hi_res` já traz `coordinates` no metadado de todo modo. Se não trouxer, a análise de
-layout roda sobre metadado vazio.)
+`analyze_layout()` na 53. Sobre esta última, uma ressalva com o que dá para saber daqui: a linha 7 do arquivo tem
+`# coordinates=True,` **comentada**. E o `08-AnalyzePDFLayout.ipynb`, no mesmo diretório e citado
+adiante nesta aula, liga o parâmetro **explicitamente** e traz coordenadas reais na saída
+(`points`, `layout_width`, `layout_height`). Isso é indício forte de que o parâmetro não vem ligado
+por padrão — logo, de que o `analyze_layout()` do `05` roda sobre metadado vazio. **Não é prova:**
+aquele notebook usa `partition_via_api=True`, então mede o caminho da API, não o `hi_res` local, e
+sem instalar o `unstructured` não fecho a pergunta. Mas a evidência estava na mesma pasta, e é mais
+honesto usá-la do que declarar a incerteza inteira.)
    PyPDF            partition()         parent-child      caixas na página
    PyMuPDF          Unstructured        Title→Text        fitz + matplotlib
 ```

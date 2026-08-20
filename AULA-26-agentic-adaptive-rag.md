@@ -395,7 +395,7 @@ Responda sem consultar:
 
 ## Vocabulário
 
-`agentic RAG` · `adaptive RAG` · `tool calling` · `bind_tools` · `ToolNode` · `tools_condition` ·
+`agentic RAG` · `adaptive RAG` · `tool calling` ·
 `tool description` · `query routing` · `datasource routing` · `web search fallback` ·
 `conditional edge` · `graph state` · `iteration limit` · `scheduling module`
 

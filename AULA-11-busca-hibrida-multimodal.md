@@ -113,6 +113,24 @@ Note a ordem dos argumentos em `WeightedRanker(weights["sparse"], weights["dense
 esparso vem primeiro. A ordem dos pesos precisa corresponder à ordem em que as requisições são
 passadas ao `hybrid_search` — trocar os dois inverte a mistura sem lançar erro.
 
+> 🔴 **E os dois arquivos que esta aula manda usar não satisfazem essa regra.** No `v2`, o ranker
+> está em `WeightedRanker(weights["sparse"], weights["dense"])`
+> (`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:147`) e as requisições em
+> `reqs=[dense_req, sparse_req]` (`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:177`) — esparso
+> primeiro no ranker, denso primeiro nas
+> requisições. O `v3` repete o mesmo par (`Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py:152` e
+> `Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py:186`). O **único** dos três em que as ordens
+> correspondem é o `Milvus+BGE-M3-HybridRetrieval-v1-Minimal.py`, nas linhas 270 e 274, justamente
+> o que a leitura recomendada deixa
+> para depois.
+>
+> **Limite declarado:** que a correspondência seja posicional é o que a documentação do `pymilvus`
+> descreve, e é o que esta aula ensina — mas não rodei nada para confirmar, porque `pymilvus` não
+> está instalado neste ambiente. Se for posicional, o peso nomeado `sparse` (0,7) está ponderando o
+> campo **denso** no `v2` e no `v3`, e os nomes das chaves enganam quem lê. O que está verificado,
+> independentemente da semântica da biblioteca, é a **incoerência**: a aula enuncia uma regra e o
+> seu próprio exemplo canônico não a satisfaz.
+
 ### A escolha explícita, no `v3`
 
 O `v3-Reranked` importa os dois rankers e torna a escolha um parâmetro:
@@ -216,9 +234,14 @@ economiza um parágrafo de explicação.
 densa pura. Depois zere o denso. Faça uma consulta com identificador (`SKU-`, código de erro) e
 outra com paráfrase — cada configuração vence em uma. É a tabela do "Modelo mental" medida.
 
-**2. Inverta a ordem dos pesos.** Em `WeightedRanker(weights["sparse"], weights["dense"])`,
-troque os dois argumentos sem trocar as requisições. Nenhum erro; a mistura inverte. Fixe o
-sintoma: híbrido que se comporta como o oposto do configurado é suspeita de ordem trocada.
+**2. Alinhe a ordem dos pesos — e note que você está consertando, não quebrando.** Em
+`WeightedRanker(weights["sparse"], weights["dense"])` do `v2`, troque os dois argumentos para
+`(weights["dense"], weights["sparse"])`, deixando `reqs=[dense_req, sparse_req]` como está. Se a
+correspondência for posicional, é **isto** que faz os nomes das chaves valerem o que dizem — o
+estado original é que estava trocado (ver o alerta da Parte 2). Rode antes e depois com a mesma
+consulta e compare os rankings. Fixe o sintoma na direção certa: híbrido que se comporta como o
+oposto do configurado é suspeita de ordem trocada, e aqui a suspeita se confirma **antes** de você
+mexer em nada.
 
 **3. Compare RRF e Weighted com pesos desequilibrados.** No `v3`, configure Weighted com 0,9
 para um lado e compare com RRF na mesma consulta. O RRF é indiferente à sua intenção de

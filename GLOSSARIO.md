@@ -29,6 +29,15 @@ numa chamada. Define quanto material recuperado cabe no prompt.
 **Token** — Unidade de texto processada pelo modelo, tipicamente um pedaço de
 palavra. Custo e limites são medidos em tokens, não caracteres.
 
+**RAG (Retrieval-Augmented Generation)** — Recuperar trechos de uma fonte externa e
+entregá-los ao modelo como contexto, para que a resposta se apoie neles em vez da memória de
+treino. Três passos: recuperar, aumentar o prompt, gerar. Reduz alucinação; não a elimina, porque
+contexto ruim produz alucinação com aparência de fundamentação.
+
+**Abstention** — A capacidade de o modelo dizer "não sei" ou "não encontrei" em vez de responder.
+É instrução de prompt, não propriedade do modelo: se o prompt não autoriza, ele tende a preencher.
+Troca falso-negativo por falso-positivo, e é a decisão de produto por trás de todo RAG confiável.
+
 **Corpus** — Acervo de documentos que alimenta o sistema.
 
 **Knowledge cutoff** — Data-limite do conhecimento do modelo. Um dos motivos de
@@ -57,10 +66,17 @@ tabela, cabeçalho). Preserva hierarquia que o texto corrido perde.
 **Unstructured** — Biblioteca que particiona documentos em elementos tipados
 (`Title`, `NarrativeText`, `Table`, `Image`).
 
+**OCR (Optical Character Recognition)** — Reconhecer texto em imagem. Necessário quando o PDF é
+digitalizado e não tem camada de texto. Custa tempo e introduz erro de leitura; o degrau anterior
+(extrair a camada de texto, quando existe) é sempre mais barato e mais fiel.
+
 **Partition** — Função do Unstructured que quebra o documento em elementos.
 
 **Parent-child** — Estratégia em que se indexa o filho pequeno (preciso na busca)
 mas se entrega o pai grande (rico em contexto) ao LLM.
+
+**Vector store** — Sinônimo de _vector database_ no vocabulário do LangChain e do LlamaIndex.
+A mesma coisa: onde os vetores ficam e por onde a busca por vizinhos acontece.
 
 **Multi-representação** — Estratégia em que o **mesmo** conteúdo é indexado de mais de uma forma —
 texto integral, resumo, pergunta hipotética — para que consultas de naturezas diferentes encontrem
@@ -166,6 +182,10 @@ casar com o modelo de embedding usado, ou o ranking sai errado silenciosamente.
 
 ## Vector DB e índices
 
+**ANN (Approximate Nearest Neighbor)** — Busca aproximada de vizinhos mais próximos. Troca uma
+fração de recall por ordens de magnitude de velocidade, e é o que torna a busca vetorial viável em
+escala. FLAT é o exato (sem aproximação); IVF, HNSW e DiskANN são aproximados.
+
 **Vector database** — Banco especializado em busca por vizinhos mais próximos em
 espaço vetorial. Milvus, Weaviate, Qdrant, pgvector, Pinecone.
 
@@ -194,6 +214,13 @@ maioria dos casos. Parâmetros `M` e `efConstruction`/`ef`.
 
 **DiskANN** — Índice em disco, para acervos que não caberiam em RAM.
 
+**MRR (Mean Reciprocal Rank)** — Média do inverso da posição do primeiro acerto. Mede se o
+documento certo veio no topo, não apenas se veio. Sensível à ordem, ao contrário do `hit_rate`.
+
+**Golden standard (gabarito)** — O conjunto de respostas ou documentos corretos contra o qual
+se mede. Sem ele não há `context recall` nem precisão: só impressão. Gabarito ruim reprova sistema
+bom, e é a falha mais cara de uma avaliação.
+
 **Recall@k** — Fração dos documentos verdadeiramente relevantes que apareceram nos
 top-k. A métrica de recuperação que mais importa.
 
@@ -216,12 +243,34 @@ alto demais dilui o contexto e encarece.
 
 **Sparse retrieval** — Recuperação léxica (BM25).
 
+**Hybrid retriever** — O objeto que implementa _hybrid search_. No Milvus é `hybrid_search` com
+um ranker no servidor; no LangChain é o `EnsembleRetriever`, que funde no cliente.
+
 **Hybrid search** — Combina densa e esparsa. Quase sempre melhor que qualquer uma
 isolada, porque as duas falham em situações diferentes.
 
 **RRF (Reciprocal Rank Fusion)** — Fusão de rankings por soma de
 `1/(k + posição)`. Não exige que os scores sejam comparáveis entre si — daí ser o
 método padrão de fusão.
+
+**Tool calling** — O modelo emite uma chamada de função estruturada em vez de texto livre, e o
+código a executa. É o que separa um agente de um pipeline: no agente, a decisão de agir é do
+modelo.
+
+**Top-p (nucleus sampling)** — Amostragem que considera só os tokens cuja probabilidade acumulada
+chega a `p`. Alternativa à temperatura para controlar variedade. Para avaliação, o que se quer é
+decodificação determinística, não ajuste fino de variedade.
+
+**LangGraph** — Biblioteca do ecossistema LangChain para descrever o pipeline como grafo de estado:
+nós que transformam o estado, arestas condicionais que decidem o caminho. É o que permite laço e
+desvio, e por isso é a base do CRAG, do Self-RAG e dos exemplos agentic.
+
+**Vision model** — Modelo que recebe imagem como entrada e devolve texto. Num RAG multimodal ele
+normalmente entra depois da recuperação, para descrever o que foi recuperado.
+
+**Text-to-image** — O inverso: texto entra, imagem sai. Aparece em pipelines multimodais como
+etapa de saída, e o que ela gera não é fundamentado em fonte nenhuma — vale lembrar disso antes de
+chamar o conjunto de "RAG".
 
 **Reranking** — Reordenar os top-k com um modelo mais caro e preciso. Melhor
 relação custo/ganho de todo o pipeline RAG.
@@ -243,6 +292,15 @@ hipotética e você busca pelo embedding dela. Funciona porque resposta se parec
 mais com documento do que pergunta se parece.
 
 **Query expansion** — Enriquecer a query com sinônimos e termos relacionados.
+
+**Query construction** — Traduzir a pergunta em linguagem natural para a linguagem de consulta da
+fonte: SQL, Cypher, filtro de metadado. Não é busca vetorial, e ainda é RAG — o que se recupera
+vem de fora do modelo e entra no contexto.
+
+**HyDE (Hypothetical Document Embeddings)** — Gerar com o LLM um documento hipotético que
+_responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A intuição: resposta
+se parece mais com resposta do que pergunta se parece com resposta. Custa uma chamada de LLM antes
+de recuperar.
 
 **Query routing** — Direcionar a query para a fonte certa. Roteamento lógico usa
 regras/LLM; semântico usa similaridade com descrições das fontes.
@@ -563,6 +621,23 @@ no baseline `TS`, os próprios chunks de texto.
 **Comprehensiveness / diversity / empowerment / directness** — Os quatro critérios do
 paper GraphRAG, julgados por comparação pareada. `directness` entra como teste de
 validade: é o critério em que o RAG vetorial vence.
+
+**Entity extraction** — Extrair entidades e relações do texto para construir o grafo. É a etapa
+mais cara da indexação do GraphRAG, porque roda um LLM sobre o corpus inteiro.
+
+**Leiden** — Algoritmo de detecção de comunidades em grafo, usado hierarquicamente pelo GraphRAG
+para particionar o grafo em níveis. Cada nível é uma partição mutuamente exclusiva e coletivamente
+exaustiva dos nós.
+
+**Iterative retrieval** — Laço com número fixo de iterações: recupera, gera, repete N vezes. O
+freio é o contador.
+
+**Recursive retrieval** — Laço com condição de saída e profundidade máxima, em que cada volta
+refina a consulta da anterior. O freio é a condição.
+
+**Judge module** — O componente que decide se o laço continua. No paper Modular RAG ele vem
+acompanhado de um `scheduling module`, que é quem de fato para; nos exemplos deste repositório
+existem os juízes e não existe o escalonador.
 
 **GraphRAG** — Constrói grafo de entidades e relações a partir do corpus.
 Responde perguntas de síntese global que busca vetorial não alcança.

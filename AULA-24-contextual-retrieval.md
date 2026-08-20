@@ -421,7 +421,7 @@ Responda sem consultar:
 
 `contextual retrieval` · `semantic isolation` · `contextualized chunk` · `prompt caching` ·
 `hit rate` · `MRR` · `Pass@K` · `exact match` · `golden standard` · `hybrid retriever` ·
-`Cohere rerank` · `BM25` · `multi-representação`
+`BM25` · `multi-representação`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
@@ -432,6 +432,6 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 > Duas aulas seguidas encontraram o mesmo padrão em lugares diferentes: a Aula 23, um capítulo sem
 > código; esta, código que implementa a técnica e mede o que não deveria. A Aula 25 volta à situação da
-> 23 — `10-AdvanceRAG/03-ModularRAG/` tem apenas o PDF do paper, verificado por `find` durante a Aula
+> 23 — `10-AdvanceRAG/03-ModularRAG/` tem o PDF do paper e um `.env.example` que declara a própria ausência de scripts, verificado por `find` durante a Aula
 > 23 —, e o método já está estabelecido: ler a fonte primária, separar o que ela mede do que promete, e
 > nomear o custo.

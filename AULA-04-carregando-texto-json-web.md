@@ -261,7 +261,9 @@ O arquivo roda os dois modos em sequência. Compare a saída do default com a de
 ## Quebre de propósito
 
 **1. Remova o `SoupStrainer`.** Em `03-LangChain-WebBaseLoader.py`, descomente a versão
-ingênua das linhas 6–11 e desative o filtro. Meça o tamanho do `page_content` antes e depois.
+ingênua das linhas **5 a 11** e desative o filtro. Meça o tamanho do `page_content` antes e depois.
+A linha 5 é a que constrói o `loader`: descomentar só de 6 em diante deixa `docs = loader.load()`
+sem `loader` definido, e o script morre com `NameError` antes de medir coisa alguma.
 Quanto do que você indexaria seria menu e rodapé?
 
 **2. Aponte o `TextLoader` para um PDF.** Em vez de `.json`, dê a ele um `.pdf`. Observe o

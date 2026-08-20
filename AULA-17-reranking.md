@@ -156,7 +156,7 @@ Duas observações que só a leitura do arquivo dá:
 2. **Não é um checkpoint ColBERT treinado.** É BERT base, e o comentário do autor na linha 35 admite
    que pode ser substituído por _"a model fine-tuned specifically for ColBERT"_.
 
-Ou seja: o arquivo demonstra o **mecanismo de late interaction** — guardar um vetor por token e
+Ou seja: o arquivo guarda um vetor por token, mas **não** faz late interaction — guardar um vetor por token e
 comparar token a token —, não ColBERT em qualidade de produção. Quem rodar esperando resultado de
 ColBERT vai se decepcionar, e a decepção seria com a expectativa, não com o código.
 

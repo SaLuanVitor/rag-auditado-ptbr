@@ -392,7 +392,7 @@ Responda sem consultar:
 ## Vocabulário
 
 `multimodal embedding` · `ImageBind` · `multi2vec-bind` · `near_text` · `near_image` · `near_media` ·
-`mediaType filter` · `filtered search` · `base64` · `inference service` · `mem_limit` ·
+`mediaType filter` · `filtered search` · `inference service` ·
 `vision model` · `text-to-image`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
