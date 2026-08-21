@@ -2214,3 +2214,132 @@ vazio; irrestrito, devolve um arquivo.
 módulos" na Aula 01, conferi com `sed -n '88,99p' | grep -c "^|"` e obtive 11, o que sugeria nove
 estágios. Ler a tabela mostrou dez linhas de dados: o `grep` incluía o separador. A regra que salvou
 foi ler a coisa quando o comando é ambíguo.
+
+
+---
+
+## Varredura da classe 8 — exercício que não entrega. 307 receitas, 62 defeitos
+
+Terceira auditoria por classe, e a mais densa de todas: **20% de taxa de defeito**, contra 4% na
+classe das contagens. Quatro auditores, com o **ambiente disponível para executar** em vez de simular.
+
+O enumerador precisou de iteração, pela terceira vez no projeto. A primeira versão contava só item
+numerado e devolvia **zero** "Mão na massa" para as aulas 03 a 18 — o que eu sabia estar errado,
+porque havia consertado o da Aula 12 no mesmo dia. A razão: essas aulas escrevem a seção como
+**sequência de blocos de comando com prosa entre eles**, não como lista numerada. Contando as duas
+coisas: 129 + 130 = **259 receitas**, e os auditores enumeraram 307 de forma independente.
+
+| Lote | Aulas | Receitas | Defeitos |
+|---|---|---|---|
+| 1 | 00, 04, 07, 11, 14, 18, 22, 26 | 81 | 16 |
+| 2 | 01, 05, 09, 12, 16, 21, 24, 28 | 72 | 15 |
+| 3 | 02, 08, 13, 17, 20, 25 | 76 | 15 |
+| 4 | 03, 06, 10, 15, 19, 23, 27 | 78 | 16 |
+| | | **307** | **62** |
+
+### Os dois achados que só existem porque havia ambiente
+
+**A Aula 07 ensinava o inverso do que acontece.** Ela dizia que o splitter de tamanho fixo corta no
+meio de palavra e que o recursivo produz chunks "mais irregulares". Medido nos pins do curso: o fixo
+dá 20 chunks de **7 a 779** caracteres, **ignora** o `chunk_size=100` (nove avisos `Created a chunk of
+size 779`) e **nunca** parte palavra, porque só corta em `\n\n`. O recursivo, com os quatro
+separadores do arquivo, dá 72 chunks e **nenhum passa de 100** — e é **ele** que parte frase ao meio,
+ao cair no separador `" "`. A lição verdadeira é melhor que a escrita: quem respeita o `chunk_size` é
+o recursivo, e o preço de respeitá-lo é cortar onde a frase não acaba.
+
+**Na Aula 20, três templates não têm `{context_str}`.** As linhas 50, 64 e 79 declaram apenas
+`{query_str}`, e o `PromptTemplate` do LlamaIndex **descarta chave extra em silêncio**. Os blocos 3, 4
+e 5 respondem **sem o contexto recuperado**, de memória paramétrica. Quem compara as cinco saídas não
+compara modos de síntese — compara com-contexto contra sem-contexto. É a terceira camada do mesmo
+defeito: a aula dizia que `COMPACT` é compressão (era refine), o roteamento de slots foi explicado, e
+ninguém tinha notado que três dos templates não têm slot de contexto.
+
+### O padrão dos que impedem execução
+
+Quase todos são a mesma coisa: **o `cd` de uma receita não resolve os caminhos relativos que o script
+usa**, ou não parte de onde a receita anterior deixou o terminal. E o repositório mistura duas bases de
+caminho — alguns scripts relativos ao próprio diretório, outros à raiz — sem que nada declare isso. A
+Aula 06 tem os dois tipos no mesmo módulo, com um único arquivo se corrigindo sozinho por `os.chdir`.
+
+Três que valem pelo que ensinam, os três medidos: `decay_rate=50.0` na Aula 17 não produz ordenação —
+a base fica negativa, a potência fracionária devolve **complexo** e o `sort` estoura com `TypeError`
+sem uma palavra sobre tempo; remover o `docstore` na Aula 15 levanta `ValidationError` na
+**construção**, antes de indexar; e trocar a tokenização na Aula 08 não degrada o ranking, **zera o
+vetor** — 11 termos contra zero, porque o vocabulário continua sendo construído por vírgula.
+
+### 35 dos 62 aplicados
+
+Em três etapas, com ordem deliberada: primeiro as contradições que eu mesmo criara, depois o que
+impede execução, depois o que mede vazio. **Restam 27**, todos da cauda de severidade menor.
+
+---
+
+## Passada de verificação sobre o próprio diff — 176 blocos, 42 defeitos meus
+
+Auditoria do inverso, e o passo que **fecha o laço**. As três varreduras por classe abriam trabalho
+novo a cada rodada, porque cada conserto gerava defeito. Esta revisou **apenas o meu diff** — escopo
+`origin/main..HEAD`, cinco commits, 723 linhas inseridas em 30 arquivos — contra a fonte, com
+instrução explícita de **não** procurar defeito novo no material. O que ela achou tem fim.
+
+| Lote | Aulas | Blocos revisados | Defeitos |
+|---|---|---|---|
+| 1 | 00-07 | 40 | 10 |
+| 2 | 08-15 | 37 | 8 |
+| 3 | 16-21 | 30 | 11 |
+| 4 | 22-28 + `GLOSSARIO` | 69 | 13 |
+| | | **176** | **42** |
+
+**24% dos blocos que eu escrevi tinham defeito.** Eu estimava 11%. A distribuição é desigual e
+informativa: a Aula 21, editada três vezes, passou com **zero** em 12 blocos; a Aula 00 teve **cinco
+em cinco**.
+
+### O pior achado é sobre o método, não sobre o curso
+
+A **Aula 15 citava literalmente, entre aspas, uma frase que eu apaguei da Aula 22** na mesma sessão — e
+a substituição diz o contrário. `grep -rn "comparação uma comparação"` achava a frase só na Aula 15 e
+no dossiê que a espelha. Citar texto apagado é a forma mais grave do problema dos irmãos, porque as
+aspas afirmam que a outra aula diz aquilo.
+
+E um caso resume o resto: na Aula 22, o discriminador "(sem gabarito) / (com gabarito)" que eu escrevi
+é falsificado pelo que **eu mesmo acrescentei 107 linhas abaixo, no mesmo arquivo, na mesma sessão**.
+
+### Cinco modos de falha novos, todos medidos
+
+1. **Recuar além da evidência.** Na Aula 17 removi "similaridade não normalizada", que era falso, e pus
+   um "não sei" — quando o docstring de `similarity_search_with_relevance_scores` responde: "Return
+   docs and relevance scores in the range [0, 1]". E o recuo **enfraqueceu a tese**: a
+   incomensurabilidade não é de escala, é de significado. Hedge não é automaticamente mais seguro.
+2. **Generalizar do meu ambiente para o do curso.** Os cinco defeitos da Aula 00 têm essa raiz.
+   `numpy==1.26.4` tem `Tag: cp313-cp313-win_amd64` **e está instalado no venv que eu montei**, sob
+   Python 3.13.11 — eu afirmei que trava em cp312. O `requirements` recomendado **pina**
+   `setuptools==76.0.0`, e eu afirmei que não pina. E `from dotenv` está em 82 arquivos, contra a minha
+   afirmação de que só o `langgraph-prebuilt` tinha uso rastreável — a conclusão prática que tirei
+   prejudicaria o leitor.
+3. **Citar texto que eu apaguei.** O caso da Aula 15.
+4. **Apresentar string limpa como medição literal.** Escrevi `Use invoke instead.` marcado como
+   **medido**; a saída real é `Use :meth:\`~invoke\` instead.`. Limpar uma citação que se declara
+   literal é falsificá-la.
+5. **Contar sobre saída que eu mesmo truncei.** `grep | head -30` escondeu o nono modo do enum.
+
+### E as formas já catalogadas reincidiram
+
+Cerca de dez casos de "corrigi no ponto citado e deixei a frase antiga viva", incluindo dois que eu
+**achava** consertados — a Aula 20 tem um bloco novo dizendo "a prosa é que precisa acertar" e a prosa
+seguia errada 55 linhas abaixo. Quatro de conclusão além da evidência. Seis de caminho de arquivo de
+biblioteca, contra uma regra escrita por mim. Quatro bastidores de auditoria em texto de aluno, um
+deles **agravado** pelo meu conserto: a referência opaca "regra 7 do protocolo de citação" virou, na
+tentativa de ancorá-la, o caminho do arquivo de instruções do auditor dentro da aula.
+
+Mais três de tipo menor mas mecanicamente detectável: off-by-one numa contagem reproduzível (18.501
+contra 18.502), linha de tabela GFM quebrada em duas linhas físicas, e palavra corrompida ao refluir
+parágrafo ("Você não vai **ever** o LLM responder").
+
+### O que isto estabelece como orçamento
+
+**Um em cada quatro blocos que eu escrevo tem defeito.** Não é argumento para parar de consertar; é
+argumento para que **toda rodada de conserto tenha a sua própria passada de verificação**, e para que
+o custo de consertar seja orçado, não presumido zero. Os 27 defeitos restantes da classe 8 devem
+gerar uns sete novos.
+
+O `avaliacao/DOSSIE-8-AULAS-SEM-NOTA.md` ficou **intocado** de propósito, espelhando a frase apagada:
+é registro histórico do que a aula dizia, e corrigi-lo apagaria a evidência do erro.

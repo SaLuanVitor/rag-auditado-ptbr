@@ -135,6 +135,41 @@ A contagem saiu; a lista fica:
   `setuptools` 81). Antes de declarar um limite de ambiente, pergunte se o limite é do ambiente ou da
   falta de vontade de montá-lo. E note o que basta: as perguntas eram sobre **mecanismo**, então sete
   pacotes resolveram o que os 274 do curso resolveriam — sem torch, sem GB de download.
+- NOVA, de 21/08 (passada de verificação): **um em cada quatro blocos que eu escrevo tem defeito.**
+  Quatro auditores revisaram só o meu diff de uma sessão — 176 blocos, 723 linhas — e acharam **42**
+  defeitos meus. Eu estimava 11%; era 24%. Isso não é argumento para parar de consertar; é orçamento:
+  **toda rodada de conserto precisa da sua própria passada de verificação**, e ela tem de revisar só
+  o diff, contra a fonte, sem procurar defeito novo no material. Varredura por classe abre trabalho a
+  cada rodada; passada sobre o diff fecha.
+- NOVA, de 21/08: **recuar além da evidência não é mais seguro que avançar além dela.** Removi
+  "similaridade não normalizada", que era falso, e pus um "não sei" no lugar — quando o docstring de
+  `similarity_search_with_relevance_scores` responde ("Return docs and relevance scores in the range
+  [0, 1]"). Pior: o recuo **enfraqueceu a tese do parágrafo**, porque a incomensurabilidade que
+  sobrava não era de escala e sim de significado, e o leitor ficou sem saber por que a soma é errada.
+  Ao remover um excesso, a pergunta é **se a fonte responde** — não se dá para não responder.
+- NOVA, de 21/08: **não generalize do seu ambiente de verificação para o ambiente do material.** Os
+  cinco defeitos da AULA-00 têm essa raiz: escrevi sobre os `requirements` do curso a partir de um
+  venv meu de sete pacotes, sem abrir os `requirements`. O caso que dói: afirmei que `numpy==1.26.4`
+  trava em cp312 quando o `numpy-1.26.4` **instalado no venv que eu mesmo montei** tem
+  `Tag: cp313-cp313-win_amd64`, sob Python 3.13.11. O ambiente que eu construí para verificar coisas
+  falsificava a afirmação, e eu não consultei. Se a frase é sobre o material, a fonte é o material.
+- NOVA, de 21/08: **nunca cite texto que você apagou.** A AULA-15 citava literalmente, entre aspas,
+  uma frase que eu havia removido da AULA-22 horas antes — e a substituição dizia o contrário. É a
+  forma mais grave do problema dos irmãos, porque as aspas **afirmam** que a outra aula diz aquilo.
+  Ao substituir qualquer frase citável, `grep` o trecho apagado no repositório inteiro antes de
+  commitar.
+- NOVA, de 21/08: **citação que se declara literal não pode ser limpa.** Escrevi
+  "`Use invoke instead.`" marcado como **medido**, e a saída real é "`Use :meth:`~invoke` instead.`".
+  Arrumar a pontuação de uma string apresentada como medição é falsificá-la. Ou cole o byte exato, ou
+  descreva o conteúdo em prosa sem aspas.
+- NOVA, de 21/08: **enumerador erra na primeira tentativa, sempre, e sempre por definir a unidade
+  errada.** Três vezes numa sessão: 1422 candidatas de contagem quando eram 440 (faltava o
+  discriminador de referência ao repositório); zero receitas em treze aulas quando eram 129 (contava
+  só item numerado, e aquelas aulas usam blocos de comando); e dez órfãs no glossário quando eram
+  três (títulos com barra tratados como string única). Iterar não é desperdício — **despachar
+  auditores sobre a primeira versão é.** E imprima sempre o que o filtro descartou, com o motivo:
+  filtro de ruído é afirmação sobre o que não importa, e afirmação não verificada é a falha dominante
+  deste projeto.
 
 ESTADO DA AVALIAÇÃO: QUATRO rodadas completas, 29 de 29 cada. Curso em 231/348 = 66,4% (R4).
 Classificação pela RUBRICA: REQUER REVISÃO, quatro rodadas no mesmo rótulo. Na R4 o percentual

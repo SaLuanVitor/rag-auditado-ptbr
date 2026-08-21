@@ -150,6 +150,37 @@ que eu mesmo truncei (`head -30` escondeu o nono modo); ampliei o escopo de um `
 rigoroso e tornei a frase falsa (o PDF casa `leiden`); e quase "corrigi" um acerto porque o meu
 comando de conferência era mais frouxo que o texto (`grep -c "^|"` conta o separador da tabela)
 
+**Varredura da classe 8 — exercício que não entrega: feita.** 307 receitas verificadas por quatro
+auditores, **62 defeitos — 20%**, cinco vezes a taxa da classe das contagens. Era a mais densa que
+restava. **35 aplicados; restam 27**, todos da cauda de severidade menor. Detalhe na seção "Varredura
+da classe 8" do GATE
+**📌 Dois achados que só existem porque havia ambiente para executar.** A Aula 07 **ensinava o
+inverso**: o splitter fixo dá 20 chunks de 7 a 779 caracteres, ignora o `chunk_size` e nunca parte
+palavra; o recursivo dá 72, nenhum acima de 100, e é ele que parte frase ao meio. E na Aula 20 três
+templates **não têm `{context_str}`** — o `PromptTemplate` do LlamaIndex descarta a chave em silêncio,
+então três dos cinco blocos respondem sem o contexto recuperado, e o exercício que compara "os cinco
+modos" compara com-contexto contra sem-contexto
+**PASSADA DE VERIFICAÇÃO SOBRE O PRÓPRIO DIFF: feita, e é o passo que fecha o laço.** Quatro
+auditores revisaram **apenas** o que esta sessão editou — `origin/main..HEAD`, 723 linhas em 30
+arquivos — contra a fonte, com instrução de **não** procurar defeito novo no material. **176 blocos,
+42 defeitos meus: 24%.** Eu estimava 11%. Varredura por classe abre trabalho a cada rodada; passada
+sobre o diff fecha. Detalhe na seção "Passada de verificação" do GATE
+**⚠️ O pior achado da sessão é sobre o método, não sobre o curso:** a Aula 15 citava literalmente,
+entre aspas, uma frase que eu havia apagado da Aula 22 na mesma sessão — e a substituição dizia o
+contrário. E na Aula 22 o discriminador que eu escrevi é falsificado pelo que **eu mesmo acrescentei
+107 linhas abaixo, no mesmo arquivo**. Cinco modos de falha novos foram para o `PROMPT-CONTINUAR`,
+sendo o mais desconfortável este: afirmei que `numpy==1.26.4` trava em cp312 quando o `numpy-1.26.4`
+**instalado no venv que eu montei** tem `Tag: cp313-cp313-win_amd64`. O ambiente que construí para
+verificar falsificava a afirmação, e eu não consultei
+**📌 O orçamento que isso estabelece:** um em cada quatro blocos que eu escrevo tem defeito. Aplicar
+os 27 restantes da classe 8 deve gerar uns sete novos. Consertar **não é gratuito**, e toda rodada de
+conserto precisa da sua própria passada de verificação. Trate isso como parte do custo, não como
+imprevisto
+**📌 A nota do curso NÃO mudou com nada disto**, e é por desenho: as notas da R6 são pré-conserto.
+O curso segue em **234/348 = 67,2%**, **Requer revisão**. A única coisa que produz número comparável
+é uma **sétima rodada completa nas 29** — e ela só faz sentido depois de as oito abaixo de 50% serem
+consertadas, senão mede material que se sabe defeituoso
+
 **📌 Próximo trabalho, na ordem:** (1) **consertar as oito abaixo de 50% da R6** — 27, 00, 08, 09,
 23, 24, 25, 26 — sabendo que a R5 fez isso com as oito da R4 e a média do curso não se moveu, porque
 apareceram as oito seguintes; (2) **sétima rodada nas oito**, para medir os consertos; (3) opcional: criar uma seção "Otimização de índice" no
