@@ -190,6 +190,25 @@ O curso segue em **234/348 = 67,2%**, **Requer revisão**. A única coisa que pr
 é uma **sétima rodada completa nas 29** — e ela só faz sentido depois de as oito abaixo de 50% serem
 consertadas, senão mede material que se sabe defeituoso
 
+**CLASSE 8 FECHADA: 62 de 62.** E uma segunda passada de verificação, agora de **escopo apertado**
+(`596f94c..HEAD`, só os 26 consertos da classe 8, não a sessão toda): 31 blocos, **9 defeitos meus**.
+Um auditor no lote pesado e eu no leve, porque a cota de agentes esgotou no meio
+**⚠️ E ela revelou a forma de erro que faltava no catálogo: prescrição que não funciona.** Todas as
+outras formas eram sobre a verdade da frase; esta é sobre a **executabilidade da instrução**. Escrevi
+"ponha `random.seed(42)` antes da linha 23" quando a linha **22** é a que sorteia os vetores — a
+semente ficava depois do sorteio e o conserto derrotava o próprio propósito, com toda a análise em
+volta correta. E mandei trocar um corpus por um do domínio errado, sem checar que **nenhum** arquivo
+do repositório tem tamanho para aquele exercício funcionar. É pior que erro de fato, porque quem paga
+é o leitor que obedece: alegação falsa o leitor atento desconfia, instrução que não funciona ele
+descobre gastando tempo
+**📌 Duas melhorias de método que valem mais que os consertos.** (a) **Peça ao verificador o que**
+**passou**, não só o que falhou — relatório sem defeitos era indistinguível de relatório sem
+trabalho, e exigir o veredito de cada reprodução revelou que eu havia escrito `draw_ascii()` sem
+checar que o método existe (existe). (b) **Briefing não deve oferecer categoria onde esconder erro**
+**próprio** — o contrato dizia "o clone deve terminar com apenas dois untracked pré-existentes", que
+era um balde pronto para arquivo do auditor. Com o clone limpo, virou "deve terminar **vazio**".
+Exceção nomeada num contrato é porta
+
 **📌 Próximo trabalho, na ordem:** (1) **consertar as oito abaixo de 50% da R6** — 27, 00, 08, 09,
 23, 24, 25, 26 — sabendo que a R5 fez isso com as oito da R4 e a média do curso não se moveu, porque
 apareceram as oito seguintes; (2) **sétima rodada nas oito**, para medir os consertos; (3) opcional: criar uma seção "Otimização de índice" no

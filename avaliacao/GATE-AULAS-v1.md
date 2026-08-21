@@ -2343,3 +2343,67 @@ gerar uns sete novos.
 
 O `avaliacao/DOSSIE-8-AULAS-SEM-NOTA.md` ficou **intocado** de propósito, espelhando a frase apagada:
 é registro histórico do que a aula dizia, e corrigi-lo apagaria a evidência do erro.
+
+
+---
+
+## Passada de verificação de escopo apertado — e a forma de erro que faltava
+
+Segunda passada sobre o próprio diff, e a primeira com **escopo apertado**: `596f94c..HEAD`, os 26
+consertos da classe 8, não a sessão toda. Revisar de novo o que já passou seria desperdício e, pior,
+criaria ilusão de cobertura nova.
+
+Um auditor no lote pesado (cinco aulas, as de maior mudança) e **eu no lote leve** (doze aulas), porque
+a cota de agentes esgotou no meio. **31 blocos revisados, 9 defeitos — 29%.**
+
+### A forma que faltava no catálogo: prescrição que não funciona
+
+Todas as formas de erro catalogadas até aqui eram sobre a **verdade da frase**. Duas destas nove são
+sobre a **executabilidade da instrução**, e é uma classe distinta:
+
+- **AULA-10.** Escrevi "ponha `random.seed(42)` antes da linha 23". A linha 22 é a que sorteia os
+  vetores — semear antes da 23 põe a semente **depois** do sorteio. O acervo continua irreprodutível e
+  só o vetor de consulta fica estável, que é o oposto do que o parágrafo promete. Toda a análise em
+  volta estava certa; a instrução derrotava o próprio propósito.
+- **AULA-15.** Mandei trocar o corpus "por um arquivo do acervo de turismo" numa aula cujas perguntas
+  são sobre o jogo — o leitor trocaria o corpus, manteria as perguntas e a recuperação não acharia
+  nada. E ao checar as alternativas descobri que **nenhuma funciona**: os arquivos do domínio certo têm
+  779 e 695 bytes, *menores* que o corpus embutido, e o maior texto de todo o `99-EN` tem 4.462 —
+  então nem trocando pelo maior o `chunk_size=8000` deixa de dar um pai só. O exercício não é
+  consertável trocando arquivo, e agora diz isso, com as duas saídas reais.
+
+É pior que erro de fato, porque **quem paga é o leitor que obedece**. Uma alegação falsa o leitor
+atento pode desconfiar; uma instrução que não funciona ele descobre gastando tempo.
+
+### As reincidências
+
+- **Dois fragmentos da frase antiga** sobrevivendo à emenda, na AULA-17. Um deixou um sujeito sem
+  predicado ("O caso em que o documento certo estava em 7º e sobe para 1º"); o outro deixou "junto com
+  a similaridade" pendurado no fim de uma frase que não o comporta. Emendei texto novo em texto velho
+  sem reler a junta.
+- **Contradição interna** na AULA-20: a linha 118 afirmava que a cerca ```json levanta exceção e o
+  texto novo mediu que ela é tolerada. O arquivo afirmava as duas coisas.
+- **Dois na AULA-09**, e o segundo é interessante: a aula já respondia "trunca" em dois lugares, e o
+  exercício novo mandava o leitor descobrir isso. Mas o auditor mediu que o `pymilvus` 2.5.4 **recusa
+  no cliente** na inserção por colunas, com `ParamError: length of string exceeds max length` — então
+  o "trunca em silêncio" das armadilhas provavelmente estava errado também, e o conserto virou dois.
+- **Dois de superfície** na AULA-05: "na linha 1" cobrindo dois arquivos quando um tem na linha 2, e
+  uma quebra de linha estilhaçada no meio de uma frase.
+
+### O que passou, e isso importa registrar
+
+Pedi ao auditor que dissesse **o que conferiu**, não só o que falhou — nas passadas anteriores eu ficava
+sem saber se uma reprodução tinha sido feita ou apenas omitida. Conferiram: a mesma collection nos
+01-04 e o `drop_collection` nos cinco; zero `random.seed`; a nota da linha 100 e os literais na
+f-string do range-search; o filtro escrito duas vezes; o `AlreadyExistError` ausente e os nomes reais;
+o `last_accessed_at` reescrito antes do `return`; a soma em vez do produto, contra um docstring que
+documenta produto com `exp`; o `Return a JSON object.` sem schema; a cerca tolerada; os PDFs
+diferentes e o `lang='chi_sim'`. No meu lote: `draw_ascii` existe no `langgraph` 0.2.69 — eu havia
+escrito isso **sem checar** —, o `CSVLoader` devolve 6 `Document`, e a AULA-07 não tem retriever.
+
+### Nota de método sobre o contrato
+
+Atualizei uma linha do briefing que estava dando desculpa pronta: até aqui ela dizia "o clone deve
+terminar com apenas dois untracked pré-existentes". Com o clone limpo, passou a ser "deve terminar
+**vazio**" — e qualquer coisa que apareça é do auditor, que tem de autodenunciar. A instrução anterior
+oferecia a um auditor descuidado uma categoria onde esconder arquivo próprio.

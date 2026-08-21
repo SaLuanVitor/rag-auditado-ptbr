@@ -170,6 +170,26 @@ A contagem saiu; a lista fica:
   auditores sobre a primeira versão é.** E imprima sempre o que o filtro descartou, com o motivo:
   filtro de ruído é afirmação sobre o que não importa, e afirmação não verificada é a falha dominante
   deste projeto.
+- NOVA, de 21/08 (passada de escopo apertado): **quando o conserto é uma prescrição, execute a**
+  **prescrição.** Todas as outras regras desta lista são sobre a **verdade da frase**. Esta é sobre a
+  **executabilidade da instrução**, e é classe distinta: escrevi "ponha `random.seed(42)` antes da
+  linha 23" quando a linha **22** é a que sorteia os vetores — a semente ficava **depois** do sorteio
+  e o conserto derrotava o próprio propósito, com toda a análise em volta correta. E mandei trocar um
+  corpus "por um arquivo do acervo de turismo" numa aula cujas perguntas são sobre outro assunto,
+  sem checar que nenhum arquivo do repositório tem tamanho para o exercício funcionar. É pior que
+  erro de fato, porque **quem paga é o leitor que obedece**: alegação falsa o leitor atento
+  desconfia; instrução que não funciona ele descobre gastando tempo. Antes de escrever "faça X",
+  faça X.
+- NOVA, de 21/08: **peça ao verificador o que PASSOU, não só o que falhou.** Nas primeiras passadas
+  eu pedia só defeitos, e ficava sem saber se uma reprodução havia sido feita ou apenas omitida — um
+  relatório sem defeitos era indistinguível de um relatório sem trabalho. Listar nominalmente as
+  alegações a reproduzir, e exigir o veredito de cada uma, revelou que eu havia escrito
+  `draw_ascii()` **sem checar** que o método existe (existe) e que o `CSVLoader` devolve 6 documentos
+  num arquivo de 8 linhas (devolve).
+- NOVA, de 21/08: **briefing não deve oferecer categoria onde esconder erro próprio.** O contrato dos
+  auditores dizia "o clone deve terminar com apenas dois untracked pré-existentes" — o que dava a um
+  auditor descuidado um balde pronto para arquivo dele. Com o clone limpo, virou "deve terminar
+  **vazio**", e qualquer coisa que apareça é dele. Exceção nomeada num contrato é porta.
 
 ESTADO DA AVALIAÇÃO: QUATRO rodadas completas, 29 de 29 cada. Curso em 231/348 = 66,4% (R4).
 Classificação pela RUBRICA: REQUER REVISÃO, quatro rodadas no mesmo rótulo. Na R4 o percentual
