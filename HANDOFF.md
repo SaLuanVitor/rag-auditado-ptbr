@@ -117,6 +117,39 @@ checkpoint, "hipótese" descrevendo o modelo e não o autor), e o resto é ressa
 "Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.11.17; não executei."
 Ela nomeia **o que leu** e **o que não fez**. É o padrão que os consertos desta varredura adotaram, e
 o que se deve exigir de qualquer ressalva nova
+**Varredura da classe 4: feita.** 595 contagens do curso reproduzidas por comando, em quatro lotes.
+**24 defeitos — 96% das contagens conferem.** Isso é informação sobre o material: ele erra menos em
+contagem do que a história sugeria, e o erro dominante **não é aritmética, é convenção**. Dezoito dos
+24 são um só problema em duas formas opostas, as duas sobre o `.env.example` oculto que existe em
+todo diretório de módulo: as Aulas 04, 05, 06, 11, 12 e 13 contam **sem** ele (número baixo demais);
+as Aulas 21, 22, 23 e 25 citam `ls` e dão o número do `ls -A` (comando errado para o número certo).
+Qual convenção é a certa ficou **provado**: a alegação central da Aula 03 só fecha se o oculto contar,
+porque `grep -r` varre ocultos. Detalhe na seção "Varredura da classe 4" do GATE
+**📌 O enumerador precisou de uma iteração, e isso é o padrão:** a primeira versão devolveu 1422
+candidatas, 49 por aula, implausível. Faltava o discriminador de que contagem só é verificável se o
+parágrafo referencia o repositório. Com ele, 440. **Enumerador é gerador de candidatas** — a terceira
+vez que este projeto reaprende isso, depois do `duplicata-semantica.js` e do enumerador de ressalvas
+**AMBIENTE MONTADO.** Venv isolado sob o scratchpad, com os **pins exatos** do curso: `langchain-core
+0.3.33`, `langchain-community 0.3.16`, `langchain-openai 0.3.3`, `langgraph 0.2.69`, `pymilvus 2.5.4`,
+`llama-index-core 0.11.17`, `ragas 0.2.15`, `numpy 1.26.4`, `jq 1.8.0`. **Não** os 274 pacotes: as
+perguntas em aberto eram sobre mecanismo e nenhuma exigia torch, chromadb ou onnxruntime — que são
+justamente os que travam o curso em Python 3.12. O miniconda base não foi tocado
+**📌 Oito limites declarados viraram medição**, e sete confirmam o que as aulas previram: o
+`recursion_limit` 25 do LangGraph; os avisos de depreciação do `llm(...)` e do
+`get_relevant_documents`, com versão e alvo de remoção; a equivalência de `model=`/`model_name=`; o
+`ValueError` do `JSONLoader`; e o `WeightedRanker`, cuja assinatura `(self, *nums)` fecha a ressalva
+da Aula 11 por completo — posição não é o canal usado, é o único aceito. **Uma virou defeito:** o
+`ragas` 0.2.15 tem `LLMContextPrecisionWithoutReference`, então a causa que a Aula 22 atribui vale
+para o recall e não para a precisão. Dois auditores suspeitaram disso sem poder provar
+**📌 E montar o ambiente rendeu um defeito que nenhuma leitura daria:** o `pymilvus==2.5.4` que o
+curso pina importa `pkg_resources`, **removido no `setuptools` 81**, e o requirements não pina
+`setuptools`. Instalar o curso hoje num ambiente limpo quebra o módulo de banco vetorial. Registrado
+na Aula 00, junto com o fato de que `numpy==1.26.4` e `onnxruntime==1.19.2` pedem **Python 3.12**
+**⚠️ Três dos 24 defeitos eu criei nesta sessão**, e os três de formas diferentes: contei sobre saída
+que eu mesmo truncei (`head -30` escondeu o nono modo); ampliei o escopo de um `grep` para ser mais
+rigoroso e tornei a frase falsa (o PDF casa `leiden`); e quase "corrigi" um acerto porque o meu
+comando de conferência era mais frouxo que o texto (`grep -c "^|"` conta o separador da tabela)
+
 **📌 Próximo trabalho, na ordem:** (1) **consertar as oito abaixo de 50% da R6** — 27, 00, 08, 09,
 23, 24, 25, 26 — sabendo que a R5 fez isso com as oito da R4 e a média do curso não se moveu, porque
 apareceram as oito seguintes; (2) **sétima rodada nas oito**, para medir os consertos; (3) opcional: criar uma seção "Otimização de índice" no

@@ -1,6 +1,6 @@
 # AULA 05 — PDF de verdade: layout, OCR e hierarquia
 
-**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/04-PDFFileLoading/` (13 arquivos) e `/03-ParsingImageAndTextData/` (3 arquivos)
+**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/04-PDFFileLoading/` (14 arquivos) e `/03-ParsingImageAndTextData/` (4 arquivos) — nos dois casos contando o `.env.example`, que o `ls` simples esconde
 
 ---
 
@@ -68,7 +68,8 @@ está na estrutura em vez de estar no texto.
 
 ## Parte 1 — Extração: as seis abordagens
 
-`04-PDFFileLoading/` tem **13 arquivos**, e a contagem por _abordagem de biblioteca_ é seis —
+`04-PDFFileLoading/` tem **14 arquivos** — 13 de código e o `.env.example` —, e a contagem por
+_abordagem de biblioteca_ é seis —
 o resto são comparações, análise de layout e hierarquia:
 
 | #   | Abordagem                        | Arquivo                                                          | Import-chave                                   |
@@ -205,7 +206,8 @@ a matéria-prima que _permitiria_ fazer small-to-big depois. Mesmo nome, mecanis
 
 ## Parte 2 — Quando o conteúdo é imagem
 
-`03-ParsingImageAndTextData/` tem 3 arquivos, e o terceiro muda o jogo:
+`03-ParsingImageAndTextData/` tem 4 arquivos — 3 de código e o `.env.example` —, e o terceiro muda
+o jogo:
 
 | Arquivo                         | Abordagem                                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------- |

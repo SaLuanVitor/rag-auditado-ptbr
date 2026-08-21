@@ -486,9 +486,11 @@ acontece na linha 123, depois da atribuição. Mova a linha 106 para o fim do ar
 quebra com `NameError`.
 
 **Um limite que declaro em vez de afirmar:** o dicionário passado ao template tem quatro chaves
-(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. Se o
-`format` do `PromptTemplate` do LangChain rejeita chaves extras ou as ignora silenciosamente é
-comportamento de biblioteca, e `langchain` **não está instalado neste ambiente** — a importação
+(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. A pergunta era se o `format` do `PromptTemplate` rejeita chaves extras ou as ignora, e agora está
+**medida** no `langchain-core` 0.3.33, a versão que o repositório pina: **ignora em silêncio.** Um
+template que declara duas variáveis, recebendo quatro, devolve a string formatada sem erro e sem
+aviso. É a pior das duas respostas possíveis, porque o dicionário errado não se anuncia. O que segue
+não mudou — a importação
 falha. Não vou afirmar o resultado sem executar. É a primeira coisa que você descobre ao rodar o
 arquivo, e está na lista da Mão na massa por isso.
 

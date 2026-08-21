@@ -204,7 +204,7 @@ O resultado é uma coleção com um único objeto, cujo campo de imagem não é 
 
 Julgamento: o arquivo não pode demonstrar o que se propõe. Como esqueleto — o que ele declara ser — a sequência das quatro etapas é útil e legível. Como exemplo executável, ele monta o pipeline sobre um placeholder.
 
-E há uma ironia de acervo: as **nove** imagens de `99-EN/assets/multimodal/` estão em disco, o arquivo `01` mostra como carregá-las em três linhas, e o `02` prefere um placeholder.
+E há uma ironia de acervo: as **nove** imagens de corpus de `99-EN/assets/multimodal/` — `01.jpg` a `09.jpg`, sem contar a `query_image.jpg`, que serve de consulta e leva o diretório a dez `.jpg` — estão em disco, o arquivo `01` mostra como carregá-las em três linhas, e o `02` prefere um placeholder.
 
 ### O corpus mental é de outro tutorial
 

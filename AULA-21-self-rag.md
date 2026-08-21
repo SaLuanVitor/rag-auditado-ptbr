@@ -1,6 +1,6 @@
 # AULA 21 — Self-RAG e estratégias dinâmicas de geração
 
-**Fase 7 — Geração** · Módulo do repo: `08-Generation/04-DynamicGenerationOptimizationStrategies/` — 1 script, 2 papers em PDF, 2 diagramas PNG (`ls` no diretório: 6 arquivos, contando o `.env.example`)
+**Fase 7 — Geração** · Módulo do repo: `08-Generation/04-DynamicGenerationOptimizationStrategies/` — 1 script, 2 papers em PDF, 2 diagramas PNG (`ls -A` no diretório: 6 arquivos; o `ls` simples mostra 5, porque o `.env.example` é oculto)
 
 ---
 
@@ -215,9 +215,9 @@ prompt autoriza a abstenção**, que foi o assunto central da Aula 19. Não vou 
 é `print(prompt.messages[0].prompt.template)` — leia antes de confiar.
 
 **2. `model_name=` aqui, `model=` nas outras quatro.** As cinco instanciações de `ChatOpenAI` estão
-nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam — `model_name` é
-apelido de `model` na classe —, e **não confirmei isso localmente**: `langchain_openai` não está
-neste ambiente nem em disco. A mistura no mesmo arquivo é o tipo de detalhe que a regra 9 do protocolo de
+nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam, e agora está **medido** no `langchain-openai` 0.3.3 que o repositório
+pina: `ChatOpenAI(model="gpt-4o")` e `ChatOpenAI(model_name="gpt-4o")` produzem o mesmo
+`.model_name`. A mistura no mesmo arquivo é o tipo de detalhe que a regra 9 do protocolo de
 citação existe para preservar: quem copia a linha errada e depois grepa por `model=` não encontra.
 
 **3. `format_docs` é definida e nunca usada.** As linhas `Self-RAG-FullImplementation.py:83-84` definem a função, e `grep -n
@@ -370,8 +370,9 @@ limite de iteração no seu código, o caso ruim não é resposta errada — é 
 meio do caminho.
 
 > ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25**
-> super-steps — valor da documentação da biblioteca, que não pude confirmar localmente porque
-> `langgraph` não está instalado neste ambiente — e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
+> super-steps — valor da documentação da biblioteca, e agora **medido**: num grafo de laço infinito, o `langgraph` 0.2.69 — a
+> versão que este repositório pina — levanta `GraphRecursionError: Recursion limit of 25 reached
+> without hitting a stop condition` — e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
 > confusa. O contador que falta no estado da aplicação não serve para evitar laço infinito;

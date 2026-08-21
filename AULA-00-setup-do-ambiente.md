@@ -135,6 +135,15 @@ Escolha o arquivo conforme sua máquina:
 | Ubuntu com GPU NVIDIA | `requirements_langchain_20250413_Ubuntu-with-GPU.txt` | `requirements_llamaindex_20250413_Ubuntu-with-GPU.txt` |
 | Ubuntu sem GPU        | `requirements_langchain_Ubuntu-with-CPU.txt`          | `requirements_llamaindex_Ubuntu-with-CPU.txt`          |
 
+> ⚠️ **Um pin que falta, e que quebra o `pymilvus` hoje.** Montei este ambiente para conferir as
+> alegações do curso e bati nisto: o `pymilvus==2.5.4` que o requirements pina importa
+> `pkg_resources`, que foi **removido do `setuptools` na versão 81**. Num ambiente novo, onde o pip
+> instala o `setuptools` mais recente, `import pymilvus` falha com
+> `ModuleNotFoundError: No module named 'pkg_resources'` — e o requirements não pina `setuptools`.
+> Instale `setuptools<81` antes, ou o módulo de banco vetorial não sobe. Note também que os dois
+> `NoGPU_Mac-Win` travam a versão do Python: `numpy==1.26.4` e `onnxruntime==1.19.2` têm wheel só
+> até cp312, então este requirements pede **Python 3.12** — não 3.13, não 3.14.
+
 Você está no Windows 11, então os dois `NoGPU_Mac-Win`. São 274 e 130 linhas de
 dependências pinadas — a instalação demora, `torch` é grande.
 
@@ -142,8 +151,10 @@ Existem ainda requirements especializados que você só instala quando a aula pe
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
 `requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
 acrescenta pouca coisa e **nada em comum entre os dois** — o do LangChain traz `colorama`,
-`langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz `colorama`,
-`llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos oito, o único com uso
+`langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz o mesmo `colorama` —
+que é o **único** acréscimo comum aos dois — mais
+`llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos **sete** pacotes
+distintos, o único com uso
 rastreável no repositório é o `langgraph-prebuilt`, importado por
 `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py` — o módulo da Aula 26, não o
 `00-SimpleRAG`. **Os dois `04_LangGraph_RAG*.py` não precisam deste arquivo:** importam apenas

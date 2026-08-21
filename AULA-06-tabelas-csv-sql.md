@@ -1,6 +1,6 @@
 # AULA 06 — Tabelas, CSV e bancos SQL como fonte
 
-**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/05-TableDataLoading/` (12 arquivos)
+**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/05-TableDataLoading/` (13 arquivos, contando o `.env.example`)
 
 ---
 
@@ -14,7 +14,7 @@ cabeçalho da coluna, ao rótulo da linha e, muitas vezes, a um título acima da
 como texto corrido e você indexa `1.842` solto — um token sem semântica, que nenhum embedding
 consegue conectar à pergunta "qual foi a receita do segundo trimestre?".
 
-Este é o segundo módulo mais numeroso da Fase 1: **12 arquivos** — mais que os 11 de texto
+Este é o segundo módulo mais numeroso da Fase 1: **13 arquivos** — mais que os 12 de texto
 simples, menos que os 13 de PDF da Aula 05.
 Não é acaso. **Julgamento:** é o reconhecimento de que tabela é onde a ingestão mais falha.
 
@@ -125,7 +125,7 @@ dado estruturado.
 
 ## Parte 3 — Tabelas dentro de PDF
 
-Aqui estão sete dos doze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
+Aqui estão sete dos treze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
 
 ### `camelot`
 
@@ -319,7 +319,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 texto que a Fase 1 produziu.
 
 > **Fase 1 concluída.** Aulas 04, 05 e 06 cobrem os subdiretórios numerados de `01-DataLoading/`:
-> texto e diretórios, dados estruturados, PDF, imagem e tabela. Fica de fora o `99-Others/`, com 8
+> texto e diretórios, dados estruturados, PDF, imagem e tabela. Fica de fora o `99-Others/`, com 9
 > arquivos de material alternativo — entre eles um `99-UsingTextract.py`, que extrai PDF com o
 > pacote PyPI `textract` (**não** o serviço AWS Textract, apesar do nome: a linha 1 é
 > `import textract` e não há `boto3` em nenhum arquivo do repositório) e seria uma sétima abordagem

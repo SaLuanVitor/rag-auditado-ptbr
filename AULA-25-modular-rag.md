@@ -1,6 +1,6 @@
 # AULA 25 — Modular RAG como arquitetura
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/03-ModularRAG/` — **dois arquivos, nenhum de código** (`ls`: o PDF do paper e um `.env.example` de 2 linhas)
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/03-ModularRAG/` — **dois arquivos, nenhum de código** (`ls -A`: o PDF do paper e um `.env.example` de 2 linhas; o `ls` simples mostra só o PDF)
 
 ---
 
@@ -58,7 +58,7 @@ A representação proposta é um grafo computacional em que **os nós são opera
 
 ## Parte 1 — O diretório, pela segunda vez
 
-`ls` em `10-AdvanceRAG/03-ModularRAG/` devolve dois arquivos: `ModularRAG-2407.21059v1.pdf`, com 2.583.566 bytes, e um `.env.example` de 116 bytes cujo conteúdo é idêntico ao do módulo de GraphRAG (`10-AdvanceRAG/03-ModularRAG/.env.example:1-2`):
+`ls -A` em `10-AdvanceRAG/03-ModularRAG/` devolve dois arquivos — o `ls` simples mostra um, porque o `.env.example` é oculto: `ModularRAG-2407.21059v1.pdf`, com 2.583.566 bytes, e um `.env.example` de 116 bytes cujo conteúdo é idêntico ao do módulo de GraphRAG (`10-AdvanceRAG/03-ModularRAG/.env.example:1-2`):
 
 ```python
 # This folder has no Python scripts (reference PDF only), so no API keys or

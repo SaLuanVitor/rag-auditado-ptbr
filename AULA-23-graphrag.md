@@ -1,6 +1,6 @@
 # AULA 23 — GraphRAG: quando o grafo ganha do vetor
 
-**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/01-GraphRAG/` — **dois arquivos**, e nenhum deles é código (`ls` no diretório: o PDF do paper e um `.env.example`)
+**Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/01-GraphRAG/` — **dois arquivos**, e nenhum deles é código (`ls -A` no diretório: o PDF do paper e um `.env.example`; o `ls` simples mostra só o PDF)
 
 ---
 
@@ -79,7 +79,8 @@ entidades.
 
 ## Parte 1 — O que este diretório contém, e o que isso significa
 
-`ls` no diretório devolve dois arquivos:
+`ls -A` no diretório devolve dois arquivos — o `ls` simples mostra um, porque o `.env.example` é
+oculto:
 
 | Arquivo                       | Tamanho             |
 | ----------------------------- | ------------------- |
@@ -109,7 +110,9 @@ dois não têm implementação: `01-GraphRAG/` e `03-ModularRAG/` contêm apenas
 planejamento para quem estuda por este repositório: a Aula 25 vai encontrar a mesma situação.
 
 Confirmação de que a ausência é real e não um arquivo fora de lugar: `grep -rlni` por `graspologic`,
-`leiden` ou `from graphrag` em **todo** o repositório — qualquer extensão — não retorna nada.
+`leiden` ou `from graphrag` em todo o repositório não retorna **nenhum arquivo de código** — o único
+acerto é o próprio PDF do paper, cujos bytes contêm `leiden`. Restrito a `--include=*.py` e
+`--include=*.ipynb`, o retorno é vazio.
 `networkx` retorna, e o retorno é instrutivo: aparece pinado em `91-Environment/requirements_*.txt` e
 usado de fato em `05-PreRetrieval/02-QueryTranslation/03-QueryClarification-BuildQueryClarificationTree.ipynb`,
 o notebook da Aula 13 — só que para **desenhar** uma árvore de clarificação (`nx.spring_layout`,

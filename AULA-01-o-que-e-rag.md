@@ -77,7 +77,8 @@ aparência de fundamentação.
 
 ### O pipeline que você vai realmente construir
 
-O loop de três passos é a versão de brochura. O pipeline de produção tem nove estágios, e eles
+O loop de três passos é a versão de brochura. O pipeline de produção tem dez estágios sobre nove
+módulos — o `04-VectorDB` aparece duas vezes, na indexação e na recuperação —, e eles
 mapeiam os módulos **centrais** do repositório — de `01-DataLoading` a `09-Evaluation`. Dois dos onze
 módulos de pipeline ficam de fora desta tabela de propósito: o `00-SimpleRAG`, que é o loop inteiro
 em miniatura (Aula 03), e o `10-AdvanceRAG`, cujas técnicas atravessam vários estágios ao mesmo

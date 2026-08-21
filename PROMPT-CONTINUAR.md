@@ -116,6 +116,25 @@ A contagem saiu; a lista fica:
   small-to-big se divide em três e fecha com uma frase — resíduo da versão anterior da célula — que
   diz o oposto. Ao editar: grep do termo em TODAS as aulas, no `GLOSSARIO.md`, e no restante do
   próprio arquivo, incluindo a célula que a nota anota.
+- NOVA, de 21/08 (varredura da classe 4): **contagem nunca sai de saída que você truncou.** Escrevi
+  "o único dos **oito** modos" depois de ler os ramos de um factory através de um `grep | head -30` e
+  de um `sed -n '60,140p'`. O enum tem **nove** membros e o factory despacha nove ramos — o nono
+  ficou fora da janela que eu mesmo impus. Não é "contagem à mão": é contagem sobre evidência
+  mutilada antes de ser olhada, e é pior, porque a mutilação foi deliberada. Se o número importa, o
+  comando termina em `awk 'END{print NR}'` ou `grep -c`, que não truncam. E se o comando de
+  conferência for ambíguo, **leia a coisa**: um `grep -c "^|"` numa tabela conta o separador e quase
+  me fez "corrigir" um acerto.
+- NOVA, de 21/08 (varredura da classe 4): **aumentar o rigor da forma pode quebrar a substância.** O
+  conserto da AULA-23 ampliou um `grep` de `--include=*.py` para "qualquer extensão", exatamente para
+  ser mais rigoroso — e isso tornou a frase **falsa**, porque o PDF do paper casa `leiden` nos
+  próprios bytes. Restrito a código o retorno é vazio; irrestrito devolve um arquivo. Toda vez que
+  você ampliar o escopo de um comando citado, **rode o comando ampliado** antes de escrever a frase.
+- NOVA, de 21/08: **ambiente é instrumento, e montar um responde o que reler não responde.** Um venv
+  isolado com os pins exatos do curso converteu oito limites declarados em medição, e rendeu um
+  defeito que nenhuma leitura daria (o `pymilvus` do curso importa `pkg_resources`, removido no
+  `setuptools` 81). Antes de declarar um limite de ambiente, pergunte se o limite é do ambiente ou da
+  falta de vontade de montá-lo. E note o que basta: as perguntas eram sobre **mecanismo**, então sete
+  pacotes resolveram o que os 274 do curso resolveriam — sem torch, sem GB de download.
 
 ESTADO DA AVALIAÇÃO: QUATRO rodadas completas, 29 de 29 cada. Curso em 231/348 = 66,4% (R4).
 Classificação pela RUBRICA: REQUER REVISÃO, quatro rodadas no mesmo rótulo. Na R4 o percentual

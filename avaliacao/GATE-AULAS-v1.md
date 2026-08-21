@@ -2120,3 +2120,97 @@ Dois auditores independentes, em momentos diferentes, suspeitaram que o `ragas` 
 `context precision` que dispensa gabarito — o que tornaria a causa que a Aula 22 atribui verdadeira
 só para metade do par. Nenhum dos dois pôde confirmar: `ragas` não está em disco, nem como wheel.
 Fica como pendência, não como defeito.
+
+
+---
+
+## Varredura da classe 4 — 595 contagens, 24 defeitos · e o ambiente montado
+
+Segunda auditoria organizada por classe. A classe: **toda contagem afirmada tem de ser reproduzida por
+comando.** Quatro auditores, um por lote de sete a oito aulas, cada um com a magnitude esperada
+declarada mas com instrução de **enumerar de forma independente** — para as duas coberturas poderem
+ser comparadas depois.
+
+| Lote | Aulas | Contagens verificadas | Defeitos |
+|---|---|---|---|
+| 1 | 00-06 | 93 | 9 |
+| 2 | 07-13 | 187 | 5 |
+| 3 | 14-21 | 126 | 2 |
+| 4 | 22-28 | 189 | 8 |
+| | | **595** | **24** |
+
+**96% das contagens do curso se reproduzem por comando.** Isso é informação sobre o material: ele erra
+menos em contagem do que a história de defeitos sugeria, e os erros que comete não são aritméticos.
+
+### O enumerador precisou de uma iteração honesta
+
+A primeira versão devolveu **1422 candidatas** — 49 por aula, implausível como número de contagens
+conferíveis. Estava capturando numeral retórico sobre a estrutura da própria aula ("três coisas a
+extrair") junto com alegação sobre o repositório. Acrescentei o discriminador certo — a contagem só é
+verificável se o parágrafo referencia o repositório — e caiu para **440**, com 1128 descartadas e o
+motivo do descarte registrado. Sem essa iteração, os auditores receberiam ruído e a taxa de defeito
+pareceria muito menor do que é.
+
+### O defeito dominante não é aritmética: é convenção
+
+Dezoito dos 24 defeitos são **um só problema, em duas formas opostas**, e as duas envolvem o
+`.env.example` oculto que existe em todo diretório de módulo:
+
+- **Forma (a) — o número é baixo demais.** As Aulas 04, 05, 06, 11, 12 e 13 contam sem o oculto.
+- **Forma (b) — o número está certo e o comando nomeado não o produz.** As Aulas 21, 22, 23 e 25
+  citam `ls` e dão o número do `ls -A`.
+
+Qual convenção é a correta ficou **provado, não escolhido**: a alegação central da Aula 03 — "`grep
+-rli` devolve 12 dos 23" — só fecha se 23 contar o oculto, porque `grep -r` varre ocultos. Então a
+convenção do curso é "todos os arquivos", e as seis aulas da forma (a) são as desviantes.
+
+Verdade de campo estabelecida por comando, uma vez, para todas: **todo diretório de módulo tem
+exatamente um arquivo oculto**, logo `ls -A` = `ls + 1` sem exceção. E só
+`05-PreRetrieval/01-QueryConstruction` tem subdiretórios (três), onde "N arquivos" é recursivo — 15,
+contra 4 no topo. Ter checado isso evitou que o conserto em bloco escrevesse "4 arquivos" na Aula 12.
+
+### O ambiente foi montado, e oito limites viraram medição
+
+Venv isolado, com os **pins exatos do curso**: `langchain-core 0.3.33`, `langchain-community 0.3.16`,
+`langchain-openai 0.3.3`, `langgraph 0.2.69`, `pymilvus 2.5.4`, `llama-index-core 0.11.17`,
+`ragas 0.2.15`, `numpy 1.26.4`, `jq 1.8.0`. Não os 274 pacotes: as perguntas em aberto eram todas
+sobre **mecanismo**, e nenhuma exigia torch, chromadb ou onnxruntime — que são justamente os que
+travam o curso em Python 3.12.
+
+| Aula | Pergunta que seis rodadas não responderam | Resposta medida |
+|---|---|---|
+| 22 | o `ragas` tem `context precision` sem gabarito? | **Sim** — `LLMContextPrecisionWithoutReference`. **É defeito** |
+| 21, 26 | o `recursion_limit` default é 25? | Sim, com a mensagem literal do `GraphRecursionError` |
+| 19 | `PromptTemplate.format` rejeita chave extra? | **Ignora em silêncio** — a pior das duas |
+| 20 | `llm(...)` avisa depreciação? | Sim — depreciado na 0.1.7, remoção na 1.0 |
+| 26 | `get_relevant_documents` avisa? | Sim — depreciado na 0.1.46, remoção na 1.0 |
+| 11 | `WeightedRanker` é posicional? | **Sim, e só** — assinatura `(self, *nums)`; kwargs dá `TypeError` |
+| 21 | `model=` e `model_name=` equivalem? | Sim, os dois resolvem para `.model_name` |
+| 04 | `JSONLoader` com `jq_schema='.'` levanta? | Sim — `ValueError`, com o texto exato |
+
+Sete das oito **confirmam** o que as aulas previram, o que é evidência sobre o julgamento do material.
+Uma virou defeito: a Aula 22 atribuía à ausência do `ground_truth` a ausência de **duas** métricas, e
+isso vale para o recall e não para a precisão.
+
+E montar o ambiente rendeu um achado que nenhuma leitura daria: o `pymilvus==2.5.4` que o curso pina
+importa `pkg_resources`, **removido no `setuptools` 81**. O requirements não pina `setuptools`, então
+instalá-lo hoje num ambiente limpo quebra o módulo de banco vetorial. Registrado na Aula 00.
+
+### Três dos 24 defeitos eu criei nesta mesma sessão
+
+E os três são instrutivos de formas diferentes.
+
+**Contei sobre saída que eu mesmo truncei.** Escrevi "`TREE_SUMMARIZE` é o único dos **oito** modos"
+depois de ler os ramos do factory através de um `grep | head -30` e de um `sed -n '60,140p'`. O enum
+tem **nove** membros e o factory despacha nove ramos; o `CONTEXT_ONLY` ficou fora da janela que eu
+mesmo impus. Não é "contagem à mão" — é contagem sobre evidência mutilada antes de ser olhada.
+
+**Aumentei o rigor da forma e quebrei a substância.** O conserto da Aula 23 ampliou um `grep` de
+`--include=*.py` para "qualquer extensão", justamente para ser mais rigoroso — e isso tornou a frase
+**falsa**, porque o PDF do paper casa `leiden` nos próprios bytes. Restrito a código, o retorno é
+vazio; irrestrito, devolve um arquivo.
+
+**Quase "corrigi" um acerto com um instrumento frouxo.** Depois de escrever "dez estágios sobre nove
+módulos" na Aula 01, conferi com `sed -n '88,99p' | grep -c "^|"` e obtive 11, o que sugeria nove
+estágios. Ler a tabela mostrou dez linhas de dados: o `grep` incluía o separador. A regra que salvou
+foi ler a coisa quando o comando é ambíguo.

@@ -129,7 +129,10 @@ contexto de quem o escreveu.** Ler criticamente é parte do ofício.
 
 ## Parte 3 — LCEL: o pipeline fica visível
 
-Abra `03_LangChain_LCEL_RAG_v3.py`. Agora cada etapa é uma linha nomeada, com
+Abra `03_LangChain_LCEL_RAG_v3.py`. Agora cada etapa é uma linha nomeada. Os comentários numerados
+vão de 1 a 9 — os oito abaixo montam o pipeline e o `# 9. Run the query` o executa, no fim do
+arquivo —, e entre eles há uma segunda série, de 1 a 5, que inspeciona a entrada e a saída de cada
+estágio. Aqui estão os oito, com
 comentários numerados de 1 a 8:
 
 ```python

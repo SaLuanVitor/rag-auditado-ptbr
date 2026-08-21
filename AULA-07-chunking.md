@@ -136,7 +136,9 @@ seria `["\n\n", "\n", ".", ",", " ", ""]`.
 `04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são, **julgamento**, o experimento
 mais bem construído do módulo. Rodando `diff` entre os dois, a diferença **relevante** está no
 splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também. O `diff` cru
-mostra mais que isso: um import extra de `Language`, a chamada de
+mostra mais que isso: **dois** blocos de import extras — `Language` na linha 2 e um import agrupado
+nas linhas 6-9 que reimporta `Language` e o `RecursiveCharacterTextSplitter` que já vinha na linha 1
+—, a chamada de
 `get_separators_for_language(Language.JS)` que só existe no primeiro, comentários e nomes de
 variável diferentes (`python_docs` vs. `text_chunks`). Nada disso muda o experimento. A tabela
 abaixo é leitura da **configuração** dos dois arquivos, não do que eles imprimem — na tela saem os

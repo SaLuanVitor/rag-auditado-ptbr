@@ -228,7 +228,9 @@ Duas proibições que a Aula 24 comprou com exemplo:
 
 ### As métricas
 
-O mínimo são três, uma por estágio, e a Aula 22 mostrou por que uma só não basta:
+O mínimo são três — ao menos uma de recuperação e as duas de geração —, e a Aula 22 mostrou por que
+uma só não basta. A tabela abaixo traz cinco linhas porque a recuperação admite três instrumentos
+diferentes; escolha um deles e leve as duas de geração inteiras:
 
 | Estágio     | Métrica                                                    | O que um número ruim acusa        |
 | ----------- | ---------------------------------------------------------- | --------------------------------- |
@@ -243,7 +245,7 @@ só a métrica de recuperação enxerga isso.
 
 **Comece pela primeira linha da tabela.** Se o seu gabarito anota qual trecho sustenta cada resposta,
 `hit rate@k` e `MRR` saem de uma comparação de ids — determinísticas, reprodutíveis, sem custo de API
-e sem a variância de um juiz. As três linhas seguintes exigem LLM e entram depois, para o que não se
+e sem a variância de um juiz. As quatro linhas seguintes exigem LLM e entram depois, para o que não se
 reduz a acerto de id.
 
 ### O relatório

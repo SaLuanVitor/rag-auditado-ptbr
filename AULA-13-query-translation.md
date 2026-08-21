@@ -1,6 +1,6 @@
 # AULA 13 — Query translation: reescrita, decomposição, HyDE e clarificação
 
-**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/02-QueryTranslation/` (6 arquivos)
+**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/02-QueryTranslation/` (7 arquivos, contando o `.env.example`)
 
 ---
 

@@ -53,7 +53,8 @@ acervo inteiro.
 
 ## Parte 1 — Texto simples e diretórios
 
-`01-DataLoading/01-SimpleTextLoading/` tem **11 arquivos**. Note que a numeração salta o
+`01-DataLoading/01-SimpleTextLoading/` tem **12 arquivos** — os 11 de código listados abaixo mais o
+`.env.example`, que o `ls` simples não mostra. Note que a numeração salta o
 `04` — não existe arquivo com esse prefixo. Separados por biblioteca, conferindo os imports e
 não os nomes:
 
@@ -104,7 +105,8 @@ versus quantos `Document` voltaram. A diferença é o seu problema silencioso.
 
 ## Parte 2 — Dados estruturados
 
-`01-DataLoading/02-StructuredDocumentLoading/` tem **6 arquivos**, e os dois primeiros formam
+`01-DataLoading/02-StructuredDocumentLoading/` tem **7 arquivos** — 6 de código e o `.env.example`
+oculto —, e os dois primeiros formam
 um contraste que vale ler com atenção.
 
 ### JSON como texto contra JSON como estrutura
@@ -274,10 +276,11 @@ prepara a Aula 05.
 versão com `silent_errors=True`. Ela conclui sem reclamar. Agora conte quantos documentos
 voltaram contra quantos arquivos existem — e veja o buraco que o silêncio produziu.
 
-**4. Troque o `jq_schema` por `.` puro — e reporte o que aconteceu.** O `JSONLoader` vem de
-`langchain_community`, que não está instalado neste ambiente, então **o que segue é previsão, não
-medição**: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
-esperado é uma exceção de validação, não uma migração silenciosa para texto bruto. Em
+**4. Troque o `jq_schema` por `.` puro — e reporte o que aconteceu.** A previsão que esta aula fazia está **medida**, no `langchain-community` 0.3.16 que o repositório
+pina: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
+`JSONLoader` levanta `ValueError: Expected page_content is string, got <class 'dict'> instead. Set
+`text_content=False` if the desired input for page_content is not a string`. Não é migração
+silenciosa para texto bruto — é exceção, com a instrução do conserto na própria mensagem. Em
 `02-LangCHain-JSONLoader-JSON.py`, use
 `jq_schema='.'`. O ramo que serializa o objeto com `json.dumps` só é alcançado com
 `text_content=False`, então o desfecho esperado é a exceção, não o texto bruto. É a prova de que o

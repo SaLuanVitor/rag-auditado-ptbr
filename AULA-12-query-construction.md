@@ -1,6 +1,6 @@
 # AULA 12 — Query construction: Text2SQL, Text2Cypher e filtros de metadados
 
-**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (14 arquivos)
+**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (15 arquivos em três subdiretórios, contando o `.env.example` da raiz)
 
 ---
 
@@ -286,7 +286,7 @@ pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha 3 de cada arqu
 divergem entre si, como
 a Parte 1 mostrou.
 
-O pipeline Sakila exige MySQL e Milvus rodando. Se não quiser subir os dois, **leia os quatro
+O pipeline Sakila exige MySQL e Milvus rodando. Se não quiser subir os dois, **leia os três
 arquivos de ingestão sem executar** — a arquitetura é o conteúdo, e ela se entende lendo. O
 `diff` entre `05-text2sql-rag-v1-error.py` e `-v2-ok.py` é o exercício que rende mais por
 minuto:

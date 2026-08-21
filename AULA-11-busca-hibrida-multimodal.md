@@ -1,6 +1,6 @@
 # AULA 11 — Busca híbrida densa + esparsa, e recuperação multimodal
 
-**Fase 3 — Armazenamento e busca** · Módulo do repo: `04-VectorDB/HybridRetrieval/` (3 arquivos) e `/MultimodalRetrieval/` (3 scripts + 3 imagens)
+**Fase 3 — Armazenamento e busca** · Módulo do repo: `04-VectorDB/HybridRetrieval/` (4 arquivos, contando o `.env.example`) e `/MultimodalRetrieval/` (3 scripts, 3 imagens e um `.env.example`)
 
 ---
 
@@ -132,8 +132,11 @@ passadas ao `hybrid_search` — trocar os dois inverte a mistura sem lançar err
 > atravessam a fronteira da chamada: a biblioteca não recebe nome nenhum, só ordem. Logo a associação
 > peso↔campo **não pode** ser por nome, e os nomes das chaves enganam quem lê — o peso 0,7, escrito
 > como `sparse`, chega primeiro, e a linha 177 declara `reqs=[dense_req, sparse_req]`. O que depende
-> da biblioteca, e eu não confirmei, é só se o i-ésimo peso casa com `reqs[i]` e se o
-> `WeightedRanker` normaliza os valores. O que está verificado,
+> da biblioteca **estava** em aberto e agora está medido, no `pymilvus` 2.5.4 que o repositório pina:
+> a assinatura é `WeightedRanker.__init__(self, *nums)` — só varargs. `WeightedRanker(0.7, 1.0)`
+> guarda `_weights = [0.7, 1.0]`, e passar nome (`WeightedRanker(sparse=0.7, dense=1.0)`) levanta
+> `TypeError`. Posição não é apenas o canal que o script usa: é o **único** que a biblioteca aceita.
+> O que continua sem medição é só se o i-ésimo peso casa com `reqs[i]` dentro do `hybrid_search`. O que está verificado,
 > independentemente da semântica da biblioteca, é a **incoerência**: a aula enuncia uma regra e o
 > seu próprio exemplo canônico não a satisfaz.
 

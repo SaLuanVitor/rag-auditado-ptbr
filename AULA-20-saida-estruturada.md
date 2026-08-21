@@ -130,9 +130,9 @@ output = llm(prompt.format(query="User ID 123"))
 ```
 
 `llm(...)` é a forma antiga; a interface atual do LangChain é `.invoke(...)` — e é o que os outros
-arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. Conhecimento de domínio,
-não afirmação sobre execução: em versões recentes essa chamada emite aviso de depreciação, e em
-alguma versão futura deixa de funcionar. `langchain` **não está instalado neste ambiente**, então
+arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33 que o repositório pina: a chamada emite
+`LangChainDeprecationWarning: The method BaseChatModel.__call__ was deprecated in langchain-core
+0.1.7 and will be removed in 1.0. Use invoke instead.` Não é previsão — há data de remoção anunciada. `langchain` **não está instalado neste ambiente**, então
 não vou afirmar o que ela imprime hoje.
 
 **`PromptTemplate.from_template` com `{query}`** (linha 12) é o formato do LangChain. Guarde o
@@ -423,7 +423,7 @@ tamanho de prompt.
 
 O diretório se chama `03-ControllingFormatViaOutputParsing`. Neste arquivo, **um** dos cinco blocos
 usa parsing de fato — o bloco 2, com `output_cls=GameInfo` na linha 36, o único lugar do arquivo
-onde o schema `GameInfo` (linhas 9–16) é usado. Os outros quatro controlam formato por **instrução
+onde o schema `GameInfo` (linhas 9–16) é usado. Dos outros quatro, **três** controlam formato por **instrução
 de prompt**: tabela (`:50`), lista numerada (`:64`), linha de tempo (`:79`).
 
 Ou seja: quatro dos cinco blocos são grau 1 num capítulo sobre grau 4. Não é erro — é o material
@@ -438,7 +438,7 @@ passa `summary_template` (`:54`); os blocos 4 e 5 passam `text_qa_template` (`:6
 parâmetros distintos, e qual deles cada modo consome é decisão da biblioteca — **e a decisão está
 legível na fonte.** Em `llama_index.core.response_synthesizers.factory`, versão 0.11.17, a
 `get_response_synthesizer` declara os dois parâmetros na assinatura (`text_qa_template` e
-`summary_template`) e então ramifica por modo. `TREE_SUMMARIZE` é o **único** dos oito modos que
+`summary_template`) e então ramifica por modo. `TREE_SUMMARIZE` é o **único** dos nove modos que
 recebe `summary_template`; todos os outros que aceitam template recebem `text_qa_template`. Duas
 consequências:
 

@@ -1,6 +1,6 @@
 # AULA 22 — Medir RAG: RAGAS, TruLens, DeepEval e a avaliação do LlamaIndex
 
-**Fase 8 — Avaliação** · Módulo do repo: `09-Evaluation/` — 4 scripts, `requirements.txt` e `.env.example` (`ls` no diretório: 6 arquivos)
+**Fase 8 — Avaliação** · Módulo do repo: `09-Evaluation/` — 4 scripts, `requirements.txt` e `.env.example` (`ls -A` no diretório: 6 arquivos; o `ls` simples mostra 5, porque o `.env.example` é oculto)
 
 ---
 
@@ -152,9 +152,13 @@ Nenhuma das duas métricas avalia recuperação. A tabela do Modelo mental diz q
 
 A causa está no dataset: as chaves são `question`, `answer` e `contexts`
 (`09-Evaluation/01-RAGAS.py:20`, `09-Evaluation/01-RAGAS.py:25`, `09-Evaluation/01-RAGAS.py:30`) — e **não há `ground_truth`**. Conhecimento de
-domínio: `context recall` compara o que foi recuperado com a resposta de referência; sem referência,
-a métrica não tem contra o que comparar. A ausência da métrica é consequência da ausência do
-gabarito, não um esquecimento de import.
+domínio, e agora medição: `context recall` compara o que foi recuperado com a resposta de
+referência, e sem referência não tem contra o que comparar. **Mas isso vale para o recall e não
+para a precisão.** No `ragas` 0.2.15 — a geração que este módulo pina com `ragas<0.3` — existe
+`LLMContextPrecisionWithoutReference`, ao lado de `LLMContextPrecisionWithReference` e
+`NonLLMContextPrecisionWithReference`. Ou seja: a precisão contextual **poderia** ter sido medida
+neste dataset sem gabarito nenhum, e não foi. A ausência das duas métricas tem causas diferentes —
+o recall não tinha como; a precisão tinha.
 
 ### O achado: o arquivo guarda uma execução real
 
