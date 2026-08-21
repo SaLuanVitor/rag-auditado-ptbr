@@ -283,8 +283,8 @@ python 03-CoBERT-Reranking.py
 Nos dois, o "antes" **não é um ranking recuperado**: os candidatos são uma lista Python literal de
 três frases, impressa na ordem em que foi escrita. O que você compara é a ordem do código-fonte com a
 ordem dos escores — suficiente para ver o mecanismo do cross-encoder, insuficiente para ver o ganho do
-estágio, que só aparece com dezenas de candidatos. O caso em que o
-documento certo estava em 7º e sobe para 1º — e é essa observação que justifica o estágio.
+estágio. O caso que justifica o estágio — o documento certo que estava em 7º e sobe para 1º — só
+aparece com dezenas de candidatos, e nenhum destes dois arquivos os tem.
 
 ```powershell
 python 04-Cohere-Reranking.py
@@ -303,8 +303,8 @@ Para ver os dois números de fato, leia o estado **antes** da consulta: percorra
 retriever calculando as horas desde o `last_accessed_at` de cada documento, e chame o
 `similarity_search_with_relevance_scores` do vetorstore à parte. Aí sim o decaimento e a relevância
 aparecem lado a lado, e você vê que é a **soma** dos dois que ordena — não o produto que o docstring
-do arquivo, nas linhas 25-26, diz ser a fórmula. O arquivo documenta uma coisa e executa outra, junto com a
-similaridade — ver os dois números lado a lado é o que torna a combinação compreensível.
+do arquivo, nas linhas 25-26, diz ser a fórmula. Ver os dois juntos é o que torna a combinação
+compreensível; o arquivo documenta uma coisa e executa outra.
 
 ---
 

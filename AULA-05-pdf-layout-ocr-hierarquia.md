@@ -257,7 +257,7 @@ python 05-LangChain-Unstrucured-PDF-SimpleDisplay.py
 
 Primeira execução baixa modelos de layout — leva tempo. Compare a estrutura obtida com a saída
 crua do `01-UsingPyPDF.py` — e note que os dois **não leem o mesmo documento**: o `01` abre o PDF de
-slides do Black Myth Wukong e o `05` abre um PDF de turismo, na linha 1. Para a comparação ser da
+slides do Black Myth Wukong na linha 2, e o `05` abre um PDF de turismo na linha 1. Para a comparação ser da
 estratégia de extração e não do documento, aponte a linha 1 do `05` para o mesmo PDF do `01` antes de
 rodar.
 
@@ -283,8 +283,7 @@ linha 20, de `chi_sim` para `eng`: o arquivo herdou o modelo chinês da origem d
 um PDF em inglês ele devolve lixo pelo motivo errado — ou aborta, se o pacote de dados
 `tesseract-ocr-chi-sim` não estiver instalado. Com `eng`, o que sobra de divergência contra a extração
 direta é imperfeição de OCR, que é o que o exercício quer medir. O OCR vai introduzir erros num
-arquivo que não precisava
-dele — argumento empírico contra "OCR em tudo por segurança".
+arquivo que não precisava dele — argumento empírico contra "OCR em tudo por segurança".
 
 **4. Compare OCR com modelo multimodal na mesma página — e note que exige uma edição.** Os dois
 scripts não olham para o mesmo arquivo: o `01-Unstructured-ReadImages.py` tem **um caminho fixo** na

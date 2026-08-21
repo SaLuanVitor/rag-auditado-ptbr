@@ -306,10 +306,10 @@ estão escritos**, e consertá-las é a primeira parte do exercício:
   `COLLECTION_NAME = "flat_index_demo"` na linha 6, e cada um faz `drop_collection` na abertura:
   rodar o `02` **apaga** o FLAT que você acabou de construir. Dê a cada arquivo um nome próprio
   (`flat_demo`, `ivf_flat_demo`, `ivf_pq_demo`, `hnsw_demo`), para que as coleções coexistam.
-- **Não há semente.** Os 1000 vetores (linha 23) e o vetor de consulta são sorteados com
+- **Não há semente.** Os 1000 vetores (linha 22) e o vetor de consulta são sorteados com
   `random.random()` em cada execução, e nenhum dos cinco arquivos chama `random.seed`. Sem semente,
   FLAT e IVF respondem sobre acervos diferentes, a perguntas diferentes — a interseção de ids é quase
-  zero por construção, e não mede aproximação nenhuma. Ponha `random.seed(42)` antes da linha 23 em
+  zero por construção, e não mede aproximação nenhuma. Ponha `random.seed(42)` antes da linha 22 em
   todos.
 - **Mil vetores é pouco para o exercício 1.** Com `nlist: 1024` você pediria mais células do que há
   vetores. Suba `num_vectors` para algo como 100000 se quiser que a tabela recall × latência tenha o

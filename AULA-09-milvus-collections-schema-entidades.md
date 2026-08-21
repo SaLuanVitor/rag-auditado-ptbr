@@ -167,8 +167,9 @@ o id do documento, do ticket, do produto — e isso torna trivial reconciliar o 
 campo extra para guardar a referência externa. **Escolher `auto_id=True` sem guardar a
 referência é como perder a chave estrangeira.**
 
-**2. `VARCHAR` exige `max_length`.** Campo de texto precisa de tamanho declarado. Subestimar
-trunca; superestimar desperdiça. Vale medir o percentil 99 do seu corpus antes de fixar.
+**2. `VARCHAR` exige `max_length`.** Campo de texto precisa de tamanho declarado. Errar para menos
+custa caro — o exercício 3 de "Quebre de propósito" faz você medir se o Milvus trunca ou recusa —, e
+errar para mais desperdiça. Vale medir o percentil 99 do seu corpus antes de fixar.
 
 **3. Tipo do vetor.** `FLOAT_VECTOR` são floats de 32 bits — o padrão. O arquivo segue
 mostrando **binary vector** como alternativa: vetores de bits, muito menores e comparados por
@@ -334,7 +335,11 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   gera duplicata; sem apagar antes de inserir, o chunk velho continua competindo no ranking e a
   resposta cita a versão revogada. É falha silenciosa, do gênero que a Fase 1 se propõe a caçar, e o
   contrato mínimo é: **id estável + delete-then-insert por documento**.
-- **`max_length` subdimensionado.** Trunca conteúdo em silêncio, e você descobre em produção.
+- **`max_length` subdimensionado.** Não conte com truncamento silencioso: no `pymilvus` 2.5.4 a
+  inserção **por colunas** já recusa a string longa no próprio cliente, com `ParamError: length of
+  string exceeds max length`, e a inserção **por dicionário** escapa dessa checagem, deixando a
+  decisão para o servidor. Dimensione pelo percentil 99 do corpus em vez de contar com qualquer dos
+  dois comportamentos.
 - **Milvus em protótipo.** Três contêineres, etcd, MinIO — é infraestrutura demais para
   validar uma ideia. FAISS ou Chroma primeiro; Milvus quando o volume justificar.
 - **Confundir database com collection.** Isolamento por database não é o mesmo que

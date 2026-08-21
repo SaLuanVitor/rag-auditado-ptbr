@@ -115,8 +115,9 @@ que ele espera. `JsonOutputParser` tem um método que gera essa instrução, e
 arquivos `.py` não retorna nada. Todo o repositório usa parser como grau 2, nunca como grau 1+2.
 
 Consequência prática: a única coisa que diz ao modelo o que fazer é a frase `"in JSON format"` da
-linha 12. Se ele responder com JSON embrulhado em ` ```json `, ou precedido de uma frase, o
-`parse` da linha 17 é que descobre — em tempo de execução, com exceção. Julgamento: para um exemplo
+linha 12. Se ele responder com JSON embrulhado em ` ```json `, o `parse` da
+linha 17 desembrulha sozinho — mesmo havendo uma frase antes da cerca. Já uma frase seguida do objeto
+**sem** cerca, ou uma vírgula final, é o `parse` que descobre, em tempo de execução e com exceção. Julgamento: para um exemplo
 de 18 linhas isso é aceitável; num serviço, gerar a instrução a partir do próprio parser evita que
 prompt e validador divirjam quando um dos dois mudar.
 

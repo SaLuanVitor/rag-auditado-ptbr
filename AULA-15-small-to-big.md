@@ -274,9 +274,14 @@ small-to-big: agora indexa e entrega o mesmo objeto, e está de volta à tensão
 
 **3. Exagere o pai — e primeiro dê texto a ele.** O corpus embutido no `02` é uma string de 1.745
 caracteres, então com `chunk_size=8000` o divisor devolve **um** pai, que é o documento inteiro: o
-contexto entregue passa a ser o mesmo para toda pergunta, e nada fica "enorme". Troque antes o corpus
-por um arquivo do acervo de turismo, e aí sim ponha o pai em 8000 e o filho em 200. O contexto
-entregue fica enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
+contexto entregue passa a ser o mesmo para toda pergunta, e nada fica "enorme". E o repositório não
+resolve isso sozinho: o maior texto de `99-EN/` tem 4.462 bytes, então mesmo trocando o corpus pelo
+maior arquivo disponível o pai de 8000 continua sendo um só. Duas saídas, e vale escolher
+conscientemente. Se quiser manter as perguntas do script, troque o corpus por
+`99-EN/black-myth-wukong/black_myth_wukong_wiki.txt` — mesmo domínio, duas vezes e meia mais texto — e
+baixe o pai para algo que o corpus sustente, como 1500 contra 200 no filho. Se quiser o pai de 8000 de
+verdade, traga um texto seu de uns 30 mil caracteres, e aí troque também as perguntas da linha 73. O
+contexto entregue fica enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
 cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
 
 **4. Remova o docstore da expansão. Não funciona, e é isso que se aprende:** no `03`, apague o

@@ -174,7 +174,8 @@ Três experimentos, em ordem de valor:
 **1. Veja o L2 ordenado no sentido errado.** A seção 3 do script já imprime as duas ordens lado a
 lado, sem que você edite nada — uma decrescente, rotulada `errado`, e uma crescente, `certo`. Leia as
 duas: a primeira devolve o pior resultado como primeiro. E **não** siga o comentário ao pé da letra: o
-único `reverse=False` do bloco é o da ordem **certa**, então trocá-lo faz os dois `print` saírem
+único `reverse=False` **em código** é o da ordem **certa** — o outro que o `grep` acha está dentro do
+próprio comentário, então trocá-lo faz os dois `print` saírem
 iguais. Para sentir o estrago no ranking principal, volte à seção 2 e ordene por `l2` mantendo
 `reverse=True`. Fixe
 esse sintoma na memória: quando um RAG seu retornar resultados sistematicamente
