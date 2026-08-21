@@ -135,14 +135,14 @@ Escolha o arquivo conforme sua máquina:
 | Ubuntu com GPU NVIDIA | `requirements_langchain_20250413_Ubuntu-with-GPU.txt` | `requirements_llamaindex_20250413_Ubuntu-with-GPU.txt` |
 | Ubuntu sem GPU        | `requirements_langchain_Ubuntu-with-CPU.txt`          | `requirements_llamaindex_Ubuntu-with-CPU.txt`          |
 
-> ⚠️ **Um pin que falta, e que quebra o `pymilvus` hoje.** Montei este ambiente para conferir as
-> alegações do curso e bati nisto: o `pymilvus==2.5.4` que o requirements pina importa
-> `pkg_resources`, que foi **removido do `setuptools` na versão 81**. Num ambiente novo, onde o pip
-> instala o `setuptools` mais recente, `import pymilvus` falha com
-> `ModuleNotFoundError: No module named 'pkg_resources'` — e o requirements não pina `setuptools`.
-> Instale `setuptools<81` antes, ou o módulo de banco vetorial não sobe. Note também que os dois
-> `NoGPU_Mac-Win` travam a versão do Python: `numpy==1.26.4` e `onnxruntime==1.19.2` têm wheel só
-> até cp312, então este requirements pede **Python 3.12** — não 3.13, não 3.14.
+> ⚠️ **Um pin que falta em uma das trilhas, e que derruba o `pymilvus`.** O `pymilvus==2.5.4` que os
+> requirements pinam importa `pkg_resources`, pacote que o `setuptools` marcou para remoção e retirou
+> na versão 81. O `requirements_langchain_NoGPU_Mac-Win.txt` — o que esta aula recomenda para Windows
+> — **já se protege**: pina `setuptools==76.0.0` na linha 221, e 76 ainda traz o `pkg_resources`. Quem
+> cai na armadilha é quem instala pelo `requirements_langchain_Ubuntu-with-CPU.txt`, que pina o
+> `pymilvus` e **não** pina o `setuptools`: num ambiente novo, o pip traz o mais recente e o import
+> falha com `ModuleNotFoundError: No module named 'pkg_resources'`. Nesse caso, instale
+> `setuptools<81` antes.
 
 Você está no Windows 11, então os dois `NoGPU_Mac-Win`. São 274 e 130 linhas de
 dependências pinadas — a instalação demora, `torch` é grande.
@@ -150,15 +150,18 @@ dependências pinadas — a instalação demora, `torch` é grande.
 Existem ainda requirements especializados que você só instala quando a aula pedir:
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
 `requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
-acrescenta pouca coisa e **nada em comum entre os dois** — o do LangChain traz `colorama`,
+acrescenta pouca coisa e quase nada em comum entre os dois — o do LangChain traz `colorama`,
 `langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz o mesmo `colorama` —
 que é o **único** acréscimo comum aos dois — mais
 `llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos **sete** pacotes
-distintos, o único com uso
-rastreável no repositório é o `langgraph-prebuilt`, importado por
-`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py` — o módulo da Aula 26, não o
-`00-SimpleRAG`. **Os dois `04_LangGraph_RAG*.py` não precisam deste arquivo:** importam apenas
-`langgraph.graph`, e `langgraph==0.2.69` já está no `NoGPU_Mac-Win` (linha 110). Instale só se
+distintos, dois têm uso amplo e antecipado: o `python-dotenv`, que **82** arquivos importam, e o
+`langchain-deepseek`, importado por **15** — entre eles o
+`00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03. O
+`langgraph-prebuilt` aparece uma vez só, em
+`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`, o módulo da Aula 26. E `colorama`,
+`sounddevice` e `llama-cloud-services` não são importados em lugar nenhum do repositório.
+**Os dois `04_LangGraph_RAG*.py` não precisam deste arquivo:** importam apenas
+`langgraph.graph`, e `langgraph==0.2.69` já está no `NoGPU_Mac-Win` (linha 110). Instale se
 chegar na Aula 26 e o import falhar; e
 `requirements_marker_20250413.txt`, que **nenhuma aula usa**: `grep -rn "import marker"` no
 repositório inteiro não encontra nada, e as duas menções ao `marker_single` estão em tabelas de

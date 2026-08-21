@@ -226,12 +226,14 @@ forma comensurável — `score = similaridade × decaimento`, ou uma média pond
 > `TimeWeightedVectorStoreRetriever` produz a ordem real, e o seu `_get_combined_score` — no módulo
 > `langchain.retrievers.time_weighted_retriever`, fora deste repositório — faz
 > `score = (1.0 - decay_rate) ** hours_passed`
-> e depois `score += vector_relevance`: **soma** o decaimento exponencial à relevância do vetor. (Se
-> essa relevância vem normalizada ou não depende do vector store, e isso está em
-> `langchain`, em `langchain.retrievers.time_weighted_retriever` — o que está conferido, lendo a fonte, é a
-> soma.) Nem multiplicação, nem α — é o padrão de somar escalas incomensuráveis que o ponto 1
-> acima chama de errado. As duas formas "corretas" do parágrafo anterior são o que **deveria** ser
-> feito, não o que roda. _Conferido lendo a fonte do `langchain` 0.3.0; não executei._
+> e depois `score += vector_relevance`: **soma** o decaimento exponencial à relevância do vetor. Essa
+> relevância vem de `get_salient_docs`, que chama `similarity_search_with_relevance_scores` — cujo
+> contrato, no docstring, é devolver valores **na faixa [0, 1]**, com aviso se saírem dela. Ou seja: o
+> problema **não é de escala**, porque as duas parcelas estão na mesma faixa. É que um fator
+> multiplicativo de decaimento não tem sentido **somado** a uma similaridade, e é soma onde o ponto 1
+> acima pede produto ou média ponderada. As duas formas "corretas" do parágrafo anterior são o que
+> **deveria** ser feito, não o que roda. _Conferido lendo a fonte do `langchain` 0.3.17, a versão que
+> o repositório pina._
 
 > ⚠️ **E aqui o arquivo ensina uma lição que não pretendia.** A linha 26 traz
 > `time_decay_factor = exp(-decay_rate * time_since_last_access)` — mas ela está **dentro do

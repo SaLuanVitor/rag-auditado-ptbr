@@ -1,6 +1,6 @@
 # AULA 12 — Query construction: Text2SQL, Text2Cypher e filtros de metadados
 
-**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (15 arquivos em três subdiretórios, contando o `.env.example` da raiz)
+**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (15 arquivos, contando o `.env.example` da raiz; 7 deles em `Text2SQL/Sakila/`)
 
 ---
 
@@ -238,8 +238,7 @@ Um exemplo concreto do que acontece com "vídeos do canal X sobre LangChain publ
 | -------------------- | ----------------------------- |
 | "sobre LangChain"    | consulta semântica            |
 | "do canal X"         | filtro `author == "X"`        |
-| "publicados em 2024" | filtro sobre `publish_date` — e **não** é direto: o campo é string
-`YYYY-MM-DD`, não um ano inteiro |
+| "publicados em 2024" | filtro sobre `publish_date` — não é direto: o campo é string `YYYY-MM-DD`, não um ano inteiro |
 
 **Sem self-query, "2024" entra na busca semântica** — e você recupera vídeos de 2021 que
 mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É a mesma armadilha do recorte temporal — e nenhuma aula posterior a retoma: o espaço vetorial
@@ -282,8 +281,8 @@ python 02-Text2SQL-LLM-DeepSeek.py
 porque o `01-*` grava o banco numa pasta chamada `90-Data`, relativa ao diretório de trabalho, e
 essa pasta não existe dentro de `Text2SQL` — o `sqlite3` não cria diretório, então sem o `mkdir` o
 passo 1 já quebra. E o `02-*` escolhido é o **DeepSeek**, não o OpenAI: o OpenAI procura o banco numa
-pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha 3 de cada arquivo antes de rodar — os dois `02-*`
-divergem entre si, como
+pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha do `sqlite3.connect` antes de rodar — linha 3 no `01-*` e no `02-*-DeepSeek`, linha 9
+no `02-*-OpenAI`, que tem imports e `load_dotenv()` antes. Os dois `02-*` divergem entre si, como
 a Parte 1 mostrou.
 
 O pipeline Sakila exige MySQL e Milvus rodando. Se não quiser subir os dois, **leia os três

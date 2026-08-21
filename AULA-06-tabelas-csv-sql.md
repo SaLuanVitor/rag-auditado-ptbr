@@ -15,7 +15,7 @@ como texto corrido e você indexa `1.842` solto — um token sem semântica, que
 consegue conectar à pergunta "qual foi a receita do segundo trimestre?".
 
 Este é o segundo módulo mais numeroso da Fase 1: **13 arquivos** — mais que os 12 de texto
-simples, menos que os 13 de PDF da Aula 05.
+simples, menos que os 14 de PDF da Aula 05.
 Não é acaso. **Julgamento:** é o reconhecimento de que tabela é onde a ingestão mais falha.
 
 ---
@@ -127,8 +127,8 @@ dado estruturado.
 
 ⚠️ **Duas bases de caminho no mesmo módulo, e é preciso trocar de diretório no meio.** O
 `01-01-ImportCSV.py` aponta para `"../../99-EN/..."` e só roda **de dentro** desta pasta; já os
-arquivos de PDF (`05-03`, `04-02`, `03-01`, `04-01`, `06-01`) apontam para
-`"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A exceção é o
+arquivos de PDF (`03-01`, `04-01`, `04-02`, `05-02`, `05-03`, `06-01`) apontam para
+`"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A única exceção é o
 `05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. Rode o `01-01` daqui e faça `cd ../..` antes dos que
 leem PDF.
 
@@ -148,11 +148,13 @@ própria execução — sinal de que a duração incomodou quem escreveu. **Não
 de tempo aparece no repositório nem nesta aula, e é justamente isso que o exercício 4 do "Quebre de
 propósito" manda você produzir. Trate como hipótese até cronometrar.
 
-Exige dependências de sistema (Ghostscript) — e existe um
-`91-Environment/requirements_camelot_20250413.txt` separado. **A razão do isolamento não está
-documentada no repositório;** a dependência de Ghostscript é a explicação provável, mas o mesmo
-diretório isola o `marker` num arquivo próprio sem que haja instabilidade envolvida, então a
-convenção pode ser só "uma biblioteca pesada por arquivo".
+Exige dependências de sistema, e isso **está** documentado: o
+`01-DataLoading/requirements.txt` registra na linha 6 que "camelot-py needs Ghostscript installed on
+the system". Existe também um `91-Environment/requirements_camelot_20250413.txt` à parte — mas isso
+não é isolamento: o mesmo `01-DataLoading/requirements.txt` lista `camelot-py[cv]` na linha 25, junto
+do resto do capítulo, e o `requirements_marker_20250413.txt` também traz `camelot-py`. Por que existe
+um arquivo dedicado, o repositório não diz. Instale por onde preferir; o que você precisa garantir é
+o Ghostscript no sistema.
 
 ### `pdfplumber`
 

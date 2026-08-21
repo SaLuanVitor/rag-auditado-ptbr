@@ -255,7 +255,7 @@ qualquer jeito.
 ## Quebre de propósito
 
 **1. Suba o `threshold_cutoff` até esvaziar o chunk.** Ponha `threshold_cutoff=0.95`. Você **não** vai
-ever o LLM responder com contexto vazio: como a Parte 3 desta aula registra, o otimizador levanta
+ver o LLM responder com contexto vazio: como a Parte 3 desta aula registra, o otimizador levanta
 `ValueError("Optimizer returned zero sentences.")` **antes** da geração. Observe **onde** o traceback
 nasce — dentro do `node_postprocessors`, não no modelo — e tire a conclusão: limiar absoluto sem
 medição não degrada a resposta, derruba a consulta. Depois desça para 0,80 e 0,70 e ache o valor em

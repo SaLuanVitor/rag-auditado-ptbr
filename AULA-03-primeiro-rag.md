@@ -99,7 +99,8 @@ execução não é gratuita: este script troca apenas o embedding, e a linha 26 
 `resolve_llm("default")` resolve para OpenAI validando a chave — a geração é cobrada nas duas vezes,
 como a própria linha 5 do arquivo avisa. E não é sem rede: a documentação do `huggingface_hub`
 registra que, mesmo com o arquivo em cache, a chamada de download ainda faz uma requisição HTTP para
-checar se há versão nova; só `HF_HUB_OFFLINE=1` corta essa ida à rede.
+checar se há versão nova; `HF_HUB_OFFLINE=1` (ou `TRANSFORMERS_OFFLINE=1`) corta essa ida à rede, e `local_files_only=True`
+na chamada faz o mesmo.
 
 ### Duas ressalvas reais sobre este código
 

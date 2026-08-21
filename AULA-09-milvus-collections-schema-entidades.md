@@ -314,7 +314,9 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   caminho de arquivo local (`MilvusClient(db_path)`, `MilvusClient(uri="./wukong_images.db")`), que
   é **Milvus Lite**, o modo embutido. **Limite declarado:** se o Lite dispensa o load explícito ou
   se esses cinco arquivos simplesmente omitem uma etapa necessária, eu não sei — confirmar exige
-  rodar, e não tenho um servidor Milvus de pé aqui. O que está verificado é que eles buscam,
+  rodar, e aqui não roda: o Lite é um pacote separado (`milvus_lite`), sem wheel para Windows, e sem
+  ele o `MilvusClient("./arquivo.db")` para antes de qualquer busca. Servidor não resolveria este
+  caso — o modo embutido não usa nenhum. O que está verificado é que eles buscam,
   e que não chamam load. Se a sua busca voltar vazia, esta é a
   primeira hipótese, antes de qualquer suspeita sobre embedding. Dado recém-inserido também pode não
   aparecer de imediato, conforme o nível de consistência configurado.

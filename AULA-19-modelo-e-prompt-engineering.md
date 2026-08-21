@@ -490,8 +490,10 @@ quebra com `NameError`.
 (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. A pergunta era se o `format` do `PromptTemplate` rejeita chaves extras ou as ignora, e agora está
 **medida** no `langchain-core` 0.3.33, a versão que o repositório pina: **ignora em silêncio.** Um
 template que declara duas variáveis, recebendo quatro, devolve a string formatada sem erro e sem
-aviso. É a pior das duas respostas possíveis, porque o dicionário errado não se anuncia. O que segue
-não mudou — a importação
+aviso. É a pior das duas respostas possíveis, porque o dicionário errado não se anuncia — e é a
+primeira coisa que você confirma ao rodar o arquivo, motivo pelo qual está na lista da Mão na massa.
+
+O que continua valendo do parágrafo antigo é só o caminho do import: a importação
 falha. Não vou afirmar o resultado sem executar. É a primeira coisa que você descobre ao rodar o
 arquivo, e está na lista da Mão na massa por isso.
 

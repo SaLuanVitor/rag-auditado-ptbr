@@ -281,8 +281,9 @@ dele — argumento empírico contra "OCR em tudo por segurança".
 **4. Compare OCR com modelo multimodal na mesma página — e note que exige uma edição.** Os dois
 scripts não olham para o mesmo arquivo: o `01-Unstructured-ReadImages.py` tem **um caminho fixo** na
 linha 2 (um `.jpg` de `99-EN/assets/`), e o `03-LLM-ReadImagesAndText.py` rasteriza todas as páginas
-de um PDF diferente, gravando `page_N.jpg`. Então: rode primeiro o `03`, escolha uma das páginas que
-ele gerou com gráfico ou diagrama, **aponte a linha 2 do `01` para esse `page_N.jpg`** e rode o `01`.
+de um PDF diferente, gravando um `page_N.jpg` por página numa pasta chamada `temp_images` — o nome dela sai da linha 12 e
+o diretório é criado na 15. Então: rode primeiro o `03`, escolha uma das páginas que
+ele gerou com gráfico ou diagrama, **aponte a linha 2 do `01` para esse arquivo, dentro de `temp_images`** e rode o `01`.
 Aí sim é a mesma página nos dois, e a diferença entre ler caracteres e interpretar conteúdo fica
 óbvia numa execução.
 

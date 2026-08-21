@@ -33,7 +33,7 @@ forçar o modelo a inventar.
 
 | Grau | Mecanismo            | O que garante                | O que não garante                | No módulo                                               |
 | ---- | -------------------- | ---------------------------- | -------------------------------- | ------------------------------------------------------- |
-| 1    | pedir no prompt      | nada                         | nada                             | `01`, e 4 dos 5 blocos de `02`                          |
+| 1    | pedir no prompt      | nada                         | nada                             | `01`, e 3 dos 5 blocos de `02`                          |
 | 2    | validar depois       | que você **detecte** o erro  | que ele não aconteça             | `01` (`parser.parse`); `04-Pydantic-v1.py` só em espírito¹ |
 | 3    | obrigar na API       | JSON sintaticamente válido   | campos, tipos, semântica         | `03-JSON-Output.py:34`                                  |
 | 4    | schema como contrato | estrutura e tipos dos campos | que os valores sejam verdadeiros | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
@@ -195,8 +195,8 @@ client = OpenAI(
 
 ## Parte 3 — O par `04-Pydantic` que não é um par
 
-⚠️ Este é o ponto do módulo em que a regra 7 do protocolo de citação — *"par de arquivos exige
-`diff`"*, item 7 de `agente/rag-specialist.md` — existe. Os nomes
+⚠️ Este é o ponto do módulo em que "nomes parecidos exigem `diff`" deixa de ser conselho e passa a
+ser método. Os nomes
 `04-Pydantic-v1.py` e `04-Pydantic-v2.py` sugerem duas versões do mesmo exemplo, uma para cada
 versão da biblioteca. O `diff` diz outra coisa: **os dois arquivos compartilham exatamente as duas
 primeiras linhas** — os imports de `pydantic` e de `typing`. Nada mais. São exemplos distintos, com
@@ -267,7 +267,7 @@ símbolos de uma vez.
 
 ## Parte 4 — O par `05-function-calling`: mesma tarefa, mesmo provedor, camadas diferentes
 
-⚠️ Segunda aplicação da mesma regra 7, e o resultado é mais surpreendente que o do par anterior. Os nomes
+⚠️ Segunda vez que o `diff` desmente o nome, e o resultado é mais surpreendente que o do par anterior. Os nomes
 são `05-function-calling-v1-LangChain.py` e `05-function-calling-v2-DeepSeek.py`. A leitura natural
 — "um usa LangChain, o outro usa DeepSeek" — sugere provedores diferentes. Os arquivos dizem que
 **ambos falam com a DeepSeek**:
@@ -437,7 +437,8 @@ usa parsing de fato — o bloco 2, com `output_cls=GameInfo` na linha 36, o úni
 onde o schema `GameInfo` (linhas 9–16) é usado. Dos outros quatro, **três** controlam formato por **instrução
 de prompt**: tabela (`:50`), lista numerada (`:64`), linha de tempo (`:79`).
 
-Ou seja: quatro dos cinco blocos são grau 1 num capítulo sobre grau 4. Não é erro — é o material
+Ou seja: três dos cinco blocos são grau 1 num capítulo sobre grau 4 — e o bloco 1 não controla
+formato de forma alguma: a chamada passa só o modo, e a query não pede formato nenhum. Não é erro — é o material
 que permite comparar os dois no mesmo arquivo. Rode o bloco 3 e o bloco 2 e olhe qual dos dois
 resultados você conseguiria consumir por programa sem escrever um parser à mão.
 
@@ -450,7 +451,10 @@ parâmetros distintos, e qual deles cada modo consome é decisão da biblioteca 
 legível na fonte.** Em `llama_index.core.response_synthesizers.factory`, versão 0.11.17, a
 `get_response_synthesizer` declara os dois parâmetros na assinatura (`text_qa_template` e
 `summary_template`) e então ramifica por modo. `TREE_SUMMARIZE` é o **único** dos nove modos que
-recebe `summary_template`; todos os outros que aceitam template recebem `text_qa_template`. Duas
+recebe `summary_template`. Os que consomem o prompt de pergunta — `REFINE`, `COMPACT`,
+`SIMPLE_SUMMARIZE`, `ACCUMULATE` e `COMPACT_ACCUMULATE` — recebem `text_qa_template`, e os dois
+primeiros também `refine_template`; o `GENERATION` recebe `simple_template`; e `NO_TEXT` e
+`CONTEXT_ONLY` não recebem template nenhum. Duas
 consequências:
 
 - **os três blocos do script estão certos** — o 3, em `TREE_SUMMARIZE`, passa `summary_template`; os
@@ -462,7 +466,7 @@ E é o tipo de erro que não avisa: se o template cair num slot que aquele modo 
 sem formatação e conclui que "o modelo não obedeceu".
 
 **O corpus é pequeno para o que os modos se propõem.** Com 4.462 bytes, o número de chunks é baixo,
-e `REFINE`, `TREE_SUMMARIZE` e `ACCUMULATE` só se diferenciam quando há **muitos** chunks para
+e `REFINE`, `TREE_SUMMARIZE` e `COMPACT_ACCUMULATE` só se diferenciam quando há **muitos** chunks para
 combinar — é justamente aí que refinar, resumir em árvore ou acumular divergem. Com um punhado de
 chunks, os cinco blocos tendem a produzir resultados parecidos, e a diferença que o arquivo quer
 demonstrar não aparece. É o mesmo padrão que a Aula 19 encontrou no corpus de 779 bytes: o exemplo
@@ -547,7 +551,7 @@ o `02`, a necessidade da chave é verificável sem executar nada, e verifiquei: 
 `validate_openai_api_key(embed_model.api_key)` — o ramo `if embed_model == "default"` de
 `resolve_embed_model`, em `llama_index.core.embeddings.utils`.
 Sem chave, a própria mensagem do código diz o que acontece: "Could not load OpenAI embedding model
-(…) please check your OPENAI_API_KEY". Idêntico na 0.11.17 extraída e na wheel 0.14.24. O `02`
+(…) please check your OPENAI_API_KEY". Comportamento estável da 0.11 em diante. O `02`
 precisa da chave, e o `.env.example` poderia tê-lo nomeado.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 

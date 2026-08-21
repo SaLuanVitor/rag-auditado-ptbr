@@ -203,8 +203,8 @@ python 00-DirectlyLoadDocumentsIndexAndQA.py
 dentro desta pasta ela não resolve. Prefixe com `../../`.
 
 E o `98-TwoTierIndex-FAISS.py` tem o mesmo problema **mais um pior**: a linha 31 aponta para
-`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas
-57-58 procuram `billionaires_table_2` … `_6` — que são as abas do **outro** arquivo da mesma pasta,
+`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas 57 e 63 montam a chave
+`billionaires_table_{matched_year+2}` — `_2` a `_6`, que são as abas — que são as abas do **outro** arquivo da mesma pasta,
 `billionaires_merged.xlsx`. Com o caminho certo e o workbook errado você recebe
 `KeyError: 'billionaires_table_2'`. Troque a linha 31 por
 `"../../90-Data/ComplexPDF/TopTenBillionaires/billionaires_merged.xlsx"`.
@@ -256,8 +256,8 @@ os ids e faz `docstore.mget(ids)`; sem docstore populado o `mget` devolve `None`
 compreensão de lista que vem depois filtra todos. Some tudo, silenciosamente.
 
 Isso é mais instrutivo que o resumo teria sido: **o resumo nunca é entregue ao LLM em nenhum
-caminho.** Ele existe só para ser encontrado. Confirmado lendo a fonte do `MultiVectorRetriever`,
-confirmado na fonte do `MultiVectorRetriever`, cujo `_get_relevant_documents` termina em
+caminho.** Ele existe só para ser encontrado. Confirmado na fonte do `MultiVectorRetriever`, cujo
+`_get_relevant_documents` termina em
 `docs = self.docstore.mget(ids)` seguido de `return [d for d in docs if d is not None]` — sem
 docstore populado, a lista sai vazia.
 

@@ -217,8 +217,8 @@ $env:DEEPSEEK_API_KEY = "sk-..."   # este arquivo não lê o .env
 python 01-QueryRewriting-1-RewriteViaPrompt.py
 ```
 
-O `$env:` é necessário e custa a primeira execução de quem não sabe: este é o **único** arquivo da
-pasta que não chama `load_dotenv()` — ele lê `DEEPSEEK_API_KEY` direto do ambiente, na linha 6. Com a
+O `$env:` é necessário e custa a primeira execução de quem não sabe: este é o **único script que precisa de chave** e
+não chama `load_dotenv()` — ele lê `DEEPSEEK_API_KEY` direto do ambiente, na linha 6. Com a
 chave só no `.env`, o construtor da linha 4 estoura em tempo de import com `OpenAIError: The api_key
 client option must be set`, mensagem que ainda nomeia `OPENAI_API_KEY`, porque vem da SDK e não do
 script. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
