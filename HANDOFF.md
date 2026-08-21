@@ -150,6 +150,15 @@ que eu mesmo truncei (`head -30` escondeu o nono modo); ampliei o escopo de um `
 rigoroso e tornei a frase falsa (o PDF casa `leiden`); e quase "corrigi" um acerto porque o meu
 comando de conferência era mais frouxo que o texto (`grep -c "^|"` conta o separador da tabela)
 
+**📌 O CLONE É O GABARITO, E O COMMIT DELE IMPORTA.** As 1830 citações do curso resolvem contra
+`E:ProjetosagRAG-from-First-Principles`, clone de
+`https://github.com/PacktPublishing/RAG-from-First-Principles.git`, **pinado em `17c6942`**
+(2026-06-23). É repositório vivo, com PRs sendo mesclados: reclonar traz o `HEAD` de então, e um
+commit upstream que insira linhas num arquivo desloca todas as citações dele — o `verify-citations`
+passaria a acusar erro por motivo que não tem relação com a qualidade do curso. Se o clone se perder,
+restaure **neste commit**: `git clone <url> && git checkout 17c6942`. Não o apague, não o atualize, e
+não o reclone sem fixar o hash
+
 **Varredura da classe 8 — exercício que não entrega: feita.** 307 receitas verificadas por quatro
 auditores, **62 defeitos — 20%**, cinco vezes a taxa da classe das contagens. Era a mais densa que
 restava. **35 aplicados; restam 27**, todos da cauda de severidade menor. Detalhe na seção "Varredura
