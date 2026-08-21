@@ -246,7 +246,9 @@ compreensão de lista que vem depois filtra todos. Some tudo, silenciosamente.
 
 Isso é mais instrutivo que o resumo teria sido: **o resumo nunca é entregue ao LLM em nenhum
 caminho.** Ele existe só para ser encontrado. Confirmado lendo a fonte do `MultiVectorRetriever`,
-não por execução — `langchain` não está instalado neste ambiente.
+confirmado na fonte do `MultiVectorRetriever`, cujo `_get_relevant_documents` termina em
+`docs = self.docstore.mget(ids)` seguido de `return [d for d in docs if d is not None]` — sem
+docstore populado, a lista sai vazia.
 
 **5. Adicione uma segunda representação.** Ao lado dos resumos, indexe palavras-chave extraídas dos
 mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índice passou a ter.

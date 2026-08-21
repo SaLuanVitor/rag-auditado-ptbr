@@ -228,7 +228,8 @@ forma comensurável — `score = similaridade × decaimento`, ou uma média pond
 > `score = (1.0 - decay_rate) ** hours_passed`
 > e depois `score += vector_relevance`: **soma** o decaimento exponencial à relevância do vetor. (Se
 > essa relevância vem normalizada ou não depende do vector store, e isso está em
-> `langchain_community`, que não consegui abrir — o que está conferido é a soma.) Nem multiplicação, nem α — é o padrão de somar escalas incomensuráveis que o ponto 1
+> `langchain`, em `langchain.retrievers.time_weighted_retriever` — o que está conferido, lendo a fonte, é a
+> soma.) Nem multiplicação, nem α — é o padrão de somar escalas incomensuráveis que o ponto 1
 > acima chama de errado. As duas formas "corretas" do parágrafo anterior são o que **deveria** ser
 > feito, não o que roda. _Conferido lendo a fonte do `langchain` 0.3.0; não executei._
 

@@ -124,8 +124,8 @@ passadas ao `hybrid_search` — trocar os dois inverte a mistura sem lançar err
 > o que a leitura recomendada deixa
 > para depois.
 >
-> **Limite declarado, e o que ele não abrange.** `pymilvus` não está instalado neste ambiente, então
-> não rodei nada. Mas parte da pergunta se responde no próprio arquivo, sem biblioteca alguma:
+> **Limite declarado, e o que ele não abrange.** Não rodei o pipeline — isso exigiria um servidor
+> Milvus de pé. Mas parte da pergunta se responde no próprio arquivo, sem biblioteca alguma:
 > `weights` é `{"sparse": 0.7, "dense": 1.0}` (linha 106) e a chamada é
 > `WeightedRanker(weights["sparse"], weights["dense"])` (linha 147) — **dois floats posicionais nus**,
 > `0.7` e depois `1.0`. As chaves `"sparse"` e `"dense"` são resolvidas dentro do script e nunca

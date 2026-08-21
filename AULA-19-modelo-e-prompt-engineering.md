@@ -368,8 +368,9 @@ Fato do código, verificado por `grep -n "n=\|choices"` no arquivo: **o parâmet
 `choices` aparece só na linha 53. Conhecimento de domínio: numa API de _chat completions_ no formato da OpenAI, `choices` traz um
 elemento quando `n` não é informado. Vale nomear de quem é o contrato aqui, porque não é da OpenAI: a
 chamada aponta para `https://api.deepseek.com` na linha 31, com `model="deepseek-chat"` na 43, então
-quem responde é a camada de compatibilidade da DeepSeek, e essa eu não verifiquei — o pacote `openai`
-não está em disco. Logo o laço "Candidate Analysis" itera uma vez —
+quem responde é a camada de compatibilidade da DeepSeek, e essa eu não verifiquei: o SDK `openai`
+está instalado (1.109.1), mas confirmar quantos elementos vêm em `choices` exigiria uma chamada real
+à API, com chave. Logo o laço "Candidate Analysis" itera uma vez —
 o rótulo plural descreve uma intenção que a chamada não solicitou.
 
 A distinção que fica: pedir múltiplas perspectivas **dentro de uma resposta** (o que o prompt faz)

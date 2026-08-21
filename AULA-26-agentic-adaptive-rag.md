@@ -300,7 +300,7 @@ O paper Modular RAG especifica o freio em todos os três subtipos de laço, e no
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 
-> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** — valor documentado da biblioteca, não algo que se leia neste repositório; `langgraph` não está instalado neste ambiente nem há wheel em disco, então confira na versão que você usar antes de contar com ele
+> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** — **medido** no `langgraph` 0.2.69, a versão que este repositório pina: um grafo de laço infinito levanta `GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition`. O valor não se lê neste repositório, e sim na plataforma
 > super-steps, e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem

@@ -132,8 +132,7 @@ output = llm(prompt.format(query="User ID 123"))
 `llm(...)` é a forma antiga; a interface atual do LangChain é `.invoke(...)` — e é o que os outros
 arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33 que o repositório pina: a chamada emite
 `LangChainDeprecationWarning: The method BaseChatModel.__call__ was deprecated in langchain-core
-0.1.7 and will be removed in 1.0. Use invoke instead.` Não é previsão — há data de remoção anunciada. `langchain` **não está instalado neste ambiente**, então
-não vou afirmar o que ela imprime hoje.
+0.1.7 and will be removed in 1.0. Use invoke instead.` Não é previsão — há data de remoção anunciada.
 
 **`PromptTemplate.from_template` com `{query}`** (linha 12) é o formato do LangChain. Guarde o
 contraste: o LlamaIndex, na Parte 5, usa `{query_str}`.

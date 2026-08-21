@@ -72,7 +72,8 @@ está no 4, que faz chamadas de embedding durante a _ingestão_ e em acervo gran
 `llama_index.core.node_parser.text.semantic_splitter`, que chama
 `get_text_embedding_batch` sobre os grupos de sentenças e depois `similarity` por par de vizinhos,
 na 0.11.17 extraída. O custo do
-nível 3 não foi verificado: `langchain_text_splitters` não está em disco.
+nível 3 não foi verificado por execução, mas é o mesmo algoritmo recursivo com outra lista de
+separadores.
 
 ---
 
@@ -216,10 +217,18 @@ python 01-LangChain-CharacterTextSplitter.py
 python 02-LangChain-RecursiveharacterTextSplitter.py
 ```
 
-Compare as saídas. Procure especificamente por **chunks que terminam no meio de uma palavra
-ou de uma frase** no primeiro, e veja se o segundo os elimina. Conte quantos chunks cada um
-produziu: o recursivo tende a gerar chunks de tamanho mais irregular, porque respeita
-fronteiras em vez de cortar na contagem exata. Irregularidade aqui é sinal de saúde.
+Compare as saídas. E prepare-se para o resultado contrariar a intuição — o que segue foi **medido** no ambiente pinado
+do curso. O `CharacterTextSplitter` do `01` usa o separador default `"\n\n"`: corta **só** em linha
+em branco, **ignora** o `chunk_size=100` (a saída traz nove avisos `Created a chunk of size 779,
+which is longer than the specified 100`) e produz 20 chunks de tamanho selvagemente desigual — 16,
+779, 11, 319 — que **nunca** partem uma palavra. O recursivo do `02`, com os quatro separadores da
+linha 6, produz 72 chunks e **nenhum passa de 100 caracteres** — regulares, não irregulares. E é
+**ele** quem parte frase ao meio, porque cai no separador `" "`: um chunk termina em "about 17
+kilometers west" e o seguinte começa em "west of Datong".
+
+A lição é a inversa da esperada, e melhor que ela: **quem respeita o `chunk_size` é o recursivo, e o
+preço de respeitá-lo é cortar onde a frase não acaba.** O fixo respeita a fronteira da frase e
+desrespeita o número que você pediu.
 
 ### Passo 2 — Código, com e sem conhecimento de linguagem
 

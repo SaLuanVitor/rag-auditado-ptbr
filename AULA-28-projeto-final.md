@@ -349,7 +349,9 @@ Se o seu projeto tiver aresta que volta, ele precisa de três coisas:
 3. **Um comportamento definido quando o limite estoura.** Responder com ressalva, admitir falha ou
    escalar. A ausência de escolha não é travamento — é deixar a plataforma abortar por você: o
    `recursion_limit` padrão do LangGraph — 25 super-steps, valor da documentação da biblioteca, que
-   as Aulas 21 e 26 registram como **não confirmado neste ambiente** porque `langgraph` não está
+   as Aulas 21 e 26 registram como **medido** no `langgraph` 0.2.69 (`GraphRecursionError: Recursion
+   limit of 25 reached without hitting a stop condition`), devolve uma exceção onde deveria haver uma
+   resposta. O que não está
    instalado — devolve um `GraphRecursionError` onde deveria haver uma resposta.
 
 E um cuidado extra, que a Aula 26 encontrou na forma dura: **guarde a pergunta original.** Um laço

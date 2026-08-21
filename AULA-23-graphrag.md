@@ -411,9 +411,13 @@ sustentam a decisão de adotar ou não.
 stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Foi assim que as citações
 desta aula foram conferidas. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
-isso; mas neste PDF ela **não serve para buscar frases**: os espaços entre palavras são
-posicionamento, não literal, então `mutually exclusive` e `RAG fails on global questions` não
-aparecem em nenhum dos dois modos de junção. Termo isolado (`graspologic`, `Traag`, `281`) ela acha.
+isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.501 literais —, com uma ressalva que é a
+própria lição: os espaços entre palavras são posicionamento, não literal. Buscar `mutually exclusive`
+com o espaço devolve zero em qualquer modo de junção. Junte os literais com `""` e tire os espaços
+**também do termo de busca**, e as duas frases aparecem: `mutuallyexclusive,collectivelyexhaustive` e
+`RAGfailsonglobalquestions`, uma ocorrência cada. Termo isolado (`graspologic`, `Traag`, `281`) ela
+acha sem truque nenhum. A conclusão a levar: por essa rota o texto existe, mas a **segmentação em
+palavras** não — e é isso que o `pdftotext` faz por você.
 
 **3. Estime o seu custo de indexação.** Pegue o número do paper — 281 minutos para ~1 milhão de
 tokens com `gpt-4-turbo` — e escale para o seu corpus. Depois multiplique pela frequência com que ele

@@ -132,8 +132,7 @@ campo de id, um campo de vetor, e um índice default. Uma linha, e você tem ond
 `dimension=5` é valor de brinquedo, escolhido para os vetores caberem legíveis na tela. Em uso
 real seria 384, 768 ou 1536 — e **precisa bater exatamente com a saída do seu modelo de
 embedding**. Divergência aqui **deve** dar erro na inserção, não degradação silenciosa — é das poucas falhas
-desta fase que aparecem na hora. _Previsão, não medição: `pymilvus` não está instalado neste
-ambiente e eu não executei._
+desta fase que aparecem na hora. _Previsão, não medição: verificar exigiria um servidor Milvus de pé, que não tenho aqui._
 
 ### `03-schema.py` — o controle
 
@@ -311,7 +310,7 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
   caminho de arquivo local (`MilvusClient(db_path)`, `MilvusClient(uri="./wukong_images.db")`), que
   é **Milvus Lite**, o modo embutido. **Limite declarado:** se o Lite dispensa o load explícito ou
   se esses cinco arquivos simplesmente omitem uma etapa necessária, eu não sei — confirmar exige
-  rodar, e `pymilvus` não está instalado neste ambiente. O que está verificado é que eles buscam,
+  rodar, e não tenho um servidor Milvus de pé aqui. O que está verificado é que eles buscam,
   e que não chamam load. Se a sua busca voltar vazia, esta é a
   primeira hipótese, antes de qualquer suspeita sobre embedding. Dado recém-inserido também pode não
   aparecer de imediato, conforme o nível de consistência configurado.
