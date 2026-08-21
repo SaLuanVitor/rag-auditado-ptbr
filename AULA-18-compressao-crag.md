@@ -261,8 +261,13 @@ nasce — dentro do `node_postprocessors`, não no modelo — e tire a conclusã
 medição não degrada a resposta, derruba a consulta. Depois desça para 0,80 e 0,70 e ache o valor em
 que este corpus para de quebrar. Esse valor é propriedade do corpus, não da técnica.
 
-**2. Comprima depois de já ter reranqueado bem.** Recupere 20, rerank para 3, e então aplique
-compressão. Compare com só o rerank. Se a resposta não melhorar, você acabou de medir que a
+**2. Comprima depois de já ter reranqueado bem — e não no `01`.** O corpus do `01` são três
+`Document` escritos no próprio arquivo, com `retriever.k = 3`: "recupere 20, rerank para 3" não é
+alcançável ali, e rerankear três para três não descarta nada, então a comparação com "só o rerank" é
+idêntica por construção. Faça o exercício sobre o corpus do `03`, que carrega o acervo de turismo
+inteiro: monte um motor com `similarity_top_k=20`, ponha um reranker como primeiro
+`node_postprocessor` e o `SentenceEmbeddingOptimizer` como segundo, e compare com o mesmo motor sem o
+otimizador. Se a resposta não melhorar, você acabou de medir que a
 compressão era desnecessária ali — e a ordem da Aula 17 se justifica.
 
 **3. Force o grader do CRAG a reprovar tudo.** Faça uma pergunta sobre assunto ausente do acervo.

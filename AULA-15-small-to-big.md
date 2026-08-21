@@ -272,8 +272,11 @@ exija o entorno e veja a resposta ficar incompleta.
 **2. Iguale pai e filho.** No `02`, ponha `chunk_size=1000` nos dois splitters. Você desmontou o
 small-to-big: agora indexa e entrega o mesmo objeto, e está de volta à tensão da Aula 07.
 
-**3. Exagere o pai.** Ponha o pai em `chunk_size=8000` e o filho em 200. O contexto entregue fica
-enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
+**3. Exagere o pai — e primeiro dê texto a ele.** O corpus embutido no `02` é uma string de 1.745
+caracteres, então com `chunk_size=8000` o divisor devolve **um** pai, que é o documento inteiro: o
+contexto entregue passa a ser o mesmo para toda pergunta, e nada fica "enorme". Troque antes o corpus
+por um arquivo do acervo de turismo, e aí sim ponha o pai em 8000 e o filho em 200. O contexto
+entregue fica enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
 cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
 
 **4. Remova o docstore da expansão. Não funciona, e é isso que se aprende:** no `03`, apague o

@@ -335,7 +335,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 ## Quebre de propósito
 
-**1. Rode o `02` como está.** Antes de consertar nada. Veja o que acontece quando o campo de imagem contém `"<YOUR_IMAGE_BASE64_STRING>"`. Registre em que etapa o erro aparece — e note que não é na inserção.
+**1. Rode o `02` como está.** Antes de consertar nada. Veja o que acontece quando o campo de imagem contém `"<YOUR_IMAGE_BASE64_STRING>"`. Registre em que etapa o erro aparece. Há duas possibilidades e vale saber qual é a sua: o campo de imagem é declarado no vetorizador, então a inserção é o momento em que o serviço tenta decodificar aquele texto como base64 — ela pode falhar já ali. Se passar, a coleção fica com um objeto cujo campo de imagem não é imagem, e a falha cai adiante, na busca ou na chamada de visão. Anote onde caiu: a distância entre a origem do defeito e o ponto em que ele estoura é a lição do exercício.
 
 **2. Descomente uma busca por mídia sem trocar a variável.** Em `01-Weaviate-Multimodal-Search.py`, descomente `:98-107` — a busca por áudio — sem tocar em `animals`. O `NameError` que você recebe não menciona áudio, nem Weaviate, nem modalidade: o Python resolve `animals.query` antes de avaliar os argumentos. **Não use o bloco de inserção `:42-52` para isto:** a linha 44 faz `os.listdir("./data/audio/")`, diretório que não existe no repositório, e você recebe `FileNotFoundError` três linhas antes de chegar ao `animals` da 47 — que é o sintoma oposto ao que o exercício quer mostrar. É a demonstração de por que import e variável fantasma custam tempo de depuração.
 

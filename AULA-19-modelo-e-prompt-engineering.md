@@ -503,6 +503,13 @@ arquivo, e está na lista da Mão na massa por isso.
 
 O subdiretório 01 não precisa de chave; o 02 precisa. Comece pelo que roda sem conta.
 
+E rode **de dentro do subdiretório do script**, não da raiz: o
+`01-UsePromptTemplateToClarifyGenerationGoal.py` carrega o corpus por caminho relativo na linha 10, que
+só resolve com o diretório de trabalho em `08-Generation/02-OptimizingResponseViaPrompts`. Da raiz do
+repositório ele levanta `FileNotFoundError` antes de chegar a qualquer coisa que os itens abaixo pedem
+para observar. Ou seja: `cd` para `01-ModelSelectionAndInvocation` nos itens 1 e 2, e `cd
+../02-OptimizingResponseViaPrompts` nos itens 3 a 6.
+
 **1. Invocação local, e a diferença do formato de conversa.** Rode
 `08-Generation/01-ModelSelectionAndInvocation/01-UsingQwen3.py`. Observe duas coisas: quanto tempo a carga leva no
 seu hardware, e que a saída impressa contém a pergunta antes da resposta. Depois, num interpretador,

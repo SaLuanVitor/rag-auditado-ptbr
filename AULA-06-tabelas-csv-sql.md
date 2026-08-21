@@ -235,8 +235,10 @@ cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
 python 01-01-ImportCSV.py
 ```
 
-Roda a parte 4 (`UnstructuredCSVLoader`). Agora **descomente a parte 1** e rode de novo: conte
-os `Document` de cada. Um documento por linha contra um documento por tabela — a mesma fonte,
+Roda a parte 4 (`UnstructuredCSVLoader`). Agora **descomente a parte 1** e rode de novo — mas
+acrescente um `print(len(data))` em cada parte antes do laço, senão o exercício não tem como ser
+feito: as duas imprimem apenas `data[:2]`, então você vê dois registros dos seis que existem, e não a
+contagem que se pede. Com o `len` na tela: seis documentos na parte 1, um na parte 4 — a mesma fonte,
 duas granularidades.
 
 Depois descomente a parte 3 e olhe o campo `source` no metadado. Antes era o caminho do
@@ -274,8 +276,13 @@ responder uma pergunta sobre a tabela.
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que
 veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, sentido na pele.
 
-**4. Meça o custo do camelot.** O arquivo `03-01` já importa `time`. Cronometre-o contra o
-`pdfplumber` do `04-01` no mesmo PDF.
+**4. Meça o custo do camelot.** Os dois arquivos já cronometram, e é aí que está a armadilha: no
+`03-01` as marcas estão nas linhas 9 e 11, cercando **só** a chamada de leitura do PDF; no `04-01`
+estão nas linhas 6 e 39, cercando abertura, extração de todas as páginas, montagem dos DataFrames **e**
+a impressão de cada um. Comparar os dois números impressos não compara as duas bibliotecas. Iguale o
+escopo antes — mova o fim da medição do `04-01` para logo depois do laço de extração, ou estenda a do
+`03-01` até o fim do laço das tabelas — e rode os dois da raiz do repositório. Note também que o
+`03-01` grava um CSV por tabela no diretório de trabalho: rode-o onde esses arquivos não incomodem.
 
 ---
 

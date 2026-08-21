@@ -246,9 +246,16 @@ não é selecionado, e nenhum ajuste no nível 2 recupera. É a cascata cobrando
 vencer, você tem evidência de que a hierarquia não está pagando — e essa é a medição que quase
 ninguém faz.
 
-**3. Conserte o segundo nível do `98`.** Use o `indices` que a linha 58 calcula e faça o retorno
-depender dele. Compare o resultado com a versão original. Você acabou de transformar um segundo
-nível decorativo em funcional.
+**3. Conserte o segundo nível do `98` — e note que consertar o `return` não basta.** Use o `indices`
+que a linha 58 calcula e faça o retorno depender dele. O resultado **não muda**, e a razão é o que o
+exercício ensina: a consulta do segundo nível é o embedding **da própria tabela já escolhida**, e essa
+tabela está indexada no `table_index` — buscar num `IndexFlatL2` um vetor idêntico a um vetor indexado
+devolve ele mesmo, a distância zero. O `indices[0][0]` reaponta para a mesma tabela.
+
+Para o segundo nível influenciar de fato, troque a consulta pelo embedding **da pergunta** e mantenha
+uma lista que mapeie a posição do índice de volta ao nome da aba. Aí compare: é a diferença entre um
+segundo nível decorativo e um funcional — e o exercício ensina duas coisas, porque a primeira
+tentativa mede zero.
 
 **4. Remova o docstore do multi-representação.** Sem ele, o retriever devolve **lista vazia** — e
 não o resumo, que seria a suposição intuitiva. O `MultiVectorRetriever` busca no vetorstore, junta

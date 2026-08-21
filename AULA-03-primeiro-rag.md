@@ -230,7 +230,9 @@ material ruim, avalia, reformula a query, recupera de novo — o grafo passa a s
 forma natural, e o pipeline linear não dá conta. É a base de Self-RAG (Aula 21),
 CRAG (Aula 18) e Agentic RAG (Aula 26).
 
-Nesta aula, apenas rode e observe a estrutura de nós e arestas. Voltaremos.
+Nesta aula, apenas rode e observe a estrutura de nós e arestas — que **não sai na tela**: o script
+imprime só a pergunta e a resposta. A estrutura está declarada no código, e para vê-la acrescente um
+`print(graph.get_graph().draw_ascii())` depois do `.compile()`. Voltaremos.
 
 ---
 

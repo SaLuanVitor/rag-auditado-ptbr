@@ -589,7 +589,7 @@ literalmente trechos do `contexts` mas responda outra coisa que não a `question
 `Select.RecordCalls.retrieve.rets[:]` (`09-Evaluation/02-Trulens.py:99`) por `.on_output()`. A `context_relevance` passa a
 avaliar a resposta como se fosse contexto. Continua produzindo um número.
 
-**6. Tire a agregação.** Remova `.aggregate(np.mean)` (`09-Evaluation/02-Trulens.py:99`) e veja o que acontece quando há mais de
+**6. Tire a agregação — depois de dar mais de um contexto ao store.** No arquivo como está, o store recebe **um** documento e `n_results=2` sobre uma coleção de um item devolve um contexto só, então remover o `.aggregate(np.mean)` (`09-Evaluation/02-Trulens.py:99`) não muda nada. Acrescente primeiro dois ou três documentos, confirme na saída que a recuperação devolve mais de um, e só então tire a agregação. Aí você vê o que acontece quando há mais de
 um contexto. A agregação não é decoração.
 
 **7. Sabote o gabarito.** Em `03-DeepEval.py`, troque `expected_output` (`09-Evaluation/03-DeepEval.py:8`) por algo verdadeiro

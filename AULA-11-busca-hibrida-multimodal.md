@@ -167,7 +167,7 @@ imagem e texto no mesmo espaço vetorial:
 | -------------------------------------------------- | ----------------------------- |
 | `Milvus+Visual-BGE-MultimodalRetrieval-Chinese.py` | pipeline completo             |
 | `Milvus+Visual-BGE-MultimodalRetrieval-English.py` | o mesmo, outra variante       |
-| `Milvus+Visual-BGE-PureRetrievalProgram.py`        | só a recuperação, sem o resto |
+| `Milvus+Visual-BGE-PureRetrievalProgram.py`        | só a recuperação, sobre um store já construído¹ |
 
 E — prática rara, mas não exclusiva, no repositório — **três imagens de saída** versionadas:
 
@@ -215,6 +215,12 @@ antes de qualquer conexão:
 ```powershell
 pip install -r requirements.txt
 ```
+
+¹ Este arquivo **não roda sozinho no clone**, e vale saber antes de tentar: ele consulta um store que
+o pipeline completo cria, e depende de um peso de modelo (`.pth`) que não vem no repositório —
+`find . -name "*.pth"` e `find . -name "*.db"` devolvem zero. O `visual_bge` também não está no PyPI;
+o `04-VectorDB/requirements.txt` traz o comando de instalação a partir do GitHub. Rode primeiro o
+pipeline completo, que constrói o store, e só então a recuperação pura.
 
 Comece pelo mais legível, não pelo `v1`:
 

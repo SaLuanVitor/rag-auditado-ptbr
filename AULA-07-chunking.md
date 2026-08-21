@@ -310,8 +310,10 @@ linha 31 — com `k=3`, se o chunk certo não estiver entre os três melhores, n
 ## Quebre de propósito
 
 **1. Zere a sobreposição.** Em `02-LangChain-RecursiveharacterTextSplitter.py:10`, mude
-`chunk_overlap=10` para `0`. Procure uma informação que atravesse a fronteira de dois chunks
-e veja-a desaparecer da recuperação. Isso mostra para que serve overlap: não é redundância,
+`chunk_overlap=10` para `0`. Este arquivo não recupera nada — ele só imprime os chunks, sem embedding,
+índice ou retriever —, então a observação é textual: escolha uma frase que atravesse a fronteira de
+dois chunks com overlap 10 e confira que, com 0, ela deixa de estar **inteira** em qualquer chunk.
+Nenhum dos dois pedaços, isolado, responderia a uma pergunta sobre ela. Isso mostra para que serve overlap: não é redundância,
 é seguro contra o corte cair no lugar errado.
 
 **2. Aplique o splitter de código a prosa.** Rode um texto comum pelo

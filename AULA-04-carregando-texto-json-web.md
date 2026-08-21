@@ -274,7 +274,10 @@ prepara a Aula 05.
 
 **3. Corrompa um arquivo e rode `03-04`.** Crie um arquivo inválido no diretório e rode a
 versão com `silent_errors=True`. Ela conclui sem reclamar. Agora conte quantos documentos
-voltaram contra quantos arquivos existem — e veja o buraco que o silêncio produziu.
+voltaram — e note que o `03-04` **não imprime contagem nenhuma**: a única saída dele é o começo do
+primeiro documento. Acrescente um `print(len(docs))` antes do final do arquivo, e só então compare com
+quantos arquivos existem no diretório. É a diferença entre os dois números que mostra o buraco que o
+silêncio produziu.
 
 **4. Troque o `jq_schema` por `.` puro — e reporte o que aconteceu.** A previsão que esta aula fazia está **medida**, no `langchain-community` 0.3.16 que o repositório
 pina: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
