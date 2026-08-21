@@ -393,13 +393,31 @@ O conteúdo novo do arquivo são os cinco `ResponseMode`, um por bloco:
 | 4     | `COMPACT_ACCUMULATE` | `:67` | `text_qa_template=bullet_prompt` (`:68`), `use_async=True` (`:70`) |
 | 5     | `SIMPLE_SUMMARIZE`   | `:82` | `text_qa_template=story_prompt` (`:83`)                            |
 
-O que os modos decidem (conhecimento de domínio do LlamaIndex, não leitura deste arquivo): como
-juntar N chunks recuperados numa resposta. `SIMPLE_SUMMARIZE` concatena e faz uma chamada;
-`COMPACT` empacota o máximo de texto por chamada para gastar menos; `REFINE` percorre chunk a chunk
-levando a resposta parcial adiante; `TREE_SUMMARIZE` resume em árvore, agregando resumos de resumos;
-`ACCUMULATE` responde por chunk e junta as respostas. É uma decisão de custo por consulta e de como
-a informação se perde: refinar propaga o que já foi dito, acumular preserva a origem de cada
-resposta, comprimir economiza chamadas.
+O que os modos decidem: como juntar N chunks recuperados numa resposta. Não está neste arquivo, mas
+está legível na fonte do `llama-index-core` 0.11.17, em `llama_index.core.response_synthesizers`, e é
+de lá que sai o que segue — lido, não executado.
+
+`SIMPLE_SUMMARIZE` concatena tudo (`"\n".join(text_chunks)`) e faz uma chamada. `REFINE` percorre
+chunk a chunk levando a resposta parcial adiante. `TREE_SUMMARIZE` resume em árvore, agregando
+resumos de resumos. E dois pontos que só aparecem lendo:
+
+- **`COMPACT` não é compressão paralela ao refine — é o refine com menos chamadas.** A classe é
+  `class CompactAndRefine(Refine)`: ela reempacota os chunks para ocupar a janela e então **refina**
+  sobre os pedaços reempacotados. Tratar "refinar" e "comprimir" como mecanismos alternativos, como
+  a frase seguinte faz, é a leitura errada.
+- **O quinto modo deste arquivo é `COMPACT_ACCUMULATE`, não `ACCUMULATE`.** A tabela acima acerta; a
+  prosa é que precisa acertar. `class CompactAndAccumulate(Accumulate)` reempacota antes de responder
+  por chunk e concatenar as respostas com um separador. O `ACCUMULATE` puro — o que de fato gera uma
+  resposta por chunk — não aparece em nenhum arquivo do repositório.
+
+E um detalhe que a docstring do próprio enum erra: ela diz que `SIMPLE_SUMMARIZE` "will fail" se o
+texto concatenado exceder a janela de contexto. A implementação não falha — chama
+`_prompt_helper.truncate`, que corta o chunk para caber. Com os 4.462 bytes deste corpus não aparece;
+num acervo real, o modo **descarta texto sem avisar**, o que é pior que falhar.
+
+É uma decisão de custo por consulta e de como a informação se perde: refinar propaga o que já foi
+dito, acumular preserva a origem de cada resposta, e reempacotar troca número de chamadas por
+tamanho de prompt.
 
 ### O que este arquivo revela sobre o nome do diretório
 
@@ -511,8 +529,15 @@ Este módulo precisa de chave: `DEEPSEEK_API_KEY` para os arquivos 01, 03 e os d
 `OPENAI_API_KEY` — o `08-Generation/03-ControllingFormatViaOutputParsing/.env.example:8-9` diz
 apenas "used by some of the function-calling/output-parsing examples in this folder", sem nomear
 quais. O `04-v2` precisa dela de forma verificável (importa `OpenAIPydanticProgram`, linha 3). Para
-o `02`, é inferência de conhecimento de domínio — o LlamaIndex usa OpenAI para embeddings por
-default —, não leitura do arquivo, e não a verifiquei por execução.
+o `02`, a necessidade da chave é verificável sem executar nada, e verifiquei: o arquivo não importa
+`Settings` nem passa `embed_model`, então o `VectorStoreIndex.from_documents` cai no default.
+`Settings.embed_model` chama `resolve_embed_model("default")` (`llama_index.core.settings`, linhas
+63-64), e esse caminho importa `OpenAIEmbedding`, instancia e chama
+`validate_openai_api_key(embed_model.api_key)` — o ramo `if embed_model == "default"` de
+`resolve_embed_model`, em `llama_index.core.embeddings.utils`.
+Sem chave, a própria mensagem do código diz o que acontece: "Could not load OpenAI embedding model
+(…) please check your OPENAI_API_KEY". Idêntico na 0.11.17 extraída e na wheel 0.14.24. O `02`
+precisa da chave, e o `.env.example` poderia tê-lo nomeado.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 
 **1. Restrições de schema, sem LLM.** Rode `04-Pydantic-v1.py`. Depois viole cada restrição da

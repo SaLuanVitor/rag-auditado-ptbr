@@ -154,8 +154,12 @@ prompt — que estoura o contexto num banco com 200 tabelas e dilui a atenção 
   `90-Data/sakila/db_description.yaml`, `customer.active` é descrito como
   _"Indicator if the customer is active (1) or inactive (0)"_ — e é essa descrição, não o nome,
   que **deve** decidir se o SQL gerado escreve `active = 1` ou `active = 'true'` — inferido da
-  arquitetura, não medido: nenhum dos arquivos do pipeline Sakila registra o prompt renderizado nem o
-  SQL de saída.
+  arquitetura, não medido: rodar o pipeline exige `OPENAI_API_KEY`, um Milvus com as três collections
+  já populadas e um MySQL Sakila vivo. Mas o que o pipeline **registra** basta para você conferir isso
+  na sua execução: os trechos recuperados (`05-text2sql-rag-v2-ok.py:99`) e o SQL gerado
+  (`05-text2sql-rag-v2-ok.py:127-128`) vão para o log, nos três consumidores. O que não vai é o
+  **prompt renderizado** — montado na linha 110 e passado direto na 122, sem log. Acrescentar essa
+  linha é o primeiro ajuste que eu faria antes de depurar qualquer Text2SQL.
 
 O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
 quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a solução anterior

@@ -177,10 +177,13 @@ esse sintoma na memória: quando um RAG seu retornar resultados sistematicamente
 absurdos, essa é a primeira hipótese.
 
 **2. Troque o modelo por um multilíngue.** Substitua `all-MiniLM-L6-v2` por
-`paraphrase-multilingual-MiniLM-L12-v2`. Compare os cossenos entre as frases em
-português. **Devem aumentar** — previsão, não medição minha. Motivo: o primeiro modelo foi treinado predominantemente em
-inglês e representa português de forma mais grosseira — questão prática direta para
-qualquer RAG em português.
+`paraphrase-multilingual-MiniLM-L12-v2`. **Não compare os cossenos absolutos dos dois modelos** —
+valor de cosseno não é comparável entre espaços vetoriais diferentes, e é a própria regra que esta
+aula estabelece mais acima: o que se compara é ranking. Compare a **distância entre os pares**: o vão
+entre o par sinônimo e o par não relacionado deve abrir. Previsão, não medição minha — e o motivo é
+atribuível aos cartões de modelo, não a mim: o cartão do `all-MiniLM-L6-v2` declara `language: en` e
+lista datasets de treino anglófonos; o do `paraphrase-multilingual-MiniLM-L12-v2` declara cinquenta
+idiomas, incluindo `pt` e `pt-br`. Questão prática direta para qualquer RAG em português.
 
 **3. Adicione uma frase com jargão do seu domínio.** Algo como
 "o CFOP 5102 exige destaque de ICMS na nota". Compare com uma frase genérica sobre

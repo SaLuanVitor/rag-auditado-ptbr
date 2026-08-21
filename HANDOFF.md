@@ -99,6 +99,24 @@ segunda
 **📌 Método que isso estabelece:** verificador mecânico pega o que releitura não pega, e o inverso
 também vale. Os dois defeitos que sobraram depois dos 69 consertos desta rodada foram achados pelos
 scripts, em segundos, **depois** de eu ter lido cada edição uma por uma
+**Varredura por classe de defeito: feita.** Primeira auditoria deste projeto organizada por
+CLASSE, não por aula — a R6 mostrou que consertar as oito piores não move a nota, revela as oito
+seguintes. A classe atacada foi a que domina: **a ressalva é verdadeira e a razão dada é**
+**inventada.** Um enumerador achou 73 candidatas; 46 declaravam razão e todas foram verificadas.
+**12 defeitos, em 9 aulas.** Detalhe na seção "Varredura da classe" do GATE
+**⚠️ Três dos 12 eram defeitos que eu introduzi na própria R6**, horas antes. O da Aula 04 é o
+padrão puro — o conserto inseriu a previsão certa e a frase antiga sobreviveu dois períodos depois,
+dizendo o contrário. O da Aula 24 é pior: eu **provei a resposta** ao conferir outro achado do mesmo
+arquivo e deixei de pé a ressalva que dizia não saber. Consertar não é um ato pontual; é um ato que
+precisa varrer os irmãos, inclusive os do próprio parágrafo
+**📌 O balde "sem razão declarada" NÃO é classe de defeito**, e vale registrar para não ser
+reauditado: das 27, cerca de doze são falsos positivos do regex (títulos de armadilha, perguntas de
+checkpoint, "hipótese" descrevendo o modelo e não o autor), e o resto é ressalva honesta e tersa —
+**ressalva sem razão não pode ter razão falsa**
+**📌 A forma exemplar de ressalva já existia no curso**, na aula que tirou 12/12: `AULA-18:136` —
+"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.11.17; não executei."
+Ela nomeia **o que leu** e **o que não fez**. É o padrão que os consertos desta varredura adotaram, e
+o que se deve exigir de qualquer ressalva nova
 **📌 Próximo trabalho, na ordem:** (1) **consertar as oito abaixo de 50% da R6** — 27, 00, 08, 09,
 23, 24, 25, 26 — sabendo que a R5 fez isso com as oito da R4 e a média do curso não se moveu, porque
 apareceram as oito seguintes; (2) **sétima rodada nas oito**, para medir os consertos; (3) opcional: criar uma seção "Otimização de índice" no

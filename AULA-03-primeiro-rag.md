@@ -93,8 +93,13 @@ decisões independentes:
   endpoint compatível com a API da OpenAI, via `CUSTOM_API_BASE_URL`.
 
 Rode `01_02` duas vezes. O esperado — comportamento padrão do cache do `huggingface_hub`, não
-medição minha — é a primeira execução baixar o modelo, com pausa, e a segunda rodar do cache local,
-sem rede e sem custo.
+medição minha — é a primeira execução baixar os pesos, com pausa, e a segunda reaproveitá-los do
+cache local, sem rebaixar nada. Duas qualificações que **não** valem, e as duas eu conferi. A
+execução não é gratuita: este script troca apenas o embedding, e a linha 26 usa o LLM padrão, que o
+`resolve_llm("default")` resolve para OpenAI validando a chave — a geração é cobrada nas duas vezes,
+como a própria linha 5 do arquivo avisa. E não é sem rede: a documentação do `huggingface_hub`
+registra que, mesmo com o arquivo em cache, a chamada de download ainda faz uma requisição HTTP para
+checar se há versão nova; só `HF_HUB_OFFLINE=1` corta essa ida à rede.
 
 ### Duas ressalvas reais sobre este código
 

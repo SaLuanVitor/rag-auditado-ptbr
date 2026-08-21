@@ -65,8 +65,14 @@ O texto decide onde ser cortado.
 
 Note a progressão: 1 e 2 são **sintáticos** (olham caracteres), 3 é **sintático com
 conhecimento de domínio** (sabe o que é uma função), 4 é **semântico** (usa embeddings para
-decidir). O custo sobe junto: o semântico faz chamadas de embedding durante a _ingestão_, o
-que em acervo grande costuma ser, **julgamento**, o item mais caro do pipeline.
+decidir). O custo **não** sobe em degraus iguais: 1, 2 e 3 são o mesmo trabalho de string e custam
+praticamente o mesmo — o nível 3 é o algoritmo recursivo com outra lista de separadores. O salto
+está no 4, que faz chamadas de embedding durante a _ingestão_ e em acervo grande costuma ser,
+**julgamento**, o item mais caro do pipeline. Verificado em
+`llama_index.core.node_parser.text.semantic_splitter`, que chama
+`get_text_embedding_batch` sobre os grupos de sentenças e depois `similarity` por par de vizinhos,
+na 0.11.17 extraída. O custo do
+nível 3 não foi verificado: `langchain_text_splitters` não está em disco.
 
 ---
 

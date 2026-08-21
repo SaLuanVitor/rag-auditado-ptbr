@@ -1991,3 +1991,132 @@ rodadas anteriores**, em três formas que se repetem:
 A conclusão de método: **verificador mecânico pega o que releitura não pega**, e o inverso também
 vale. Os dois defeitos que sobraram depois de aplicar os 69 consertos desta rodada foram achados
 pelos scripts, em segundos, depois de eu ter lido cada edição.
+
+
+---
+
+## Varredura da classe "proveniência fabricada" — 46 ressalvas, 12 defeitos
+
+Primeira auditoria deste projeto organizada **por classe de defeito**, não por aula. A R6 mostrou que
+consertar as oito piores aulas não move a nota do curso — revela as oito seguintes. Esta varredura
+testa a hipótese oposta: atacar a classe que domina, em todas as 29 aulas de uma vez.
+
+A classe: **a ressalva é verdadeira e a razão dada é inventada.** É a que mais escapa, porque a forma
+parece honesta e o revisor para de ler na ressalva. Regra operacional que ela impõe: quando o texto
+diz "não verifiquei porque X", verificar X.
+
+### Método
+
+Um enumerador varreu as 29 aulas e o `GLOSSARIO.md` procurando marcador de ressalva epistêmica,
+agrupando por **parágrafo** e não por linha — o material quebra linha a ~100 colunas e uma ressalva
+atravessa quebras, então cortar por linha subconta. Resultado: **73 candidatas**, 46 com razão
+declarada e 27 sem.
+
+**O enumerador é gerador de candidatas, não lista de defeitos** — a mesma ressalva que o
+`duplicata-semantica.js` exigiu na auditoria do glossário. Das 27 "sem razão", cerca de doze são
+falsos positivos do regex: títulos de armadilha ("sem medir", "não medir contra o baseline plano"),
+perguntas de checkpoint, e usos de "hipótese"/"plausível" descrevendo o comportamento do modelo em vez
+do grau de certeza do autor. E o balde inteiro não é classe de defeito: **ressalva sem razão não pode
+ter razão falsa.** Declarar "não rodei" sem dizer por quê é honesto, só terso.
+
+As 46 com razão foram verificadas, uma por uma, em quatro categorias com métodos diferentes.
+
+### Categoria A — "X não está instalado neste ambiente" (13 ressalvas, 9 bibliotecas)
+
+Inteiramente mecânica, e feita por script: para cada biblioteca nomeada, é importável? há wheel ou
+fonte em disco? É a categoria da **classe 9** — limite que era legítimo quando escrito e deixou de ser
+quando a fonte apareceu em disco.
+
+| Biblioteca | Estado | Veredito |
+|---|---|---|
+| `langchain` (aulas 16, 19, 20, 26) | wheel, 1342 entradas | **legítimas, as quatro** |
+| `llama_index` (aula 24) | extraída em disco | ⚠️ **defeito de classe 9** |
+| `pymilvus`, `langchain_community`, `langchain_openai`, `langgraph`, `pydantic`, `sentence-transformers` | ausentes, sem wheel | legítimas |
+
+As quatro de `langchain` se sustentam por razões diferentes, e a distinção importa: a da Aula 16 diz
+ter lido a fonte, e a fonte está lá — `langchain/retrievers/multi_vector.py`, com a substância
+confirmada (`docs = self.docstore.mget(ids)` seguido de `[d for d in docs if d is not None]`). As das
+Aulas 19, 20 e 26 dependem de `langchain_core`, e os módulos correspondentes na wheel são
+**reexportação pura** — o `base_language.py`, por exemplo, é literalmente "Deprecated module (…) kept
+for backwards compatibility". Wheel presente não é o mesmo que resposta disponível.
+
+### Categoria B — "conhecimento de domínio" (8 ressalvas, 4 defeitos)
+
+O rótulo diz: isto não vem do repositório, vem do que se sabe da área. Duas coisas podem estar
+erradas — o conteúdo, ou o rótulo. O segundo foi o mais comum: **a afirmação era verificável e o
+rótulo dispensou a verificação.**
+
+O caso mais forte da varredura é a Aula 20 sobre a `OPENAI_API_KEY` do `02`: dizia "é inferência de
+conhecimento de domínio (…) e não a verifiquei por execução", quando `resolve_embed_model("default")`
+não só importa `OpenAIEmbedding` como chama `validate_openai_api_key` — legível em duas versões em
+disco, e responde exatamente a pergunta que a aula deixou aberta.
+
+E a leitura que o rótulo dispensou expôs dois erros de conteúdo na mesma aula: `COMPACT` não é
+compressão paralela ao refine — é `class CompactAndRefine(Refine)`, o refine com menos chamadas — e o
+quinto modo do arquivo é `COMPACT_ACCUMULATE`, não `ACCUMULATE`. De brinde, a docstring do enum
+afirma que `SIMPLE_SUMMARIZE` "will fail" se o texto exceder a janela, e a implementação chama
+`truncate`: **descarta texto em silêncio**, o que é pior que falhar.
+
+A Aula 24 traz a forma inversa: o rótulo foi posto sobre uma frase cuja metade causal estava provada
+dezesseis linhas abaixo, no próprio arquivo. Rotular como domínio o que era leitura descarta a
+evidência que estava ao lado.
+
+### Categorias C e D — "exige recurso externo" e "o dado não está em disco" (11 ressalvas, 3 defeitos)
+
+Uma **razão falsa**: a Aula 12 dizia que "nenhum dos arquivos do pipeline Sakila registra o prompt
+renderizado nem o SQL de saída". Os três consumidores logam o SQL, e também os trechos recuperados; o
+que nenhum loga é o prompt. A razão era falsa na metade que importa, e a observabilidade que ela
+declarava ausente é justamente o que permite ao leitor conferir a alegação na própria execução.
+
+Duas **razões imprecisas**. A Aula 03 dizia que a segunda execução roda "sem rede e sem custo": as
+duas qualificações caem — o script troca só o embedding e a geração continua indo para a OpenAI, e a
+documentação do `huggingface_hub` registra que a checagem de versão vai à rede mesmo com o arquivo em
+cache. A Aula 11 concedia mais do que precisava: tratava como pergunta aberta se a correspondência de
+pesos é posicional, quando o script responde sozinho — `WeightedRanker(weights["sparse"],
+weights["dense"])` passa **dois floats posicionais nus**, e as chaves nunca atravessam a chamada. Se a
+biblioteca não recebe nome, a associação não pode ser por nome. O "se for posicional" não tinha
+alternativa a excluir.
+
+### Doze consertos, e três eram meus
+
+| Aula | Defeito |
+|---|---|
+| 20 | verificação dispensada (chave OpenAI); `COMPACT` é refine; o modo é `COMPACT_ACCUMULATE` |
+| 24 | ressalva obsoleta (classe 9); rótulo sobre leitura; "seis linhas antes" que não fecha |
+| 12 | razão falsa (os arquivos logam o SQL) |
+| 03 | "sem rede e sem custo" — as duas caem |
+| 11 | ressalva concede mais do que precisa |
+| 04 | contradição dentro do parágrafo |
+| 07 | "o custo sobe junto" contradiz a descrição do nível 3 |
+| 02 | exercício pedia comparar cosseno absoluto entre espaços vetoriais distintos |
+| 19 | o contrato invocado é da DeepSeek, não da OpenAI |
+
+Três desses defeitos **eu introduzi nesta mesma sessão**. O da Aula 04 é o padrão puro: o conserto da
+R6 inseriu a previsão certa e a frase antiga sobreviveu dois períodos depois, dizendo o contrário. O
+da Aula 24 é pior: eu **provei a resposta** ao conferir outro achado do mesmo arquivo, horas antes, e
+deixei de pé a ressalva que dizia não saber.
+
+### A forma exemplar já existia
+
+Na aula que tirou 12/12:
+
+> **AULA-18:136** — _"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
+> `llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.11.17; não executei."_
+
+Ela nomeia **o que leu** e **o que não fez**. É o padrão contra o qual as outras 45 deveriam ser
+medidas, e é o que os consertos desta varredura adotaram.
+
+### E os consertos introduziram três defeitos de ancoragem
+
+Ao citar fonte de biblioteca com número de linha, três citações viraram `BAD_ANCHOR`: o verificador
+resolve número de linha contra o nome de arquivo **anterior**, e nome de módulo pontilhado não é
+arquivo do repositório. A correção acabou melhor que o original — **nomear o símbolo em vez da
+linha**, porque número de linha de biblioteca muda entre versões, e proveniência que envelhece mal é
+o problema que esta varredura existe para resolver.
+
+### Pendência de ambiente, registrada como tal
+
+Dois auditores independentes, em momentos diferentes, suspeitaram que o `ragas` tem uma variante de
+`context precision` que dispensa gabarito — o que tornaria a causa que a Aula 22 atribui verdadeira
+só para metade do par. Nenhum dos dois pôde confirmar: `ragas` não está em disco, nem como wheel.
+Fica como pendência, não como defeito.

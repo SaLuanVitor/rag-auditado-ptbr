@@ -124,10 +124,16 @@ passadas ao `hybrid_search` — trocar os dois inverte a mistura sem lançar err
 > o que a leitura recomendada deixa
 > para depois.
 >
-> **Limite declarado:** que a correspondência seja posicional é o que a documentação do `pymilvus`
-> descreve, e é o que esta aula ensina — mas não rodei nada para confirmar, porque `pymilvus` não
-> está instalado neste ambiente. Se for posicional, o peso nomeado `sparse` (0,7) está ponderando o
-> campo **denso** no `v2` e no `v3`, e os nomes das chaves enganam quem lê. O que está verificado,
+> **Limite declarado, e o que ele não abrange.** `pymilvus` não está instalado neste ambiente, então
+> não rodei nada. Mas parte da pergunta se responde no próprio arquivo, sem biblioteca alguma:
+> `weights` é `{"sparse": 0.7, "dense": 1.0}` (linha 106) e a chamada é
+> `WeightedRanker(weights["sparse"], weights["dense"])` (linha 147) — **dois floats posicionais nus**,
+> `0.7` e depois `1.0`. As chaves `"sparse"` e `"dense"` são resolvidas dentro do script e nunca
+> atravessam a fronteira da chamada: a biblioteca não recebe nome nenhum, só ordem. Logo a associação
+> peso↔campo **não pode** ser por nome, e os nomes das chaves enganam quem lê — o peso 0,7, escrito
+> como `sparse`, chega primeiro, e a linha 177 declara `reqs=[dense_req, sparse_req]`. O que depende
+> da biblioteca, e eu não confirmei, é só se o i-ésimo peso casa com `reqs[i]` e se o
+> `WeightedRanker` normaliza os valores. O que está verificado,
 > independentemente da semântica da biblioteca, é a **incoerência**: a aula enuncia uma regra e o
 > seu próprio exemplo canônico não a satisfaz.
 

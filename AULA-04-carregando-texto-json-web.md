@@ -279,8 +279,10 @@ voltaram contra quantos arquivos existem — e veja o buraco que o silêncio pro
 medição**: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
 esperado é uma exceção de validação, não uma migração silenciosa para texto bruto. Em
 `02-LangCHain-JSONLoader-JSON.py`, use
-`jq_schema='.'`. Você volta ao comportamento do `TextLoader`: o JSON inteiro como texto. É a
-prova de que o ganho do `JSONLoader` está no esquema, não na classe.
+`jq_schema='.'`. O ramo que serializa o objeto com `json.dumps` só é alcançado com
+`text_content=False`, então o desfecho esperado é a exceção, não o texto bruto. É a prova de que o
+ganho do `JSONLoader` está no esquema, não na classe: sem um `jq_schema` que produza string, ele não
+aceita o documento — ao contrário do `TextLoader`, que aceitaria qualquer coisa.
 
 ---
 

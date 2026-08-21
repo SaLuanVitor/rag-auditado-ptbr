@@ -132,7 +132,22 @@ Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendari
         )
 ```
 
-O campo `text` é **idêntico** ao do nó original; o contexto vive em `metadata`. Se esse metadado entra ou não no texto que é embutido e no que o BM25 indexa depende do `metadata_mode` que a biblioteca aplica em cada caminho — `llama_index` **não está instalado neste ambiente** e eu não executei nada, então não afirmo o resultado. O que é verificável na leitura: o texto passado ao BM25 é `node.get_content()` (`LlamaIndex-Implementation.py:73`), e o construtor do nó contextual não declara nenhuma chave de exclusão de metadado.
+O campo `text` é **idêntico** ao do nó original; o contexto vive em `metadata`. Onde esse metadado entra é decidido pelo `metadata_mode`, e a fonte do `llama-index-core` responde
+sem ambiguidade — 0.11.17 extraída e wheel 0.14.24, texto idêntico; lido, não executado:
+
+- **O BM25 não vê o metadado.** a assinatura de `TextNode.get_content` em `llama_index.core.schema` traz
+  `metadata_mode: MetadataMode = MetadataMode.NONE` como default, e o `get_metadata_str` da mesma
+  classe devolve `""` no ramo `if mode == MetadataMode.NONE`, então
+  o retorno é `self.text` puro. Como a linha 73 constrói os nós do BM25 com `text=node.get_content()`
+  e `id_=node.node_id`, a lista passada ao "Contextual BM25 Retriever" é **byte-idêntica** à do
+  "BM25 Retriever". São duas linhas da tabela final reportando o mesmo experimento.
+- **O denso vê.** O `VectorStoreIndex` embute com `MetadataMode.EMBED` — é o que o
+  `embed_nodes` de `llama_index.core.indices.utils` passa ao `get_content` —, e `excluded_embed_metadata_keys` é lista vazia por
+  padrão — o script não exclui nada. O texto embutido fica `generated_context: …` seguido do
+  conteúdo, pelo template `"{metadata_str}\n\n{content}"`.
+
+Das três condições "com contexto", portanto, uma é inexistente e as outras duas diferem do controle
+por um prefixo derivado do próprio chunk.
 
 ### O gabarito é posicional
 
@@ -196,7 +211,7 @@ Documento inteiro em `<document>`, chunk em `<chunk>`, e a instrução de enriqu
 
 A chamada usa `gpt-3.5-turbo` com `temperature=0` e `max_tokens=1000` (`Milvus-Implementation.py:447-455`), e o resultado é o texto que vai ser embutido (`:458`).
 
-**Uma diferença em relação ao método original, que vale conhecer:** o prompt pede que a resposta **contenha o chunk completo** enriquecido — ou seja, uma reescrita. A formulação original da Anthropic gera um contexto curto para ser **prefixado** ao chunk, preservando o original. Conhecimento de domínio, não leitura deste arquivo: reescrever é mais fluido e mais arriscado, porque o texto indexado passa a ser produção do modelo. A boa decisão que este arquivo toma é guardar **os dois** campos, `content` e `contextualized_content` — a gravação está em
+**Uma diferença em relação ao método original, que vale conhecer:** o prompt pede que a resposta **contenha o chunk completo** enriquecido — ou seja, uma reescrita. A formulação original da Anthropic gera um contexto curto para ser **prefixado** ao chunk, preservando o original — conhecimento de domínio, e o cabeçalho deste arquivo confirma a filiação ao método (`Milvus-Implementation.py:6` e `:20`). Que aqui o texto indexado passe a ser produção do modelo, isso **é leitura deste arquivo**, não domínio: a linha 458 grava `contextualized_chunk = response.choices[0].message.content.strip()`, e as linhas 475 e 484 embutem exatamente esse texto no vetor denso e no esparso. **Julgamento:** reescrever é mais fluido e mais arriscado — o que o índice passa a conter é o que o modelo escreveu, e a instrução do prompt na linha 440 ("keep the core information unchanged") é pedido, não garantia. A boa decisão que este arquivo toma é guardar **os dois** campos, `content` e `contextualized_content` — a gravação está em
 `Milvus-Implementation.py:476-480`, e a linha 540 mostra os dois sendo lidos de volta em
 `output_fields` —, o que mantém o original recuperável.
 
@@ -283,7 +298,9 @@ tempo de execução e não está em disco aqui. Cada uma é um prefixo literal d
 Julgamento, e é o ponto central desta aula: nenhuma técnica de recuperação pode se distinguir de outra nesse teste. Buscar um texto usando a sua própria primeira metade é o caso mais fácil que existe — denso acha, esparso acha, e a contextualização não tem como ajudar porque não havia dificuldade a resolver. Os três experimentos vão reportar valores próximos, e a "melhoria" impressa no fim
 (`Milvus-Implementation.py:970-976`) será ruído.
 
-Repare também que o comentário da linha 891 admite o problema: _"In actual applications, a specially designed evaluation dataset should be used"_. O autor sabe. O que o arquivo não diz é que o conjunto especialmente desenhado **já estava em disco**, baixado seis linhas antes.
+Repare também que o comentário da linha 891 admite o problema: _"In actual applications, a specially designed evaluation dataset should be used"_. O autor sabe. O que o arquivo não diz é que o conjunto especialmente desenhado **já estava em disco**: o
+`download_data()` da linha 843 baixa o `evaluation_set.jsonl` do repositório da Anthropic (linhas
+767-772), e a linha 904 o sobrescreve com o conjunto de brinquedo.
 
 ### Ato 3 — O denominador conta o que foi descartado
 
