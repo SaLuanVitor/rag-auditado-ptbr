@@ -267,7 +267,8 @@ Depois abra `07-Unstructed-PDF-CompareVariousModes.ipynb`, que compara modos lad
 
 **1. Meça a densidade de texto.** Escreva um laço curto sobre as páginas do PDF com PyMuPDF
 imprimindo `len(page.get_text())`. É o classificador nativo/digitalizado da seção "Modelo
-mental", em cinco linhas. Rode nos PDFs de `90-Data/ComplexPDF/` e veja a distribuição.
+mental", em cinco linhas. Rode nos PDFs de `../../90-Data/ComplexPDF/` — o caminho é relativo a `04-PDFFileLoading/`, onde a
+receita anterior deixou você — e veja a distribuição.
 
 **2. Troque `hi_res` pela estratégia rápida.** Em `05-LangChain-Unstrucured-PDF-SimpleDisplay.py`,
 mude `strategy="hi_res"` para `"fast"`. Cronometre os dois e compare a estrutura. Quanto de

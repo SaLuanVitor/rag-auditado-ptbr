@@ -277,7 +277,7 @@ repositório**, e não ao diretório do módulo como todos os outros arquivos da
 dentro de `02-DocChunking/`, ele não acha o arquivo. Rode da raiz:
 
 ```powershell
-cd RAG-from-First-Principles
+cd ..   # você está em 02-DocChunking desde o Passo 1; o alvo é o diretório pai
 python 02-DocChunking/03_LlamaIndex-ChunkSizeAffectsAccuracy.py
 ```
 

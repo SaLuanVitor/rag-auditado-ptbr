@@ -235,6 +235,14 @@ Nesta aula, apenas rode e observe a estrutura de nós e arestas. Voltaremos.
 
 ## Quebre de propósito
 
+Antes dos quatro, faça o script falar. O `03_LangChain_LCEL_RAG_v3.py` é o único dos três LCEL que
+**não imprime a resposta**: a linha 99 calcula `response = chain.invoke(question)` e o arquivo acaba
+ali — o `v1` imprime na linha 66, o `v2` na 96. E os cinco `print` de inspeção das linhas 79-95 rodam
+sobre a string literal `"test question"` da linha 75, não sobre a pergunta da linha 98. Então, antes
+de mexer em `k`, prompt ou overlap: acrescente `print(response)` no fim do arquivo e troque a linha 75
+pela pergunta que você quer testar. Sem esses dois passos, os quatro exercícios abaixo não têm saída
+para comparar.
+
 **1. Faça o retriever falhar por top-k.** Em `03_LangChain_LCEL_RAG_v3.py`, mude
 `k=3` para `k=1`. Pergunte algo que exija combinar dois trechos ("compare os estilos
 de combate e o sistema de transformações"). A resposta fica incompleta — e o

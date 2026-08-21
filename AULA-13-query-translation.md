@@ -213,8 +213,15 @@ sistema jurídico ou médico, o cálculo se inverte.
 
 ```powershell
 cd RAG-from-First-Principles/05-PreRetrieval/02-QueryTranslation
+$env:DEEPSEEK_API_KEY = "sk-..."   # este arquivo não lê o .env
 python 01-QueryRewriting-1-RewriteViaPrompt.py
 ```
+
+O `$env:` é necessário e custa a primeira execução de quem não sabe: este é o **único** arquivo da
+pasta que não chama `load_dotenv()` — ele lê `DEEPSEEK_API_KEY` direto do ambiente, na linha 6. Com a
+chave só no `.env`, o construtor da linha 4 estoura em tempo de import com `OpenAIError: The api_key
+client option must be set`, mensagem que ainda nomeia `OPENAI_API_KEY`, porque vem da SDK e não do
+script. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
 
 Comece por aqui e **leia o prompt completo** antes de rodar. Depois teste com perguntas de
 qualidade decrescente: uma bem formulada, uma coloquial, uma com erro de digitação, uma com gíria.

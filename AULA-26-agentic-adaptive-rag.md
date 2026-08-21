@@ -350,7 +350,7 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **
 
 **6. Rebaixe o `Literal` a `str`.** No `RouteQuery` (`:52`), troque `Literal["vectorstore", "web_search"]` por `str`. Agora o roteador pode devolver um rótulo fora do dicionário de arestas. Veja o que acontece — e compare com o que a Aula 20 disse sobre enumeração escrita na descrição em vez de no tipo.
 
-**7. Tire a abstenção.** No `02`, remova a guarda de documentos vazios (`:163-164`) e deixe a cadeia gerar com contexto vazio. É a dívida da Aula 19 reaparecendo no último exemplo do curso.
+**7. Tire a abstenção.** No `02`, a guarda é `if not docs:` seguido da atribuição da mensagem (163-164), e o `else:` da 165 sustenta a chamada da 166 — apagar só 163-164 deixa um `else` órfão e o arquivo **para de compilar** (`SyntaxError`, medido). Remova as **quatro** linhas 163-166 e ponha no lugar, com um nível de indentação, `gen = rag_chain.invoke({"context": docs, "question": state.question})`. Aí a cadeia gera com contexto vazio. É a dívida da Aula 19 reaparecendo no último exemplo do curso.
 
 ---
 

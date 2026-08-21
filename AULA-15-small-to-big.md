@@ -275,8 +275,13 @@ small-to-big: agora indexa e entrega o mesmo objeto, e está de volta à tensão
 enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
 cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
 
-**4. Remova o docstore da expansão.** No `03`, veja o que acontece sem `docstore=docstore`. A
-expansão precisa da informação de ordem — que o índice vetorial não tem.
+**4. Remova o docstore da expansão. Não funciona, e é isso que se aprende:** no `03`, apague o
+`docstore=docstore` da linha 40 e o Pydantic levanta `ValidationError` (campo obrigatório ausente) na
+**construção** do `PrevNextNodePostprocessor` — antes de indexar ou consultar qualquer coisa. A
+biblioteca se recusa a montar um expansor sem fonte de ordem, porque a informação de qual nó vem
+depois de qual não existe no índice vetorial. Para ver a expansão desligada e comparar contexto
+entregue, use `num_nodes=0`, que a classe aceita, ou o `base_engine` da linha 32, que já é o baseline.
+Medido no `llama-index-core` 0.11.17.
 
 **5. Compare os três na mesma pergunta.** Rode uma consulta pelas três estratégias e compare o
 contexto entregue. Não há vencedor universal; o exercício é perceber **qual formato de contexto**

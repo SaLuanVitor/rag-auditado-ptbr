@@ -418,6 +418,18 @@ num acervo real, o modo **descarta texto sem avisar**, o que é pior que falhar.
 dito, acumular preserva a origem de cada resposta, e reempacotar troca número de chamadas por
 tamanho de prompt.
 
+🔴 **E há um problema anterior a todos esses, que invalida a comparação: os três templates não têm
+`{context_str}`.** As linhas 50, 64 e 79 declaram apenas `{query_str}`, e o `PromptTemplate` do
+LlamaIndex **descarta chave extra em silêncio** — verificado por execução no `llama-index-core`
+0.11.17: formatar um template de `{query_str}` passando também `context_str` devolve o prompt sem uma
+letra do contexto. O sintetizador passa o texto recuperado como `context_str`, e ele é jogado fora.
+
+Ou seja: os blocos 3, 4 e 5 respondem **sem o acervo**, de memória paramétrica do modelo, enquanto os
+blocos 1 e 2 usam o contexto recuperado. Quem comparar as cinco saídas não está comparando modos de
+síntese — está comparando com-contexto contra sem-contexto, e o corpus pequeno deixa de ser a
+explicação principal para os cinco parecerem parecidos. É a terceira variante da armadilha do slot
+errado nesta aula, e a mais cara, porque a saída continua plausível.
+
 ### O que este arquivo revela sobre o nome do diretório
 
 O diretório se chama `03-ControllingFormatViaOutputParsing`. Neste arquivo, **um** dos cinco blocos

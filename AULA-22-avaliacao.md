@@ -524,9 +524,14 @@ a única coisa que nenhuma quantidade de prompt conserta.
 Os quatro scripts precisam de `OPENAI_API_KEY` (`09-Evaluation/.env.example:4-7`); as dependências
 estão em `09-Evaluation/requirements.txt`, com `ragas<0.3` pinado.
 
-**1. Comece pelo mais curto.** Rode `03-DeepEval.py` e leia os dois escores. Depois estrague o
-`actual_output` (`09-Evaluation/03-DeepEval.py:7`) — diga "oferecemos 90 dias" — e rode de novo. Qual das duas métricas cai? A
-resposta diz o que cada uma mede.
+**1. Comece pelo mais curto.** Rode `03-DeepEval.py` e leia os dois escores. Agora faça duas edições
+separadas na linha 7 de `09-Evaluation/03-DeepEval.py`, porque elas ensinam coisas diferentes.
+Primeiro troque 30 por 90 dias: a resposta fica **falsa** e — este é o ponto — provavelmente
+**nenhum** dos dois escores se move. O `AnswerRelevancy` mede relevância à pergunta, não verdade; o
+`ContextualPrecision` julga o contexto recuperado contra a resposta esperada e nem lê o
+`actual_output`. Nenhuma das duas pega erro factual. Depois troque a resposta por algo fora do assunto
+("nossa loja abre às 9h"): aí o `AnswerRelevancy` cai e o `ContextualPrecision` continua parado. É o
+par de execuções que revela o que cada métrica mede — e o que nenhuma das duas mede.
 
 **2. Adicione o limiar.** Ainda no `03`, compare os escores com um valor mínimo e faça o script sair
 com código de erro quando não passar. Você acabou de transformar avaliação em gate.

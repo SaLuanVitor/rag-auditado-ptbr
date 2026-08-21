@@ -125,6 +125,13 @@ dado estruturado.
 
 ## Parte 3 — Tabelas dentro de PDF
 
+⚠️ **Duas bases de caminho no mesmo módulo, e é preciso trocar de diretório no meio.** O
+`01-01-ImportCSV.py` aponta para `"../../99-EN/..."` e só roda **de dentro** desta pasta; já os
+arquivos de PDF (`05-03`, `04-02`, `03-01`, `04-01`, `06-01`) apontam para
+`"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A exceção é o
+`05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. Rode o `01-01` daqui e faça `cd ../..` antes dos que
+leem PDF.
+
 Aqui estão sete dos treze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
 
 ### `camelot`
@@ -222,6 +229,7 @@ banco e consultar. As três valem quando a tabela precisa conviver com prosa no 
 
 ```powershell
 cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
+# ⚠️ este módulo mistura duas bases de caminho — leia a nota abaixo antes de rodar tudo daqui
 python 01-01-ImportCSV.py
 ```
 

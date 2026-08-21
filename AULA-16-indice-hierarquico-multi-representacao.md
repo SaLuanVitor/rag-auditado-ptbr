@@ -198,6 +198,17 @@ cd RAG-from-First-Principles/06-Indexing/02-BuildingHierarchicalIndex
 python 00-DirectlyLoadDocumentsIndexAndQA.py
 ```
 
+⚠️ **Dois consertos de caminho antes de rodar, e os dois são do repositório.** A linha 19 do `00-*` é
+`file_path = "90-Data/ComplexPDF/billionaires_page-1-5.pdf"`, relativa à **raiz** do repositório: de
+dentro desta pasta ela não resolve. Prefixe com `../../`.
+
+E o `98-TwoTierIndex-FAISS.py` tem o mesmo problema **mais um pior**: a linha 31 aponta para
+`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas
+57-58 procuram `billionaires_table_2` … `_6` — que são as abas do **outro** arquivo da mesma pasta,
+`billionaires_merged.xlsx`. Com o caminho certo e o workbook errado você recebe
+`KeyError: 'billionaires_table_2'`. Troque a linha 31 por
+`"../../90-Data/ComplexPDF/TopTenBillionaires/billionaires_merged.xlsx"`.
+
 **Comece pelo baseline** e guarde as respostas. É o número contra o qual tudo aqui deve ser
 comparado.
 

@@ -337,7 +337,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 **1. Rode o `02` como está.** Antes de consertar nada. Veja o que acontece quando o campo de imagem contém `"<YOUR_IMAGE_BASE64_STRING>"`. Registre em que etapa o erro aparece — e note que não é na inserção.
 
-**2. Descomente o áudio sem trocar a variável.** Em `01-Weaviate-Multimodal-Search.py`, descomente `:42-52` sem tocar em `animals`. O `NameError` que você recebe não menciona áudio, nem Weaviate, nem modalidade. É a demonstração de por que import e variável fantasma custam tempo de depuração.
+**2. Descomente uma busca por mídia sem trocar a variável.** Em `01-Weaviate-Multimodal-Search.py`, descomente `:98-107` — a busca por áudio — sem tocar em `animals`. O `NameError` que você recebe não menciona áudio, nem Weaviate, nem modalidade: o Python resolve `animals.query` antes de avaliar os argumentos. **Não use o bloco de inserção `:42-52` para isto:** a linha 44 faz `os.listdir("./data/audio/")`, diretório que não existe no repositório, e você recebe `FileNotFoundError` três linhas antes de chegar ao `animals` da 47 — que é o sintoma oposto ao que o exercício quer mostrar. É a demonstração de por que import e variável fantasma custam tempo de depuração.
 
 **3. Tire o filtro de modalidade.** No `02` corrigido, indexe uma imagem e um áudio e remova o `filters` da linha 46. Busque por texto. Se vier o áudio, você acabou de ver por que o espaço único precisa do filtro.
 

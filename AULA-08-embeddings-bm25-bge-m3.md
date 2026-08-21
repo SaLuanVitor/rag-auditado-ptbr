@@ -279,11 +279,16 @@ Compare os resultados do `BM25Retriever` com os do Chroma para a mesma consulta.
 consulta em que discordam — ela é o seu argumento a favor do híbrido.
 
 ```powershell
+$env:OPENAI_API_KEY = "sk-..."   # este arquivo não lê o .env
 python 01-openai-embedding-recomendation-system.py
 python 02-jina-embeddings-v3-clustering.py
 ```
 
-O primeiro exige `OPENAI_API_KEY`; o segundo, chave da Jina. Se estiver no caminho local, leia
+O primeiro exige `OPENAI_API_KEY`; o segundo, chave da Jina. E há uma pegadinha só no primeiro: ele é
+o único script do módulo que precisa de chave e **não chama `load_dotenv()`**, então a variável tem de
+estar no ambiente do shell. Sem isso a falha vem da SDK, antes de qualquer embedding: `OpenAIError:
+The api_key client option must be set`. O `.env.example` da pasta também não declara essa variável —
+declara `O3_API_KEY`/`O3_BASE_URL`, que são as do `03-LangChain-BM25.py`. Se estiver no caminho local, leia
 os arquivos e rode os outros — o mecanismo já está claro pela Aula 02.
 
 ```powershell
@@ -306,9 +311,13 @@ Você acabou de sentir o que cada hiperparâmetro
 faz — algo que a maioria dos tutoriais de BM25 não mostra, porque chamam a biblioteca com os
 padrões e seguem adiante.
 
-**2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()`. Se o corpus
-usa vírgula como separador de campo, o ranking degrada. Fixa que BM25 é tão bom quanto sua
-tokenização.
+**2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()` e rode. O vetor
+impresso fica **vazio** — `Sparse embedding: {}` —, e o motivo é mais instrutivo que uma degradação:
+o `vocabulary` da linha 13 continua sendo construído por vírgula, então nenhum dos tokens separados
+por espaço passa pelo filtro `if word in vocabulary` da linha 27. Medido: 11 termos com `split(",")`,
+zero com `split()`. Tokenização é acordo entre indexação e consulta — mudar um lado só não piora o
+ranking, apaga o índice. Para ver degradação de ranking de verdade, faça a mesma troca no
+`03-LangChain-BM25.py`, que é prosa separada por espaço e tem consulta.
 
 **3. Consulte por identificador.** No `03-LangChain-BM25.py`, faça uma consulta com um código
 ou nome próprio raro. Compare BM25 e Chroma. **Julgamento:** é a demonstração mais rápida do ponto cego do

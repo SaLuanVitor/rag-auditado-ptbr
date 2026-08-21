@@ -232,7 +232,11 @@ Observe qual dos dois acontece — e conclua que **falta uma rota de fallback**.
 escolhida tende a ser a do assunto negado. É a Aula 02 cobrando de novo, agora no roteador.
 
 **4. Crie duas rotas com descrições parecidas.** No semântico, adicione um terceiro template com
-assunto sobreposto a um existente. Faça perguntas na zona de fronteira e observe a oscilação —
+assunto sobreposto a um existente e inclua-o em `prompt_templates` (linha 29). Antes de rodar, troque
+a linha 40: ela é um `if/else` **binário** — qualquer vencedor que não seja o de combate é anunciado
+como "storyline", e você não veria o terceiro ganhar. Ponha um rótulo por índice, algo como
+`nomes = ["combate", "história", "o novo"]` e `print(f"Rota: {nomes[similarity.argmax()]} —
+similaridades: {similarity}")`. Aí sim: faça perguntas na zona de fronteira e observe a oscilação —
 sem erro, sem aviso.
 
 **5. Implemente o limiar.** Acrescente ao `prompt_router` uma verificação: se

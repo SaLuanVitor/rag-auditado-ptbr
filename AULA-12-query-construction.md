@@ -292,7 +292,8 @@ arquivos de ingestão sem executar** — a arquitetura é o conteúdo, e ela se 
 minuto:
 
 ```bash
-diff Text2SQL/Sakila/05-text2sql-rag-v1-error.py Text2SQL/Sakila/05-text2sql-rag-v2-ok.py
+# você continua em Text2SQL/ depois do bloco anterior
+diff Sakila/05-text2sql-rag-v1-error.py Sakila/05-text2sql-rag-v2-ok.py
 ```
 
 Text2Cypher exige Neo4j com SNOMED CT carregado — infraestrutura pesada. Leia o par e compare as

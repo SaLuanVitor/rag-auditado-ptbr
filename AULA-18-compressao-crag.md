@@ -254,9 +254,12 @@ qualquer jeito.
 
 ## Quebre de propósito
 
-**1. Suba o `threshold_cutoff` até esvaziar o chunk.** Ponha `threshold_cutoff=0.95`. Provavelmente
-nenhuma sentença passa, e o LLM recebe contexto vazio. Observe o que ele responde — e por que limiar
-absoluto sem medição é perigoso.
+**1. Suba o `threshold_cutoff` até esvaziar o chunk.** Ponha `threshold_cutoff=0.95`. Você **não** vai
+ever o LLM responder com contexto vazio: como a Parte 3 desta aula registra, o otimizador levanta
+`ValueError("Optimizer returned zero sentences.")` **antes** da geração. Observe **onde** o traceback
+nasce — dentro do `node_postprocessors`, não no modelo — e tire a conclusão: limiar absoluto sem
+medição não degrada a resposta, derruba a consulta. Depois desça para 0,80 e 0,70 e ache o valor em
+que este corpus para de quebrar. Esse valor é propriedade do corpus, não da técnica.
 
 **2. Comprima depois de já ter reranqueado bem.** Recupere 20, rerank para 3, e então aplique
 compressão. Compare com só o rerank. Se a resposta não melhorar, você acabou de medir que a

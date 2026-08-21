@@ -216,9 +216,13 @@ explícito do `03`.
 ## Mão na massa
 
 ```powershell
+cd RAG-from-First-Principles/04-VectorDB/Milvus
 docker compose up -d
 curl -f http://localhost:9091/healthz
 ```
+
+O `cd` é indispensável: o `docker-compose.yml` está em `Milvus/`, e rodar de qualquer outro lugar
+devolve `no configuration file provided: not found`.
 
 Depois, na ordem dos degraus:
 

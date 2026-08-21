@@ -199,8 +199,21 @@ formalizar.
 ## Mão na massa
 
 ```powershell
-cd RAG-from-First-Principles/04-VectorDB
-docker compose up -d   # se ainda não estiver rodando (compose está em Milvus/)
+cd RAG-from-First-Principles/04-VectorDB/Milvus
+docker compose up -d   # se ainda não estiver rodando
+cd ..
+```
+
+O `cd` até `Milvus/` é necessário — o `docker-compose.yml` está lá, e de `04-VectorDB` o Compose
+responde `no configuration file provided`.
+
+⚠️ **E instale uma dependência que a Aula 00 não instalou.** Os três scripts de `HybridRetrieval/`
+importam `milvus_model.hybrid` (linha 30 do `v2`), e o `milvus-model` **não** está em nenhum dos dois
+`requirements_*_NoGPU_Mac-Win.txt` — só em `04-VectorDB/requirements.txt`. Sem ele o import falha
+antes de qualquer conexão:
+
+```powershell
+pip install -r requirements.txt
 ```
 
 Comece pelo mais legível, não pelo `v1`:

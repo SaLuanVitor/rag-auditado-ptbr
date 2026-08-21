@@ -226,8 +226,14 @@ mesmo diretório que rodar de dentro da pasta, e acha o mesmo `.env`.
 
 ### Passo 6 — Prova de que funciona
 
+Duas coisas antes do comando. Você está em `00-SimpleRAG` desde o Passo 5 — não repita o `cd`. E o
+Passo 2 deixou o `.venv-langchain` ativo, que **não** tem `llama_index`: o `requirements` do LangChain
+não o instala (confira com `grep -i llama`). Este script importa `llama_index.core`, então volte ao
+ambiente do outro framework primeiro.
+
 ```powershell
-cd 00-SimpleRAG
+deactivate
+.\.venv-llamaindex\Scripts\Activate.ps1
 python 01_05_LlamaIndex_5LineCode_Ollama.py
 ```
 

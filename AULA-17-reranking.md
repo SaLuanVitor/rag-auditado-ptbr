@@ -315,8 +315,13 @@ rode. O ranking **não muda**: a ordem já veio pronta de `07-PostRetrieval/01-R
 de dentro da biblioteca; a linha 150 só calcula um número que é impresso depois. Agora mexa em
 `decay_rate` (`07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:73`, valor `0.5`), que é o que
 `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:83` entrega ao
-`TimeWeightedVectorStoreRetriever` **antes** da busca — suba para `50.0` e volte para `0.01`,
-comparando as duas ordens. A lição é qual dos dois números o seu código controla de fato.
+`TimeWeightedVectorStoreRetriever` **antes** da busca — desça para `0.01` e suba para `0.9`,
+comparando as duas ordens. **Não passe de `1.0`:** nesta biblioteca o parâmetro é a fração de peso
+perdida por hora, e o escore é `(1.0 - decay_rate) ** hours_passed`. Com `50.0` a base fica negativa,
+a potência fracionária devolve um número **complexo** e a ordenação estoura com `TypeError: '<' not
+supported between instances of 'complex' and 'complex'` — sem uma palavra sobre tempo ou decaimento
+na mensagem. Medido no `langchain` 0.3.17; vale rodar uma vez só para ver, é um bom exemplo de
+parâmetro sem validação de domínio. A lição é qual dos dois números o seu código controla de fato.
 
 **5. Rode o RankLLM duas vezes na mesma consulta.** Compare as ordens. Se divergirem, você
 observou o não determinismo — e o problema que ele cria para comparar configurações.
