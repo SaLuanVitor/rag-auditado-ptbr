@@ -41,9 +41,9 @@ O repositório usa **as duas**, e é a combinação que faz sentido: o espaço �
 
 ### Multimodal cobra infraestrutura, não só API
 
-O custo aqui é **um serviço de inferência que você hospeda**, e é a primeira vez no curso que o
-requisito de memória vem **quantificado no próprio arquivo**: `mem_limit: 12g` — doze gigabytes,
-com o sufixo de unidade do Compose, não um número em bytes — é ocorrência única no
+O custo aqui é **um serviço de inferência que você hospeda**, e é a primeira vez no curso que uma
+**restrição** de memória vem quantificada no próprio arquivo: `mem_limit: 12g` — doze gigabytes de
+**teto**, com o sufixo de unidade do Compose, não um número em bytes — é ocorrência única no
 repositório (`grep -rn "mem_limit"` nos `.yml` devolve só
 `10-AdvanceRAG/05-MultiModalRAG/docker-compose.yml:21`). Infraestrutura hospedada em si não é
 novidade — a Aula 09 já subiu Milvus com etcd e MinIO, como a Parte 1 abaixo registra —, mas lá o

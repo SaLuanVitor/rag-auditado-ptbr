@@ -411,7 +411,7 @@ sustentam a decisão de adotar ou não.
 stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Foi assim que as citações
 desta aula foram conferidas. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
-isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.501 literais —, com uma ressalva que é a
+isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.502 literais —, com uma ressalva que é a
 própria lição: os espaços entre palavras são posicionamento, não literal. Buscar `mutually exclusive`
 com o espaço devolve zero em qualquer modo de junção. Junte os literais com `""` e tire os espaços
 **também do termo de busca**, e as duas frases aparecem: `mutuallyexclusive,collectivelyexhaustive` e
@@ -448,8 +448,8 @@ contrafactuais sobre o desenho — cada um isolando uma peça do método para ve
 **1. Tire a hierarquia.** Suponha uma única partição, sem níveis. Você perde o `C0` — e com ele os
 2,6% de tokens que tornam a consulta repetida viável, que é o argumento de escala inteiro. O que
 sobra é o nível folha, e ele **não** é "`TS` com passos extras": pela Table 2 acima, ainda é 26-33%
-mais barato que `TS` e ainda ganha dele (64% de win rate em comprehensiveness nas Notícias,
-`p<.001`). Perder a hierarquia não devolve você ao `TS`; devolve você ao ganho pequeno, pagando quase
+mais barato que `TS`, e pela §5.1 ainda ganha dele (64% de win rate em comprehensiveness nas
+Notícias, `p<.001`). Perder a hierarquia não devolve você ao `TS`; devolve você ao ganho pequeno, pagando quase
 o preço cheio. A hierarquia é o que compra a ordem de grandeza, não o ganho de qualidade.
 
 **2. Tire a exaustividade.** Suponha que as comunidades se sobreponham ou não cubram todos os nós. A

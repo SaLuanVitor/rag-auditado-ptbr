@@ -300,8 +300,9 @@ duas coisas, e é a Aula 13 que separa os dois usos.
 
 **Query routing** — Direcionar a query para o **destino** certo. Lógico usa regras ou LLM com saída
 restrita a um conjunto de rotas; semântico usa similaridade de embedding. **E o destino não é
-necessariamente uma fonte:** no exemplo do repositório (Aula 14) as rotas são dois _prompts_, não
-dois índices — o roteador escolhe **como perguntar**, não **onde buscar**. Rotear fonte e rotear
+necessariamente uma fonte:** dos dois exemplos da Aula 14, o semântico roteia dois _prompts_ — ali o
+roteador escolhe **como perguntar**, não **onde buscar** — e o lógico devolve um rótulo de fonte que
+nada a jusante consome. Rotear fonte e rotear
 prompt usam a mesma mecânica e resolvem problemas diferentes.
 
 **Text2SQL** — Traduzir linguagem natural em SQL. Recuperação sobre dado
@@ -667,11 +668,14 @@ uma rodada final junta as parciais. No GraphRAG as unidades são resumos de comu
 no baseline `TS`, os próprios chunks de texto.
 
 **Comprehensiveness / diversity / empowerment / directness** — Os quatro critérios do
-paper GraphRAG, julgados por comparação pareada. `directness` entra como teste de
-validade: é o critério em que o RAG vetorial vence.
+paper GraphRAG, julgados por comparação pareada. `directness` é o critério de **controle**:
+existe como referência para julgar a solidez dos outros três, e — por estar em oposição a
+comprehensiveness e diversity — o paper registra que não espera método algum vencer nos quatro. Que o
+RAG vetorial vença nele em todas as comparações é resultado, não hipótese.
 
 **Entity extraction** — Extrair entidades, relações **e afirmações** do texto para construir o grafo,
-a partir de prompt e não de schema. A Aula 23 a chama, **marcando como julgamento**, de a primeira
+a partir de prompt e não de modelagem de banco de grafos — mas com uma lista fechada de tipos de
+entidade dentro do prompt, escolhida a mão (ver [[Graph index]]). A Aula 23 a chama, **marcando como julgamento**, de a primeira
 fonte de custo escondido da indexação do GraphRAG — e a menos discutida —, porque roda um LLM sobre o
 corpus inteiro. Não é o mesmo que dizer que é a etapa mais cara das três: o paper dá só o custo
 agregado da indexação (281 minutos), sem decompor por etapa.

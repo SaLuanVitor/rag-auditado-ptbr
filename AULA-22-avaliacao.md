@@ -48,7 +48,7 @@ Toda avaliação de RAG se reduz a três perguntas encadeadas, e cada uma isola 
 
 | Pergunta                                     | Nome usual                        | O que o resultado ruim acusa                  |
 | -------------------------------------------- | --------------------------------- | --------------------------------------------- |
-| O contexto recuperado serve para a pergunta? | **context relevance** (sem gabarito) / **context precision** (com gabarito) | recuperação — ou ingestão, antes dela         |
+| O contexto recuperado serve para a pergunta? | **context relevance** / **context precision** — nomes de fornecedor para a mesma pergunta | recuperação — ou ingestão, antes dela         |
 | A resposta se sustenta no contexto?          | **faithfulness** / groundedness   | geração inventando                            |
 | A resposta responde à pergunta?              | **answer relevancy**              | geração desviando, ou pergunta mal recuperada |
 

@@ -101,9 +101,10 @@ Aula 07 cumpria.
 `similarity_top_k=2` (`01-NodeSentenceSlidingWindow.py:48`) e o `base_query_engine` com
 `similarity_top_k=6` (`01-NodeSentenceSlidingWindow.py:55`). São duas variáveis mudando ao mesmo
 tempo — mecanismo **e** `k` —, então a comparação que o script imprime não é controlada. A Aula 22
-elogia o oposto em `09-Evaluation/04-LlamaIndexEvaluation.py`: manter o `similarity_top_k` igual
-nos dois "é o que torna a comparação uma comparação". Iguale o `top_k` antes de concluir qualquer
-coisa das duas saídas.
+encontra o mesmo problema pela metade em `09-Evaluation/04-LlamaIndexEvaluation.py`: lá o
+`similarity_top_k` é igual nos dois motores, o que controla o **número** de itens recuperados mas não
+o volume de texto, porque as unidades indexadas têm tamanhos muito diferentes. Iguale o `top_k` antes
+de concluir qualquer coisa das duas saídas — e depois pergunte quanto texto cada lado entregou.
 
 O módulo traz também `01-NodeSentenceSlidingWindow-EvalVersion.ipynb`, a mesma técnica com
 avaliação acoplada — útil para medir se a janela está ajudando, e antecipando a Aula 22.

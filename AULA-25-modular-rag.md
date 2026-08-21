@@ -217,7 +217,7 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 **4. Reescreva um exemplo do repositório na notação do paper.** Comece pelo mais fácil: o pipeline de `00-SimpleRAG` é o Naive RAG que o paper formaliza. Depois faça o CRAG da Aula 18 — cinco nós, uma aresta condicional, acíclico — e o Self-RAG da Aula 21 — quatro nós, duas condicionais, três ciclos simples (a mesma convenção da Parte 4 e da Aula 21; se você contar pontos de entrada em laço, são dois — o que não vale é trocar de convenção entre duas passagens). A diferença entre as duas notações é a diferença entre os dois sistemas.
 
-**5. Localize os cinco eixos de divergência de rota.** O paper diz que rotas divergem em fonte, processo, configuração, modelo e prompt. Pegue o roteamento da Aula 14, que divergia só em prompt, e escreva o que mudaria em cada um dos outros quatro eixos para o seu domínio.
+**5. Localize os cinco eixos de divergência de rota.** O paper diz que rotas divergem em fonte, processo, configuração, modelo e prompt. Pegue o roteamento da Aula 14, que exercia só o eixo do prompt e declarava o da fonte sem consumi-lo, e escreva o que mudaria em cada um dos outros três eixos para o seu domínio.
 
 **6. Implemente o `scheduling module` que falta.** No grafo do Self-RAG (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py`), acrescente ao estado um contador e um limite, e faça as duas funções de decisão consultarem o escalonador em vez de decidirem sozinhas. Compare o seu resultado com a descrição do rule judge do paper: você usou limiar de escore, contagem de voltas, ou os dois?
 

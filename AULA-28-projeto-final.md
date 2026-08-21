@@ -245,7 +245,9 @@ só a métrica de recuperação enxerga isso.
 
 **Comece pela primeira linha da tabela.** Se o seu gabarito anota qual trecho sustenta cada resposta,
 `hit rate@k` e `MRR` saem de uma comparação de ids — determinísticas, reprodutíveis, sem custo de API
-e sem a variância de um juiz. As quatro linhas seguintes exigem LLM e entram depois, para o que não se
+e sem a variância de um juiz. Das quatro linhas seguintes, duas admitem variante sem LLM — o `ragas`
+0.2.15 traz `NonLLMContextPrecisionWithReference`, que compara contextos por semelhança de texto —, e
+as duas de geração exigem juiz. Todas entram depois, para o que não se
 reduz a acerto de id.
 
 ### O relatório
@@ -348,11 +350,9 @@ Se o seu projeto tiver aresta que volta, ele precisa de três coisas:
    produzir a mesma saída — e o mesmo veredito.
 3. **Um comportamento definido quando o limite estoura.** Responder com ressalva, admitir falha ou
    escalar. A ausência de escolha não é travamento — é deixar a plataforma abortar por você: o
-   `recursion_limit` padrão do LangGraph — 25 super-steps, valor da documentação da biblioteca, que
-   as Aulas 21 e 26 registram como **medido** no `langgraph` 0.2.69 (`GraphRecursionError: Recursion
-   limit of 25 reached without hitting a stop condition`), devolve uma exceção onde deveria haver uma
-   resposta. O que não está
-   instalado — devolve um `GraphRecursionError` onde deveria haver uma resposta.
+   `recursion_limit` padrão do LangGraph — 25 super-steps, valor da documentação da biblioteca e
+   **medido** pelas Aulas 21 e 26 no `langgraph` 0.2.69 (`GraphRecursionError: Recursion limit of 25
+   reached without hitting a stop condition`) — devolve uma exceção onde deveria haver uma resposta.
 
 E um cuidado extra, que a Aula 26 encontrou na forma dura: **guarde a pergunta original.** Um laço
 que reescreve a reescrita se afasta da intenção; um laço que apaga o histórico não converge.
