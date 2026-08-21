@@ -256,7 +256,10 @@ python 05-LangChain-Unstrucured-PDF-SimpleDisplay.py
 ```
 
 Primeira execução baixa modelos de layout — leva tempo. Compare a estrutura obtida com a saída
-crua do `01-UsingPyPDF.py`.
+crua do `01-UsingPyPDF.py` — e note que os dois **não leem o mesmo documento**: o `01` abre o PDF de
+slides do Black Myth Wukong e o `05` abre um PDF de turismo, na linha 1. Para a comparação ser da
+estratégia de extração e não do documento, aponte a linha 1 do `05` para o mesmo PDF do `01` antes de
+rodar.
 
 Depois abra `07-Unstructed-PDF-CompareVariousModes.ipynb`, que compara modos lado a lado, e
 `08-AnalyzePDFLayout.ipynb`, que é onde as caixas aparecem desenhadas.
@@ -275,7 +278,12 @@ mude `strategy="hi_res"` para `"fast"`. Cronometre os dois e compare a estrutura
 fidelidade o tempo comprou?
 
 **3. Rode OCR num PDF nativo.** Aplique `03-UsingPytesseract+pdf2image.py` a um PDF que já tem
-texto e compare com a extração direta. O OCR vai introduzir erros num arquivo que não precisava
+texto e compare com a extração direta. Antes de rodar, troque o `lang` da chamada do Tesseract, na
+linha 20, de `chi_sim` para `eng`: o arquivo herdou o modelo chinês da origem do repositório, e sobre
+um PDF em inglês ele devolve lixo pelo motivo errado — ou aborta, se o pacote de dados
+`tesseract-ocr-chi-sim` não estiver instalado. Com `eng`, o que sobra de divergência contra a extração
+direta é imperfeição de OCR, que é o que o exercício quer medir. O OCR vai introduzir erros num
+arquivo que não precisava
 dele — argumento empírico contra "OCR em tudo por segurança".
 
 **4. Compare OCR com modelo multimodal na mesma página — e note que exige uma edição.** Os dois

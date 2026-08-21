@@ -280,7 +280,10 @@ python 02-CrossEncoder-Reranking.py
 python 03-CoBERT-Reranking.py
 ```
 
-Compare a ordem **antes e depois** do reranking na mesma consulta. O ganho aparece quando o
+Nos dois, o "antes" **não é um ranking recuperado**: os candidatos são uma lista Python literal de
+três frases, impressa na ordem em que foi escrita. O que você compara é a ordem do código-fonte com a
+ordem dos escores — suficiente para ver o mecanismo do cross-encoder, insuficiente para ver o ganho do
+estágio, que só aparece com dezenas de candidatos. O caso em que o
 documento certo estava em 7º e sobe para 1º — e é essa observação que justifica o estágio.
 
 ```powershell
@@ -289,7 +292,18 @@ python 05-RankLLM-Reranking.py
 python 06-RecencyWeightedReranking.py
 ```
 
-O `04` exige chave da Cohere. No `06`, imprima o `decay_factor` de `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:150` para cada documento, junto com a
+O `04` exige chave da Cohere. No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem **1,0000, sempre**, e vale
+entender por quê antes de tentar consertá-lo. O retriever reescreve o `last_accessed_at` para o
+instante da consulta nos documentos que devolve — o `_get_rescored_docs` faz isso **antes** do
+`return` —, e a linha 148 calcula o tempo decorrido contra esse valor recém-gravado: dá zero. Junte o
+`k_value = 1` da linha 74, que faz "para cada documento" ser um documento, e a similaridade do vetor,
+que nunca sai de `_get_combined_score` e portanto não está disponível para imprimir ao lado.
+
+Para ver os dois números de fato, leia o estado **antes** da consulta: percorra o `memory_stream` do
+retriever calculando as horas desde o `last_accessed_at` de cada documento, e chame o
+`similarity_search_with_relevance_scores` do vetorstore à parte. Aí sim o decaimento e a relevância
+aparecem lado a lado, e você vê que é a **soma** dos dois que ordena — não o produto que o docstring
+do arquivo, nas linhas 25-26, diz ser a fórmula. O arquivo documenta uma coisa e executa outra, junto com a
 similaridade — ver os dois números lado a lado é o que torna a combinação compreensível.
 
 ---
@@ -303,8 +317,12 @@ de aparições. Você acabou de sentir o que o parâmetro controla.
 **2 e 3. Os dois lados do `k` — e note que estes dois exercícios exigem código seu.** O
 `02-CrossEncoder-Reranking.py` e o `03-CoBERT-Reranking.py` **não têm recuperação**: os documentos
 são uma lista Python fixa de três, sem `retriever` nem parâmetro `k` (`grep -c "retriever\|k="` devolve
-zero nos dois). Para fazer o experimento, ligue um dos dois a um índice — o `03-LangChain-BM25.py` da
-Aula 08 serve de ponto de partida — e então varie o `k`.
+zero nos dois). Para fazer o experimento, ligue um dos dois a um índice e então varie o `k`. Um detalhe
+decide se o exercício mede algo: o acervo precisa render **mais de cem** candidatos. O
+`03-LangChain-BM25.py` da Aula 08 serve de molde de código, mas não de corpus — são cinco documentos,
+e com eles `k=3` e `k=100` devolvem praticamente a mesma lista, então a latência entre os dois extremos
+fica indistinguível. Use o acervo do `01-RRF-Reranking.py` desta mesma pasta, que carrega o corpus de
+turismo inteiro e corta em chunks pequenos — daí sai volume suficiente.
 
 Com `k=3`, o reranking não tem o que consertar: ele só reordena o que veio, e recuperar estreito
 anula o ganho de reordenar. Com `k=100`, meça o tempo: o cross-encoder faz 100 forward passes, e a

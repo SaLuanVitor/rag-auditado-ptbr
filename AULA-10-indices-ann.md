@@ -299,7 +299,23 @@ python 05-DiskANN.py
 Rode nesta ordem e **guarde os resultados do FLAT** — eles são o gabarito de recall dos outros
 quatro.
 
-Depois monte a medição que a aula pede. Para um conjunto de consultas:
+Depois monte a medição que a aula pede — mas **três coisas nos arquivos impedem que ela funcione como
+estão escritos**, e consertá-las é a primeira parte do exercício:
+
+- **Os arquivos 01 a 04 usam a mesma collection.** Todos declaram
+  `COLLECTION_NAME = "flat_index_demo"` na linha 6, e cada um faz `drop_collection` na abertura:
+  rodar o `02` **apaga** o FLAT que você acabou de construir. Dê a cada arquivo um nome próprio
+  (`flat_demo`, `ivf_flat_demo`, `ivf_pq_demo`, `hnsw_demo`), para que as coleções coexistam.
+- **Não há semente.** Os 1000 vetores (linha 23) e o vetor de consulta são sorteados com
+  `random.random()` em cada execução, e nenhum dos cinco arquivos chama `random.seed`. Sem semente,
+  FLAT e IVF respondem sobre acervos diferentes, a perguntas diferentes — a interseção de ids é quase
+  zero por construção, e não mede aproximação nenhuma. Ponha `random.seed(42)` antes da linha 23 em
+  todos.
+- **Mil vetores é pouco para o exercício 1.** Com `nlist: 1024` você pediria mais células do que há
+  vetores. Suba `num_vectors` para algo como 100000 se quiser que a tabela recall × latência tenha o
+  que mostrar.
+
+Feito isso, para um conjunto de consultas:
 
 1. Rode contra FLAT e guarde os ids retornados. Este é o conjunto verdadeiro.
 2. Rode contra cada índice aproximado.
@@ -344,10 +360,22 @@ sistematicamente estranho, sem exceção nenhuma, é suspeita de métrica incomp
 
 **4. Filtre de forma muito seletiva.** Em `03-filtered-search.py`, mude o filtro para algo que
 elimine quase tudo (`likes > 999999`). Observe quantos resultados voltam, e depois compare com
-o comportamento sob `"hints": "iterative_filter"`.
+o comportamento sob `"hints": "iterative_filter"` — e note que o filtro está escrito **duas vezes** no
+arquivo, uma na busca padrão e outra na iterativa. Extraia-o para uma variável e passe-a nas duas
+chamadas; trocando só a primeira, você compara filtros diferentes em vez de estratégias diferentes.
 
-**5. Inverta `radius` e `range_filter`.** Em `04-range-search.py`, ponha `range_filter` maior
-que `radius`, contra a nota da linha 100. Veja o que acontece — e por que a nota está lá.
+**5. Inverta `radius` e `range_filter` — depois de fazer a busca devolver algo.** A janela do exemplo
+é vazia para o dado deste script, e isso não é bug de configuração: é a geometria do dado sintético.
+Os 1000 vetores e a consulta são uniformes em [0,1) com 128 dimensões, e a distância entre dois
+vetores assim fica em torno de 4,5 — o vizinho mais próximo mede 3,84, ou 14,75 na escala quadrática
+que o Milvus reporta para L2. Nenhum vetor cai entre 0,5 e 1,0, então a busca devolve lista vazia. Se
+você inverter a partir daí, compara vazio com vazio.
+
+Então: primeiro leia as distâncias que a busca top-k do mesmo arquivo imprime e escolha `radius` e
+`range_filter` em torno delas — algo como 20 e 15. Confirme que a busca traz resultados. **Só então**
+ponha `range_filter` maior que `radius`, contra a nota da linha 100, e compare. Ajuste também a linha
+de relatório: ela escreve os dois números como literais na f-string, e passa a mentir sobre a faixa
+depois que você muda os parâmetros.
 
 ---
 

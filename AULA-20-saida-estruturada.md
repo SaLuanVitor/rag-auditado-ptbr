@@ -568,9 +568,17 @@ exemplo do system prompt (linhas 16–23). A saída continua sendo JSON válido 
 deixar de ser `question` e `answer`. É a demonstração de que grau 3 garante sintaxe, não contrato.
 
 **4. Parser como prevenção, não como detector.** Em `01-LangChain-OutputParsing.py`, imprima
-`parser.get_format_instructions()` e cole o resultado no template da linha 12. Compare a taxa de
-sucesso do `parse` antes e depois, em algumas execuções. Você acabou de usar a metade do parser que
-o repositório inteiro nunca usa.
+`parser.get_format_instructions()` como está: sai `Return a JSON object.` e nada mais. Medido — o
+parser da linha 11 é um `JsonOutputParser()` **sem `pydantic_object`**, e sem schema ele não tem o que
+descrever. Colada no template, essa frase repete o que o prompt já diz.
+
+É aí que o exercício começa. Declare o contrato e instancie o parser com ele — uma classe `BaseModel`
+com os campos que você espera, passada como `JsonOutputParser(pydantic_object=Usuario)` — e imprima de
+novo: agora vem o JSON Schema inteiro. Cole-o no prompt por `partial_variables`, **não** dentro da
+string de `from_template`, porque as chaves do schema seriam lidas como variáveis de template e o
+`format` quebraria com `KeyError`. Compare a taxa de sucesso do `parse` antes e depois. Você acabou de
+usar a metade do parser que o repositório inteiro nunca usa — e descobriu que ela só rende com um
+schema declarado.
 
 **5. O campo inventado.** Rode `04-Pydantic-v2.py` e olhe o valor de `file_name`. Nenhum nome de
 arquivo foi passado (linha 50). Depois torne o campo opcional e rode de novo. Guarde os dois
@@ -594,9 +602,12 @@ divergem? Depois aponte o `input_files` da linha 19 para um documento grande e r
 ## Quebre de propósito
 
 **1. Peça JSON e não valide.** Em `01-LangChain-OutputParsing.py`, troque a linha 17 por
-`print(output.content)` e rode algumas vezes. Observe se aparece cerca de código, texto antes do
-objeto, ou vírgula final. Cada uma dessas variações é uma exceção que o grau 2 pegaria e o grau 1
-não.
+`print(output.content)` e rode algumas vezes. Observe o que aparece: cerca de código, texto antes do
+objeto, vírgula final. **Só as duas últimas viram exceção** — medido no `langchain-core` 0.3.33: a
+cerca ` ```json ` o `JsonOutputParser` desembrulha sozinho, mesmo havendo uma frase antes dela, e
+devolve o dicionário. Vírgula final e prosa seguida do objeto sem cerca levantam
+`OutputParserException: Invalid json output`. Conferir qual variação o parser perdoa é metade do
+exercício, e o lembrete é que "o parser aceitou" e "o modelo obedeceu" são coisas diferentes.
 
 **2. Valide contra o schema errado.** Ainda no `01`, peça no prompt uma lista (`"in JSON array
 format"`) e mantenha o `JsonOutputParser`. O parse pode até passar — e o consumidor que espera um

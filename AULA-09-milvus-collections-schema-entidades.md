@@ -238,11 +238,17 @@ O nome do quarto arquivo tem parênteses — aspas são necessárias no PowerShe
 
 Este exercício exige duas edições, e a segunda é o achado. Comente as duas chamadas de
 `drop_database` do fim de `01-database.py`, nas linhas 86 e 92 — sem isso, o script apaga as duas databases ao
-terminar e a segunda execução cria do zero, sem exercitar nada. **E envolva também a criação de
-`my_database_2` (linhas 40-43) num `try/except exceptions.AlreadyExistError`**: só o
-`my_database_1` tem esse tratamento, nas linhas 31-35. Com as duas edições, a segunda execução cai
-no `except` nas duas databases; com apenas a primeira, ela cai no `except` da primeira e **estoura**
-na segunda.
+terminar e a segunda execução cria do zero, sem exercitar nada. **E conserte o tratamento de erro, que não
+funciona.** Só o `my_database_1` tem `try/except`, nas linhas 31-35 — mas o nome que ele captura,
+`exceptions.AlreadyExistError`, **não existe no `pymilvus` 2.5.4**, a versão que o curso pina (os
+nomes reais são `PartitionAlreadyExistException`, `CollectionNotExistException` e afins). Como a
+expressão do `except` só é avaliada quando alguma exceção sobe, a primeira execução passa e a
+**segunda morre dentro do próprio tratador**, com `AttributeError: module 'pymilvus.exceptions' has no
+attribute 'AlreadyExistError'`. O tratamento é decorativo.
+
+Então: troque aquele nome por `exceptions.MilvusException`, que existe, e envolva também a criação de
+`my_database_2` (linhas 40-43) no mesmo `try/except`. Com as duas edições a segunda execução cai no
+`except` nas duas databases; sem elas, ela estoura na linha 34 antes de chegar à segunda.
 
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
 da lição, uma em cada database.
@@ -271,8 +277,11 @@ data=[{"id": 1, "text_vector": [...], ...}])` antes do `drop_collection` da linh
 `id` mesmo assim. Observe o conflito. Depois pense: se o Milvus gera o id, como
 você descobre a qual documento do seu sistema aquele resultado corresponde?
 
-**3. Declare `VARCHAR` com `max_length` pequeno.** Ponha `max_length=10` num campo e insira um
-texto maior. Veja se trunca ou rejeita — a resposta muda como você deve dimensionar.
+**3. Declare `VARCHAR` com `max_length` pequeno.** Em `03-schema.py`, baixe o `max_length` do campo
+`title` para 10 e insira um texto maior — reaproveitando o `client.insert` que o exercício 2 mandou
+acrescentar, já que este arquivo não tem `insert` nenhum (`grep -c insert` devolve 0). Veja se trunca
+ou rejeita: a resposta vem do **servidor**, não do cliente — o `pymilvus` aceita a linha sem reclamar
+—, e ela muda como você deve dimensionar o campo.
 
 **4. Insira sem o campo escalar.** Omita `color` de uma das entidades de `04`. O schema aceita?
 Se aceitar, o que acontece quando você filtrar por `color` depois?
