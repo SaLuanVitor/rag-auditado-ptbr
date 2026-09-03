@@ -42,8 +42,20 @@ o de orçamento dobrado deu nota menor e achou defeito verificável que o outro 
 das rodadas 1 e 2 como piso otimista, não como medida
 **Classificação:** **Requer revisão** — cinco rodadas completas convergindo no mesmo rótulo. Na R6 os
 67,2% ficam **abaixo do piso de 70%** de "Publicável com ressalvas", e o gate eliminatório reprova
-independentemente: **oito aulas abaixo de 50%** — 27 (4), 00 (5), 08 (5), 09 (5), 23 (5), 24 (5),
-25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
+independentemente: **oito aulas abaixo de 50%** na R6 — 27 (4), 00 (5), 08 (5), 09 (5), 23 (5),
+24 (5), 25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
+
+**Sétima rodada, 03/09: parcial, só nas quatro piores.** 27 sobe a **7**, 09 a **6**, e 24 e 08
+**caem a 4**. Soma das quatro: 19/48 → 21/48. **O gate eliminatório continua reprovando**, agora
+por duas aulas medidas (24 e 08) mais quatro não remedidas (00, 23, 25, 26). O percentual de curso
+válido segue sendo o da R6, porque a sétima não cobriu as 29.
+
+**O diagnóstico da sétima é sobre o método de conserto, não sobre o material.** Em três das quatro
+aulas os consertos estavam corretos e a **propagação** falhou: Checkpoint, título de seção e
+rodapé continuaram cobrando a versão antiga. A AULA-08 é a única regressão de verdade, por uma
+prescrição que não funciona. E a AULA-24 caiu por defeito **pré-existente** que a lente do
+conserto anterior tornou visível, o que não é regressão. Regras novas em `PROMPT-CONTINUAR.md`,
+seção "Regras que a sétima rodada acrescentou"; ferramentas em `ferramentas/{residuo,fechos}.js`.
 **⚠️ São oito outras aulas, não as mesmas oito.** As oito da R4 (09, 11, 07, 17, 00, 14, 01, 15)
 foram consertadas e renotadas na R5, e sete delas saíram da lista. A 00 é a única que reincide — e
 reincide por um defeito que **eu** escrevi na R6, numa instrução de instalação, na aula que o leitor

@@ -277,11 +277,61 @@ projetar, não arquivo a mover.
 
 O QUE NÃO É O PRÓXIMO PASSO, e por que:
 - Renotar você mesmo depois de corrigir. É a autoavaliação que a RUBRICA proíbe.
-- Declarar "publicável com ressalvas" porque o percentual está em 72,1%. As portas são
-  eliminatórias, não bônus — a rubrica é explícita nisso, e são 18 notas -1 contra o máximo de uma.
-- Escrever aula nova, exercício novo ou exame v3 antes de as quatro aulas abaixo de 50% subirem.
+- Declarar "publicável com ressalvas" a partir do percentual. As portas são eliminatórias, não
+  bônus, e a rubrica é explícita nisso. O percentual válido é o da última rodada COMPLETA (a sexta,
+  234/348 = 67,2%); a sétima foi parcial, só nas quatro piores, e não produz percentual de curso.
+- Escrever aula nova, exercício novo ou exame v3 antes de as aulas abaixo de 50% subirem. Estado
+  medido em 03/09: das oito da sexta rodada, quatro foram remedidas na sétima e **duas seguem
+  abaixo** (24 e 08, ambas em 4/12); as outras quatro (00, 23, 25, 26) receberam conserto e **não
+  foram remedidas**.
   Há trabalho opcional de sobra listado na seção 9 do HANDOFF; nenhum dele destrava a publicação.
 ```
+
+---
+
+## Regras que a sétima rodada acrescentou
+
+### O conserto pode estar certo e a propagação falhar
+
+Medido na sétima rodada, em três das quatro aulas: o corpo foi reescrito com precisão, e
+Checkpoint, título de seção, referência cruzada e rodapé continuaram cobrando a versão antiga.
+O auditor da AULA-09 foi explícito: "os seis consertos que você aplicou estão todos corretos e
+provados. O que trava a nota é resíduo."
+
+Releitura da aula não pega isso, porque a leitura reconstrói o sentido novo e passa por cima da
+frase velha. Use `ferramentas/fechos.js` depois de cada lote: ele enumera as superfícies de fecho
+das aulas que o diff tocou e marca as que o diff alterou. O que sobra sem marca é a lista finita
+a percorrer. **Título de seção é a pior delas**, porque é o que o leitor apressado leva embora, e
+foi onde o `mem_limit` sobreviveu a dois consertos do corpo.
+
+### Percorra a lista de achados até o fim
+
+O `12 GB que não somem` da AULA-28 foi apontado por um auditor com correção pronta para colar, e
+não foi aplicado. Isso é pior que resíduo: resíduo é frase que sobreviveu a uma emenda, isto é
+item que nunca foi lido. Ao fechar um lote, confira a contagem de achados do relatório contra a
+contagem de edições aplicadas, e diga qual achado você recusou e por quê.
+
+### Nota que cai não é necessariamente regressão
+
+Precisão errada pontua pior que vagueza. Um conserto que troca "os experimentos isolam a variável
+certa" por alegações exatas sobre `top_k`, `MetadataMode` e listas idênticas cria alegações
+checáveis onde antes não havia nenhuma, e a rubrica passa a poder reprovar. Duas das quatro aulas
+caíram, e em uma delas a queda veio de um defeito **pré-existente** que a lente do conserto
+anterior tornou visível: o `Pass@5` do experimento 3 da AULA-24 é idêntico ao do 2.
+
+Separe os dois casos antes de concluir. Regressão é prescrição nova que não funciona, como a da
+AULA-08. Defeito recém-visível não é regressão, e apagar a precisão para recuperar a nota seria
+o pior conserto possível.
+
+### Valide o verificador contra um positivo plantado antes de reportar o zero dele
+
+Um juiz automático de desalinho, por sobreposição de palavras, deu 98 pares com limiar frouxo e
+**zero** com limiar estreito. O zero teria sido reportado como lote limpo. Plantar um positivo
+conhecido (reverter o Checkpoint 9 da AULA-27 ao texto defeituoso) mostrou que ele não dispara
+nem no caso para o qual foi construído. A ferramenta não foi instalada.
+
+Vale para qualquer verificador novo: antes de acreditar no que ele **não** achou, plante um
+defeito que você sabe que existe e confirme que ele acha.
 
 ---
 
