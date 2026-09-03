@@ -45,10 +45,17 @@ das rodadas 1 e 2 como piso otimista, não como medida
 independentemente: **oito aulas abaixo de 50%** na R6 — 27 (4), 00 (5), 08 (5), 09 (5), 23 (5),
 24 (5), 25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
 
-**Sétima rodada, 03/09: parcial, só nas quatro piores.** 27 sobe a **7**, 09 a **6**, e 24 e 08
-**caem a 4**. Soma das quatro: 19/48 → 21/48. **O gate eliminatório continua reprovando**, agora
-por duas aulas medidas (24 e 08) mais quatro não remedidas (00, 23, 25, 26). O percentual de curso
-válido segue sendo o da R6, porque a sétima não cobriu as 29.
+**Sétima rodada, 03/09: COMPLETA nas oito abaixo de 50%.** 27 sobe a **7**; 09, 23 e 26 a **6**;
+24 e 08 **caem a 4**; 00 a **3**; 25 a **2**, com a primeira nota **`−1`** destas oito. Soma:
+39/96 → **38/96**, ou seja as oito medem o mesmo depois de uma rodada inteira de varreduras por
+classe. **O gate eliminatório continua reprovando por duas razões independentes:** quatro aulas
+abaixo de 50% (24, 08, 00, 25) e uma `−1` nova. O percentual de curso válido segue sendo o da R6,
+porque a sétima cobriu oito aulas, não 29.
+
+**O que a AULA-00 revelou vale para a auditoria toda:** seis rodadas auditaram os **números** e
+nenhuma **executou o caminho de instalação**. Nenhum requirements de `91-Environment/` instala
+cliente de Ollama, e a trilha que a aula recomenda não roda o script que ela manda rodar. Estava
+lá desde o começo.
 
 **O diagnóstico da sétima é sobre o método de conserto, não sobre o material.** Em três das quatro
 aulas os consertos estavam corretos e a **propagação** falhou: Checkpoint, título de seção e
@@ -141,7 +148,10 @@ porque `grep -r` varre ocultos. Detalhe na seção "Varredura da classe 4" do GA
 candidatas, 49 por aula, implausível. Faltava o discriminador de que contagem só é verificável se o
 parágrafo referencia o repositório. Com ele, 440. **Enumerador é gerador de candidatas** — a terceira
 vez que este projeto reaprende isso, depois do `duplicata-semantica.js` e do enumerador de ressalvas
-**AMBIENTE MONTADO.** Venv isolado sob o scratchpad, com os **pins exatos** do curso: `langchain-core
+**⚠️ AMBIENTE PERDIDO EM 03/09, E ELE PRECISA SER RECONSTRUÍDO.** O venv sob o scratchpad não
+existe mais; três auditores da sétima rodada o procuraram, não acharam, e declararam
+`NÃO_EXECUTADO` no eixo que dependia dele. As medições abaixo continuam válidas porque estão
+registradas, mas **não são reproduzíveis** sem remontar. Os **pins exatos** do curso: `langchain-core
 0.3.33`, `langchain-community 0.3.16`, `langchain-openai 0.3.3`, `langgraph 0.2.69`, `pymilvus 2.5.4`,
 `llama-index-core 0.11.17`, `ragas 0.2.15`, `numpy 1.26.4`, `jq 1.8.0`. **Não** os 274 pacotes: as
 perguntas em aberto eram sobre mecanismo e nenhuma exigia torch, chromadb ou onnxruntime — que são

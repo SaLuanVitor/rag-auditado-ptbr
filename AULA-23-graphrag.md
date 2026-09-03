@@ -124,7 +124,7 @@ O único `.py` do repositório que fala com um banco de grafos é o par Text2Cyp
 `05-PreRetrieval/01-QueryConstruction/Text2Cypher/03-Text2Cypher-SNOMED-v2-Succeeded.py:2` importa
 `GraphDatabase` do driver `neo4j`. É outra técnica, como a seção anterior separou.
 
-**Consequência para esta aula:** a fonte primária é o paper, que eu li. Onde eu falar do
+**Consequência para esta aula:** a fonte primária é o paper. Onde a aula falar do
 comportamento do sistema, é o paper falando — não código deste repositório, porque não existe. Onde
 for julgamento, está marcado.
 
@@ -212,7 +212,9 @@ método sugere.
 
 ### O ganho
 
-Contra RAG vetorial convencional (a condição `SS`), medindo com juiz LLM:
+Contra RAG vetorial convencional (a condição `SS`), medindo com juiz LLM. A faixa é das
+**abordagens globais** como grupo (`C0` a `C3` e o `TS`), e vale reparar em quem ocupa cada ponta:
+no Podcast, o 83% de comprehensiveness é do `TS`, **sem grafo**, e o `C0` fica em 72%.
 
 | Critério                     | Podcast           | Notícias          |
 | ---------------------------- | ----------------- | ----------------- |
@@ -297,6 +299,13 @@ erra:
 1. **Sobre o RAG vetorial**, a maior parte do ganho vem de a abordagem ser **global**.
 2. **Sobre o map-reduce de texto**, o grafo acrescenta um incremento pequeno e significativo — nos
    níveis intermediário e folha, não no raiz.
+
+   Com uma ressalva que o próprio paper registra, e que muda como se lê o número: o Experimento 2
+   (§4.2 e §5.2) mede comprehensiveness e diversity contando claims extraídos por Claimify, 47.075
+   no total, e nesse eixo _"there were no statistically significant differences observed among the
+   global search conditions or between global search and TS"_. O incremento do grafo sobre o `TS`
+   aparece na taxa de vitória julgada por LLM e **não** aparece na contagem de claims. Ler os dois
+   juntos é o que impede transformar 57% e 64% em fato estabelecido.
 3. **No nível raiz**, você **troca** esse incremento por 97% menos tokens: 2,6% do orçamento
    mantendo 72% de win rate contra o vetorial, com o que o paper chama de _"a modest drop in
    performance compared with other global methods"_.
@@ -357,7 +366,7 @@ O paper gera as perguntas com personas, e dá o algoritmo:
 > relevant to the user. 3. Specific to each user & task pair, generate M high-level questions that:
 > Require understanding of the entire corpus. Do not require retrieval of specific low-level facts."_
 
-Com `K = M = N = 5`, são **125 perguntas por dataset**, e cada comparação foi repetida cinco vezes e
+Com `K = M = N = 5`, são **125 perguntas por dataset**, e cada comparação foi repetida cinco vezes, com a média das cinco, e
 mediada.
 
 Compare com o que a Aula 22 encontrou no repositório: três exemplos no RAGAS, uma pergunta no TruLens,
@@ -368,7 +377,10 @@ significa.
 E a circularidade da Aula 22 reaparece, agora assumida: o LLM inventa as personas, o LLM escreve as
 perguntas, o LLM julga as respostas. O paper é explícito sobre o motivo — não há gabarito para
 perguntas de sensemaking. Julgamento: é a melhor coisa disponível para essa classe de pergunta, e
-continua medindo concordância com um juiz, não acerto. Um painel humano numa amostra é o que calibra
+continua medindo concordância com um juiz, não acerto. O paper tenta calibrar por conta própria, e
+o resultado é modesto: o rótulo agregado do juiz casou com o rótulo por claims em 78% das
+comparações de comprehensiveness e 69-70% das de diversity, e só nos pares em que o juiz não
+empatou (§5.2). Um painel humano numa amostra é o degrau seguinte, e é o que calibra
 isso, e é o que a Aula 22 recomendou.
 
 ---
@@ -387,9 +399,9 @@ global e o seu RAG vai falhar nela em silêncio:
    isso: o que veio está fielmente resumido, e o que faltou não aparece em nenhuma métrica que só
    olha o que veio.
 
-O terceiro é, **julgamento**, o mais perigoso, e é a razão pela qual `context recall` exige
-gabarito: só ele mede
-ausência.
+O terceiro é, **julgamento**, o mais perigoso, e a Fase 8 explica por quê: das métricas da tríade,
+nenhuma olha o que ficou de fora. Medir ausência exige comparar o recuperado com a resposta certa,
+e é essa comparação que obriga o gabarito do `context recall`.
 
 Julgamento, para quem tem esse problema e não vai construir um grafo: antes de GraphRAG há degraus
 mais baratos. Um resumo por documento, indexado junto do texto (a multi-representação da Aula 16), já
@@ -408,7 +420,7 @@ igual, porque é o que você faria antes de adotar o método.
 sustentam a decisão de adotar ou não.
 
 **2. Extraia o texto do PDF.** Use `pdftotext "GraphRAG - 2404.16130v2.pdf" -`, que joga o texto em
-stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Foi assim que as citações
+stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Vale saber que as citações
 desta aula foram conferidas. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
 isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.502 literais —, com uma ressalva que é a
@@ -523,7 +535,8 @@ Responda sem consultar:
    mantém?
 9. Quanto tempo levou a indexação do dataset Podcast, e como esse número entra numa decisão de
    adoção?
-10. Por que o paper não usa faithfulness nem context recall?
+10. Quais critérios do RAGAS o paper nomeia para dizer que não servem aqui, e qual é o argumento
+    dele? E por que `context recall`, que o paper não chega a nomear, também não caberia?
 11. Como as 125 perguntas foram geradas, e qual circularidade isso introduz?
 12. O que existe neste diretório do repositório, e onde está o único código do repo que fala com um
     banco de grafos?

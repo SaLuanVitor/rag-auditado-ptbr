@@ -28,7 +28,7 @@ A distinção mínima, e ela é sobre **onde mora a decisão**:
 |                   | Quem decide                                      | Exemplo no curso                   |
 | ----------------- | ------------------------------------------------ | ---------------------------------- |
 | Grafo condicional | o código, lendo um veredito                      | CRAG (Aula 18), Self-RAG (Aula 21) |
-| Roteador          | o código, lendo a saída de um classificador      | Aula 14 (embedding), Aula 19 (LLM) |
+| Roteador          | o código, lendo a saída de um classificador      | Aula 14 (LLM com `Literal`, e embedding), Aula 19 (LLM) |
 | **Agente**        | **o modelo**, emitindo uma chamada de ferramenta | este módulo, arquivo `01`          |
 
 Num grafo condicional, o LLM produz um **dado** (`yes`/`no`, um rótulo) e o código decide o que fazer com ele. Num agente, o LLM produz uma **ação** — a chamada de ferramenta da Aula 20 — e a decisão de agir já é dele.
@@ -41,7 +41,7 @@ A Aula 25 leu no paper Modular RAG que o **adaptive (active) retrieval** é o su
 
 Existe outro uso corrente da palavra: **adaptar a rota à pergunta** — decidir **onde** buscar. É o padrão _conditional_ da mesma taxonomia.
 
-Os dois se chamam "adaptive" na literatura de blog, e o arquivo `02` deste módulo é o segundo sentido, não o primeiro. Esta aula verifica isso no código em vez de aceitar pelo nome — foi exatamente o que o plano desta aula pedia.
+Os dois se chamam "adaptive" na literatura de blog, e o arquivo `02` deste módulo é o segundo sentido, não o primeiro. Esta aula confere isso no código em vez de aceitar pelo nome — foi exatamente o que o plano desta aula pedia.
 
 ---
 
@@ -158,7 +158,8 @@ A aresta `rewrite → agent` (`01-LangChain-AgenticRAG.py:174`) fecha o ciclo, e
 
 O comentário é honesto: `Reset messages here`. O histórico é descartado e **só a pergunta reescrita sobrevive**.
 
-A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura: a pergunta original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como todos os nós leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
+A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura, e ela atinge quatro dos cinco nós, todos menos o próprio `agent`: a pergunta
+original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como todos os nós leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
 
 E, pela segunda vez neste curso — depois do Self-RAG da Aula 21 —, **o ciclo não tem contador**. Nada limita quantas vezes `agent → retrieve → grade_documents → rewrite → agent` pode girar.
 
@@ -176,7 +177,7 @@ E o `hub.pull("rlm/rag-prompt")` (`01-LangChain-AgenticRAG.py:150`) é o mesmo p
 
 `02-LangChain-AdaptiveRAG.py` é o exemplo mais completo do repositório em número de componentes: um roteador de fonte, três graders, um reescritor, busca na web e cinco nós.
 
-E ele traz o que a Aula 25 apontou como faltando — com uma ressalva que a Aula 25 não fez. O paper Modular RAG diz que rotas divergem em _"retrieval sources, retrieval processes, configurations, models, and prompts"_ — cinco eixos. O eixo da **fonte** já apareceu no curso: `05-PreRetrieval/03-QueryRouting/01-LogicalRouting.py:12-17` declara `class RouteQuery` com `datasource: Literal["python_docs", "js_docs", "golang_docs"]`, a mesma classe e o mesmo campo que aqui. O que é novo não é a técnica; é o que se faz com o resultado. Lá o rótulo era impresso e morria — `route_question` devolve `result.datasource` e o `__main__` só imprime. Aqui ele **governa uma aresta do grafo**, e as duas fontes existem de fato (`02-LangChain-AdaptiveRAG.py:50-54`):
+E ele traz o que a Aula 25 apontou como faltando, com a mesma ressalva que a Aula 25 registrou. O paper Modular RAG diz que rotas divergem em _"retrieval sources, retrieval processes, configurations, models, and prompts"_ — cinco eixos. O eixo da **fonte** já apareceu no curso: `05-PreRetrieval/03-QueryRouting/01-LogicalRouting.py:12-17` declara `class RouteQuery` com `datasource: Literal["python_docs", "js_docs", "golang_docs"]`, a mesma classe e o mesmo campo que aqui. O que é novo não é a técnica; é o que se faz com o resultado. Lá o rótulo era impresso e morria — `route_question` devolve `result.datasource` e o `__main__` só imprime. Aqui ele **governa uma aresta do grafo**, e as duas fontes existem de fato (`02-LangChain-AdaptiveRAG.py:50-54`):
 
 ```python
 class RouteQuery(BaseModel):
@@ -186,7 +187,11 @@ class RouteQuery(BaseModel):
     )
 ```
 
-`Literal` como contrato — a Aula 20 recomendou exatamente isso e observou que o repositório usava `str` solto. Aqui o roteador não pode devolver um rótulo fora do conjunto.
+`Literal` como contrato — a Aula 20 recomendou exatamente isso e observou que o repositório usava `str` solto. O contrato vale para a rota e para nada mais: os três graders deste mesmo arquivo declaram
+`binary_score: str` com a enumeração na `description` (`:68`, `:82`, `:95`), que é o achado que a
+Aula 20 registrou. E aqui ele custa mais: `:173` reprova por `!= "yes"`, então um `"Yes"` com
+maiúscula, que o tipo aceita, manda para `retry` — o único ciclo que volta ao mesmo nó sem mudar
+nada. Aqui o roteador não pode devolver um rótulo fora do conjunto.
 
 E o roteamento acontece **na aresta que sai do START** (`02-LangChain-AdaptiveRAG.py:188-192`):
 
@@ -300,7 +305,9 @@ O paper Modular RAG especifica o freio em todos os três subtipos de laço, e no
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 
-> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** **super-steps** — valor da documentação da biblioteca, e agora **medido**: no `langgraph` 0.2.69, a versão que este repositório pina, um grafo de laço infinito levanta `GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition`. O valor não se lê neste repositório: `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
+> ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** **super-steps** — valor documentado pela biblioteca e confirmado por execução no `langgraph` 0.2.69, uma das duas
+> versões que o repositório pina (a outra é 0.3.18, no requirements de pacotes adicionais; o
+> `10-AdvanceRAG/requirements.txt` não pina nenhuma). **Medido**: no `langgraph` 0.2.69, a versão que este repositório pina, um grafo de laço infinito levanta `GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition`. O valor não se lê neste repositório: `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
 > confusa. O contador que falta no estado da aplicação não serve para evitar laço infinito;
@@ -317,7 +324,9 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **
 
 **1. Veja a decisão do agente.** No `01`, imprima `last_msg.tool_calls` dentro de `should_use_tools` (`:122-129`) e registre, a cada execução, se o roteamento veio da chamada de ferramenta ou da substring. Essa contagem diz quanto do comportamento "agentic" é real.
 
-**2. Tire o `or`.** No mesmo lugar, remova a segunda condição da linha 127 e rode. Se o grafo passar a terminar sem recuperar, você descobriu que o exemplo dependia da substring — e o próximo item explica por quê.
+**2. Tire o `or`.** No mesmo lugar, o segundo teste mora na linha 127, mas a 126 termina com a
+continuação de linha, então apagar só a 127 deixa o `if` pela metade e o arquivo para de compilar.
+Reescreva as duas como uma: `if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:`. Se o grafo passar a terminar sem recuperar, você descobriu que o exemplo dependia da substring — e o próximo item explica por quê.
 
 **3. Use o `tools_condition` que está importado.** Trocar `should_use_tools` pelo `tools_condition` da linha 18 e o nó `retrieve` pelo `ToolNode` exige duas mudanças que o import não anuncia. A primeira: o mapa de `add_conditional_edges` da linha 170 tem as chaves que `should_use_tools` devolve (`"retrieve"`/`"end"`); com o roteador pronto, o mapa precisa ser reescrito para as chaves que **ele** devolve — confira na versão de `langgraph` que você instalar, porque não pude confirmar aqui. A segunda, mais séria: `AgentState.messages` é `Sequence[BaseMessage]` **sem reducer**, e é por isso que o `Annotated` da linha 3 está morto e que o `retrieve` escrito à mão faz `msgs + [retrieval_msg]` na linha 97. Um nó pronto que devolve só a mensagem que produziu vai **substituir** a lista inteira. Anote `messages` como `Annotated[Sequence[BaseMessage], add_messages]` antes de trocar qualquer coisa. Esse é o exercício de verdade: o import prometia uma arquitetura que o estado não sustenta.
 
@@ -384,7 +393,8 @@ Responda sem consultar:
 5. Por que a segunda condição de `should_use_tools` é um defeito, e o que ela provavelmente estava consertando?
 6. Como a descrição da ferramenta e a lista de URLs se contradizem, e por que isso é pior num sistema agentic que num pipeline?
 7. O que o nó `rewrite` faz com o histórico, e por que um laço que perde informação não converge?
-8. Que eixo de divergência de rota o arquivo `02` exercita, e por que ele é novo neste curso?
+8. Que eixo de divergência de rota o arquivo `02` exercita, onde esse mesmo eixo já apareceu no
+   curso, e o que muda de lá para cá?
 9. Por que a rota `web_search` do arquivo `02` é uma assimetria difícil de justificar?
 10. `grade_generation_node` é um nó do grafo? Onde ele é chamado, e qual o custo escondido disso?
 11. Qual pergunta está comentada no arquivo `02`, e o que a ausência dela impede de testar?
@@ -407,7 +417,9 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 > Este foi o último grafo do curso, e o defeito que ele repete pela terceira vez é o mesmo que a Aula
 > 25 mostrou estar especificado na literatura. A Aula 27 fecha a Fase 9 com
-> `10-AdvanceRAG/05-MultiModalRAG/` — dois scripts Weaviate e um `docker-compose.yml`, a segunda vez
+> `10-AdvanceRAG/05-MultiModalRAG/` — 4 arquivos: dois scripts Weaviate, um `docker-compose.yml` e um
+> `.env.example` oculto. É a segunda vez
 > em todo o curso que um exemplo traz a sua própria infraestrutura: a primeira foi o Milvus da Aula 09
-> (`04-VectorDB/Milvus/docker-compose.yml`). O que a Aula 27 traz de novo é o requisito de memória
-> **quantificado em bytes**.
+> (`04-VectorDB/Milvus/docker-compose.yml`). O que a Aula 27 traz de novo é um **teto** de memória
+> escrito no próprio compose, e a distinção entre teto imposto pelo autor e requisito declarado
+> pelo modelo.

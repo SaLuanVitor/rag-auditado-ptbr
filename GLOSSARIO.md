@@ -614,9 +614,10 @@ módulo Judge. Subdivide-se em iterativo (número fixo de iterações), recursiv
 (profundidade máxima e condição de saída) e adaptativo/ativo (o sistema decide quando
 recuperar e quando parar).
 
-**Scheduling module** — Componente que identifica quando recuperar dado externo, avalia a
-adequação da resposta e decide cessar a geração ou iniciar novo laço. É o freio que o
-padrão de laço especifica.
+**Scheduling module** — Submódulo de `Orchestration` que identifica quando recuperar dado
+externo, avalia a adequação da resposta e decide cessar a geração ou iniciar novo laço. Seus
+operadores são `Rule judge`, `LLM judge` e `Knowledge-guide scheduling`. É onde mora o freio do
+padrão de laço, mas o **limite** de voltas não é operador: é entrada dos algoritmos do paper.
 
 **Rule judge** — Juízo por regra e limiar — tipicamente sobre a confiança dos tokens da
 resposta tentativa. Grátis em custo de API e dependente de acesso aos logits.
@@ -697,10 +698,11 @@ freio é o contador.
 **Recursive retrieval** — Laço com condição de saída e profundidade máxima, em que cada volta
 refina a consulta da anterior. O freio é a condição.
 
-**Judge module** — O componente que decide se o laço continua. No paper Modular RAG ele vem
-acompanhado de um `scheduling module`, que é quem de fato para; nos exemplos deste repositório
-existem os juízes e não existe o escalonador. É a mesma peça de código que a seção de
-Pós-recuperação chama de `grader`, sob o vocabulário do paper.
+**Judge module** — O operador do `scheduling module` que decide se o laço continua. O paper
+Modular RAG o nomeia em dois modos, `Rule judge` e `LLM judge`; o grader dos exemplos deste
+repositório é o segundo, o que julga por prompt. O que falta nos exemplos não é o escalonador,
+é o limite de voltas, que nos algoritmos do paper é parâmetro de entrada. É a mesma peça de
+código que a seção de Pós-recuperação chama de `grader`, sob o vocabulário do paper.
 
 **GraphRAG** — Constrói grafo de entidades e relações a partir do corpus e o particiona em
 comunidades hierárquicas com resumo pré-gerado. Responde perguntas de síntese global que busca

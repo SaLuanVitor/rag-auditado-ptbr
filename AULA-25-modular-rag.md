@@ -69,7 +69,7 @@ A Aula 23 já havia confirmado isso por `find` e registrado o alerta de que esta
 
 Julgamento, e é uma observação sobre o livro, não sobre a técnica: Modular RAG é o capítulo que **menos** perde por não ter código, porque é taxonomia. Um leitor que chegue aqui depois de vinte e quatro aulas de código tem os exemplos na cabeça; o que faltava era o nome de cada coisa. É o que esta aula entrega.
 
-O que se perde, e vale dizer: sem código, ninguém confere se a taxonomia cobre os casos. Esta aula faz essa conferência à mão, mapeando cada padrão do paper às aulas anteriores — e cada correspondência foi verificada no paper **e** na aula, não inferida do nome.
+O que se perde, e vale dizer: sem código, ninguém confere se a taxonomia cobre os casos. Esta aula faz essa conferência à mão, mapeando cada padrão do paper às aulas anteriores, e cada correspondência foi verificada no paper **e** na aula, não inferida do nome.
 
 ---
 
@@ -79,7 +79,7 @@ O paper estabelece seis módulos de topo, e a frase é literal:
 
 > _"Based on the current stage of RAG development, we have established six main modules: Indexing, Pre-retrieval, Retrieval, Post-retrieval, Generation, and Orchestration."_
 
-Cinco deles são exatamente as fases deste curso. O sexto não é:
+Cinco deles têm correspondência no curso, e ela é aproximada em vez de exata: `Indexing` se espalha por quatro fases e divide as Aulas 09-11 com `Retrieval`, porque o repositório trata schema, índice ANN e busca no mesmo módulo. O sexto não tem correspondência nenhuma:
 
 | Módulo do paper    | Onde está no curso                       |
 | ------------------ | ---------------------------------------- |
@@ -92,11 +92,11 @@ Cinco deles são exatamente as fases deste curso. O sexto não é:
 
 Essa última linha é o achado desta aula. O curso — como o repositório, e como a maioria dos tutoriais — organiza o aprendizado pelos **estágios do dado**: entra, é dividido, é indexado, é buscado, é reordenado, é gerado. A orquestração não é um estágio do dado; é o que decide **qual estágio roda em seguida**. Ela aparece transversalmente nas Aulas 14, 18, 21 e vai reaparecer na 26, sempre como propriedade de outro assunto e nunca como assunto próprio.
 
-O paper diz que o nível de topo _"not only inherits the main processes from the Advanced RAG paradigm but also introduces an orchestration module to control the coordination of RAG processes"_. Essa é a única peça genuinamente nova do paradigma. Todo o resto é herança.
+O paper diz que o nível de topo _"not only inherits the main processes from the Advanced RAG paradigm but also introduces an orchestration module to control the coordination of RAG processes"_. No nível dos **módulos**, essa é a única peça genuinamente nova do paradigma. Todo o resto é herança.
 
 Os três níveis, na descrição do paper: o topo trata cada estágio como módulo independente; o meio _"is composed of sub-modules within each module, further refining and optimizing the functions"_; a base _"consists of basic units of operation—operators"_.
 
-Julgamento de engenharia: a utilidade prática desses três níveis não é catalogar. É que **operador é a unidade que você troca sem tocar no resto**. Se `rerank` é um operador do módulo de pós-recuperação, trocar Cohere por um cross-encoder local é uma substituição local. Se o reranking estiver embutido no meio da função que também gera a resposta — como no híbrido escrito à mão da Aula 24 —, não é.
+Julgamento de engenharia: a utilidade prática desses três níveis não é catalogar. É que **operador é a unidade que você troca sem tocar no resto**. Se `rerank` é um operador do módulo de pós-recuperação, trocar Cohere por um cross-encoder local é uma substituição local. E a fronteira que permite a troca é a **injeção**: o híbrido escrito à mão da Aula 24 é exemplo **positivo** disso, porque o `EmbeddingBM25RerankerRetriever` recebe o reranker no construtor (`10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py:93`) e o trata como opcional (`:114`), então trocar de reranker é uma linha em `:238`. Onde a fronteira não existe, a mesma troca vira cirurgia.
 
 ---
 
@@ -160,7 +160,7 @@ O exemplo de recursivo é o ToC (Tree of Clarifications), em que cada recursão 
 
 ---
 
-## Parte 4 — O freio tem nome, e o repositório não o implementou
+## Parte 4 — O freio tem nome, e o repositório não o apertou
 
 Aqui esta aula fecha uma conta aberta na Aula 21.
 
@@ -172,7 +172,9 @@ O paper mostra que não é uma ausência acidental — é a omissão de uma peç
 - no laço **recursivo**, há profundidade máxima e mecanismo explícito de saída;
 - e o **scheduling module** existe justamente para _"ensuring that the system makes informed decisions on when to cease generation or initiate a new retrieval loop"_.
 
-Cessar a geração é responsabilidade nomeada de um componente nomeado. O grafo do repositório tem os juízes e não tem o escalonador.
+Cessar a geração é responsabilidade nomeada de um componente nomeado, e o nome dele é `scheduling module`, o submódulo 2 da seção IV.F. Os operadores dele o paper batiza um por um: `Rule judge`, `LLM judge` e `Knowledge-guide scheduling`.
+
+Isso **reposiciona** o grader do repositório em vez de o deixar de fora: ele **é** um `LLM judge`, no primeiro dos dois modos que o paper descreve, aquele que _"leverages LLM's in-context learning capability, and make judgments through prompt engineering"_. O repositório tem escalonador. O que ele não tem é o **limite** — e o limite não é peça, é argumento: os algoritmos 5 e 6 o exigem na entrada (`maximum iterative times T`, `maximum recursive depth Kmax`), e nenhum grafo do repositório declara qualquer um dos dois.
 
 O paper também descreve **como** esse juízo pode ser tomado. Um dos modos é o **rule judge**: o sistema avalia a qualidade da resposta por pontuação e a decisão de seguir ou parar depende de os escores passarem de limiares predefinidos, _"often related to the confidence levels of individual tokens"_. A formulação que ele dá aceita a resposta tentativa apenas se **todos** os tokens tiverem probabilidade acima de um limiar; caso contrário, regenera com o contexto recuperado.
 
@@ -187,7 +189,7 @@ Sobre o retrieval adaptativo, o paper separa duas famílias:
 
 A Aula 21 afirmou que há dois Self-RAG — o do paper, que **treina** o modelo a emitir tokens de reflexão, e o do repositório, que **emula** os juízos com graders externos. Um segundo paper, independente, descreve o Self-RAG exatamente assim. A distinção não era leitura minha; é como a literatura o classifica.
 
-Nota de vocabulário para não confundir: o repositório do curso tem um arquivo chamado `02-LangChain-AdaptiveRAG.py` em `10-AdvanceRAG/04-AgenticRAG/`, que é assunto da Aula 26. "Adaptive" ali e "adaptive (active) retrieval" aqui podem ou não ser a mesma coisa — o arquivo não foi aberto, e a Aula 26 vai verificar antes de afirmar.
+Nota de vocabulário para não confundir: o repositório do curso tem um arquivo chamado `02-LangChain-AdaptiveRAG.py` em `10-AdvanceRAG/04-AgenticRAG/`, que é assunto da Aula 26. "Adaptive" ali e "adaptive (active) retrieval" aqui **não** são a mesma coisa. Adaptive ali é decidir **onde** buscar: um roteador de fonte governa as arestas que saem do `START` (`:188-192`). Adaptive aqui é decidir **quando** recuperar, e os exemplos do paper para isso são o FLARE e o Self-RAG treinado. Mesma palavra, dois padrões: o do arquivo é o **conditional** da seção B. O nome não decidia nada, e foi por isso que o arquivo foi aberto.
 
 ---
 
@@ -197,11 +199,11 @@ Julgamento de engenharia, explícito. Três usos que valem mais que a leitura do
 
 **1. Como ferramenta de diagnóstico.** Quando o sistema responde mal, a pergunta deixa de ser "o que eu ajusto?" e passa a ser "qual módulo?". A ordem da persona deste curso — ingestão, recuperação, geração — é uma travessia dos módulos do paper, e o quarto candidato, que só existe depois desta aula, é a orquestração: **o fluxo escolheu o caminho errado.** Antes desta aula, essa hipótese não tinha nome.
 
-**2. Como fronteira de refatoração.** Se `rerank`, `compress` e `route` são operadores, eles têm assinatura estável e trocam de implementação sem tocar no resto. A Aula 24 mostrou o contraexemplo: o híbrido escrito à mão fundia recuperação densa, esparsa e reranking numa classe só — e desligar o reranker exigiu um `try/except` que, quando disparou, deixou o sistema rodando sem a etapa e sem avisar.
+**2. Como fronteira de refatoração.** Se `rerank`, `compress` e `route` são operadores, eles têm assinatura estável e trocam de implementação sem tocar no resto. A Aula 24 mostrou o caso bem resolvido: o híbrido escrito à mão funde recuperação densa, esparsa e reranking numa classe só, mas recebe o reranker de fora e o trata como opcional, então desligá-lo é passar `reranker=None`. O `try/except` daquele arquivo é outra coisa, e a Aula 24 registra que ler o código não decide se ele chega a disparar.
 
-**3. Como checklist de padrão.** Antes de construir, escolha o padrão: linear, condicional, ramificado ou com laço. Se for laço, você acabou de herdar três obrigações — limite de iteração, mudança de estado entre voltas e comportamento definido quando o limite estoura. Nenhuma das duas implementações cíclicas do repositório tem as três.
+**3. Como checklist de padrão.** Antes de construir, escolha o padrão: linear, condicional, ramificado ou com laço. Se for laço, você acabou de herdar três obrigações: limite de iteração, mudança de estado entre voltas e comportamento definido quando o limite estoura. Nenhuma das duas implementações cíclicas do repositório tem as três.
 
-E o custo de tudo isso, para não vender arquitetura como grátis: cada módulo adicional é uma chamada a mais no caminho da consulta, uma dependência a mais para versionar e um lugar a mais para o erro nascer. O paper diz isso ao listar manutenibilidade entre os novos desafios. Modularizar não reduz a complexidade — organiza-a, e cobra em latência e em superfície de manutenção.
+E o custo de tudo isso, para não vender arquitetura como grátis: cada módulo adicional é uma etapa a mais no caminho da consulta, muitas vezes uma chamada de modelo, uma dependência a mais para versionar e um lugar a mais para o erro nascer. O paper diz isso ao listar manutenibilidade entre os novos desafios. Modularizar não reduz a complexidade — organiza-a, e cobra em latência e em superfície de manutenção.
 
 ---
 
@@ -219,7 +221,7 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 **5. Localize os cinco eixos de divergência de rota.** O paper diz que rotas divergem em fonte, processo, configuração, modelo e prompt. Pegue o roteamento da Aula 14, que exercia só o eixo do prompt e declarava o da fonte sem consumi-lo, e escreva o que mudaria em cada um dos outros três eixos para o seu domínio.
 
-**6. Implemente o `scheduling module` que falta.** No grafo do Self-RAG (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py`), acrescente ao estado um contador e um limite, e faça as duas funções de decisão consultarem o escalonador em vez de decidirem sozinhas. Compare o seu resultado com a descrição do rule judge do paper: você usou limiar de escore, contagem de voltas, ou os dois?
+**6. Ponha no laço o limite que os algoritmos do paper exigem.** No grafo do Self-RAG (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py`), acrescente ao `GraphState` (`:171`) uma chave de contagem e um teto. **Cuidado com onde cada metade mora, porque errar isso falha calado:** `decide_to_generate` (`:271`) e `grade_generation_v_documents_and_question` (`:295`) são funções de **aresta condicional** e devolvem string de rota, então só podem **ler** o contador. O incremento tem de ir num **nó**, junto do `return` de `generate` (`:220`) e de `transform_query` (`:267`), que são os que devolvem dicionário de estado. Um contador posto na função de decisão nunca sai de zero, e faça as duas funções de decisão consultarem o escalonador em vez de decidirem sozinhas. Compare o seu resultado com a descrição do rule judge do paper: você usou limiar de escore, contagem de voltas, ou os dois?
 
 **7. Meça o custo de cada módulo.** Instrumente o seu pipeline para contar chamadas de LLM e de embedding por consulta, agrupadas por módulo. A tabela resultante é o que transforma "modularizar custa" em número — e é o insumo que a decisão do item 3 precisava.
 
@@ -229,15 +231,15 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 Sem código, os contrafactuais isolam peças do desenho.
 
-**1. Colapse o padrão.** Tome o CRAG da Aula 18 e remova a aresta condicional: sempre gere, nunca corrija. Você acabou de rebaixar um fluxo condicional a linear, e o paper prevê o resultado — Naive RAG é caso especial de Advanced RAG. O que se perde é exatamente o caso em que a recuperação falhou.
+**1. Colapse o padrão.** Tome o CRAG da Aula 18 e remova a aresta condicional de `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py:441-448`: sempre gere, nunca corrija. Você rebaixou um fluxo condicional a linear, e o paper diz onde ele para: sobram `retrieve`, `grade_documents` e `generate`, e `grade_documents` **é** pós-recuperação, então o que resta é Advanced RAG, não Naive. Para chegar a Naive faltaria tirar a graduação também, porque _"if there are no pre-retrieval and post-retrieval modules, it follows the Naive RAG paradigm"_. O que se perde no primeiro corte é o caso em que a recuperação falhou; no segundo, saber que ela falhou. E a herança que explica o rebaixamento é a outra metade da cadeia: Advanced RAG é caso especial de Advanced RAG. O que se perde é exatamente o caso em que a recuperação falhou.
 
-**2. Tire o Judge do laço.** No Self-RAG, faça as arestas condicionais devolverem sempre o mesmo destino. O grafo continua sendo um grafo, e deixa de ser um laço: sem juízo, o ciclo é uma cadeia com passos repetidos.
+**2. Tire o Judge do laço, e escolha com cuidado por onde.** No Self-RAG, faça `grade_generation_v_documents_and_question` (`:295`) devolver sempre `"useful"`: o `END` fica alcançável na primeira volta e o laço desaparece. Agora faça devolver sempre `"not supported"` e veja o oposto: a aresta `generate` para `generate` de `:359` dispara para sempre. Sem juízo, o laço não vira cadeia — vira uma das duas degenerações, e qual delas você pega é escolha sua, não propriedade do grafo. No primeiro ramo, o ciclo é uma cadeia com passos repetidos.
 
 **3. Ramifique sem agregar.** No branching pós-recuperação, gere uma resposta por chunk e **não** una: devolva a primeira. Você transformou uma técnica de diversidade num top-1 caro. A agregação não é o acabamento do padrão — é o padrão.
 
 **4. Agregue ramos heterogêneos por score.** Use `WeightedRanker` em vez de RRF para unir ramos de modelos diferentes, cujos escores não estão na mesma escala. O paper diz por que RRF é preferível aí; a Aula 11 mostrou a mecânica. Veja um ramo dominar a lista por ter escores maiores, não melhores.
 
-**5. Confunda operador com módulo.** Escreva o reranking dentro da função que gera a resposta. Funciona, e é o que a Aula 24 encontrou. Agora tente trocar de reranker sem tocar na geração.
+**5. Confunda operador com módulo.** Pegue o `EmbeddingBM25RerankerRetriever` da Aula 24 e apague o parâmetro `reranker` do construtor (`10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py:93`), instanciando o `CohereRerank` dentro do `_retrieve`. Funciona igual. Agora troque de reranker sem editar o retriever, e você verá o que a injeção estava comprando.
 
 **6. Modularize o que não precisa.** Pegue um caso de uso com pergunta local, corpus pequeno e resposta direta, e monte um fluxo com laço, roteamento e três graders. Some as chamadas por consulta e compare com o Naive RAG. Nem toda pergunta merece arquitetura — e o custo dessa escolha é medido, não intuído.
 
@@ -251,7 +253,7 @@ Sem código, os contrafactuais isolam peças do desenho.
 
 **Juízo sem custo calculado.** Grader por LLM custa uma chamada por juízo; limiar de probabilidade de token é grátis e exige acesso aos logits, o que a maioria das APIs comerciais não dá. A escolha entre os dois é de infraestrutura, não de qualidade.
 
-**Rota que divirja apenas em prompt.** Os dois exemplos de roteamento do repositório escolhem prompts. Quando a diferença real entre os casos é a **fonte** — um índice jurídico e um índice de suporte —, rotear prompt não resolve nada e dá a impressão de que resolveu.
+**Rota que divirja apenas em prompt.** Dos três roteadores do repositório, **dois escolhem prompt** (o semântico da Aula 14 e o por LLM da Aula 19); o terceiro escolhe fonte e não a consome (`01-LogicalRouting.py`). Quando a diferença real entre os casos é a **fonte** — um índice jurídico e um índice de suporte —, rotear prompt não resolve nada e dá a impressão de que resolveu.
 
 **Fronteira de operador mal desenhada.** Se você não consegue substituir um componente sem editar outro, não tem operadores — tem uma função grande com nomes de operadores nos comentários.
 
@@ -274,7 +276,7 @@ Responda sem consultar:
 7. Qual a diferença entre branching pré-recuperação e pós-recuperação?
 8. Por que RRF é preferível a fusão por score ponderado quando os ramos vêm de modelos diferentes?
 9. Quais são os três subtipos do padrão de laço, e como cada um termina?
-10. O que é o `scheduling module`, e o que a sua ausência no Self-RAG do repositório causou?
+10. Onde o paper coloca os juízes na taxonomia, e por que o Self-RAG do repositório tem um `LLM judge` e ainda assim pode não parar?
 11. O que é um `rule judge`, e por que ele é mais barato e menos portátil que um grader por LLM?
 12. Como o paper classifica o Self-RAG, e por que isso confirma o que a Aula 21 afirmou?
 

@@ -2461,3 +2461,70 @@ próprio lote: o Ato 4 da 24 entrou antes do Ato 3, e o rodapé da 09 mudou de l
 
 O zero do juiz teria sido reportado como evidência de lote limpo se o positivo plantado não
 tivesse sido testado. É a razão de a validação vir antes do uso.
+
+---
+
+## Sétima rodada, COMPLETA nas oito abaixo de 50%
+
+As outras quatro, medidas depois. O briefing destas trouxe três mudanças em relação ao primeiro
+lote: a classe "resíduo de conserto" veio endereçada por aula em vez de genérica, a classe
+"bastidor de auditoria" veio com o caso já identificado, e às aulas com biblioteca no ambiente foi
+dito **o que** medir com ela.
+
+| Aula | R6 | R7 | O que travou a nota |
+|---|---|---|---|
+| [23](../AULA-23-graphrag.md) | 5/12 | **6**/12 | O paper roda um Experimento 2 (§5.2, 47.075 claims por Claimify) que **não** acha diferença significativa entre busca global e `TS` justamente no eixo em que a aula afirma ganho, e a aula não o menciona. |
+| [26](../AULA-26-agentic-adaptive-rag.md) | 5/12 | **6**/12 | O rodapé diz que a Aula 27 traz "o requisito de memória quantificado em bytes", e as duas palavras são as que a Aula 27 nega em quatro lugares depois do conserto desta rodada. Vazamento do próprio conserto, entre arquivos. |
+| [00](../AULA-00-setup-do-ambiente.md) | 5/12 | **3**/12 | **Nenhum requirements de `91-Environment/` instala cliente de Ollama**, e a trilha que a aula recomenda não roda o script que a aula manda rodar. Mais um caminho de ativação que o conserto anterior escreveu errado. |
+| [25](../AULA-25-modular-rag.md) | 5/12 | **2**/12 | **`−1` em correção técnica.** A aula afirma que o híbrido da Aula 24 embute reranking "na função que também gera a resposta"; o `EmbeddingBM25RerankerRetriever` é `BaseRetriever`, não chama LLM, e recebe o reranker por construtor. E a Parte 4 inteira lê o paper ao contrário. |
+
+### O resultado das oito, e ele é o achado da rodada
+
+| | R6 | R7 |
+|---|---|---|
+| Soma das oito | 39/96 | **38/96** |
+| Abaixo de 50% | 8 | **4** (24, 08, 00, 25) |
+| Notas `−1` | 0 nestas | **1** (25, dimensão C) |
+
+**As oito, depois de uma rodada inteira de varreduras por classe, medem o mesmo.** Quatro subiram,
+quatro caíram, e a soma perdeu um ponto. O gate eliminatório continua reprovando por duas razões
+independentes: quatro aulas abaixo de 50% e uma nota `−1` nova.
+
+Isso não se explica por regressão. Três causas, medidas:
+
+**Precisão errada pontua pior que vagueza.** Cada conserto que troca uma frase vaga por uma
+alegação exata cria algo que a rubrica pode reprovar. Onde a alegação nova está certa, a lente que
+ela ensina encontra defeito pré-existente maior: foi assim que o `Pass@5` idêntico da 24 e a
+saturação inobservável da 08 apareceram.
+
+**Os auditores melhoram a cada rodada, e o briefing deste lote os melhorou de propósito.** Dizer a
+cada um o que já foi consertado libera orçamento para o que sobrou. O da AULA-00 usou o dele para
+**executar o caminho de instalação**, que seis rodadas de auditoria de números nunca fizeram, e
+achou o P0 que estava lá desde o começo.
+
+**Resíduo de conserto é a classe dominante, e metade dela não é mecanizável.** O
+`ferramentas/residuo.js` acha o que foi apagado num lugar e sobrevive em outro. Não acha o caso da
+AULA-26: nada foi apagado, e o texto dela nunca existiu na AULA-27; é contradição semântica entre
+arquivos. O `ferramentas/fechos.js` enumera as superfícies de fecho para a leitura percorrer, que é
+o substituto disponível.
+
+### O ambiente foi perdido, e três auditores o reportaram
+
+O venv com os pins do curso **não existe mais**. Três dos quatro auditores deste lote o procuraram,
+não acharam, e declararam `NÃO_EXECUTADO` no eixo que dependia dele: `ResponseMode` e
+`COMPACT_ACCUMULATE` na 25, `recursion_limit` e `tools_condition` na 26. As medições anteriores
+continuam válidas porque estão registradas aqui, mas **não são reproduzíveis** sem reconstruir.
+
+Para reconstruir: venv isolado com `langchain 0.3.17`, `langchain-core 0.3.33`,
+`langchain-community 0.3.16`, `langchain-openai 0.3.3`, `langchain-text-splitters 0.3.5`,
+`langgraph 0.2.69`, `pymilvus 2.5.4`, `llama-index-core 0.11.17`, `ragas 0.2.15`, `pydantic 2.13.4`,
+`openai 1.109.1`, `numpy 1.26.4`, `setuptools<81`. Não os 274 pacotes.
+
+### Um achado rejeitado, e o motivo importa
+
+O auditor da AULA-26 pediu trocar "as vinte e cinco anteriores" por "vinte e seis", contando o
+`AULA-00`. **Rejeitado:** a convenção do curso exclui o `AULA-00` da numeração, e ela é consistente
+(a AULA-22 diz "vinte e uma" com 22 arquivos antes). Aplicar teria quebrado o padrão em três aulas
+para consertar uma que estava certa.
+
+**47 consertos aplicados**, mais uma citação minha que ancorou no arquivo errado e foi corrigida.
