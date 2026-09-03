@@ -76,7 +76,7 @@ Quatro leituras, e cada uma é uma decisão de projeto visível.
 
 **1. O modelo é o ImageBind.** A tag da imagem Docker diz `imagebind`, e é o que dá ao módulo mais de duas modalidades. Conhecimento de domínio: o ImageBind é o modelo da Meta que alinha várias modalidades num espaço comum — imagem, texto, áudio e outras. O vetorizador que os scripts configuram declara três dessas: imagem, áudio e vídeo.
 
-**2. Um teto de doze gigabytes — e leia a palavra "teto".** `mem_limit` é a chave do Compose que define o **máximo** que o contêiner pode consumir; não é o ImageBind declarando de quanto precisa. Um serviço com `mem_limit: 12g` pode consumir dois. O que está escrito no arquivo é uma decisão do autor do compose: ele julgou que 12 GB bastam, e que passar disso seria vazamento. **Julgamento:** um teto nessa casa é evidência de que o serviço opera na ordem de gigabytes, e é a única pista quantificada de custo de infraestrutura em todo o repositório — mas o consumo real não está escrito em lugar nenhum, e eu não o medi. O exercício 5 do "Mão na massa" existe exatamente para você medir antes de decidir se este módulo cabe na sua máquina.
+**2. Um teto de doze gigabytes — e leia a palavra "teto".** `mem_limit` é a chave do Compose que define o **máximo** que o contêiner pode consumir; não é o ImageBind declarando de quanto precisa. Um serviço com `mem_limit: 12g` pode consumir dois. O que está escrito no arquivo é uma decisão do autor do compose: ele julgou que 12 GB bastam, e que passar disso seria vazamento. **Julgamento:** um teto nessa casa é evidência de que o serviço opera na ordem de gigabytes, e é a única pista de **memória** quantificada no repositório — o compose do Milvus quantifica outro recurso, `ETCD_QUOTA_BACKEND_BYTES=4294967296` (`04-VectorDB/Milvus/docker-compose.yml:10`), que é backend do etcd e não memória de processo — mas o consumo real não está escrito em lugar nenhum, e eu não o medi. O exercício 5 do "Mão na massa" existe exatamente para você medir antes de decidir se este módulo cabe na sua máquina.
 
 **3. Sem GPU.** `ENABLE_CUDA: '0'`. Combinado com o ImageBind e com o item anterior: a vetorização vai funcionar e vai ser lenta. Para três imagens de demonstração, tudo bem; para um acervo real, é a primeira coisa a mudar.
 
@@ -200,7 +200,7 @@ def insert_multimodal_data():
 
 O que é inserido na coleção multimodal é o texto literal `"<YOUR_IMAGE_BASE64_STRING>"`. E o `__main__` chama essa função sem qualquer substituição (`02-Weaviate-Multimodal-RAG.py:97`), com o comentário da linha 96 pedindo para trocar antes — um pedido que nada verifica.
 
-O resultado é uma coleção com um único objeto, cujo campo de imagem não é uma imagem. A recuperação seguinte (`:42-52`) pede `limit=1` e acessa `response.objects[0]` sem verificar se houve resultado. Depois disso, a descrição por visão e a geração recebem esse conteúdo.
+O resultado depende do que o vetorizador faz com aquele texto na inserção, e eu não medi qual dos dois ramos ocorre — o exercício 1 de "Quebre de propósito" existe para você medir. **Se** a inserção passar, a coleção fica com um único objeto cujo campo de imagem não é uma imagem, e a recuperação seguinte (`:42-52`) pede `limit=1` e acessa `response.objects[0]` sem verificar se houve resultado. Depois disso, a descrição por visão e a geração recebem esse conteúdo.
 
 Julgamento: o arquivo não pode demonstrar o que se propõe. Como esqueleto — o que ele declara ser — a sequência das quatro etapas é útil e legível. Como exemplo executável, ele monta o pipeline sobre um placeholder.
 
@@ -270,7 +270,10 @@ O que seria multimodal RAG no sentido pleno: recuperar imagem **e** o texto que 
 
 ## Parte 5 — Os dois arquivos, lado a lado
 
-`diff -u` entre eles não compartilha nada além do assunto: são dois programas distintos.
+São dois programas distintos, e o `diff -u` acha pouco em comum além do esqueleto —
+`client.collections.create(`, `audio_fields=["audio"]`, `"mediaType": "image"`. É justamente esse
+esqueleto compartilhado que explica a variável fantasma da Parte 2: os dois vêm de um ancestral
+comum, e o `01` herdou os comentários do `02` sem renomear.
 
 |                                 | `01-Weaviate-Multimodal-Search.py`            | `02-Weaviate-Multimodal-RAG.py`                 |
 | ------------------------------- | --------------------------------------------- | ----------------------------------------------- |
@@ -351,9 +354,9 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 ## Armadilhas de produção
 
-**Placeholder que roda.** `"<YOUR_IMAGE_BASE64_STRING>"` inserido num banco é o gênero de erro que atravessa o pipeline e falha longe da origem. Um `assert` de que o campo se parece com base64 custa uma linha.
+**Placeholder que roda.** `"<YOUR_IMAGE_BASE64_STRING>"` entregue a um banco é o gênero de erro que **pode** atravessar o pipeline e falhar longe da origem — se a inserção não o barrar antes. Um `assert` de que o campo se parece com base64 custa uma linha.
 
-**Doze gigabytes que não somem.** Custo de inferência hospedada é permanente, diferente de custo por consulta. Se o seu acervo multimodal é pequeno, um serviço gerenciado por chamada pode sair mais barato que manter o contêiner de pé.
+**Inferência hospedada não some.** O custo de um serviço que você mantém de pé é permanente, diferente do custo por consulta — e note que o compose escreve um **teto** de 12 GB, não uma reserva: o `mem_limit` não retém memória, e o consumo real não está medido em lugar nenhum. O que não some é o contêiner. Se o seu acervo multimodal é pequeno, um serviço gerenciado por chamada pode sair mais barato que manter o contêiner de pé.
 
 **CPU para vetorizar mídia.** `ENABLE_CUDA: '0'` é o padrão do exemplo e o primeiro gargalo real. Vetorizar vídeo em CPU é impraticável em qualquer volume.
 
@@ -383,7 +386,7 @@ Responda sem consultar:
 6. Quantas modalidades a coleção declara, e quantas são exercitadas?
 7. Que variável fantasma aparece nos blocos comentados do `01`, e de onde ela veio?
 8. Quantas imagens o `01` indexa, e o que o `md5sum` revela sobre o acervo multimodal do repositório?
-9. O que o `02` insere no campo de imagem, e em que etapa a falha aparece?
+9. O que o `02` insere no campo de imagem, e quais são as **duas** etapas em que a falha pode aparecer?
 10. Que duas formas de chamar a API da OpenAI convivem no `02`?
 11. Cite duas assimetrias de ciclo de vida entre o `01` e o `02`.
 12. Por que o pipeline do `02` é multimodal e generativo, mas não é fundamentação? O que faltaria?

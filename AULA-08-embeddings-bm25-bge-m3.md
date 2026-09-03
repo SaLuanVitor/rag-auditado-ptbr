@@ -1,6 +1,6 @@
 # AULA 08 — Embeddings na prática, BM25 esparso e BGE-M3 híbrido
 
-**Fase 2 — Representação** · Módulo do repo: `03-Embedding/` (8 arquivos, contando o `.env.example`)
+**Fase 2 — Representação** · Módulo do repo: `03-Embedding/` (8 arquivos: 6 scripts, mais o `.env.example` e o `requirements.txt`)
 
 ---
 
@@ -11,7 +11,7 @@ dedica **dois dos seis arquivos ao BM25**, que não é embedding e é de 1994?
 
 Porque o capítulo não é sobre vetores densos — é sobre **representação de informação para
 recuperação**, e há mais de uma família. A ordem dos arquivos conta a história: dois exemplos
-densos, dois de BM25 esparso, um de BGE-M3 que emite os dois, e um multimodal. É uma
+densos, dois de BM25 esparso, um de BGE-M3 que emite as três, e um multimodal. É uma
 progressão deliberada que termina na busca híbrida da Aula 11.
 
 ---
@@ -22,7 +22,7 @@ progressão deliberada que termina na busca híbrida da Aula 11.
 
 |             | **Denso** (embedding)               | **Esparso** (BM25)                             |
 | ----------- | ----------------------------------- | ---------------------------------------------- |
-| Dimensões   | centenas, quase todas não-zero      | uma por termo do vocabulário, quase todas zero |
+| Dimensões   | centenas a milhares (1024 no BGE-M3, 1536 no `text-embedding-3-small`), quase todas não-zero | uma por termo do vocabulário, quase todas zero |
 | Captura     | semântica, sinônimo, paráfrase      | correspondência literal de termo               |
 | Acerta em   | "rescindir" ≈ "cancelar"            | `SKU-88213-B`, `CFOP 5102`                     |
 | Erra em     | identificador, jargão novo, negação | sinônimo, outra língua                         |
@@ -78,14 +78,21 @@ E define o embedder na linha 16:
 def get_embedding(text, model="text-embedding-3-small"):
 ```
 
-O mecanismo é o da Aula 02, aplicado: embute a avaliação do usuário, embute os itens do guia,
-e compara com `cosine_similarity` do scikit-learn (linha 50, com o `[0,0]` para extrair o
-escalar da matriz 1×1). Quem escreveu avaliações sobre combate recebe recomendações sobre
-combate — sem nenhuma regra escrita.
+O mecanismo é o da Aula 02, aplicado — mas leia com atenção **o que** ele embute: só as descrições
+do `game_guide.json` (linha 31). O texto da avaliação **nunca é embutido**: `review_text` e `rating`
+têm zero usos no arquivo, e o vetor do usuário é a **média das descrições dos jogos que ele
+avaliou** (linha 41). Depois compara com `cosine_similarity` do scikit-learn (linha 50, com o
+`[0,0]` para extrair o escalar da matriz 1×1). E a saída não recomenda jogos a um usuário: fixa um
+jogo-alvo (linha 25) e ranqueia os **top-5 usuários** mais propensos a gostar dele (linhas 54-57).
 
-O que isso ensina para RAG: **o "documento" pode ser qualquer coisa que você decida embutir.**
-Aqui é a preferência de um usuário. No seu projeto pode ser um perfil, uma consulta anterior,
-o histórico de uma sessão.
+E aí está o defeito real do exemplo, que vale mais que o acerto: uma avaliação `rating=1` entra na
+média exatamente como uma `rating=5`. O sinal usado é "quais jogos este usuário tocou", não "o que
+ele achou".
+
+O que isso ensina para RAG: **o "documento" é o que você de fato embute, não o que a variável se
+chama.** `user_vectors` sugere preferência; o que está lá dentro é catálogo. No seu projeto o
+"documento" pode ser um perfil, uma consulta anterior ou o histórico de uma sessão — desde que você
+confira que é isso que chega ao modelo.
 
 ### Clusterização
 
@@ -217,7 +224,7 @@ Três representações, um modelo, uma passada:
 **Julgamento:** o terceiro é o mais interessante e o menos usado. **ColBERT** guarda um vetor por token e
 compara token a token, obtendo precisão próxima de um cross-encoder com custo bem menor — e
 custo de armazenamento bem maior, porque você guarda dezenas de vetores por chunk em vez de um.
-Ele reaparece no reranking da Aula 17.
+Ele reaparece no reranking da Aula 17 — **com uma ressalva que vale antecipar:** o `03-CoBERT-Reranking.py` do repositório **não faz late interaction**. O `calculate_similarity()` reduz os vetores por _mean pooling_ antes de comparar (linhas 128-131), e o próprio docstring avisa, na linha 123, que o ColBERT de verdade usaria MaxSim. O `colbert_vecs` do BGE-M3 é a matéria-prima certa; o repositório não a consome como ColBERT.
 
 O `use_fp16=False` merece nota: `fp16` (meia precisão) acelera em GPU e pode degradar
 levemente a qualidade. `False` é a escolha segura para rodar em CPU, que é onde a maioria vai
@@ -258,22 +265,26 @@ python 03-BM25.py
 
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
 **fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
-tem variável `query` nenhuma (`grep -c query` devolve 0). Ele calcula o **vetor esparso de cada
-documento**, com o IDF do próprio corpus; pontuar uma consulta contra documentos é o que o
-`03-LangChain-BM25.py` faz — mas por biblioteca, chamando o `BM25Retriever` — mas não é o único: o
-`calculate_similarity()` de `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145` (a
-normalização L2 nas linhas 137-138, o `torch.mm` na 141) também
-pontua query contra documento à mão, com normalização L2 e `torch.mm`. O que o `03-BM25.py` tem de
-particular é a fórmula clássica inteira — IDF, saturação por `k1` e normalização de comprimento por
-`b` — num só lugar. O outro algoritmo que **decide ranking**
-escrito à mão no repositório é o `reciprocal_rank_fusion` de
+tem variável de consulta nenhuma. Ele calcula o **vetor esparso de cada documento**, com o IDF do
+próprio corpus. Pontuar uma consulta contra documentos aparece em outros dois lugares: no
+`03-LangChain-BM25.py`, por biblioteca (`BM25Retriever`), e no `calculate_similarity()` de
+`07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145`, à mão — normalização L2 nas linhas
+137-138 e `torch.mm` na 141, mas sobre vetores já reduzidos por mean pooling, não token a token. O
+que o `03-BM25.py` tem de particular é a fórmula clássica inteira — IDF, saturação por `k1` e
+normalização de comprimento por `b` — num só lugar. Um **terceiro** algoritmo de ranking escrito à
+mão é o `reciprocal_rank_fusion` de
 `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` — mas ele refunde posições de listas já
 recuperadas, em vez de pontuar relevância; são estágios diferentes do pipeline. Leia a saída
 junto com a fórmula da linha 29.
 
 ```powershell
+# copie 03-Embedding/.env.example para .env e preencha O3_API_KEY / O3_BASE_URL antes desta linha
 python 03-LangChain-BM25.py
 ```
+
+Este é o primeiro script do módulo que gasta chave: ele embute com `OpenAIEmbeddings` (linhas 27-31)
+e gera com `gpt-4o` (linhas 49-52), ambos lendo `O3_API_KEY`/`O3_BASE_URL`. Sem o `.env`, o `print`
+do BM25 (linha 21) sai e o script morre no Chroma.
 
 Compare os resultados do `BM25Retriever` com os do Chroma para a mesma consulta. Anote uma
 consulta em que discordam — ela é o seu argumento a favor do híbrido.
@@ -284,40 +295,62 @@ python 01-openai-embedding-recomendation-system.py
 python 02-jina-embeddings-v3-clustering.py
 ```
 
-O primeiro exige `OPENAI_API_KEY`; o segundo, chave da Jina. E há uma pegadinha só no primeiro: ele é
-o único script do módulo que precisa de chave e **não chama `load_dotenv()`**, então a variável tem de
-estar no ambiente do shell. Sem isso a falha vem da SDK, antes de qualquer embedding: `OpenAIError:
-The api_key client option must be set`. O `.env.example` da pasta também não declara essa variável —
-declara `O3_API_KEY`/`O3_BASE_URL`, que são as do `03-LangChain-BM25.py`. Se estiver no caminho local, leia
+O primeiro exige `OPENAI_API_KEY`; o segundo, `JINA_API_KEY` — e essa o `.env.example` da pasta
+**declara**, na linha 10, com o comentário dizendo qual script a usa. O `02` chama `load_dotenv()`
+(linhas 6-7), então basta preencher o `.env`; sem a chave ele morre em `RuntimeError: API call
+failed: 401` na linha 32. A pegadinha é só no `01`: ele é o único script do módulo que precisa de
+chave e **não chama `load_dotenv()`**, então a variável tem de estar no ambiente do shell. Sem isso
+a falha vem da SDK, antes de qualquer embedding: `OpenAIError: The api_key client option must be
+set`. O que o `.env.example` **não** declara é `OPENAI_API_KEY`: os nomes que ele traz são
+`O3_API_KEY`/`O3_BASE_URL`, do `03-LangChain-BM25.py`. E não confie no cabeçalho dele, que afirma
+"Every script here loads this file via `load_dotenv()`" — é falso para quatro dos seis. Se estiver no caminho local, leia
 os arquivos e rode os outros — o mecanismo já está claro pela Aula 02.
 
 ```powershell
 python 04-BGE-M3.py
 ```
 
-Imprima o **shape** de cada uma das três saídas. Ver que `colbert_vecs` tem uma dimensão a mais
-que `dense_vecs` é o que torna concreto "um vetor por token".
+O script já imprime as três formas (linhas 19, 22, 25) — o exercício é **ler** a assimetria delas.
+`dense_vecs[0].shape` é `(1024,)`; `colbert_vecs[0].shape` é `(n_tokens, 1024)`, uma dimensão a
+mais, e é isso que torna concreto "um vetor por token". A esparsa não tem `shape` nenhum:
+`lexical_weights[0]` é um **dicionário** termo→peso, e é por isso que a linha 22 usa `len()`. Essa
+diferença de **tipo**, e não a de número, é o que separa as duas famílias na hora de guardar no banco.
 
 ---
 
 ## Quebre de propósito
 
-**1. Mexa no `k1` e no `b`.** Em `03-BM25.py`, teste `k1=0.1` (saturação quase imediata — a
-frequência quase não importa) e `b=0` (sem normalização por comprimento — documentos longos
-passam a dominar). **Não espere um ranking:** o `print` da linha 35 está fora do laço das linhas
-33-34, então a execução imprime um único vetor — o do último log. Compare os **pesos** de um termo
-entre execuções, e se quiser ver ranking de verdade rode o `03-LangChain-BM25.py`, que tem consulta.
+**1. Mexa no `b`, e entenda por que o `k1` não tem o que mostrar aqui.** Em `03-BM25.py`, teste
+`b=0` (sem normalização por comprimento) e compare os **pesos** de um termo entre execuções.
+**Não espere um ranking:** o `print` da linha 35 está fora do laço das linhas 33-34, então a
+execução imprime um único vetor — o do último log. **E não espere sentir a saturação por `k1`:**
+neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
+frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
+`Flaming Fist.` são termos diferentes. Com a frequência sempre em 1, mudar `k1` reescala tudo por
+igual e a curva não aparece. Para vê-la, duplique um campo num dos logs (`,Flaming Fist,` duas
+vezes) e só então varie `k1` entre 0.1 e 3.0. Ranking de verdade é no `03-LangChain-BM25.py`, que
+tem consulta.
 Você acabou de sentir o que cada hiperparâmetro
 faz — algo que a maioria dos tutoriais de BM25 não mostra, porque chamam a biblioteca com os
 padrões e seguem adiante.
 
 **2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()` e rode. O vetor
 impresso fica **vazio** — `Sparse embedding: {}` —, e o motivo é mais instrutivo que uma degradação:
-o `vocabulary` da linha 13 continua sendo construído por vírgula, então nenhum dos tokens separados
-por espaço passa pelo filtro `if word in vocabulary` da linha 27. Medido: 11 termos com `split(",")`,
-zero com `split()`. Tokenização é acordo entre indexação e consulta — mudar um lado só não piora o
-ranking, apaga o índice. Para ver degradação de ranking de verdade, faça a mesma troca no
-`03-LangChain-BM25.py`, que é prosa separada por espaço e tem consulta.
+o `vocabulary` da linha 13 continua sendo construído por vírgula, então quase nenhum token separado
+por espaço passa pelo filtro `if word in vocabulary` da linha 27 — os tamanhos por log viram
+`[0, 1, 0]`, e o único sobrevivente é o `and` do segundo log, que existe como campo isolado no
+terceiro. O vetor **impresso** sai vazio porque o `print` mostra só o último, e esse é 0: a lição
+aí é que você está vendo um documento, não o índice. Tokenização é acordo entre indexação e consulta — mudar um lado só não piora o
+ranking, apaga o índice.
+
+E **não** tente "a mesma troca" no `03-LangChain-BM25.py`: ali não existe `split(",")` — o
+`BM25Retriever` usa o `default_preprocessing_func` do `langchain_community`, que é `text.split()`.
+Se você forçar a vírgula com `BM25Retriever.from_texts(battle_logs, preprocess_func=lambda t:
+t.split(","))`, o efeito é o mesmo zero, e por um motivo ainda mais direto: a consulta
+`"What equipment and moves does Wukong have?"` não tem vírgula, então ela vira **um** token que não
+existe em documento nenhum e todos os scores dão 0. Degradação **parcial** de ranking exige
+descasamento **parcial** — stemming de um lado só, por exemplo, que é a armadilha do português mais
+abaixo.
 
 **3. Consulte por identificador.** No `03-LangChain-BM25.py`, faça uma consulta com um código
 ou nome próprio raro. Compare BM25 e Chroma. **Julgamento:** é a demonstração mais rápida do ponto cego do
@@ -337,14 +370,12 @@ não está separando bem o seu domínio.
 - **Modelo no idioma errado.** Vale repetir o defeito real deste repositório, visto na Aula 03:
   `bge-small-zh` sobre corpus inglês degrada recall sem lançar erro. Para português,
   `intfloat/multilingual-e5-*` ou `paraphrase-multilingual-*` são pontos de partida melhores.
-- 🔴 **Recuperação com bi-encoder moderno é assimétrica, e o prefixo faz parte do texto.** A família
-  **E5** exige `query: ` antes da consulta e `passage: ` antes do documento; a família **BGE** pede
-  uma instrução do lado da consulta. Sem isso, o modelo é usado fora da distribuição em que foi
-  treinado e o recall cai — **sem erro, sem aviso**, que é a assinatura de falha que este curso
-  inteiro ensina a caçar.
+- 🔴 **Recuperação com bi-encoder moderno costuma ser assimétrica, e o prefixo faz parte do texto.**
+  Sem o que o cartão do modelo pede, ele é usado fora da distribuição em que foi treinado e o recall
+  cai — **sem erro, sem aviso**, que é a assinatura de falha que este curso inteiro ensina a caçar.
 
   **E o detalhe muda por família, então não generalize** — o que segue vem dos cartões de modelo, não
-  de execução**:** na **E5**, o prefixo entra nos **dois**
+  de execução. Na **E5**, o prefixo entra nos **dois**
   lados — `passage: ` na ingestão e `query: ` na consulta. Nas famílias **BGE v1/v1.5**, a instrução
   vai **só** do lado da consulta; o documento entra cru. E o **BGE-M3** — justamente o modelo que
   esta aula ensina em `04-BGE-M3.py` — **não exige instrução nenhuma**. Ou seja: nem existe uma

@@ -201,7 +201,7 @@ nada".
 | A pergunta é local ou global?                              | adotar o grafo pela pergunta errada; o ganho sobre o RAG vetorial vem de ser global, e o grafo acrescenta um incremento menor — decida pelo nível de hierarquia que vai consultar (Aula 23) |
 | Padrão de fluxo: linear, condicional, ramificado, com laço | modularizar sem necessidade; laço sem escalonador (Aula 25)                                                                                                                                 |
 | Quem decide a ação: código ou modelo?                      | descrição de ferramenta é prompt; roteamento por substring (Aula 26)                                                                                                                        |
-| Modalidades além de texto                                  | 12 GB que não somem; CPU para vetorizar mídia; espaço comum sem filtro de tipo (Aula 27)                                                                                                    |
+| Modalidades além de texto                                  | inferência hospedada que não some, sob teto de 12 GB declarado no compose e consumo não medido; CPU para vetorizar mídia; espaço comum sem filtro de tipo (Aula 27)                                                                                                    |
 
 ---
 

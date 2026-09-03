@@ -2407,3 +2407,57 @@ Atualizei uma linha do briefing que estava dando desculpa pronta: até aqui ela 
 terminar com apenas dois untracked pré-existentes". Com o clone limpo, passou a ser "deve terminar
 **vazio**" — e qualquer coisa que apareça é do auditor, que tem de autodenunciar. A instrução anterior
 oferecia a um auditor descuidado uma categoria onde esconder arquivo próprio.
+
+---
+
+## Renota adversarial — SÉTIMA rodada, PARCIAL, 4 das 8 abaixo de 50%
+
+Rodada lançada só sobre as quatro piores da R6, para responder primeiro a pergunta do gate
+eliminatório ("existe aula abaixo de 50%?") com quatro auditores em vez de 29. Cada briefing
+listou os consertos já aplicados, para o auditor não gastar orçamento reencontrando o que a
+rodada anterior endereçou, e acrescentou três classes de defeito que nunca foram pedidas antes:
+resíduo de conserto, prescrição que não funciona, e bastidor de auditoria em texto de aluno.
+
+| Aula | R6 | R7 | O que travou a nota |
+|---|---|---|---|
+| [27](../AULA-27-multimodal-rag.md) | 4/12 | **7**/12 | Três lugares e o título da armadilha ainda afirmavam o desfecho que o exercício passou a declarar desconhecido; e o superlativo "única pista quantificada de custo de infraestrutura", que o compose do Milvus refuta. |
+| [09](../AULA-09-milvus-collections-schema-entidades.md) | 5/12 | **6**/12 | Os seis consertos da R6 estão todos corretos e provados. Quatro seções não foram alinhadas a eles, e sobrou um mecanismo que ninguém tinha tocado: `color` não é campo declarado, é dinâmico. |
+| [24](../AULA-24-contextual-retrieval.md) | 5/12 | **4**/12 | O `Pass@5` do experimento 3 é matematicamente idêntico ao do 2, e a aula elogia o isolamento de variável do experimento que a métrica não pode ver. Defeito pré-existente, achado com a lente que os consertos da R6 ensinaram. |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | 5/12 | **4**/12 | Prescrição minha que não funciona: mandava fazer no `03-LangChain-BM25.py` uma troca que não existe lá, para ver um efeito que a consulta sem vírgula impede. Regressão, não achado novo. |
+
+**Soma das quatro: 19/48 → 21/48.** Duas subiram, duas caíram, e duas seguem abaixo de 50%
+(24 e 08, ambas em 33%). A previsão declarada antes de ver os relatórios era que as quatro
+passariam de 50%; errou em metade dos casos.
+
+### O que a rodada mediu, e que releitura não mediria
+
+**Os consertos estão majoritariamente corretos; a propagação é que falha.** O auditor da 09
+enunciou isso diretamente, e o padrão se repete em três das quatro aulas: o corpo foi
+reescrito, e Checkpoint, título de seção, referência cruzada e rodapé continuaram cobrando a
+versão antiga. Em 27 e 24 o defeito estava numa pergunta de Checkpoint que pedia ao aluno,
+"sem consultar", a resposta que a aula acabara de declarar desconhecida.
+
+**Uma forma nova, e pior que resíduo: achado entregue e não aplicado.** O `12 GB que não somem`
+da AULA-28 foi apontado por um auditor no lote 2 da classe 8, com correção pronta, e não foi
+aplicado. Não é frase que sobreviveu a uma emenda: é item de lista que não foi percorrido até
+o fim.
+
+**As duas notas que caíram não caíram por regressão, com uma exceção.** Precisão errada pontua
+pior que vagueza na rubrica, e os consertos da R6 trocaram vagueza por alegações checáveis.
+Onde a alegação nova estava certa, a lente que ela ensinou achou defeito pré-existente maior
+(o `Pass@5` da 24, a saturação inobservável da 08). A exceção é a prescrição da 08, que é
+regressão pura.
+
+**43 consertos aplicados nesta rodada**, mais dois defeitos meus achados na verificação do
+próprio lote: o Ato 4 da 24 entrou antes do Ato 3, e o rodapé da 09 mudou de linha.
+
+### Duas ferramentas novas, e uma que reprovou
+
+| Ferramenta | Estado |
+|---|---|
+| `ferramentas/residuo.js` | **Funciona.** Extrai do diff os trechos removidos e procura cada um no acervo. Rodada sobre este lote: 1 candidato em 72 trechos, e o candidato é citação num dossiê que declara a data no cabeçalho, logo falso positivo corretamente descartado na leitura. |
+| `ferramentas/fechos.js` | **Funciona como enumerador, não como juiz.** Lista as superfícies de fecho das aulas que o diff tocou e marca as que o diff alterou. O que sobra é a lista finita que a leitura percorre: 55 na 24, 53 na 27, 32 na 08, 27 na 09. |
+| juiz automático de desalinho | **Reprovado, e não foi instalado.** Sobreposição de palavras com limiar 2 dá 98 pares de ruído; com limiar 3 mais marcador de hedge dá zero, e o zero é cego — validado contra um positivo plantado, o Checkpoint 9 da AULA-27, que ele não pegou. O sinal não é lexical, e não há limiar no meio. Contradição entre corpo e superfície de fecho fica com a leitura. |
+
+O zero do juiz teria sido reportado como evidência de lote limpo se o positivo plantado não
+tivesse sido testado. É a razão de a validação vir antes do uso.

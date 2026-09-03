@@ -84,8 +84,11 @@ Antes de rodar qualquer exemplo, confirme a saúde:
 curl -f http://localhost:9091/healthz
 ```
 
-O módulo traz ainda `create_milvus_db.py` e `a-working-sample.py` — este último é o exemplo
-completo que funciona de ponta a ponta, útil como referência quando algum passo falhar.
+O módulo traz ainda `create_milvus_db.py` e `a-working-sample.py`. Cuidado com esses dois: eles
+**não usam o servidor que você acabou de subir** — instanciam `MilvusClient` com caminho de arquivo
+(`MilvusClient("./wukong.db")`, linhas 25-26), que é **Milvus Lite**, o modo embutido. São
+referência de forma, não de execução: no Windows nem rodam, porque o Lite é pacote separado sem
+wheel para a plataforma. As Armadilhas de produção voltam a esses arquivos no fim da aula.
 
 ---
 
@@ -102,8 +105,9 @@ client.create_database(db_name="my_database_1")       # linha 32
 ```
 
 Repare no import da linha 16: ele traz `exceptions` junto com o cliente. Criar database que já
-existe levanta erro, e o arquivo trata isso — detalhe pequeno que separa exemplo de script
-utilizável.
+existe levanta erro, e o arquivo **tenta** tratar isso nas linhas 31-35 — a intenção certa, com o
+nome errado. A Mão na massa desta aula mostra por que aquele `except` nunca captura nada, e
+conserta. Guarde a forma da lição: **`except` presente não é erro tratado.**
 
 Database em Milvus é isolamento lógico, como em Postgres. Serve para separar ambientes
 (dev/prod) ou inquilinos. A escolha entre isolar por database e isolar por partição é a decisão de
@@ -116,6 +120,8 @@ desenho multi-tenant, retomada nas Armadilhas de produção desta própria aula.
 > `create_partition`, `has_partition`, `load_partitions`/`release_partitions`, `drop_partition`).
 > Você vai executar o recurso sem que ele tenha sido apresentado. Leia essas linhas com atenção: é
 > isolamento **dentro** de uma collection, o degrau mais fino que o `database` do começo desta aula.
+> E não procure no `GLOSSARIO.md`: o único verbete `Partition` de lá é a função do Unstructured que
+> quebra documento em elementos — homônimo, outro assunto.
 
 ### `02-collection.py` — o atalho
 
@@ -208,7 +214,12 @@ numa collection diferente; `color like "red%"` filtraria aqui, mas não é a exp
 usa.)
 
 Note também que a inserção é uma **lista de dicionários** — não há SQL, não há `INSERT INTO`.
-Cada dicionário é uma entity, e as chaves precisam corresponder aos campos declarados. O nome
+Cada dicionário é uma entity. E aqui há uma sutileza que a Armadilha "escalares esquecidos no
+schema" cobra mais adiante: o quick setup do `02` declara **apenas** `id` e `vector`, e liga
+`enable_dynamic_field=True` por conta própria — `_fast_create_collection` força o parâmetro quando
+você não o passa. Ou seja, `color` **não é campo declarado** nesta collection: é metadado absorvido
+pelo campo dinâmico. Funciona, filtra, e paga o preço em JSON e em eficiência de filtro. O
+`03-schema.py` é onde `color` seria declarado de verdade. O nome
 da collection, `quick_setup`, indica que ela veio pelo atalho do `02`, não pelo schema
 explícito do `03`.
 
@@ -248,7 +259,7 @@ expressão do `except` só é avaliada quando alguma exceção sobe, a primeira 
 attribute 'AlreadyExistError'`. O tratamento é decorativo.
 
 Então: troque aquele nome por `exceptions.MilvusException`, que existe, e envolva também a criação de
-`my_database_2` (linhas 40-43) no mesmo `try/except`. Com as duas edições a segunda execução cai no
+`my_database_2` (linhas 40-43) no mesmo `try/except`. Com essas duas correções no tratador, a segunda execução cai no
 `except` nas duas databases; sem elas, ela estoura na linha 34 antes de chegar à segunda.
 
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
@@ -267,15 +278,29 @@ remover) e é isso que vale ver, não só a inserção.
 ## Quebre de propósito
 
 **1. Insira um vetor com a dimensão errada.** Em `04-entity(data).py`, remova um número de um
-dos vetores, deixando-o com 4 dimensões numa collection de 5. O erro aparece na inserção — e é
-bom que apareça. Compare com o truncamento silencioso do embedding da Aula 07: aqui o sistema
-avisa, lá não.
+dos vetores, deixando-o com 4 dimensões numa collection de 5. O `pymilvus` **não** confere isto no
+cliente — `Prepare.row_insert_param` aceita a linha —, então a recusa, se vier, vem do servidor, e é
+isso que este exercício mede. Compare com o truncamento silencioso do embedding da Aula 07: aqui se
+**espera** aviso, lá não há.
 
 **2. Troque `auto_id=False` por `True`.** Em `03-schema.py`, ative o auto-id — e note que este
 exercício exige uma linha sua: **o arquivo não tem `insert` nenhum** (`grep -c insert` devolve 0), só
-cria o schema, descreve e dropa. Acrescente um `client.insert(collection_name=collection_name,
-data=[{"id": 1, "text_vector": [...], ...}])` antes do `drop_collection` da linha 144, fornecendo o
-`id` mesmo assim. Observe o conflito. Depois pense: se o Milvus gera o id, como
+cria o schema, descreve e dropa. Antes do `drop_collection` da linha 144, acrescente o dicionário
+**completo** — o cliente recusa qualquer campo declarado que faltar:
+
+```python
+client.insert(collection_name=collection_name, data=[{
+    "id": 1, "text_vector": [0.1] * 768,
+    "image_vector": bytes(32),      # BINARY_VECTOR dim=256 -> 256/8 = 32 bytes
+    "title": "t", "age": 30, "is_active": True,
+    "metadata": {}, "tags": ["a"],
+}])
+```
+
+Com `auto_id=False` o `pymilvus` aceita. Com `auto_id=True` ele recusa **no cliente, sem tocar no
+servidor**: `DataNotMatchException: Attempt to insert an unexpected field 'id' to collection without
+enabling dynamic field`. A mensagem fala de campo dinâmico, mas a causa é o auto-id — o `id` deixou
+de ser campo que você fornece. Depois pense: se o Milvus gera o id, como
 você descobre a qual documento do seu sistema aquele resultado corresponde?
 
 **3. Declare `VARCHAR` com `max_length` pequeno.** Em `03-schema.py`, baixe o `max_length` do campo
@@ -284,8 +309,12 @@ acrescentar, já que este arquivo não tem `insert` nenhum (`grep -c insert` dev
 ou rejeita: a resposta vem do **servidor**, não do cliente — o `pymilvus` aceita a linha sem reclamar
 —, e ela muda como você deve dimensionar o campo.
 
-**4. Insira sem o campo escalar.** Omita `color` de uma das entidades de `04`. O schema aceita?
-Se aceitar, o que acontece quando você filtrar por `color` depois?
+**4. Insira sem o campo escalar.** Omita `color` de uma das entidades de `04`. Vai passar — e o
+motivo é o da Parte 3: `color` não é declarado ali, é dinâmico, e chave dinâmica ausente é
+simplesmente ausente. Agora faça o mesmo contra um campo **declarado**: em `03-schema.py`, omita
+`age` do `insert` que o exercício 2 mandou acrescentar. O `pymilvus` recusa **antes de falar com o
+servidor**, com `DataNotMatchException: Insert missed an field 'age' to collection without set
+nullable==true or set default_value`. A diferença entre os dois casos é a Armadilha inteira.
 
 ---
 
@@ -310,7 +339,8 @@ Se aceitar, o que acontece quando você filtrar por `color` depois?
 - 🔴 **Inserir não é publicar.** Depois do `insert`, a collection ainda precisa ser **carregada**
   para o query node: `load_collection()` (e o par `release_collection()` para devolver a memória).
   `grep -rln "load_collection"` encontra o nome em 16 dos 27 `.py` de `04-VectorDB/` — e a
-  conclusão fácil aqui é falsa: dos 11 restantes, **nove buscam** — e por dois caminhos
+  conclusão fácil aqui é falsa: dos 11 restantes, **nove leem a collection** — oito com
+  `search`/`hybrid_search`, e o `04-entity(data).py` com `query` — e por dois caminhos
   diferentes, que vale separar.
 
   **Quatro carregam a collection com outro nome:** os três de `HybridRetrieval/` usam
@@ -376,7 +406,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 ---
 
 **Anterior:** [AULA 08 — Embeddings, BM25 e BGE-M3](AULA-08-embeddings-bm25-bge-m3.md)
-**Próxima:** AULA 10 — Índices ANN: FLAT, IVF*FLAT, IVF_PQ, HNSW e DiskANN *(a escrever)\_
+**Próxima:** [AULA 10 — Índices ANN: FLAT, IVF_FLAT, IVF_PQ, HNSW e DiskANN](AULA-10-indices-ann.md)
 
 > A collection desta aula é a estrutura vazia. A Aula 10 constrói o índice sobre ela e mede o
 > que cada tipo custa em recall e em latência.
