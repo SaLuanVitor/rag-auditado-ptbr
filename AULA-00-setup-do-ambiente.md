@@ -203,7 +203,7 @@ ollama list
 O `.env.example` usa `OLLAMA_MODEL=llama3` como padrão. Ollama sobe um servidor
 local em `http://localhost:11434` e não precisa de chave. Os scripts `_Ollama` mandam a **geração**
 para esse servidor; o embedding deles não passa por ali, roda por HuggingFace na sua CPU, e é ele
-que provoca a pausa de download da linha seguinte.
+que provoca a pausa de download que o Passo 6 descreve no fim.
 
 ### Passo 5 — O arquivo `.env`
 
@@ -247,16 +247,19 @@ não o instala (confira com `grep -i llama`). Este script importa `llama_index.c
 ambiente do outro framework primeiro. Repare no caminho: os venvs foram criados na **raiz** do
 clone, no Passo 1, e você está um nível abaixo.
 
-Falta ainda um pacote, e este é o defeito mais sério deste módulo. **Nenhum arquivo de
+Faltam ainda **dois** pacotes, e este é o defeito mais sério deste módulo. **Nenhum arquivo de
 `91-Environment/` instala cliente de Ollama**, em nenhuma das trilhas: `grep -rn -i ollama
 91-Environment/` não devolve nada. O `01_05` importa `llama_index.llms.ollama`, e o comentário na
-linha 24 do próprio script já avisa que isso pede instalação à parte. Sem ela, a trilha que este
-passo recomendou não roda o script que este passo manda rodar.
+linha 24 do próprio script já avisa que isso pede instalação à parte. E o
+`requirements_llamaindex_NoGPU_Mac-Win.txt` **também não traz `python-dotenv`** — `grep -n -i
+dotenv` nele não devolve nada, enquanto `requirements_langchain_NoGPU_Mac-Win.txt:194` o pina —, e os **seis**
+arquivos `01_0x` o importam. Sem os dois, a trilha que este passo recomendou não roda o script que
+este passo manda rodar, e nem o `01_01` do caminho OpenAI logo abaixo.
 
 ```powershell
 deactivate
 ..\.venv-llamaindex\Scripts\Activate.ps1
-pip install llama-index-llms-ollama
+pip install llama-index-llms-ollama python-dotenv
 python 01_05_LlamaIndex_5LineCode_Ollama.py
 ```
 

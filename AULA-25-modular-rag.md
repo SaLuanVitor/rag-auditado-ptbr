@@ -96,7 +96,7 @@ O paper diz que o nível de topo _"not only inherits the main processes from the
 
 Os três níveis, na descrição do paper: o topo trata cada estágio como módulo independente; o meio _"is composed of sub-modules within each module, further refining and optimizing the functions"_; a base _"consists of basic units of operation—operators"_.
 
-Julgamento de engenharia: a utilidade prática desses três níveis não é catalogar. É que **operador é a unidade que você troca sem tocar no resto**. Se `rerank` é um operador do módulo de pós-recuperação, trocar Cohere por um cross-encoder local é uma substituição local. E a fronteira que permite a troca é a **injeção**: o híbrido escrito à mão da Aula 24 é exemplo **positivo** disso, porque o `EmbeddingBM25RerankerRetriever` recebe o reranker no construtor (`10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py:93`) e o trata como opcional (`:114`), então trocar de reranker é uma linha em `:238`. Onde a fronteira não existe, a mesma troca vira cirurgia.
+Julgamento de engenharia: a utilidade prática desses três níveis não é catalogar. É que **operador é a unidade que você troca sem tocar no resto**. Se `rerank` é um operador do módulo de pós-recuperação, trocar Cohere por um cross-encoder local é uma substituição local. E a fronteira que permite a troca é a **injeção**: o híbrido escrito à mão da Aula 24 é exemplo **positivo** disso, porque o `EmbeddingBM25RerankerRetriever` recebe o reranker no construtor (`10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py:93`) e o trata como opcional (`:114`), então trocar de reranker é trocar a construção de `:219`, que os dois retrievers recebem (`:238` e `:251`). É uma linha em `:238`. Onde a fronteira não existe, a mesma troca vira cirurgia.
 
 ---
 
@@ -166,7 +166,7 @@ Aqui esta aula fecha uma conta aberta na Aula 21.
 
 O Self-RAG de `08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py` tem três ciclos simples, e nenhum deles tem limite de iteração: a aresta `"not supported"` volta ao nó `generate` (`:359`) e a aresta `"not useful"` volta a `transform_query` (`:361`). A Aula 21 apontou isso como ausência.
 
-O paper mostra que não é uma ausência acidental — é a omissão de uma peça que o padrão canônico **especifica**:
+O paper mostra que não é uma ausência acidental — é a omissão de um parâmetro que o padrão canônico **especifica**:
 
 - no laço **iterativo**, há um número máximo de iterações;
 - no laço **recursivo**, há profundidade máxima e mecanismo explícito de saída;
@@ -221,7 +221,7 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 **5. Localize os cinco eixos de divergência de rota.** O paper diz que rotas divergem em fonte, processo, configuração, modelo e prompt. Pegue o roteamento da Aula 14, que exercia só o eixo do prompt e declarava o da fonte sem consumi-lo, e escreva o que mudaria em cada um dos outros três eixos para o seu domínio.
 
-**6. Ponha no laço o limite que os algoritmos do paper exigem.** No grafo do Self-RAG (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py`), acrescente ao `GraphState` (`:171`) uma chave de contagem e um teto. **Cuidado com onde cada metade mora, porque errar isso falha calado:** `decide_to_generate` (`:271`) e `grade_generation_v_documents_and_question` (`:295`) são funções de **aresta condicional** e devolvem string de rota, então só podem **ler** o contador. O incremento tem de ir num **nó**, junto do `return` de `generate` (`:220`) e de `transform_query` (`:267`), que são os que devolvem dicionário de estado. Um contador posto na função de decisão nunca sai de zero, e faça as duas funções de decisão consultarem o escalonador em vez de decidirem sozinhas. Compare o seu resultado com a descrição do rule judge do paper: você usou limiar de escore, contagem de voltas, ou os dois?
+**6. Ponha no laço o limite que os algoritmos do paper exigem.** No grafo do Self-RAG (`08-Generation/04-DynamicGenerationOptimizationStrategies/Self-RAG-FullImplementation.py`), acrescente ao `GraphState` (`:171`) uma chave de contagem e um teto. **Cuidado com onde cada metade mora, porque errar isso falha calado:** `decide_to_generate` (`:271`) e `grade_generation_v_documents_and_question` (`:295`) são funções de **aresta condicional** e devolvem string de rota, então só podem **ler** o contador. O incremento tem de ir num **nó**, junto do `return` de `generate` (`:220`) e de `transform_query` (`:267`), que são os que devolvem dicionário de estado. Um contador posto na função de decisão nunca sai de zero. Feito o incremento no nó, as duas funções de decisão passam a ler o contador antes de escolher a rota, que é o limite que falta ao juízo que elas já exercem. Compare o seu resultado com a descrição do rule judge do paper: você usou limiar de escore, contagem de voltas, ou os dois?
 
 **7. Meça o custo de cada módulo.** Instrumente o seu pipeline para contar chamadas de LLM e de embedding por consulta, agrupadas por módulo. A tabela resultante é o que transforma "modularizar custa" em número — e é o insumo que a decisão do item 3 precisava.
 
@@ -231,9 +231,9 @@ Segundo módulo do curso sem nada para executar. O trabalho é de leitura, mapea
 
 Sem código, os contrafactuais isolam peças do desenho.
 
-**1. Colapse o padrão.** Tome o CRAG da Aula 18 e remova a aresta condicional de `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py:441-448`: sempre gere, nunca corrija. Você rebaixou um fluxo condicional a linear, e o paper diz onde ele para: sobram `retrieve`, `grade_documents` e `generate`, e `grade_documents` **é** pós-recuperação, então o que resta é Advanced RAG, não Naive. Para chegar a Naive faltaria tirar a graduação também, porque _"if there are no pre-retrieval and post-retrieval modules, it follows the Naive RAG paradigm"_. O que se perde no primeiro corte é o caso em que a recuperação falhou; no segundo, saber que ela falhou. E a herança que explica o rebaixamento é a outra metade da cadeia: Advanced RAG é caso especial de Advanced RAG. O que se perde é exatamente o caso em que a recuperação falhou.
+**1. Colapse o padrão.** Tome o CRAG da Aula 18 e remova a aresta condicional de `07-PostRetrieval/03-Correction/01-CRAG-ReflectiveRetrieval.py:441-448`: sempre gere, nunca corrija. Você rebaixou um fluxo condicional a linear, e o paper diz onde ele para: sobram `retrieve`, `grade_documents` e `generate`, e `grade_documents` **é** pós-recuperação, então o que resta é Advanced RAG, não Naive. Para chegar a Naive faltaria tirar a graduação também, porque _"if there are no pre-retrieval and post-retrieval modules, it follows the Naive RAG paradigm"_. O que se perde no primeiro corte é o caso em que a recuperação falhou; no segundo, saber que ela falhou. E a herança que explica o rebaixamento é a outra metade da cadeia: Naive RAG é caso especial de Advanced RAG.
 
-**2. Tire o Judge do laço, e escolha com cuidado por onde.** No Self-RAG, faça `grade_generation_v_documents_and_question` (`:295`) devolver sempre `"useful"`: o `END` fica alcançável na primeira volta e o laço desaparece. Agora faça devolver sempre `"not supported"` e veja o oposto: a aresta `generate` para `generate` de `:359` dispara para sempre. Sem juízo, o laço não vira cadeia — vira uma das duas degenerações, e qual delas você pega é escolha sua, não propriedade do grafo. No primeiro ramo, o ciclo é uma cadeia com passos repetidos.
+**2. Tire o Judge do laço, e escolha com cuidado por onde.** No Self-RAG, faça `grade_generation_v_documents_and_question` (`:295`) devolver sempre `"useful"`: o `END` fica alcançável na primeira volta e o laço desaparece. Agora faça devolver sempre `"not supported"` e veja o oposto: a aresta `generate` para `generate` de `:359` dispara para sempre. Sem juízo, o laço não vira cadeia — vira uma das duas degenerações, e qual delas você pega é escolha sua, não propriedade do grafo.
 
 **3. Ramifique sem agregar.** No branching pós-recuperação, gere uma resposta por chunk e **não** una: devolva a primeira. Você transformou uma técnica de diversidade num top-1 caro. A agregação não é o acabamento do padrão — é o padrão.
 
@@ -253,7 +253,7 @@ Sem código, os contrafactuais isolam peças do desenho.
 
 **Juízo sem custo calculado.** Grader por LLM custa uma chamada por juízo; limiar de probabilidade de token é grátis e exige acesso aos logits, o que a maioria das APIs comerciais não dá. A escolha entre os dois é de infraestrutura, não de qualidade.
 
-**Rota que divirja apenas em prompt.** Dos três roteadores do repositório, **dois escolhem prompt** (o semântico da Aula 14 e o por LLM da Aula 19); o terceiro escolhe fonte e não a consome (`01-LogicalRouting.py`). Quando a diferença real entre os casos é a **fonte** — um índice jurídico e um índice de suporte —, rotear prompt não resolve nada e dá a impressão de que resolveu.
+**Rota que divirja apenas em prompt.** Dos quatro roteadores do repositório, **dois escolhem prompt** (o semântico da Aula 14 e o por LLM da Aula 19); o terceiro escolhe fonte e **não** a consome (`01-LogicalRouting.py`), e só o quarto, que é assunto da Aula 26, escolhe fonte e a consome. Quando a diferença real entre os casos é a **fonte** — um índice jurídico e um índice de suporte —, rotear prompt não resolve nada e dá a impressão de que resolveu.
 
 **Fronteira de operador mal desenhada.** Se você não consegue substituir um componente sem editar outro, não tem operadores — tem uma função grande com nomes de operadores nos comentários.
 

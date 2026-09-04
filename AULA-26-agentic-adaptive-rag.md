@@ -159,7 +159,7 @@ A aresta `rewrite → agent` (`01-LangChain-AgenticRAG.py:174`) fecha o ciclo, e
 O comentário é honesto: `Reset messages here`. O histórico é descartado e **só a pergunta reescrita sobrevive**.
 
 A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura, e ela atinge quatro dos cinco nós, todos menos o próprio `agent`: a pergunta
-original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como todos os nós leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
+original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como os quatro leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
 
 E, pela segunda vez neste curso — depois do Self-RAG da Aula 21 —, **o ciclo não tem contador**. Nada limita quantas vezes `agent → retrieve → grade_documents → rewrite → agent` pode girar.
 
@@ -187,11 +187,11 @@ class RouteQuery(BaseModel):
     )
 ```
 
-`Literal` como contrato — a Aula 20 recomendou exatamente isso e observou que o repositório usava `str` solto. O contrato vale para a rota e para nada mais: os três graders deste mesmo arquivo declaram
+`Literal` como contrato — a Aula 20 recomendou exatamente isso e observou que o repositório usava `str` solto, e aqui o roteador não pode devolver um rótulo fora do conjunto. O contrato vale para a rota e para nada mais: os três graders deste mesmo arquivo declaram
 `binary_score: str` com a enumeração na `description` (`:68`, `:82`, `:95`), que é o achado que a
 Aula 20 registrou. E aqui ele custa mais: `:173` reprova por `!= "yes"`, então um `"Yes"` com
 maiúscula, que o tipo aceita, manda para `retry` — o único ciclo que volta ao mesmo nó sem mudar
-nada. Aqui o roteador não pode devolver um rótulo fora do conjunto.
+nada.
 
 E o roteamento acontece **na aresta que sai do START** (`02-LangChain-AdaptiveRAG.py:188-192`):
 
@@ -307,7 +307,7 @@ Julgamento de engenharia, e é a recomendação prática desta aula: se você co
 
 > ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25** **super-steps** — valor documentado pela biblioteca e confirmado por execução no `langgraph` 0.2.69, uma das duas
 > versões que o repositório pina (a outra é 0.3.18, no requirements de pacotes adicionais; o
-> `10-AdvanceRAG/requirements.txt` não pina nenhuma). **Medido**: no `langgraph` 0.2.69, a versão que este repositório pina, um grafo de laço infinito levanta `GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition`. O valor não se lê neste repositório: `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
+> `10-AdvanceRAG/requirements.txt` não pina nenhuma). Um grafo de laço infinito levanta `GraphRecursionError: Recursion limit of 25 reached without hitting a stop condition`. O valor não se lê neste repositório: `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
 > confusa. O contador que falta no estado da aplicação não serve para evitar laço infinito;

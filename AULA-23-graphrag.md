@@ -301,11 +301,12 @@ erra:
    níveis intermediário e folha, não no raiz.
 
    Com uma ressalva que o próprio paper registra, e que muda como se lê o número: o Experimento 2
-   (§4.2 e §5.2) mede comprehensiveness e diversity contando claims extraídos por Claimify, 47.075
-   no total, e nesse eixo _"there were no statistically significant differences observed among the
-   global search conditions or between global search and TS"_. O incremento do grafo sobre o `TS`
-   aparece na taxa de vitória julgada por LLM e **não** aparece na contagem de claims. Ler os dois
-   juntos é o que impede transformar 57% e 64% em fato estabelecido.
+   (§4.2 e §5.2) mede comprehensiveness contando claims extraídos por Claimify, 47.075 no total, e
+   diversity agrupando esses claims em clusters. Nos dois eixos, _"there were no statistically
+   significant differences observed among the global search conditions or between global search and
+   TS"_. O incremento do grafo sobre o `TS` aparece na taxa de vitória julgada por LLM e **não**
+   aparece em nenhuma das duas medidas por claim. Ler os dois juntos é o que impede transformar 57%
+   e 64% em fato estabelecido.
 3. **No nível raiz**, você **troca** esse incremento por 97% menos tokens: 2,6% do orçamento
    mantendo 72% de win rate contra o vetorial, com o que o paper chama de _"a modest drop in
    performance compared with other global methods"_.
@@ -366,8 +367,8 @@ O paper gera as perguntas com personas, e dá o algoritmo:
 > relevant to the user. 3. Specific to each user & task pair, generate M high-level questions that:
 > Require understanding of the entire corpus. Do not require retrieval of specific low-level facts."_
 
-Com `K = M = N = 5`, são **125 perguntas por dataset**, e cada comparação foi repetida cinco vezes, com a média das cinco, e
-mediada.
+Com `K = M = N = 5`, são **125 perguntas por dataset**, e cada comparação foi repetida cinco vezes, com a
+média das cinco.
 
 Compare com o que a Aula 22 encontrou no repositório: três exemplos no RAGAS, uma pergunta no TruLens,
 trinta no LlamaIndex — e, no RAGAS, um vencedor declarado sem variância. Aqui: 125 perguntas, cinco
@@ -420,8 +421,7 @@ igual, porque é o que você faria antes de adotar o método.
 sustentam a decisão de adotar ou não.
 
 **2. Extraia o texto do PDF.** Use `pdftotext "GraphRAG - 2404.16130v2.pdf" -`, que joga o texto em
-stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. Vale saber que as citações
-desta aula foram conferidas. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
+stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
 isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.502 literais —, com uma ressalva que é a
 própria lição: os espaços entre palavras são posicionamento, não literal. Buscar `mutually exclusive`
@@ -460,7 +460,8 @@ contrafactuais sobre o desenho — cada um isolando uma peça do método para ve
 **1. Tire a hierarquia.** Suponha uma única partição, sem níveis. Você perde o `C0` — e com ele os
 2,6% de tokens que tornam a consulta repetida viável, que é o argumento de escala inteiro. O que
 sobra é o nível folha, e ele **não** é "`TS` com passos extras": pela Table 2 acima, ainda é 26-33%
-mais barato que `TS`, e pela §5.1 ainda ganha dele (64% de win rate em comprehensiveness nas
+mais barato que `TS`, e pela §5.1 ainda ganha dele, com a ressalva do Experimento 2 registrada na
+Parte 3 (64% de win rate em comprehensiveness nas
 Notícias, `p<.001`). Perder a hierarquia não devolve você ao `TS`; devolve você ao ganho pequeno, pagando quase
 o preço cheio. A hierarquia é o que compra a ordem de grandeza, não o ganho de qualidade.
 
