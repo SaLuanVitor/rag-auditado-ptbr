@@ -389,3 +389,29 @@ esse custo.
 Duas notas de uso. Passe o intervalo como `HEAD~1..HEAD`; a forma com `^` é comida por alguma
 camada do shell e o script sai vazio, sem erro. E a régua para escolher os termos do filtro é a
 mesma da lista de achados: para cada conserto, qual palavra mudou de sentido?
+
+### A taxa de defeito próprio é 33%, não 24%, e ela sobe com o tamanho do conserto
+
+Medida em 03/09 sobre o commit de 47 consertos, por duas verificações de escopo apertado:
+**17 defeitos em 52 blocos**. A sessão vinha citando 24%, de uma medição anterior sobre consertos
+menores.
+
+O sinal está na distribuição, não na média. O lote das aulas 00 e 23, com consertos pontuais, deu
+**6 em 23 (26%)**. O lote das aulas 25 e 26, que incluía a reescrita da Parte 4 inteira da 25, deu
+**11 em 29 (38%)**. Reescrever uma seção é mais arriscado que emendar uma frase, e o risco não é
+proporcional: é a cauda antiga que cola na frase nova.
+
+Três formas foram responsáveis pela maioria, e as três só aparecem em conserto grande:
+
+**Cauda que cola.** Ancorar num prefixo e deixar o fim da frase antiga emendar no texto novo.
+Produziu `Advanced RAG é caso especial de Advanced RAG`, tautologia onde o original estava certo.
+**Ao substituir, ancore na frase inteira, com o ponto final.**
+
+**Cauda duplicada ou contraditória.** O bloco novo já disse o que a frase seguinte, não tocada,
+repete ou nega. Aparece quando o conserto cresce e passa a cobrir o que vinha depois.
+
+**Frase órfã.** Inserir no meio de um parágrafo desloca o referente de "aqui", "esse" e "ele" da
+frase seguinte, sem quebrar nada visivelmente.
+
+**Consequência para o planejamento:** um lote de N consertos custa o lote mais a verificação dele,
+e a verificação acha um terço de N. Orçar sem isso é orçar metade do trabalho.
