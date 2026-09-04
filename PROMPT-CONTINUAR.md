@@ -365,3 +365,27 @@ defeito que você sabe que existe e confirme que ele acha.
 - **Tem uma seção de "o que NÃO é o próximo passo".** Três das quatro sessões anteriores começaram
   fazendo a coisa errada por ler o handoff como catálogo de possibilidades em vez de ordem de
   prioridade.
+
+### Como usar o `fechos.js`, medido em 03/09
+
+Ele não julga: enumera. Rodado sobre o commit de 47 consertos, listou **197 superfícies de fecho**
+não tocadas, o que é lista demais para ler. O que funcionou foi um passo a mais, e é ele que vale
+como técnica:
+
+```bash
+node ferramentas/fechos.js 'HEAD~1..HEAD' | grep -iE "<conceitos que o conserto mudou de sentido>"
+```
+
+Na prática: a reescrita da AULA-25 mudou o sentido de escalonador, juiz, laço, limite e operador.
+Filtrar as 197 por esses termos deixou **18 linhas**, e duas eram achado — o título da armadilha
+central da AULA-25, que continuava dizendo "laço sem escalonador" três seções depois de o corpo
+passar a dizer que o repositório **tem** escalonador, e uma célula de tabela da AULA-26 afirmando
+`scheduling module | ausente`.
+
+Ou seja: **os dois eram a mesma classe que aquele commit consertava em outro lugar.** Consertar a
+classe num arquivo não a consertou no vizinho, e nenhuma releitura das aulas os teria achado com
+esse custo.
+
+Duas notas de uso. Passe o intervalo como `HEAD~1..HEAD`; a forma com `^` é comida por alguma
+camada do shell e o script sai vazio, sem erro. E a régua para escolher os termos do filtro é a
+mesma da lista de achados: para cada conserto, qual palavra mudou de sentido?

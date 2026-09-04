@@ -249,7 +249,7 @@ Sem código, os contrafactuais isolam peças do desenho.
 
 **Modularizar sem necessidade.** A flexibilidade cobra em latência, custo e manutenção. O paper lista manutenibilidade entre os novos desafios; um fluxo com laço num caso que se resolve linearmente é dívida contratada sem contrapartida.
 
-**Laço sem escalonador.** É a armadilha central da aula. Iterativo pede número máximo de iterações; recursivo pede profundidade máxima e condição de saída; adaptativo pede critério de parada. O padrão especifica o freio — implementar o laço sem ele é implementar metade do padrão.
+**Laço sem limite.** É a armadilha central da aula, e repare no que ela **não** é: o juízo o repositório tem, no `LLM judge` que a Parte 4 identificou. O que falta é o teto. Iterativo pede número máximo de iterações; recursivo pede profundidade máxima e condição de saída; adaptativo pede critério de parada. Nos algoritmos do paper esse teto é parâmetro de entrada, não componente, e implementar o laço sem ele é implementar metade do padrão.
 
 **Juízo sem custo calculado.** Grader por LLM custa uma chamada por juízo; limiar de probabilidade de token é grátis e exige acesso aos logits, o que a maioria das APIs comerciais não dá. A escolha entre os dois é de infraestrutura, não de qualidade.
 

@@ -278,7 +278,7 @@ Agora a régua. Cada linha abaixo foi verificada no código, não inferida do no
 | Graders                                   | 1 — relevância (`:60`)                                                    | 3 — relevância, alucinação, resposta (`:66`, `:80`, `:93`)          |
 | Fonte alternativa                         | não (Tavily importado e não usado)                                        | **sim**, busca na web (`:118`, `:152-155`)                          |
 | Ciclos                                    | 1, sem limite                                                             | 3, sem limite                                                       |
-| `scheduling module`                       | ausente                                                                   | ausente                                                             |
+| Limite de voltas (`T` / `Kmax`)           | ausente (o grader é o `LLM judge`)                                        | ausente (o grader é o `LLM judge`)                                  |
 | É "adaptive (active) retrieval" do paper? | não                                                                       | **não** — decide _onde_, não _quando_                               |
 | É agentic?                                | **sim**, no sentido mínimo                                                | não                                                                 |
 

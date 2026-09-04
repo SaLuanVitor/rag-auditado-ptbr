@@ -10,7 +10,9 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const diff = execSync('git diff -U0', { maxBuffer: 64 * 1024 * 1024 }).toString();
+// Aceita um intervalo do git como argumento; sem ele, usa o diff de trabalho.
+const faixa = process.argv[2] ? process.argv[2] + ' ' : '';
+const diff = execSync('git diff -U0 ' + faixa, { maxBuffer: 64 * 1024 * 1024 }).toString();
 const tocadas = new Map();
 let arq = null;
 for (const l of diff.split('\n')) {
