@@ -88,16 +88,27 @@ versões da pergunta** e une os resultados. O `diff` mostra que a diferença é 
 | `02-QueryDecomposition-1-MultiQueryRetriever.py` | só `MultiQueryRetriever` (linha 9)                        |
 | `02-QueryDecomposition-2-MultiQueryRetriever.py` | `+ BaseOutputParser`, `+ PromptTemplate`, `+ typing.List` |
 
-O `-2` acrescenta um **output parser próprio** (o comentário do arquivo diz _"Custom output
-parser"_) e um `PromptTemplate` explícito. Ou seja: no `-1` você aceita o prompt e o parser
-default da biblioteca; no `-2` você controla **como as subconsultas são geradas** e **como a saída
-do LLM é convertida em lista**.
+O `-2` acrescenta um `PromptTemplate` explícito e reimplementa o output parser. **Abra os dois
+antes de acreditar no comentário do arquivo.** O `LineListOutputParser` das linhas 27 a 30 é cópia
+literal do default do LangChain: mesma quebra por linha, mesmo filtro de linhas vazias, e só o
+comentário muda, de "Remove empty lines" para "Filter out empty lines". O `-2` não customiza
+parsing nenhum: ele expõe o gancho e o preenche com o default. E o `parser_key="lines"` da linha 47
+é campo depreciado, que a própria biblioteca documenta como ignorado.
+
+O que muda de fato é o **prompt**: o `DEFAULT_QUERY_PROMPT` pede três versões genéricas, e o do
+`-2` pede cinco, com papel de domínio e eixos declarados.
 
 Por que o parser precisa ser customizável: o LLM devolve as subconsultas como texto — uma por
 linha, ou numeradas, ou com bullet. O parser default assume um formato. Quando o modelo varia, a
 lista sai errada ou vazia, e o retriever silenciosamente busca menos do que deveria. É o mesmo
 problema da Aula 12, seção Text2SQL: **a saída do LLM não vem no formato que você espera**, e a
 solução é a mesma — controlar a extração em vez de confiar.
+
+E há a consequência a jusante, que esta aula não pode deixar de nomear. Unir os resultados de N
+subconsultas devolve até N×k trechos em ordem arbitrária: a união do `MultiQueryRetriever`
+deduplica, não ordena. É por isso que a Aula 01 e a Aula 28 mandam quem tem maioria de perguntas
+`local composta` para decomposição **e** reranking (Aula 17), como par. Decompor sem reranquear
+troca um problema de recall por um de precisão no topo.
 
 ### Uma distinção que o nome esconde
 
@@ -130,9 +141,11 @@ embutir, `TextLoader` e `RecursiveCharacterTextSplitter` para o acervo, e `Chrom
 
 ### Por que funciona
 
-A explicação curta é que o espaço de embedding foi treinado para aproximar **textos parecidos entre
-si**, não para alinhar pergunta com resposta — e uma pergunta é textualmente muito diferente de um
-documento:
+A explicação curta não é que o espaço de embedding ignore a pergunta: bi-encoders modernos como a
+família BGE são treinados justamente em pares consulta-passagem, como a Aula 08 mostra e como a
+entrada `Assimetria consulta/passagem` do glossário registra. O que o treino não cobre é a
+distância de **forma e extensão** entre uma pergunta curta e interrogativa e um parágrafo
+declarativo, e é isso que a tabela abaixo mede:
 
 |             | Pergunta      | Documento   | Resposta hipotética |
 | ----------- | ------------- | ----------- | ------------------- |
@@ -152,6 +165,20 @@ A resposta hipotética **pode estar factualmente errada e HyDE ainda funciona** 
 Isso é o que confunde quem vê a técnica pela primeira vez: parece que se está indexando ou
 respondendo com invenção. Não — a resposta final vem dos documentos **reais** recuperados.
 
+**Antes de rodar, troque o embedder.** Os quatro scripts executáveis deste módulo embutem um acervo
+em inglês (`99-EN/black-myth-wukong/`) com `BAAI/bge-small-zh`, que é um modelo chinês. É a
+armadilha que a Aula 03 e a Aula 08 nomeiam: degrada recall **sem lançar erro**. Ela pesa mais aqui
+do que em qualquer outro módulo, porque o argumento desta aula é exatamente onde as coisas caem no
+espaço vetorial. Troque por `BAAI/bge-small-en-v1.5` antes do exercício 4, ou a comparação entre
+HyDE e busca direta sai degradada nos dois braços e não mede nada.
+
+**E um detalhe do arquivo que muda o exercício.** Em `04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py`,
+a linha `:36` gera um documento hipotético e a `:38` o imprime, mas a `:42` remonta a cadeia
+geradora e a `:43` a invoca **de novo**. O documento que você lê não é o que foi embutido: são duas
+gerações independentes, e duas chamadas de LLM antes da primeira recuperação, mais uma em `:61`
+para a resposta final. Para ver a sonda de verdade, quebre a cadeia: guarde o `generated_doc` de
+`:36` e passe-o direto a `retriever.invoke(generated_doc)`.
+
 ### Quando HyDE atrapalha
 
 Julgamento, e vale explicitar porque é onde a técnica é mal aplicada:
@@ -161,13 +188,13 @@ Julgamento, e vale explicitar porque é onde a técnica é mal aplicada:
 - **Perguntas numéricas.** Gerar uma resposta hipotética sobre valores fiscais produz números
   inventados, e a sonda arrasta a recuperação para documentos com números parecidos e errados.
   Para esse caso, o caminho é a Aula 12 (Text2SQL), não HyDE.
-- **Latência apertada.** É uma chamada de LLM antes de cada busca.
+- **Latência apertada.** É uma chamada de LLM antes de cada busca, e em
+  `04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py` são duas, pela invocação repetida
+  de `:43`.
 
 Uma ressalva sobre a ressalva: numa pergunta **mista** — parte numérica, parte explicativa — o
 raciocínio não é rejeitar HyDE em bloco. Roteie a parte numérica para SQL e considere HyDE apenas
-para a sub-pergunta explicativa. (Registro isso porque a versão anterior deste raciocínio, feita
-numa avaliação deste curso, rejeitou HyDE inteiro para uma query mista e foi corretamente
-apontada como inconsistente.)
+para a sub-pergunta explicativa.
 
 ---
 
@@ -193,7 +220,7 @@ um ramo da árvore até restar uma consulta específica.
 >
 > Ou seja: este é o gerador de perguntas de clarificação, não o diálogo. Ele produz **o que
 > perguntar**; quem pergunta, espera e poda é o sistema que você escreveria em volta dele. E note a
-> ironia, que é, **julgamento**, o achado mais instrutivo desta aula: o arquivo que ilustra "não resolver a
+> ironia, que é, **julgamento**, a coisa mais instrutiva desta aula: o arquivo que ilustra "não resolver a
 > ambiguidade sozinho" resolve a ambiguidade sozinho, por `if`.
 
 Por que isso importa: as três técnicas anteriores **assumem** que a intenção é recuperável do
@@ -217,11 +244,15 @@ $env:DEEPSEEK_API_KEY = "sk-..."   # este arquivo não lê o .env
 python 01-QueryRewriting-1-RewriteViaPrompt.py
 ```
 
-O `$env:` é necessário e custa a primeira execução de quem não sabe: este é o **único script que precisa de chave** e
-não chama `load_dotenv()` — ele lê `DEEPSEEK_API_KEY` direto do ambiente, na linha 6. Com a
-chave só no `.env`, o construtor da linha 4 estoura em tempo de import com `OpenAIError: The api_key
-client option must be set`, mensagem que ainda nomeia `OPENAI_API_KEY`, porque vem da SDK e não do
-script. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
+O `$env:` é necessário e custa a primeira execução de quem não sabe: este é o único script que
+precisa de chave **e não chama `load_dotenv()`** (os outros quatro chamam), e lê
+`DEEPSEEK_API_KEY` direto do ambiente, na linha 6. Com a chave só no `.env` há dois desfechos, e o
+segundo é o caro. Sem `OPENAI_API_KEY` no ambiente, o construtor da linha 4 estoura em tempo de
+import com `OpenAIError: The api_key client option must be set`, mensagem que ainda nomeia
+`OPENAI_API_KEY` porque vem da SDK e não do script. **Com** `OPENAI_API_KEY` presente, que é o caso
+de quem fez as aulas anteriores, a SDK cai silenciosamente nela: o script sobe, manda a chave da
+OpenAI para `api.deepseek.com` e só falha na requisição, com 401, num ponto onde a causa não é
+legível. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
 
 Comece por aqui e **leia o prompt completo** antes de rodar. Depois teste com perguntas de
 qualidade decrescente: uma bem formulada, uma coloquial, uma com erro de digitação, uma com gíria.
@@ -241,7 +272,8 @@ distintas. Essa observação decide se você está fazendo multi-perspectiva ou 
 python 04-QueryExpansion-HyDE-HypotheticalDocumentGeneration.py
 ```
 
-Imprima o **documento hipotético** antes de ele ser embutido. Ler o que o modelo inventou é o que
+O script já imprime um documento hipotético, mas não o que ele embute: quebre a cadeia como a
+Parte 3 descreve e imprima o que de fato vai ao retriever. Ler o que o modelo inventou é o que
 torna a técnica compreensível — e é também como você detecta que ela está apontando para o bairro
 errado.
 
@@ -281,8 +313,12 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 ## Armadilhas de produção
 
 - **Latência somada.** As três primeiras técnicas custam uma chamada de LLM **antes** de recuperar
-  (a quarta cobra em outra moeda: atrito na interface).
+  (a quarta cobra em outra moeda: atrito na interface), e o script de HyDE deste módulo custa
+  duas, por invocar a cadeia geradora mais de uma vez.
   Em cadeia (reescreve, decompõe, HyDE) você triplica o tempo até o primeiro resultado.
+- **Candidato inflado e desordenado.** Decompor em N subconsultas devolve até N×k trechos, unidos
+  por deduplicação e não por ordenação. Sem reranking (Aula 17) depois, você trocou um problema de
+  recall por ruído no topo.
 - **Reescrita que muda a intenção.** O modelo "corrige" a pergunta para algo que ele acha mais
   sensato, e você recupera resposta para outra pergunta. Registre a query original e a reescrita
   no log — sem isso, o diagnóstico é impossível.
