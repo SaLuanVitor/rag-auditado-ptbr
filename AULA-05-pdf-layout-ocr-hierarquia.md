@@ -236,8 +236,8 @@ o jogo:
 | `02-Unstructured-ReadPPT.py`    | `partition_ppt(filename=".../black_myth_wukong_slides.pptx")` (a chamada está sozinha na linha 16; a 14 é o import)                            |
 | `03-LLM-ReadImagesAndText.py`   | **modelo multimodal** — `convert_from_path` + `base64` + `OpenAI`, com `model="gpt-4o-mini"` (linha 35) |
 
-O `03` é a abordagem mais recente e, **julgamento**, a mais poderosa: rasteriza a página, codifica em base64,
-manda para um modelo de visão e pede a **descrição do conteúdo**. Depois embrulha o resultado
+O `03` é a abordagem mais recente e, **julgamento**, a mais poderosa: rasteriza a página, codifica
+em base64, manda para um modelo de visão e pede a **descrição do conteúdo**. Depois embrulha o resultado
 num `Document` (linha 59; a 56 é só o import).
 
 ⚠️ **Um bug antes de rodar.** Na linha 52, o `results.append(...)` ficou na **coluna 0**, fora do
@@ -301,14 +301,21 @@ instala o `unstructured` antes. Note também que o `08` roda `partition_via_api=
 `api.unstructuredapp.io` e exige `UNSTRUCTURED_API_KEY`: o mesmo envio para fora que esta aula
 trata como decisivo ao discutir o LlamaParse.
 
+⚠️ **E há uma credencial na saída commitada desse notebook.** A célula 4 existe só para conferir a
+variável de ambiente, e a saída gravada junto com o arquivo traz o valor. Não a use, e não a copie:
+ela é de outra pessoa, provavelmente já revogada, e usá-la seria consumir cota alheia. Vale como a
+lição mais barata deste módulo sobre o que se commita: **saída de notebook é conteúdo versionado**,
+e `jupyter nbconvert --clear-output` antes do commit resolve o caso inteiro. Se você for rodar o
+notebook, ponha a sua chave no ambiente e limpe as saídas antes de versionar.
+
 ---
 
 ## Quebre de propósito
 
 **1. Meça a densidade de texto.** Escreva um laço curto sobre as páginas do PDF com PyMuPDF
 imprimindo `len(page.get_text())`. É o classificador nativo/digitalizado da seção "Modelo
-mental", em cinco linhas. Rode nos PDFs de `../../90-Data/ComplexPDF/` — o caminho é relativo a `04-PDFFileLoading/`, onde a
-receita anterior deixou você — e veja a distribuição.
+mental", em cinco linhas. Rode nos PDFs de `../../90-Data/ComplexPDF/` — o caminho é relativo a
+`04-PDFFileLoading/`, onde a receita anterior deixou você — e veja a distribuição.
 
 **2. Troque `hi_res` pela estratégia rápida.** Em `05-LangChain-Unstrucured-PDF-SimpleDisplay.py`,
 mude `strategy="hi_res"` para `"fast"`. Cronometre os dois e compare a estrutura. Quanto de

@@ -124,8 +124,7 @@ avaliação acoplada — útil para medir se a janela está ajudando, e antecipa
 
 ## Parte 2 — Pai-filho: o parent-child de verdade
 
-`02-ParentChildTextChunkRetrieval.py` é o arquivo que resolve a confusão central desta aula, e o que
-fecha uma confusão que atravessou o curso.
+`02-ParentChildTextChunkRetrieval.py` é o arquivo que fecha a confusão que atravessou o curso.
 
 **Dois splitters, dois tamanhos** (linhas 22–23 e 28–29):
 
@@ -226,15 +225,23 @@ from llama_index.core.postprocessor import PrevNextNodePostprocessor, AutoPrevNe
 
 Dois pós-processadores, e a diferença entre eles é quem decide:
 
-- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está escrita, só para frente**. Determinístico, barato, previsível. A classe tem `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do script **não passa**. Então ela puxaria os 2 nós seguintes, não 2 de cada lado, se houvesse nós seguintes: com o
-  `chunk_size` padrão ela puxa **zero**, e a incoerência abaixo só fica demonstrável depois de você
-  reduzir o `chunk_size` da linha 16. **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas `# Should look backward` (linhas 59-60). A incoerência é do repositório: o script pede comportamento para trás e a chamada não o habilita. _Limite: conferido lendo a fonte de `llama-index-core` (0.12.15 e 0.14.24, texto idêntico nas duas); não executei._
+- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está
+  escrita, só para frente**. Determinístico, barato, previsível. A classe tem
+  `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse
+  modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do
+  script **não passa**. Com o `chunk_size` reduzido a 200, como a Parte 3 explica, isso está
+  **medido**: a partir do nó 3, `mode="next"` devolve `[3]`, e `mode="previous"` e `mode="both"`
+  devolvem `[1, 2, 3]`. Ou seja, ela puxa para frente e ali não há para onde ir. Com o
+  `chunk_size` padrão ela puxa **zero**, e é por isso que o efeito só aparece depois da troca.
+  **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas
+  `# Should look backward` (linhas 59-60). A incoerência é do repositório: o script pede
+  comportamento para trás e a chamada não o habilita.
 - **`AutoPrevNextNodePostprocessor`** — expansão **decidida por LLM**: o modelo avalia se vale
-  expandir e em qual direção. Adaptativo, e custa uma chamada de LLM **por nó recuperado** — o `_postprocess_nodes` tem um laço
-`for node in nodes` com a chamada dentro. No script isso dá uma por consulta só porque
-`similarity_top_k=1` (linha 46); com `k=6` seriam **pelo menos** seis: o que roda é um
-`response_synthesizer` em modo `COMPACT`, que faz uma chamada por nó enquanto o nó couber num
-prompt, e mais de uma quando não couber.
+  expandir e em qual direção. Adaptativo, e custa uma chamada de LLM **por nó recuperado**, porque o
+  `_postprocess_nodes` tem um laço `for node in nodes` com a chamada dentro. No script isso dá uma
+  por consulta só porque `similarity_top_k=1` (linha 46); com `k=6` seriam **pelo menos** seis, já
+  que o que roda é um `response_synthesizer` em modo `COMPACT`, que faz uma chamada por nó enquanto
+  o nó couber num prompt e mais de uma quando não couber.
 
 Note o `docstore=docstore`, e note também o que ele **não** é. A ordem em si mora nas
 `relationships` de cada nó, nos campos `PREVIOUS` e `NEXT` que o parser grava porque
@@ -291,7 +298,13 @@ se o LLM decide expandir.
 
 ## Quebre de propósito
 
-**1. Tente zerar a janela — e leia o erro.** No `01`, ponha `window_size=0`. **Não funciona, e é isso que se aprende:** o campo é declarado `window_size: int = Field(default=DEFAULT_WINDOW_SIZE, ..., gt=0)`, então o Pydantic levanta `ValidationError` na construção do parser, antes de indexar ou recuperar qualquer coisa. A biblioteca se recusa a montar uma janela vazia. Para de fato ver a degradação, use `window_size=1`, o mínimo permitido. _Limite: conferido na fonte de `llama-index-core`; não executei._ Com janela mínima você se aproxima do chunking de sentença puro — o
+**1. Tente zerar a janela — e leia o erro.** No `01`, ponha `window_size=0`. **Não funciona, e é
+isso que se aprende:** o campo é declarado
+`window_size: int = Field(default=DEFAULT_WINDOW_SIZE, ..., gt=0)`, então o Pydantic levanta
+`ValidationError` na construção do parser, antes de indexar ou recuperar qualquer coisa. Medido
+nos pins do curso: a mensagem é `Input should be greater than 0`, e `window_size=1` constrói. A
+biblioteca se recusa a montar uma janela vazia. Para de fato ver a degradação, use o mínimo
+permitido. Com janela mínima você se aproxima do chunking de sentença puro — o
 extremo "pequeno" da Aula 07, com embedding ótimo e contexto insuficiente. Faça uma pergunta que
 exija o entorno e veja a resposta ficar incompleta.
 
@@ -310,8 +323,8 @@ conscientemente. Se quiser manter as perguntas do script, troque o corpus por
 baixe o pai para algo que o corpus sustente, como 1500 contra 200 no filho. Se quiser o pai de 8000 de
 verdade, traga um texto seu de uns 30 mil caracteres, e aí troque também as perguntas das linhas
 74-77. O
-contexto entregue fica enorme; observe se a resposta melhora ou piora. Esse é o ponto onde _lost in the middle_ começa a
-cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
+contexto entregue fica enorme; observe se a resposta melhora ou piora. Esse é o ponto onde
+_lost in the middle_ começa a cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
 
 **4. Remova o docstore da expansão. Não funciona, e é isso que se aprende:** no `03`, apague o
 `docstore=docstore` da linha 40 e o Pydantic levanta `ValidationError` (campo obrigatório ausente) na
@@ -326,7 +339,8 @@ Medido no `llama-index-core` 0.12.15.
 **5. Compare os três na mesma pergunta, depois de unificar o corpus.** O `01` e o `02` usam o
 `game_knowledge`; o `03` usa um `game_story` narrativo e disjunto, então nenhuma pergunta é
 respondível pelos três como estão. Cole o `game_knowledge` no `03` e reduza o `chunk_size` da
-linha 16. Só então rode uma consulta pelas três estratégias e compare o contexto entregue. Não há vencedor universal; o exercício é perceber **qual formato de contexto**
+linha 16. Só então rode uma consulta pelas três estratégias e compare o contexto entregue. Não há
+vencedor universal; o exercício é perceber **qual formato de contexto**
 sua pergunta precisava.
 
 ---
