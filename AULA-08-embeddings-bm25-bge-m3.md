@@ -266,14 +266,15 @@ python 03-BM25.py
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
 **fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
 tem variável de consulta nenhuma. Ele calcula o **vetor esparso de cada documento**, com o IDF do
-próprio corpus. Pontuar uma consulta contra documentos é o que o repositório inteiro faz, em 67
-scripts que chamam retriever ou `search`. O que é raro é ver a **conta escrita à mão**, e isso
-aparece em outro lugar além deste: no
+próprio corpus. Pontuar uma consulta contra documentos é o que o repositório inteiro faz: **79** dos
+`.py` citam `retriever` ou `search` (`grep -rlE "retriever|search" --include=*.py .`). O que é raro é
+ver a **conta escrita à mão**, e pontuação de consulta aparece em outros dois lugares deste
+caminho: no
 `03-LangChain-BM25.py`, por biblioteca (`BM25Retriever`), e no `calculate_similarity()` de
-`07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145`, à mão — normalização L2 nas linhas
+`07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145`, esse sim à mão — normalização L2 nas linhas
 137-138 e `torch.mm` na 141, mas sobre vetores já reduzidos por mean pooling, não token a token. O
 que o `03-BM25.py` tem de particular é a fórmula clássica inteira — IDF, saturação por `k1` e
-normalização de comprimento por `b` — num só lugar. **Outro** algoritmo de ranking escrito à
+normalização de comprimento por `b` — num só lugar. Um **terceiro** algoritmo de ranking escrito à
 mão é o `reciprocal_rank_fusion` de
 `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` — mas ele refunde posições de listas já
 recuperadas, em vez de pontuar relevância; são estágios diferentes do pipeline. Leia a saída
@@ -331,13 +332,12 @@ linha 30 para `embedding[word] = score`.
 
 Feito isso, rode com `b=0.75` e com `b=0`, e compare o peso de `Flaming Fist` no **log 3** (11
 campos) com o do **log 1** (9 campos). Com `b=0.75` o log longo é penalizado; com `b=0` os dois
-recebem o mesmo `idf`. **Dentro** de um único log a mudança não diz nada, e é a mesma razão pela
-qual o `k1` não serve aqui: **E não espere sentir a saturação por `k1`:**
-neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
+recebem o mesmo `idf`. **Dentro** de um único log a mudança não diz nada, e pela mesma razão o
+`k1` também não serve aqui: neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
 frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
 `Flaming Fist.` são termos diferentes. Com a frequência sempre em 1, mudar `k1` reescala tudo por
 igual e a curva não aparece. Para vê-la, duplique um campo no **terceiro** log (`,Flaming Fist,`
-duas vezes, e é o terceiro porque é o que o `print` mostra) e só então varie `k1` entre 0.1 e 3.0:
+duas vezes, e é o terceiro porque é o mais longo, 11 campos, onde a duplicação também move o denominador de comprimento) e só então varie `k1` entre 0.1 e 3.0:
 a razão entre `Flaming Fist` e `summons` vai de 0,505 a 0,783. Ranking de verdade é no
 `03-LangChain-BM25.py`, que tem consulta.
 

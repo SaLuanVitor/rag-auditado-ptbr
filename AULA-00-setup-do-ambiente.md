@@ -136,12 +136,15 @@ um pacote compilado.
 deactivate
 .\.venv-langchain\Scripts\Activate.ps1
 pip install -r 91-Environment/requirements_langchain_NoGPU_Mac-Win.txt
-pip install langchain-ollama langchain-deepseek
+pip install langchain-ollama
 ```
 
 A segunda linha de instalação não é opcional, e é a mesma lacuna do Passo 6 noutra trilha: o
-`requirements_langchain_NoGPU_Mac-Win.txt` **não** traz `langchain-ollama` nem `langchain-deepseek`,
-e a Aula 03 usa os dois sem repetir instalação. Deixe este ambiente pronto agora.
+`requirements_langchain_NoGPU_Mac-Win.txt` **não** traz `langchain-ollama`, e a Aula 03 roda o
+`03_LangChain_LCEL_RAG_v3.py`, que importa `langchain_ollama` na linha 50. Do DeepSeek ele traz a
+distribuição `langchain-deepseek-official==0.1.0` (linha 103), que serve o mesmo módulo
+`langchain_deepseek`: não instale `langchain-deepseek` por cima dela neste venv. Deixe este
+ambiente pronto agora.
 
 Escolha o arquivo conforme sua máquina:
 
@@ -177,8 +180,9 @@ que é o **único** acréscimo comum aos dois — mais
 `llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos **sete** pacotes
 distintos, dois têm uso amplo e antecipado: o `python-dotenv`, que **83** arquivos importam, e o
 `langchain-deepseek`, importado por **15** — entre eles o
-`00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03. O
-o `langgraph-prebuilt` não é acréscimo de capacidade: o
+`00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03.
+
+O `langgraph-prebuilt` não é acréscimo de capacidade: o
 `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py:18` importa o **módulo** `langgraph.prebuilt`,
 que sob o `langgraph==0.2.69` da linha 110 já vem dentro do pacote base. A distribuição separada só
 existe porque o `Additional` sobe o `langgraph` para 0.3.18, versão que extraiu o subpacote, e você
