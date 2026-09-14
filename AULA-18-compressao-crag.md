@@ -50,8 +50,10 @@ Compressão trabalha **o que voltou**. Correção decide que **o que voltou não
 curso — refaz a busca, reformula a pergunta, ou vai buscar fora do acervo.
 
 Isso exige algo que nenhuma técnica anterior tinha: **um desvio condicional decidido depois da
-recuperação**. A Aula 14 já ramificava, mas antes de recuperar, com base só na pergunta. Aqui o
-grafo escolhe o que fazer depois de olhar o que voltou. Um pipeline linear vai da
+recuperação**. A Aula 14 decidia com base só na pergunta, e em nenhum dos dois exemplos dela a
+decisão ramificava uma recuperação: o rótulo do roteador lógico não é consumido, e o semântico
+escolhe prompt no estágio de geração. Aqui o grafo escolhe o que fazer depois de olhar o que
+voltou. Um pipeline linear vai da
 recuperação à geração e termina. Correção precisa fazer outra coisa antes de gerar.
 
 ---

@@ -1,6 +1,6 @@
 # AULA 14 — Query routing lógico e semântico
 
-**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/03-QueryRouting/` (2 arquivos)
+**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/03-QueryRouting/` (3 arquivos, contando o `.env.example`)
 
 ---
 
@@ -75,6 +75,14 @@ class RouteQuery(BaseModel):
 E as duas funções que organizam: `create_router()` (linha 19) e `route_question(question)`
 (linha 36).
 
+**Duas ressalvas que o exemplo não anuncia.** A primeira é a que mais importa: **nada a jusante
+consome o rótulo.** `route_question` devolve uma string (linha 40) e o `__main__` a imprime
+(linha 48). O arquivo demonstra a decisão, não o desvio: o eixo está declarado, não exercido, e é
+a Aula 25 que registra isso. Quem exerce o desvio de fonte de verdade é o
+`02-LangChain-AdaptiveRAG.py` da Aula 26. A segunda é de custo: `route_question` chama
+`create_router()` a cada pergunta (linha 38), remontando o modelo, o `with_structured_output` e o
+`ChatPromptTemplate` por consulta. Em produção isso se constrói uma vez.
+
 Três coisas para notar:
 
 **1. `Literal` declara o espaço de saída — e o Pydantic recusa o que sair dele.** As rotas válidas
@@ -87,19 +95,25 @@ que "não é garantia". Garantia de estrutura só existe no grau 4b (`json_schem
 `bind_tools`, `response_format` e Pydantic; o `with_structured_output` em si reaparece nas Aulas
 18, 21 e 26.)
 
-**2. O `Field` é onde vive o prompt.** A descrição do campo é o que o modelo lê para decidir. Ela
-não é documentação — é instrução, exatamente como o `AttributeInfo` do self-query da Aula 12.
+**2. O `Field` é uma das três superfícies de prompt.** A descrição do campo é instrução, não
+documentação, exatamente como o `AttributeInfo` do self-query da Aula 12. Mas ela não está
+sozinha: a docstring da classe (linha 13) vira a `description` da tool, e a mensagem `system`
+(linhas 26-27) é a mais específica das três, porque é a única que diz **por qual critério** rotear.
 Descrição vaga produz roteamento errado, e o sintoma aparece longe da causa.
 
 **3. É testável.** Dado que a saída é um de três rótulos, você pode escrever um teste: pergunta X
-deve rotear para `python_docs`. Isso é raro no resto do pipeline RAG e é, **julgamento**, a vantagem prática mais subestimada do
+deve rotear para `python_docs`. E é a linha 22 que torna isso possível: o `temperature=0` do
+`ChatDeepSeek` fixa a decodificação. Sem ela o mesmo teste dá respostas diferentes, que é a
+armadilha nomeada na Aula 19. Isso é raro no resto do pipeline RAG e é, **julgamento**, a vantagem prática mais subestimada do
 roteamento lógico: **você consegue medir o roteador separadamente do retriever**, o que evita
 atribuir ao índice uma falha que foi de rota.
 
 O exemplo usa três rotas de documentação de linguagens. A generalização óbvia: no seu sistema as
 rotas seriam `fiscal`, `juridico`, `suporte` — ou `sql`, `vetorial`, `grafo`, generalizando os três
 alvos de tradução da Aula 12 (SQL, Cypher e filtro de metadado) para uma decisão de rota. A Aula 12
-não usa a palavra "roteamento" em nenhum ponto: a ponte entre as duas aulas é minha, não dela.
+encaminha explicitamente o recorte temporal para cá, classificando-o como roteamento lógico
+(`AULA-12:244-246`); o resto da ponte, a generalização dos três alvos de tradução para uma decisão
+de rota, é minha.
 
 ---
 
@@ -137,18 +151,18 @@ Note que as rotas são `combat_template` e `story_template` — **dois prompts d
 índices. Isso é importante e é fácil passar batido: o roteamento semântico aqui escolhe **como
 perguntar ao LLM**, não **onde buscar**.
 
-É um uso legítimo e distinto: uma pergunta sobre mecânica de combate merece um prompt com
-instruções diferentes de uma pergunta sobre narrativa. Roteamento de prompt é a mesma técnica
-aplicada ao estágio de geração — e reaparece em `08-Generation/02-.../04-SelectAppropriatePromptTemplateViaRouting.py`,
-que é a Aula 19.
+É um uso legítimo e distinto: uma pergunta sobre mecânica de combate merece um prompt com instruções
+diferentes de uma pergunta sobre narrativa. Roteamento de prompt é a mesma técnica aplicada ao
+estágio de geração — e reaparece em
+`08-Generation/02-.../04-SelectAppropriatePromptTemplateViaRouting.py`, que é a Aula 19.
 
 ### Onde o semântico falha
 
 O `argmax` sem limiar é o ponto frágil, e vale enumerar os casos:
 
 - **Negação e polaridade.** "documentos que **não** são fiscais" fica próximo da rota fiscal,
-  porque o espaço vetorial captura assunto e não polaridade. A Aula 02 já mostrou isso medindo
-  cosseno entre uma frase e sua negação.
+  porque o espaço vetorial captura assunto e não polaridade. A Aula 02 já montou o par, uma frase e
+  a sua negação, para você medir o cosseno entre as duas.
 - **Condição estrutural.** "quantos" contra "quais" decide entre agregação SQL e recuperação de
   trecho — e as duas perguntas são semanticamente vizinhas.
 - **Rotas com assunto sobreposto.** "jurídico" e "compliance" têm descrições próximas; o roteador
@@ -194,13 +208,26 @@ cd RAG-from-First-Principles/05-PreRetrieval/03-QueryRouting
 python 01-LogicalRouting.py
 ```
 
+São **duas chaves de provedores diferentes**, e o `.env.example` do módulo declara qual é de quem:
+o `01` usa DeepSeek e o `02` usa OpenAI. O `01` ainda importa `langchain_deepseek`, cuja
+distribuição a Aula 12 manda instalar e esta não mencionava.
+
 Teste com perguntas de três tipos: uma claramente de uma rota, uma ambígua entre duas, e uma que
 não pertence a nenhuma das três. Observe o que acontece no terceiro caso — e note que o `Literal`
-**não** garante nada. Há dois desfechos possíveis, ruins de formas diferentes: o modelo espreme a
-pergunta numa das três rotas, roteando errado em silêncio, ou tenta sair do schema e a chamada
-estoura em exceção de validação do Pydantic. **Qual dos dois é mais frequente eu não medi** — rodar
-exige chave de API. Registre o que aconteceu no seu caso, porque é isso que decide se você precisa de
-uma rota de fallback ou de um tratamento de exceção.
+**não** garante nada. Há **três** desfechos possíveis, ruins de formas diferentes, e os três foram
+reproduzidos com um duplo de teste, sem rede e sem chave:
+
+1. O modelo espreme a pergunta numa das três rotas, roteando errado em silêncio.
+2. Ele tenta sair do schema e o Pydantic recusa com `ValidationError`, tanto para valor fora do
+   `Literal` quanto para campo ausente.
+3. **Ele não chama a tool de jeito nenhum**, responde em prosa, o `with_structured_output` devolve
+   `None` em silêncio, e `01-LogicalRouting.py:40` estoura `AttributeError` sobre um `NoneType`.
+
+O terceiro é o mais insidioso, e é o mais provável justamente para uma pergunta fora de escopo, que
+o modelo sabe responder de cabeça: a mensagem de erro não menciona rota nenhuma. **Qual dos três é
+mais frequente na prática eu não medi**, porque isso exige chave de API. Registre o que aconteceu
+no seu caso, porque é isso que decide se você precisa de uma rota de fallback, de um tratamento de
+exceção, ou de um teste do resultado nulo antes de `01-LogicalRouting.py:40`.
 
 ```powershell
 python 02-SemanticRouting.py
@@ -209,7 +236,10 @@ python 02-SemanticRouting.py
 Imprima o vetor de similaridades antes do `argmax`. Ver os números lado a lado é o que revela
 quando a decisão foi confortável e quando foi um empate técnico — algo como 0,82 contra 0,31 no
 primeiro caso e 0,54 contra 0,52 no segundo (números ilustrativos: rodar isto exige chave de API, e
-eu não rodei) — e a segunda situação é a que precisa de limiar.
+eu não rodei) — e a segunda situação é a que precisa de limiar. **Não leve a faixa absoluta a
+sério**: ela depende do modelo de embedding, e a Aula 02 avisa que cosseno de modelos diferentes
+não se compara. O que decide aqui é a distância entre o primeiro e o segundo, não o valor de
+nenhum dos dois.
 
 Depois compare os dois na **mesma pergunta ambígua**. O lógico devolve um rótulo com aparência de
 certeza; o semântico devolve um argmax que você pode inspecionar. Essa diferença de
@@ -220,13 +250,16 @@ observabilidade é, **julgamento**, um argumento a favor do semântico que raram
 ## Quebre de propósito
 
 **1. Piore a descrição do `Field`.** No `01-LogicalRouting.py`, troque a descrição do campo
-`datasource` por algo vago ("a fonte de dados"). Repita as mesmas perguntas. A degradação mostra
-que aquele texto é prompt, não comentário.
+`datasource` por algo vago ("a fonte de dados"). Repita as mesmas perguntas. Se a degradação não
+aparecer, não conclua que o texto era decorativo: as outras duas superfícies de prompt continuam
+lá, e a mensagem `system` das linhas 26-27 sozinha já especifica a tarefa. Degrade as três, uma de
+cada vez, e compare. É a comparação que mostra que aquele texto é prompt, não comentário.
 
 **2. Pergunte fora do escopo ao roteador lógico.** "Qual a capital da França?" Com três rotas de
 documentação de linguagens, o `Literal` não abre uma quarta opção — mas também não obriga o modelo
-a nada: ou ele espreme a pergunta numa das três, ou tenta fugir do schema e o Pydantic recusa.
-Observe qual dos dois acontece — e conclua que **falta uma rota de fallback**.
+a nada: ou ele espreme a pergunta numa das três, ou tenta fugir do schema e o Pydantic recusa, ou
+não chama a tool e o resultado volta nulo. Observe qual dos três acontece — e conclua que falta
+**uma rota de fallback e um teste do resultado nulo antes de `01-LogicalRouting.py:40`**.
 
 **3. Roteie uma negação no semântico.** Pergunte algo com "não" e observe o argmax. A rota
 escolhida tende a ser a do assunto negado. É a Aula 02 cobrando de novo, agora no roteador.
