@@ -1,6 +1,6 @@
 # AULA 17 — Reranking: RRF, cross-encoder, ColBERT, Cohere, RankLLM e recência
 
-**Fase 6 — Pós-recuperação** · Módulo do repo: `07-PostRetrieval/01-Reranking/` (6 arquivos)
+**Fase 6 — Pós-recuperação** · Módulo do repo: `07-PostRetrieval/01-Reranking/` (7 arquivos: 6 scripts, mais o `.env.example`)
 
 ---
 
@@ -27,8 +27,9 @@ acervo  →  [retriever: barato, k=20]  →  [reranker: caro, k=20→5]  →  LL
            bi-encoder, índice ANN         cross-encoder ou LLM
 ```
 
-O desenho de dois estágios existe por duas restrições, que esta aula estabelece agora — a Aula 08
-apresentou bi-encoder e cross-encoder, mas não tratou de indexabilidade:
+O desenho de dois estágios existe por duas restrições, que esta aula estabelece agora. O par
+bi-encoder e cross-encoder está definido no `GLOSSARIO.md`, e a Aula 08 o usa, mas nenhum dos dois
+trata de indexabilidade:
 
 - **Bi-encoder é indexável, cross-encoder não.** Não há vetor de documento para guardar
   num cross-encoder — ele julga pares. Logo, N forward passes por query, impossível no acervo
@@ -109,15 +110,25 @@ convenção usada logo abaixo. (Pela outra convenção, sobre o escore do segund
 você usa antes de comparar os dois casos.) Com `k` pequeno — digamos 1 — o 1º valeria 1,0 e o 2º
 0,5: uma diferença de 50%.
 
+E note de onde vêm as "várias listas" deste arquivo: das linhas 158-178, que pedem ao LLM quatro
+consultas de ângulos diferentes, e das 207-211, que recuperam para cada uma. **É a decomposição de
+query da Aula 13**, e o RRF é a metade que falta a ela: unir N subconsultas devolve até N×k trechos
+deduplicados e não ordenados. A Aula 13 manda as duas como par, e este arquivo é o par montado.
+
 Isso é uma **aposta deliberada**: com `k=60`, um único retriever muito confiante não domina a
 fusão. **Concordância entre listas passa a valer mais que convicção de uma só.** É o que torna o
-RRF robusto — e é também o que ele perde.
+RRF robusto, e é também o que ele perde.
+
+Uma precisão sobre o papel do `k`, porque é fácil creditar a ele o que a soma já faz: com as quatro
+listas que este arquivo gera, um documento em 2º lugar em todas vence um 1º de uma lista só **mesmo
+com `k=1`**, por 2,0 contra 1,0. O que o `k=60` muda é a margem, que cai para 0,0656 contra
+0,0167. Ele amplia a propriedade; quem a cria é somar sobre as listas.
 
 ### Por que RRF dispensa scores comparáveis
 
-O score de um documento é a **soma** de `1/(rank+k)` sobre todas as listas em que ele aparece —
-é isso que o `+=` de
-`07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:141` faz. Só a **posição** entra na conta.
+O score de um documento é a **soma** de `1/(rank+k)` sobre todas as listas em que ele aparece — é
+isso que o `+=` de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:141` faz. Só a **posição**
+entra na conta.
 
 Consequência: não importa que uma lista traga cosseno em [0,1], outra BM25 numa escala ilimitada, e
 uma terceira distância L2 onde menor é melhor. Todas são reduzidas a "1º, 2º, 3º".
@@ -184,6 +195,11 @@ levantou sobre o LlamaParse.
 Note a combinação com BM25: recuperar com esparso e reordenar com um reranker neural é um pipeline
 comum e barato — o esparso é rápido e inspecionável, o reranker corrige a ordem.
 
+**Com a mesma ressalva do `02` e do `03`, e ela é estrutural.** São três `Document` literais, um
+`retriever.k = 3` na linha 82 e um `CohereRerank` sem `top_n`, cujo default é 3. Entram três, saem
+três: você vê a chamada de API, não o estreitamento. É a mesma degeneração que a Aula 18 registra
+no arquivo gêmeo deste, no módulo dela.
+
 ### RankLLM — o próprio LLM ordenando
 
 `05-RankLLM-Reranking.py` importa `RankLLMRerank` de
@@ -192,13 +208,21 @@ comum e barato — o esparso é rápido e inspecionável, o reranker corrige a o
 Aqui o reranker é um LLM: ele recebe a query e a lista de documentos e **devolve a ordem**. Não há
 score por par; há uma permutação.
 
-Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é, **julgamento**, o mais caro e o
-mais lento dos cinco, e é **não determinístico** — a mesma lista pode sair ordenada diferente.
+**E note o que só este arquivo tem:** `search_kwargs={"k": 20}` na linha 75 e `top_n=3` na 101, que
+é o desenho de dois estágios do diagrama lá de cima, montado. Com uma ressalva medida: o
+`yungang_grottoes.txt` cortado em 500/100 rende **13** chunks, menos que os 20 pedidos, então o
+`k=20` não restringe nada. O estreitamento real é de 13 para 3.
+
+Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é o mais caro e o mais
+lento dos cinco, e é **não determinístico**, a mesma lista pode sair ordenada diferente.
 Julgamento: reservaria para top-k pequeno em domínio onde a ordem importa muito, e mediria contra o
 cross-encoder antes de assumir que compensa.
 
 Note o pacote: `document_compressors`. No LangChain, reranking e compressão são a mesma
-abstração — um compressor recebe documentos e devolve menos ou reordenados. Isso antecipa a Aula 18.
+abstração: um compressor recebe uma lista de documentos e devolve outra, com **menos documentos, em
+outra ordem, ou com o texto de cada um encurtado**. O `RankLLMRerank` faz as duas primeiras; o
+`LLMChainExtractor`, do mesmo pacote, reescreve o `page_content`. Isso antecipa a Aula 18, que
+trabalha as três.
 
 ---
 
@@ -272,8 +296,9 @@ cd RAG-from-First-Principles/07-PostRetrieval/01-Reranking
 python 01-RRF-Reranking.py
 ```
 
-Comece aqui e leia a função de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` junto com a saída. Depois **calcule à mão** os scores das
-três primeiras posições com `k=60` e confira com o que o script imprime.
+Comece aqui e leia a função de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` junto com a
+saída. Depois **calcule à mão** os scores das três primeiras posições com `k=60` e confira com o que
+o script imprime.
 
 ```powershell
 python 02-CrossEncoder-Reranking.py
@@ -292,18 +317,28 @@ python 05-RankLLM-Reranking.py
 python 06-RecencyWeightedReranking.py
 ```
 
-O `04` exige chave da Cohere. No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem **1,0000, sempre**, e vale
-entender por quê antes de tentar consertá-lo. O retriever reescreve o `last_accessed_at` para o
-instante da consulta nos documentos que devolve — o `_get_rescored_docs` faz isso **antes** do
-`return` —, e a linha 148 calcula o tempo decorrido contra esse valor recém-gravado: dá zero. Junte o
-`k_value = 1` da linha 74, que faz "para cada documento" ser um documento, e a similaridade do vetor,
-que nunca sai de `_get_combined_score` e portanto não está disponível para imprimir ao lado.
+**Três provedores, e o `.env.example` do módulo lista os três.** O `01`, por onde a linha acima
+manda começar, exige `DEEPSEEK_API_KEY`; o `04` exige a da Cohere, na variável `CO_API_KEY`, que
+segue o nome do SDK e não o padrão das outras; o `05` e o `06` exigem `OPENAI_API_KEY`. O `05` pede
+ainda o pacote `rank_llm`, que puxa `torch`.
+
+No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem **1,0000, sempre**, e vale
+entender por quê antes de tentar consertá-lo. **Quatro fórmulas circulam neste arquivo e só uma
+ordena:** o docstring da linha 26 e o `print` da linha 78 anunciam decaimento exponencial e nenhum
+dos dois executa, são texto; a linha 150 calcula um decaimento hiperbólico, rotulado _"Simplified
+decay calculation"_, que só alimenta outro `print`; e quem ordena é `(1.0 - decay_rate) **
+hours_passed`, dentro da biblioteca. Com `decay_rate=0.5` isso é perda de **50%** por hora, não os
+"about 39%" que a linha 79 promete. O retriever reescreve o `last_accessed_at` para o instante da
+consulta nos documentos que devolve — o `_get_rescored_docs` faz isso **antes** do `return` —, e a
+linha 148 calcula o tempo decorrido contra esse valor recém-gravado: dá zero. Junte o `k_value = 1`
+da linha 74, que faz "para cada documento" ser um documento, e a similaridade do vetor, que nunca
+sai de `_get_combined_score` e portanto não está disponível para imprimir ao lado.
 
 Para ver os dois números de fato, leia o estado **antes** da consulta: percorra o `memory_stream` do
 retriever calculando as horas desde o `last_accessed_at` de cada documento, e chame o
 `similarity_search_with_relevance_scores` do vetorstore à parte. Aí sim o decaimento e a relevância
 aparecem lado a lado, e você vê que é a **soma** dos dois que ordena — não o produto que o docstring
-do arquivo, nas linhas 25-26, diz ser a fórmula. Ver os dois juntos é o que torna a combinação
+de `06-RecencyWeightedReranking.py:25-26` diz ser a fórmula. Ver os dois juntos é o que torna a combinação
 compreensível; o arquivo documenta uma coisa e executa outra.
 
 ---
@@ -336,7 +371,9 @@ de dentro da biblioteca; a linha 150 só calcula um número que é impresso depo
 `decay_rate` (`07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:73`, valor `0.5`), que é o que
 `07-PostRetrieval/01-Reranking/06-RecencyWeightedReranking.py:83` entrega ao
 `TimeWeightedVectorStoreRetriever` **antes** da busca — desça para `0.01` e suba para `0.9`,
-comparando as duas ordens. **Não passe de `1.0`:** nesta biblioteca o parâmetro é a fração de peso
+comparando as duas ordens. **Suba antes o `k` do retriever (linha 74) de 1 para 2**, senão você
+compara duas listas de um item e não vê ordem nenhuma: o `k_value = 1` está registrado na própria
+lista de armadilhas desta seção. **Não passe de `1.0`:** nesta biblioteca o parâmetro é a fração de peso
 perdida por hora, e o escore é `(1.0 - decay_rate) ** hours_passed`. Com `50.0` a base fica negativa,
 a potência fracionária devolve um número **complexo** e a ordenação estoura com `TypeError: '<' not
 supported between instances of 'complex' and 'complex'` — sem uma palavra sobre tempo ou decaimento
@@ -378,9 +415,12 @@ observou o não determinismo — e o problema que ele cria para comparar configu
 6. Cite as três fragilidades de normalizar e somar em vez de usar RRF.
 7. O `03-CoBERT-Reranking.py` entrega ColBERT em qualidade de produção? O que ele demonstra?
 8. Onde late interaction se situa entre bi-encoder e cross-encoder, e a que custo?
-9. O que o pacote `document_compressors` do RankLLM sugere sobre reranking e compressão?
+9. O pacote `document_compressors` abriga três operações sobre uma lista de documentos. Quais são,
+   e o que isso diz sobre a fronteira entre reranking e compressão?
 10. Por que somar similaridade e idade diretamente está errado? Cite as três razões.
-11. Qual a diferença entre recência de publicação e `time_since_last_access`?
+11. Qual a diferença entre recência de publicação e a recência que o
+    `TimeWeightedVectorStoreRetriever` mede pelo `last_accessed_at`? (E por que o
+    `time_since_last_access` do docstring não é o nome que o código usa?)
 12. Se o documento certo não está no top-k do retriever, o reranking resolve?
 
 ---
