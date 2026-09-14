@@ -2528,3 +2528,44 @@ O auditor da AULA-26 pediu trocar "as vinte e cinco anteriores" por "vinte e sei
 para consertar uma que estava certa.
 
 **47 consertos aplicados**, mais uma citação minha que ancorou no arquivo errado e foi corrigida.
+
+---
+
+## Oitava rodada, nas quatro que reprovavam o portão
+
+Rodada feita com o ambiente de medição reconstruído, e a diferença aparece nos relatórios: os
+auditores mediram `ResponseMode`, `DEFAULT_RECURSION_LIMIT`, `SentenceSplitter` e `BM25Retriever`
+em vez de os inferir. Na sétima rodada, três auditores declararam `NÃO_EXECUTADO` nesse eixo.
+
+| Aula | R7 | R8 | O que a rodada achou |
+|---|---|---|---|
+| [00](../AULA-00-setup-do-ambiente.md) | 3/12 | **8**/12 | O maior salto do curso. Sobrou que o caminho recomendado não chega à Aula 03: o venv do LangChain ficava sem `langchain-ollama`. |
+| [25](../AULA-25-modular-rag.md) | 2/12 | **6**/12 | O eixo do paper ficou limpo e o exercício reproduz ao literal. Sobrou ponto cego no eixo do repositório: a aula nunca abrira o grafo de `04-AgenticRAG/`. |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | 4/12 | **6**/12 | **Classe nova: o exercício substituto herdou o defeito do substituído.** O `b` não mostra nada dentro de um log, pela mesma razão que o `k1` não mostrava. |
+| [24](../AULA-24-contextual-retrieval.md) | 2/12 | **6**/12 | Remedida depois dos consertos. O Ato 4 era o único ato sem conserto: a aula provava que o reranking não pode aparecer na métrica e o exercício 5 prometia o contrário. |
+
+**Soma das quatro: 13/48 → 26/48.** As quatro estavam abaixo do portão e nenhuma está mais.
+
+### O portão do "abaixo de 50%" cai pela primeira vez
+
+Contando as 29 pela medição mais recente de cada aula: **nenhuma abaixo de 6/12.** É o primeiro
+estado do projeto em que esse critério passa.
+
+**O que isso não significa.** O percentual do curso continua sendo o da sexta rodada, porque 21
+aulas nunca foram remedidas com o instrumento atual. E o segundo critério eliminatório, o de no
+máximo uma nota `−1`, **não é contável a partir deste GATE**: as rodadas recentes registram só o
+total por aula, e as antigas misturam nota de dimensão com coluna de delta. Fica como pendência
+de medição, e ela pode reprovar por conta própria.
+
+### O que a rodada mediu sobre o método, e é o mais caro
+
+**Três das quatro notas da S1 mediram um estado que os consertos seguintes já mudaram.** Só a
+AULA-24 foi remedida depois de consertada. As outras três carregam nota de antes de 46 consertos
+aplicados sobre elas, então provavelmente estão subestimadas, e isso é um defeito de sequência
+que a próxima rodada deve evitar: remedir sempre depois de aplicar, nunca antes.
+
+**Taxa de defeito próprio, três medições nesta rodada:** 26% (19 blocos), 32% (19 blocos), e a
+verificação da AULA-24 achou 7 achados em 12 blocos. A média da sessão sobe para cerca de 33%.
+
+**A cauda que cola apareceu sete vezes.** A trava de casamento único abortou em todas, sem
+escrever nada. Ela agora vive em `ferramentas/lock.js`, com suíte própria.
