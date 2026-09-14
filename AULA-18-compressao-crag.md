@@ -92,8 +92,9 @@ custo da compressão é por query. A ingestão tem o dela: o `03` embute o acerv
 `02-Compression/02-LLMLingua-Compression.py` chama `llm_lingua.compress_prompt(...)` — compressão no
 nível da string, que remove tokens de baixa informação do prompt.
 
-⚠️ **Uma observação que só aparece lendo o arquivo:** na linha 33 (e de novo na 92), o parâmetro `question=""` está
-**vazio**. Isso significa que, nesta demonstração, a compressão **não está condicionada à
+⚠️ **Uma observação que só aparece lendo o arquivo:** na linha 33 (e de novo na 92), o parâmetro
+`question=""` está **vazio**. Isso significa que, nesta demonstração, a compressão **não está
+condicionada à
 pergunta** — ela reduz o prompt por densidade de informação geral, não por relevância para a query
 específica.
 
@@ -108,8 +109,8 @@ padrão que atravessa este repositório.
 
 ## Parte 3 — Otimização por embedding de sentença
 
-`02-Compression/03-SentenceEmbeddingOptimizer-Compression.py` é, **julgamento**, o mais didático do trio, porque
-mostra o **mesmo mecanismo com dois critérios de corte** (linhas 13 e 18):
+`02-Compression/03-SentenceEmbeddingOptimizer-Compression.py` é, **julgamento**, o mais didático do
+trio, porque mostra o **mesmo mecanismo com dois critérios de corte** (linhas 13 e 18):
 
 ```python
 query_engine = index.as_query_engine(node_postprocessors=[SentenceEmbeddingOptimizer(percentile_cutoff=0.5)])
@@ -144,11 +145,12 @@ O percentil elege **cerca de** metade como âncora, mesmo quando todas eram rele
 `0`, que a implementação trata como _sem limite_ (o teste é `if similarity_top_k and …`, e zero é
 falsy). Chunk curto passa inteiro.
 
-O limiar é o mais arriscado das três configurações que este arquivo roda (**julgamento**), mas não pelo motivo que se espera: se nenhuma
-sentença atinge 0,7, o resultado **não** é chunk vazio chegando ao LLM — é
-`ValueError("Optimizer returned zero sentences.")`, levantado antes de qualquer geração. A falha é
-alta e barulhenta, o que é melhor que silenciosa; o risco real é a consulta quebrar em produção para
-um documento cujo vocabulário se afasta do da pergunta, e você não saber disso até acontecer.
+O limiar é o mais arriscado das três configurações que este arquivo roda (**julgamento**), mas não
+pelo motivo que se espera: se nenhuma sentença atinge 0,7, o resultado **não** é chunk vazio
+chegando ao LLM — é `ValueError("Optimizer returned zero sentences.")`, levantado antes de qualquer
+geração. A falha é alta e barulhenta, o que é melhor que silenciosa; o risco real é a consulta
+quebrar em produção para um documento cujo vocabulário se afasta do da pergunta, e você não saber
+disso até acontecer.
 
 _Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
 `llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.12.15; não executei._
@@ -204,8 +206,8 @@ estado que a Aula 22 vai mostrar ser invisível em faithfulness.
 ### O que o CRAG faz com o veredito
 
 O arquivo carrega o acervo com `WebBaseLoader`, `RecursiveCharacterTextSplitter`, `Chroma` e
-`OpenAIEmbeddings` (imports em 24–27, execução em 43–63), e sobre isso monta o grafo. A lógica do paper CRAG, em três
-saídas possíveis:
+`OpenAIEmbeddings` (imports em 24–27, execução em 43–63), e sobre isso monta o grafo. A lógica do
+paper CRAG, em três saídas possíveis:
 
 | Veredito dos documentos | Ação                                             |
 | ----------------------- | ------------------------------------------------ |
@@ -216,8 +218,8 @@ saídas possíveis:
 > ⚠️ **A terceira linha é do paper, não deste arquivo.** O `grade_documents` de
 > `01-CRAG-ReflectiveRetrieval.py:296-321` só produz
 > **dois** resultados possíveis — e quem roteia com base neles é `decide_to_generate` (`:383-411`),
-> passada como função de decisão em `add_conditional_edges` (441-448): zero documentos aprovados → busca na web; um ou mais aprovados → gera
-> direto com os que sobraram. Não existe caminho que "complemente o resto" — o ambíguo desaparece
+> passada como função de decisão em `add_conditional_edges` (441-448): zero documentos aprovados →
+> busca na web; um ou mais aprovados → gera direto com os que sobraram. Não existe caminho que "complemente o resto" — o ambíguo desaparece
 > dentro do ramo "relevantes", e o que foi reprovado é simplesmente descartado. Ao ler o código,
 > espere duas saídas.
 
@@ -286,19 +288,21 @@ que este corpus para de quebrar. Esse valor é propriedade do corpus, não da t�
 
 **2. Comprima depois de já ter reranqueado bem — e não no `01`.** O corpus do `01` são três
 `Document` escritos no próprio arquivo, com `retriever.k = 3`: "recupere 20, rerank para 3" não é
-alcançável ali, e rerankear três para três não descarta nada, então a comparação com "só o rerank" é
-idêntica por construção. Faça o exercício sobre o corpus do `03`, que carrega o acervo de turismo
-inteiro: monte um motor com `similarity_top_k=20`, ponha um `LLMRerank` (de `llama_index.core.postprocessor`, que já vem no `llama-index-core`) como primeiro
-`node_postprocessor` e o `SentenceEmbeddingOptimizer` como segundo, e compare com o mesmo motor sem o
-otimizador. Se a resposta não melhorar, você acabou de medir que a
+alcançável ali, e rerankear três para três não descarta nada, então a comparação com "só o rerank"
+é idêntica por construção. Faça o exercício sobre o corpus do `03`, que carrega o acervo de turismo
+inteiro: monte um motor com `similarity_top_k=20`, ponha um `LLMRerank` (de
+`llama_index.core.postprocessor`, que já vem no `llama-index-core`) como primeiro
+`node_postprocessor` e o `SentenceEmbeddingOptimizer` como segundo, e compare com o mesmo motor
+sem o otimizador. Se a resposta não melhorar, você acabou de medir que a
 compressão era desnecessária ali, e a ordem que esta aula propôs se justifica.
 
 **3. Force o grader do CRAG a reprovar tudo.** Faça uma pergunta sobre assunto ausente do acervo.
 Observe o caminho que o grafo toma quando nenhum documento é aprovado. Esse é o comportamento
 corretivo em ação.
 
-**4. Torne o critério do grader rigoroso.** Mude o prompt de `01-CRAG-ReflectiveRetrieval.py:97` para exigir que o documento
-**responda** à pergunta, não apenas se relacione. Mais documentos serão reprovados. O sistema passa
+**4. Torne o critério do grader rigoroso.** Mude o prompt de
+`01-CRAG-ReflectiveRetrieval.py:97` para exigir que o documento **responda** à pergunta, não apenas
+se relacione. Mais documentos serão reprovados. O sistema passa
 a buscar fora com mais frequência — mais custo, possivelmente mais qualidade. Onde está o ponto
 certo?
 
@@ -357,7 +361,8 @@ diferença entre parecer bem e estar certo.
 6. O que o `ContextualCompressionRetriever` com `CohereRerank` como `base_compressor` revela sobre a
    abstração do LangChain?
 7. O que significa `question=""` no exemplo de LLMLingua, e por que isso muda a leitura da técnica?
-8. Diferencie `percentile_cutoff` de `threshold_cutoff`. Qual pode derrubar a consulta, com que exceção, e em que ponto do pipeline?
+8. Diferencie `percentile_cutoff` de `threshold_cutoff`. Qual pode derrubar a consulta, com que
+   exceção, e em que ponto do pipeline?
 9. Qual é o componente central do CRAG, e o que `with_structured_output(GradeDocuments)` garante?
 10. Por que o critério do grader é deliberadamente generoso?
 11. O paper do CRAG prevê três saídas conforme o veredito. Quantas o `grade_documents` de
@@ -379,4 +384,5 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Próxima:** [AULA 19 — Escolha de modelo e prompt engineering para RAG](AULA-19-modelo-e-prompt-engineering.md)
 
 > **Fase 6 concluída.** As Aulas 17 e 18 cobrem `07-PostRetrieval/`: reordenar, remover e corrigir.
-> O CRAG introduziu a **ramificação condicional** — e a Fase 7 vai levá-la ao ciclo de fato, para que o modelo critique a própria resposta.
+> O CRAG introduziu a **ramificação condicional** — e a Fase 7 vai levá-la ao ciclo de fato, para
+> que o modelo critique a própria resposta.

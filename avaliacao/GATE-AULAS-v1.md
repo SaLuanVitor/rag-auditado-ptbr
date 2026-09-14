@@ -2734,3 +2734,53 @@ que nada aqui registre.
 **A correção é de procedimento e vale da próxima medição em diante:** ao aplicar uma rodada,
 gravar as seis dimensões, não só a soma. Sem isso o critério continua incontável por mais 29
 aulas, e o custo de recuperá-lo é remedir tudo.
+
+## Oitava rodada, lote 3: as duas menos tocadas, e a hipótese se confirma
+
+O lote 3 foi montado como teste, não como auditoria a mais. Critério de seleção: as aulas
+**menos tocadas** desde a sexta rodada, porque o lote 2 tinha sugerido que nota alta media,
+em parte, que ninguém tinha olhado fundo. Previsão declarada antes de ver o resultado: as
+duas caem, e a 18 cai mais.
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [01](../AULA-01-o-que-e-rag.md) | 8/12 | **5**/12 | 1 | 0 | 1 | 0 | 2 | 1 | O exercício violava o critério que a própria aula enuncia: ela diz que sem resposta conhecida não se otimiza, e pedia pergunta, localização, classificação e filtro, nunca a resposta. Duas aulas a jusante pagavam a conta. Mais a tabela de estágios com `06-Indexing` antes de `05-PreRetrieval`, contra o livro, o clone e as Fases 4 e 5 do próprio curso. |
+| [18](../AULA-18-compressao-crag.md) | 12/12 | **5**/12 | 1 | 0 | 2 | 0 | 1 | 1 | O mecanismo central da Parte 3 estava invertido. O `SentenceEmbeddingOptimizer` devolve cada sentença eleita com uma vizinha de cada lado, porque `context_before` e `context_after` são fixados em 1 quando chegam `None`. Medido: 123 caracteres entram, **162 saem**. Um objeto chamado `Optimizer` que, no default, engorda a entrada. |
+
+**As duas previsões acertaram**, e é a primeira vez na sessão que uma previsão declarada
+sobre queda acerta em cheio nas duas pontas. A 18 caiu 7 pontos, a queda mais funda do curso,
+e ela tinha a nota máxima.
+
+**O que a 18 ensina sobre o que "12/12" significava.** Ela declarava `não executei` em três
+lugares, honestamente, e foi por isso que tirou 2 em honestidade epistêmica mesmo caindo para
+5. O erro não é de honestidade: é que a rodada anterior aceitou o limite declarado em vez de
+levantá-lo. Bastava uma execução com um embedder de mentira, sem rede e sem chave, para o
+mecanismo inverter. **Limite declarado protege o autor, não o leitor.**
+
+**A tese da aula acontecendo dentro dela, de novo.** A 18 aponta, na linha 116, para a expansão
+prev/next da Aula 15. É literalmente o que roda por dentro do otimizador que ela descreve
+errado. Ela tinha o instrumento na mão e passou ao lado. Segunda ocorrência da classe, depois
+da AULA-12.
+
+**Um defeito meu, medido neste lote.** Ao dar gabarito ao exercício da Aula 01, deixei a Aula 22
+mandando "conte que falta um campo" e descrevendo a tarefa herdada por dois campos. O campo
+deixou de faltar no mesmo lote que criou a frase. **O `fechos.js` não pega isto**, porque as duas
+ocorrências são prosa, e prosa não é superfície de fecho. Quem pegou foi `grep` por "Aula 01"
+nas 29 aulas. Vale como regra: conserto que muda uma promessa entre aulas se varre por busca
+textual do nome da aula, não pela ferramenta de fechos.
+
+**Instrumento novo, e a razão dele.** Requebrar linha é onde a cauda que cola nasce, e este lote
+precisava requebrar dez. O requebrador escrito aqui **prova que a sequência de palavras não
+mudou** antes de gravar, e a prova roda de novo sobre o arquivo inteiro depois. Sem essa prova,
+requebrar é a operação mais perigosa da rodada, porque o diff parece cosmético.
+
+### Estado do portão depois deste lote
+
+Soma: **232/348**. Remedidas na oitava rodada: **18 de 29**.
+
+**O portão reabre mais fundo.** Eram 3 aulas abaixo de 6/12, passam a ser **cinco**: 01 (5),
+04 (5), 06 (5), 12 (4), 18 (5). As duas novas entraram vindas de 8 e de 12.
+
+**O critério dos `−1` ganha as duas primeiras medições diretas.** Nenhuma das duas tem `−1`, e
+agora isso está registrado por dimensão em vez de inferido do total. Ficam **13 aulas livres de
+`−1`**, 11 por aritmética (nota 10 ou mais) e 2 por medição. Restam 16 desconhecidas.
