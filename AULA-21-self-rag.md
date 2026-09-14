@@ -215,9 +215,9 @@ prompt autoriza a abstenção**, que foi o assunto central da Aula 19. Não vou 
 é `print(prompt.messages[0].prompt.template)` — leia antes de confiar.
 
 **2. `model_name=` aqui, `model=` nas outras quatro.** As cinco instanciações de `ChatOpenAI` estão
-nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam, e agora está **medido** no `langchain-openai` 0.3.3 que o repositório
-pina: `ChatOpenAI(model="gpt-4o")` e `ChatOpenAI(model_name="gpt-4o")` produzem o mesmo
-`.model_name`. A mistura no mesmo arquivo é o tipo de detalhe que a regra 9 do protocolo de
+nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam, e agora está **medido** no `langchain-openai` 0.3.3, uma das duas versões que o repositório pina (a outra é
+0.3.9): `ChatOpenAI(model="gpt-4o")` e `ChatOpenAI(model_name="gpt-4o")` produzem o mesmo
+`.model_name`. A mistura no mesmo arquivo é motivo para copiar a linha literal em vez de parafrasear: quem copia a forma errada e depois grepa por `model=` não encontra. É o tipo de detalhe que o protocolo de
 citação existe para preservar: quem copia a linha errada e depois grepa por `model=` não encontra.
 
 **3. `format_docs` é definida e nunca usada.** As linhas `Self-RAG-FullImplementation.py:83-84` definem a função, e `grep -n
@@ -370,8 +370,8 @@ limite de iteração no seu código, o caso ruim não é resposta errada — é 
 meio do caminho.
 
 > ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25**
-> super-steps — valor da documentação da biblioteca, e agora **medido**: num grafo de laço infinito, o `langgraph` 0.2.69 — a
-> uma das duas versões que o repositório pina (a outra é 0.3.18) — levanta `GraphRecursionError: Recursion limit of 25 reached
+> super-steps — valor da documentação da biblioteca, e agora **medido**: num grafo de laço infinito, o `langgraph`
+> 0.2.69, uma das duas versões que o repositório pina (a outra é 0.3.18), levanta `GraphRecursionError: Recursion limit of 25 reached
 > without hitting a stop condition` — e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem
@@ -491,7 +491,7 @@ atendendo requisições.
 
 **7. Meça o custo.** Conte quantas chamadas de LLM uma pergunta consome no melhor caso (recupera,
 gradua N documentos, gera, julga fundamentação, julga utilidade) e no caso com duas voltas. Some às
-chamadas de reranking (Aula 17) e de roteamento (Aula 19). É a conta que decide se reflexão cabe no
+chamadas de reranking (Aula 17) e de roteamento (Aula 14). É a conta que decide se reflexão cabe no
 seu orçamento por consulta.
 
 ---
@@ -543,8 +543,8 @@ reprovar uma boa. Três juízes multiplicam a chance de um deles errar — e um 
 volta inteira. Não há, neste desenho, nada medindo a qualidade dos juízes; medir isso é a Aula 22.
 
 **Binário esconde o meio.** Uma resposta parcialmente fundamentada — a mais comum em corpus real, no meu julgamento —
-tem que virar `yes` ou `no`. O paper tem `partially supported` justamente porque essa é a categoria
-que mais aparece.
+tem que virar `yes` ou `no`. O paper adota três valores seguindo a escala de atribuição de Yue et
+al., citada na Seção 4; o motivo declarado é taxonômico, não de frequência.
 
 **Prompt vindo da rede.** `hub.pull` (`Self-RAG-FullImplementation.py:77`) torna o comportamento do sistema dependente de um
 recurso externo que você não versiona. Para produção, buscar uma vez e fixar no repositório é a

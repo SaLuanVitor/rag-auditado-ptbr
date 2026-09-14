@@ -22,8 +22,8 @@ A pergunta desta aula é onde colocar a garantia de formato:
 4. No **schema como contrato** — declarar a estrutura e deixar a plataforma cobrá-la.
 
 Os sete arquivos deste módulo dão exemplo de cada uma. E a lição que considero mais importante não é qual escolher
-— é que **nenhuma delas garante que o conteúdo esteja certo**. Duas delas, como veremos, chegam a
-forçar o modelo a inventar.
+— é que **nenhuma delas garante que o conteúdo esteja certo**. E a quarta, a mais forte, chega a
+forçar o modelo a inventar: a Parte 6 mostra dois casos disso no próprio módulo.
 
 ---
 
@@ -63,7 +63,7 @@ intacta:
 
 - do 1 para o 2 você passa a **saber** que falhou;
 - do 2 para o 3 você deixa de receber texto que não é JSON;
-- do 3 para o 4 você deixa de receber JSON com campos errados;
+- do 3 para o 4 o campo errado deixa de passar em silêncio: vira exceção de validação em vez de objeto aceito;
 - e depois do 4 **ainda** pode receber um objeto perfeito com valores inventados.
 
 O grau 4 é o teto do que a plataforma resolve. Verdade do conteúdo é assunto de recuperação
@@ -199,8 +199,8 @@ client = OpenAI(
 ⚠️ Este é o ponto do módulo em que "nomes parecidos exigem `diff`" deixa de ser conselho e passa a
 ser método. Os nomes
 `04-Pydantic-v1.py` e `04-Pydantic-v2.py` sugerem duas versões do mesmo exemplo, uma para cada
-versão da biblioteca. O `diff` diz outra coisa: **os dois arquivos compartilham exatamente as duas
-primeiras linhas** — os imports de `pydantic` e de `typing`. Nada mais. São exemplos distintos, com
+versão da biblioteca. O `diff` diz outra coisa: **os dois arquivos compartilham dois imports e o
+esqueleto `try`/`except`** — e nenhuma linha de conteúdo. São exemplos distintos, com
 modelos distintos, resolvendo problemas distintos.
 
 **`04-Pydantic-v1.py` (42 linhas) não chama LLM nenhum.** É Pydantic puro: um modelo com validação
@@ -221,15 +221,15 @@ Um dicionário fixo é validado (`08-Generation/03-ControllingFormatViaOutputPar
 
 E aqui está o detalhe que dá nome ao achado: `model_dump()` e `model_dump_json()` são API do
 **Pydantic v2**. Num arquivo chamado `-v1`. O sufixo é numeração de variante do capítulo — como o
-`05-...-v1` e `-v2` da Parte 4 —, não versão de biblioteca. `pydantic` **não está instalado neste
-ambiente** e eu não executei nada; a leitura é do nome do método, que é literal no arquivo.
+`05-...-v1` e `-v2` da Parte 4 —, não versão de biblioteca. **Medido** no `pydantic` 2.13.4 que o
+repositório pina: o arquivo roda inteiro, `model_dump()` e `model_dump_json()` incluídos.
 
 O valor pedagógico do arquivo é real e independe do nome: ele mostra que `min_length`, `pattern` e
 `gt`/`lt` são **restrições que o schema carrega**. Quando esse mesmo modelo virar contrato de saída
-de um LLM, essas restrições passam a ser cobradas da geração — e é por isso que valer a pena
+de um LLM, essas restrições passam a ser cobradas da geração — e é por isso que vale a pena
 declarar um campo `str` com `pattern` em vez de um `str` solto.
 
-**`04-Pydantic-v2.py` (66 linhas) é o grau 4 completo.** O schema é aninhado — uma lista de
+**`04-Pydantic-v2.py` (66 linhas) é o grau 4a inteiro.** O schema é aninhado — uma lista de
 `CodeIssue` dentro de `CodeAnalysis`
 (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v2.py:17`):
 
@@ -403,10 +403,10 @@ resumos de resumos. E dois pontos que só aparecem lendo:
 
 - **`COMPACT` não é compressão paralela ao refine — é o refine com menos chamadas.** A classe é
   `class CompactAndRefine(Refine)`: ela reempacota os chunks para ocupar a janela e então **refina**
-  sobre os pedaços reempacotados. Tratar "refinar" e "comprimir" como mecanismos alternativos, como
-  a frase seguinte faz, é a leitura errada.
-- **O quinto modo deste arquivo é `COMPACT_ACCUMULATE`, não `ACCUMULATE`.** A tabela acima acerta; a
-  prosa é que precisa acertar. `class CompactAndAccumulate(Accumulate)` reempacota antes de responder
+  sobre os pedaços reempacotados. Refinar propaga o que já foi dito e acumular preserva a origem de
+  cada resposta; reempacotar não é um terceiro mecanismo, é o que o `COMPACT` faz antes de refinar.
+- **O quinto modo deste arquivo é `COMPACT_ACCUMULATE`, não `ACCUMULATE`.**
+  `class CompactAndAccumulate(Accumulate)` reempacota antes de responder
   por chunk e concatenar as respostas com um separador. O `ACCUMULATE` puro — o que de fato gera uma
   resposta por chunk — não aparece em nenhum arquivo do repositório.
 
@@ -428,8 +428,8 @@ letra do contexto. O sintetizador passa o texto recuperado como `context_str`, e
 Ou seja: os blocos 3, 4 e 5 respondem **sem o acervo**, de memória paramétrica do modelo, enquanto os
 blocos 1 e 2 usam o contexto recuperado. Quem comparar as cinco saídas não está comparando modos de
 síntese — está comparando com-contexto contra sem-contexto, e o corpus pequeno deixa de ser a
-explicação principal para os cinco parecerem parecidos. É a terceira variante da armadilha do slot
-errado nesta aula, e a mais cara, porque a saída continua plausível.
+explicação principal para os cinco parecerem parecidos. É a variante mais cara da armadilha do slot
+de template, porque a saída continua plausível, e a próxima seção mostra as outras duas.
 
 ### O que este arquivo revela sobre o nome do diretório
 
@@ -458,7 +458,7 @@ primeiros também `refine_template`; o `GENERATION` recebe `simple_template`; e 
 `CONTEXT_ONLY` não recebem template nenhum. Duas
 consequências:
 
-- **os três blocos do script estão certos** — o 3, em `TREE_SUMMARIZE`, passa `summary_template`; os
+- **os três blocos do script acertam o slot** — o conteúdo do template é outro problema, e é o da seção anterior; — o 3, em `TREE_SUMMARIZE`, passa `summary_template`; os
   4 e 5, em `COMPACT_ACCUMULATE` e `SIMPLE_SUMMARIZE`, passam `text_qa_template`;
 - **passar o slot errado não dá erro.** Como a assinatura aceita os dois, o argumento é válido; ele
   simplesmente não é repassado adiante no ramo daquele modo. É descartado em silêncio.
@@ -552,7 +552,7 @@ o `02`, a necessidade da chave é verificável sem executar nada, e verifiquei: 
 `validate_openai_api_key(embed_model.api_key)` — o ramo `if embed_model == "default"` de
 `resolve_embed_model`, em `llama_index.core.embeddings.utils`.
 Sem chave, a própria mensagem do código diz o que acontece: "Could not load OpenAI embedding model
-(…) please check your OPENAI_API_KEY". Comportamento estável da 0.11 em diante. O `02`
+(…) please check your OPENAI_API_KEY". Medido na 0.11.17. **O repositório pina a 0.12.15**, e esta medição é da 0.11.17: confira na versão que você instalar. O `02`
 precisa da chave, e o `.env.example` poderia tê-lo nomeado.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 

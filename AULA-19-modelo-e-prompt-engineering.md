@@ -488,7 +488,7 @@ quebra com `NameError`.
 
 **Um limite que declaro em vez de afirmar:** o dicionário passado ao template tem quatro chaves
 (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. A pergunta era se o `format` do `PromptTemplate` rejeita chaves extras ou as ignora, e agora está
-**medida** no `langchain-core` 0.3.33, a versão que o repositório pina: **ignora em silêncio.** Um
+**medida** no `langchain-core` 0.3.33, uma das duas versões que o repositório pina (a outra é 0.3.47): **ignora em silêncio.** Um
 template que declara duas variáveis, recebendo quatro, devolve a string formatada sem erro e sem
 aviso. É a pior das duas respostas possíveis, porque o dicionário errado não se anuncia — e é a
 primeira coisa que você confirma ao rodar o arquivo, motivo pelo qual está na lista da Mão na massa.
