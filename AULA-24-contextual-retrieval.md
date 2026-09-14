@@ -118,7 +118,7 @@ Três confirmações por `grep`, porque asserção sobre comportamento exige ver
 - `llm = OpenAI(model="gpt-3.5-turbo")` está em `LlamaIndex-Implementation.py:32`, e `llm` também aparece **só ali**. O modelo é instanciado e nunca chamado.
 - `generate_question_context_pairs` é importado em `LlamaIndex-Implementation.py:12` e nunca usado — a geração de dataset sintético do LlamaIndex está importada e substituída por três perguntas escritas à mão. A Aula 22 encontrou o análogo `DatasetGenerator` **comentado** no seu módulo (`AULA-22:406-427`): nos dois arquivos a geração automática está declarada e desligada.
 
-Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendaria como ponto de partida. Como demonstração de que Contextual Retrieval melhora a recuperação, ele não pode demonstrar nada — o tratamento e o controle diferem por um prefixo de 50 caracteres.
+Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendaria como ponto de partida. Como demonstração de que Contextual Retrieval melhora a recuperação, ele não pode demonstrar nada — o tratamento e o controle diferem por um prefixo de 98 caracteres, dos quais 50 são recortados do próprio chunk.
 
 ### E o contexto vai para o metadado
 
@@ -295,11 +295,9 @@ A **query são os primeiros 50 caracteres do próprio chunk que é a resposta**.
 tenham ao menos dois chunks cada, o que não confirmei, porque o `codebase_chunks.json` é baixado em
 tempo de execução e não está em disco aqui. Cada uma é um prefixo literal do seu alvo.
 
-Julgamento, e é o ponto central desta aula: nenhuma técnica de recuperação pode se distinguir de outra nesse teste. Buscar um texto usando a sua própria primeira metade é o caso mais fácil que existe — denso acha, esparso acha, e a contextualização não tem como ajudar porque não havia dificuldade a resolver. Os três experimentos vão reportar valores próximos, e a "melhoria" impressa no fim
-(`Milvus-Implementation.py:970-976`) será ruído, e as três linhas imprimirão o mesmo número: o
-`rerank_improvement` de `:971` é `reranker − standard` e, sob a identidade do Ato 4, isso é o mesmo
-que o `context_improvement`. O incremento do reranking, que é o que seria zero, nunca chega a ser
-calculado.
+Julgamento, e é o ponto central desta aula: nenhuma técnica de recuperação pode se distinguir de outra nesse teste. Buscar um texto usando os seus próprios primeiros 50 caracteres é o caso mais fácil que existe — denso acha, esparso acha, e a contextualização não tem como ajudar porque não havia dificuldade a resolver. Os três experimentos vão reportar valores próximos, e a "melhoria" impressa no fim
+(`Milvus-Implementation.py:970-976`) será ruído. O Ato 4 mostra por quê, e o que o número impresso
+de fato é.
 
 Repare também que o comentário da linha 891 admite o problema: _"In actual applications, a specially designed evaluation dataset should be used"_. O autor sabe. O que o arquivo não diz é que o conjunto especialmente desenhado **já estava em disco**: o
 `download_data()` da linha 843 baixa o `evaluation_set.jsonl` do repositório da Anthropic (linhas
@@ -324,12 +322,13 @@ E, mais abaixo, uma query cujo documento-ouro não foi encontrado é abandonada 
 
 O `continue` pula sem somar nada a `total_score`, mas `total_queries` **já foi incrementado**. A média final (`Milvus-Implementation.py:688`) divide por um denominador que inclui as queries puladas — cada uma entra valendo zero.
 
-Isso importa porque o dataset é truncado: `dataset = dataset[:5]` (`Milvus-Implementation.py:851`). Se o conjunto de avaliação apontasse para documentos fora desses cinco — que é exatamente o que aconteceria com o gabarito oficial da Anthropic —, a maioria das queries seria pulada e contada como zero. O sistema apareceria péssimo por um motivo que não tem nada a ver com recuperação.
+Isso importa porque o dataset é truncado: `dataset = dataset[:5]` (`Milvus-Implementation.py:851`). Se o conjunto de avaliação apontasse para documentos fora desses cinco — que é o que se espera do gabarito oficial da Anthropic, por inferência de domínio, porque ele também é baixado em tempo de execução e não está em disco aqui com o gabarito oficial da Anthropic —, a maioria das queries seria pulada e contada como zero. O sistema apareceria péssimo por um motivo que não tem nada a ver com recuperação.
 
 ### Ato 4 — O reranking não pode aparecer na métrica
 
-O experimento 3 é impecável no isolamento da variável e cego na medição, e as duas coisas vêm da
-mesma linha. `evaluate_db(contextual_retriever, "evaluation_set.jsonl", 5)`
+O experimento 3 é impecável no isolamento da variável e cego na medição, e as duas coisas vêm de
+lugares diferentes. O isolamento vem de `:954-955`, que só religa a chave no mesmo retriever. A
+cegueira vem de `evaluate_db(contextual_retriever, "evaluation_set.jsonl", 5)`
 (`Milvus-Implementation.py:958`) manda o mesmo `k=5` para dois lugares: o `limit` da busca
 (`:539`) e o corte `retrieved_docs[0][:k]` do casamento (`:671`). O reranking reordena **os mesmos
 cinco hits** — `:546-563` reconstrói `res` a partir de `result.index` —, e a métrica só pergunta
@@ -338,7 +337,7 @@ se o chunk-ouro **está** entre os cinco, não em que posição. Uma permutaçã
 A consequência é exata, não aproximada: o `pass_at_n` do reranker é **idêntico** ao do contextual,
 e as três linhas de `:974-976` imprimem o mesmo número. Note **qual** número: `rerank_improvement`
 é `reranker − standard`, e sob a identidade acima isso vale `contextual − standard`, o mesmo de
-`context_improvement`. O incremento que o rótulo promete é que é zero por construção, e ele nunca
+`context_improvement`. O incremento que o rótulo promete é zero por construção, e ele nunca
 é impresso. A seção "Um rótulo errado no relatório" volta a isso.
 
 E a assinatura de `retrieve_base` mostra que o desenho previa outra coisa: `k: int = 20` (`:698`).
@@ -383,9 +382,9 @@ E imprime `rerank_improvement` como _"Reranking further improved by"_ (`Milvus-I
 
 Julgamento de engenharia, explícito porque é recomendação:
 
-**Do arquivo LlamaIndex, aproveite a estrutura.** Seis retrievers, duas condições, `mrr` e `hit_rate`, tabela final. Troque três coisas: o contexto simulado por uma chamada de LLM usando o `CONTEXT_PROMPT_TEMPLATE` que já está escrito (e que precisa passar a receber o documento, não só o chunk); o gabarito posicional por perguntas com relevância anotada à mão; e o `0.0` em caso de falha por uma exceção que interrompe.
+**Do arquivo LlamaIndex, aproveite a estrutura.** Seis retrievers, duas condições, `mrr` e `hit_rate`, tabela final. Troque quatro coisas. A primeira é a que a Parte 2 chamou de anterior a todas: o `similarity_top_k=3` sobre um corpus de 3, que impede o `hit_rate` de discriminar antes de qualquer questão de gabarito. Depois, o contexto simulado por uma chamada de LLM usando o `CONTEXT_PROMPT_TEMPLATE` que já está escrito (e que precisa passar a receber o documento, não só o chunk); o gabarito posicional por perguntas com relevância anotada à mão; e o `0.0` em caso de falha por uma exceção que interrompe.
 
-**Do arquivo Milvus, aproveite o miolo.** O prompt `<document>`/`<chunk>`, a persistência dos dois campos, o reranking sobre o texto enriquecido e o isolamento de variável entre os experimentos 2 e 3. Troque uma coisa: **não sobrescreva o `evaluation_set.jsonl`**. Ele chega ao disco no primeiro `download_data()`, é o gabarito real da Anthropic, e usá-lo exige apenas inserir o dataset completo em vez de `[:5]` — ou filtrar o conjunto de avaliação para os documentos inseridos, **corrigindo o denominador** para não contar os descartados.
+**Do arquivo Milvus, aproveite o miolo.** O prompt `<document>`/`<chunk>`, a persistência dos dois campos, o reranking sobre o texto enriquecido e o isolamento de variável entre os experimentos 2 e 3. Troque duas coisas. A primeira: **não sobrescreva o `evaluation_set.jsonl`**. Ele chega ao disco no primeiro `download_data()`, é o gabarito real da Anthropic, e usá-lo exige apenas inserir o dataset completo em vez de `[:5]` — ou filtrar o conjunto de avaliação para os documentos inseridos, **corrigindo o denominador** para não contar os descartados.
 
 Juntando os dois, sai o experimento que nenhum dos dois faz: contextualização real medida contra gabarito real. É o exercício 5 da próxima seção.
 
@@ -403,7 +402,10 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 **4. Veja o gabarito oficial que o script joga fora.** Antes de rodar o Milvus, execute apenas o `download_data()` e abra o `evaluation_set.jsonl` baixado. Leia três queries. Compare com as quatro que o `main` fabrica na linha 896. Guarde o arquivo com outro nome antes de rodar o script inteiro.
 
-**5. O experimento que falta.** Rode o Milvus com o `evaluation_set.jsonl` **oficial**: comente as linhas 892-906, insira o dataset completo (ou filtre o conjunto de avaliação para os documentos que você inseriu) e conserte o denominador movendo o `total_queries += 1` para depois da verificação da linha 660. Agora os três experimentos medem algo. Registre os três `Pass@5`.
+**5. O experimento que falta.** Rode o Milvus com o `evaluation_set.jsonl` **oficial**: comente as linhas 892-906, insira o dataset completo (ou filtre o conjunto de avaliação para os documentos que você inseriu) e conserte o denominador movendo o `total_queries += 1` para depois da verificação da linha 660. Agora os experimentos 1 e 2 medem algo. O 3 continua idêntico ao 2, pelo Ato 4: para o reranking
+aparecer, é preciso separar a janela de candidatos do corte da métrica. Chame
+`retrieve_base(query, db, k=20)` e mantenha `retrieved_docs[0][:5]`, ou troque o `pass_at_n` por
+uma métrica sensível a posição. Registre os três `Pass@5` antes e depois dessa separação.
 
 **6. Meça o custo real.** Instrumente `insert_contextualized_data` para contar chamadas e tokens de entrada. Multiplique pelo tamanho do seu corpus. Compare com o custo de indexação do GraphRAG que a Aula 23 registrou — as duas técnicas pagam na indexação, e é útil ter as duas contas na mesma unidade.
 
@@ -413,9 +415,9 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 ## Quebre de propósito
 
-**1. Tire o documento do prompt.** No arquivo Milvus, troque `{doc_content}` por `{chunk_content}` na linha 430. Agora o LLM contextualiza o chunk com o próprio chunk — que é, conceitualmente, o que o arquivo LlamaIndex faz. Rode a avaliação do exercício 5 e veja quanto do ganho desaparece. Isso mede o valor do documento no prompt.
+**1. Tire o documento do prompt.** Em `Milvus-Implementation.py`, troque `{doc_content}` por `{chunk_content}` na linha 430. Agora o LLM contextualiza o chunk com o próprio chunk — que é, conceitualmente, o que o arquivo LlamaIndex faz. Rode a avaliação do exercício 5 e veja quanto do ganho desaparece. Isso mede o valor do documento no prompt.
 
-**2. Avalie contra o texto reescrito.** Em `evaluate_retrieval`, troque o campo de comparação para `contextualized_content` (as linhas 672-676 explicitamente escolhem `content` "to ensure fairness"). O casamento exato passa a nunca acontecer, e o `Pass@K` vai a zero com o sistema intacto. É a demonstração de por que aquela linha existe.
+**2. Avalie contra o texto reescrito.** Em `evaluate_retrieval`, troque o campo de comparação para `contextualized_content` (em `Milvus-Implementation.py`, as linhas 672-676 explicitamente escolhem `content` "to ensure fairness"). O casamento exato passa a nunca acontecer, e o `Pass@K` vai a zero com o sistema intacto. É a demonstração de por que aquela linha existe.
 
 **3. Deixe o modelo alterar o conteúdo.** Ainda no prompt de `Milvus-Implementation.py`, remova a instrução _"Keep the core information of the original chunk unchanged"_ (linha 440) e peça explicitamente para resumir. Compare `content` e `contextualized_content` de alguns chunks e procure números ou exceções que mudaram. É o risco do "reescrever em vez de prefixar", visível.
 
@@ -483,8 +485,9 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Anterior:** [AULA 23 — GraphRAG: quando o grafo ganha do vetor](AULA-23-graphrag.md)
 **Próxima:** [AULA 25 — Modular RAG como arquitetura](AULA-25-modular-rag.md)
 
-> Duas aulas seguidas encontraram o mesmo padrão em lugares diferentes: a Aula 23, um capítulo sem
-> código; esta, código que implementa a técnica e mede o que não deveria. A Aula 25 volta à situação da
+> Duas aulas seguidas encontraram promessa maior que entrega, em formas diferentes: a Aula 23, um
+> paradigma anunciado sem código; esta, código que implementa a técnica e mede o que não pode
+> distinguir. A Aula 25 volta à situação da
 > 23 — `10-AdvanceRAG/03-ModularRAG/` tem o PDF do paper e um `.env.example` que declara a própria ausência de scripts, verificado por `find` durante a Aula
 > 23 —, e o método já está estabelecido: ler a fonte primária, separar o que ela mede do que promete, e
 > nomear o custo.
