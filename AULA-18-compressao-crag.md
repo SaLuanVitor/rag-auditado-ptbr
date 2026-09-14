@@ -26,7 +26,7 @@ O reflexo é pensar em compressão como redução de custo de token. O ganho mai
 do _lost in the middle_, **contexto menor e mais denso é usado melhor pelo modelo**. Comprimir é
 tirar o trecho bom do meio de um monte de texto irrelevante.
 
-Mas a ordem importa, e ela foi estabelecida na Aula 17: **rerank primeiro, comprimir só se ainda
+Mas a ordem importa, e ela decorre do que a Aula 17 mostrou: **rerank primeiro, comprimir só se ainda
 estiver longo.** Se depois de reordenar você entrega 3 a 5 chunks bem escolhidos, o contexto já é
 curto — comprimir ali é risco sem retorno.
 
@@ -49,9 +49,10 @@ E nenhum deles é hipotético:
 Compressão trabalha **o que voltou**. Correção decide que **o que voltou não serve** e muda o
 curso — refaz a busca, reformula a pergunta, ou vai buscar fora do acervo.
 
-Isso exige algo que nenhuma técnica anterior tinha: **um desvio condicional** — o grafo escolhe o
-que fazer depois de olhar o que recuperou. Um pipeline linear vai da
-recuperação à geração e termina. Correção precisa voltar.
+Isso exige algo que nenhuma técnica anterior tinha: **um desvio condicional decidido depois da
+recuperação**. A Aula 14 já ramificava, mas antes de recuperar, com base só na pergunta. Aqui o
+grafo escolhe o que fazer depois de olhar o que voltou. Um pipeline linear vai da
+recuperação à geração e termina. Correção precisa fazer outra coisa antes de gerar.
 
 ---
 
@@ -63,20 +64,26 @@ recuperação à geração e termina. Correção precisa voltar.
 
 Repare no que isso revela: **o "compressor" aqui é um reranker.** No LangChain, a abstração
 `document_compressors` — a mesma que a Aula 17 encontrou no `RankLLMRerank` — cobre qualquer
-transformação que receba documentos e devolva menos documentos ou em outra ordem.
+transformação que receba uma lista de documentos e devolva outra: menos documentos, em outra ordem,
+ou com o texto de cada um encurtado. As três moram no mesmo pacote: `CohereRerank` reordena,
+`EmbeddingsFilter` descarta, e `LLMChainExtractor` reescreve o `page_content` de cada documento,
+extraindo só o trecho relevante.
 
-Ou seja, este arquivo não reduz o texto de cada documento; ele **reduz a quantidade** de documentos,
-descartando os irrelevantes. É compressão no nível da lista, não da string.
+Este arquivo escolheu a primeira. Ele não reduz o texto de cada documento; opera sobre a lista. E
+aqui não reduz nem a lista: o `top_n` do `CohereRerank` tem default `3`, entram três documentos e
+saem três, apenas reordenados. Troque o `base_compressor` por um `LLMChainExtractor` e o mesmo
+retriever vira compressão de string.
 
 A distinção vale para o vocabulário:
 
 | Nível      | O que reduz                    | Exemplo                                     |
 | ---------- | ------------------------------ | ------------------------------------------- |
 | **Lista**  | quantos documentos             | `ContextualCompressionRetriever` + reranker |
-| **String** | quanto texto dentro de cada um | LLMLingua, `SentenceEmbeddingOptimizer`     |
+| **String** | quanto texto dentro de cada um | LLMLingua, `SentenceEmbeddingOptimizer`, `LLMChainExtractor` |
 
 E note o `.invoke(query)`: o processamento acontece **no caminho da consulta**, não na ingestão. Todo
-custo desta aula é por query.
+custo da compressão é por query. A ingestão tem o dela: o `03` embute o acervo em
+`VectorStoreIndex.from_documents` e o CRAG em `Chroma.from_documents`.
 
 ---
 
@@ -85,7 +92,7 @@ custo desta aula é por query.
 `02-Compression/02-LLMLingua-Compression.py` chama `llm_lingua.compress_prompt(...)` — compressão no
 nível da string, que remove tokens de baixa informação do prompt.
 
-⚠️ **Uma observação que só aparece lendo o arquivo:** na linha 33, o parâmetro `question=""` está
+⚠️ **Uma observação que só aparece lendo o arquivo:** na linha 33 (e de novo na 92), o parâmetro `question=""` está
 **vazio**. Isso significa que, nesta demonstração, a compressão **não está condicionada à
 pergunta** — ela reduz o prompt por densidade de informação geral, não por relevância para a query
 específica.
@@ -111,23 +118,33 @@ query_engine = index.as_query_engine(node_postprocessors=[SentenceEmbeddingOptim
 ```
 
 O mecanismo do `SentenceEmbeddingOptimizer`: dentro de cada chunk recuperado, ele **embute as
-sentenças individualmente** e mantém só as mais similares à query. É compressão semântica em nível
-de sentença — e é o `node_postprocessors` do LlamaIndex, a mesma abstração que a Aula 15 usou para
-o `MetadataReplacementPostProcessor` e para a expansão prev/next.
+sentenças individualmente**, escolhe as mais similares à query e **devolve cada uma com uma vizinha
+de cada lado**. `context_before` e `context_after` são opcionais, e o `_postprocess_nodes` os fixa
+em `1` quando chegam `None`, que é o caso deste arquivo. É o `node_postprocessors` do LlamaIndex, a
+mesma abstração que a Aula 15 usou para o `MetadataReplacementPostProcessor` e para a expansão
+prev/next, e aqui aquela expansão está rodando por dentro do próprio otimizador.
+
+**A consequência derruba a expectativa criada pelo nome.** Como as janelas se sobrepõem, o texto que
+sai pode ser maior que o que entrou, com sentenças repetidas e fora da ordem de leitura. Medido no
+ambiente pinado do curso, com um embedder controlado, seis sentenças e `percentile_cutoff=0.5`:
+entrada de 123 caracteres, saída de **162**, três sentenças irrelevantes preservadas e duas
+duplicadas. A mesma chamada com `context_before=0, context_after=0` devolve 63 caracteres. O corte
+seleciona âncoras; quem decide o tamanho final é a janela. Se você quer compressão de fato, passe os
+dois zeros explicitamente, e saiba que aí perde a coesão que a janela dava.
 
 A diferença entre os dois cortes é de natureza, não de valor:
 
 | Parâmetro               | Critério     | Comportamento                               |
 | ----------------------- | ------------ | ------------------------------------------- |
-| `percentile_cutoff=0.5` | **relativo** | mantém as 50% melhores sentenças, sempre    |
+| `percentile_cutoff=0.5` | **relativo** | elege 50% das sentenças como âncora, sempre |
 | `threshold_cutoff=0.7`  | **absoluto** | mantém as que passam de 0,7 de similaridade |
 
-O percentil remove **cerca de** metade, mesmo quando todas as sentenças eram relevantes — e o
+O percentil elege **cerca de** metade como âncora, mesmo quando todas eram relevantes — e o
 "cerca de" é literal: o corte é `int(len(sentenças) * 0.5)`, e num chunk de **uma** sentença isso dá
 `0`, que a implementação trata como _sem limite_ (o teste é `if similarity_top_k and …`, e zero é
 falsy). Chunk curto passa inteiro.
 
-O limiar é o mais arriscado dos três (**julgamento**), mas não pelo motivo que se espera: se nenhuma
+O limiar é o mais arriscado das três configurações que este arquivo roda (**julgamento**), mas não pelo motivo que se espera: se nenhuma
 sentença atinge 0,7, o resultado **não** é chunk vazio chegando ao LLM — é
 `ValueError("Optimizer returned zero sentences.")`, levantado antes de qualquer geração. A falha é
 alta e barulhenta, o que é melhor que silenciosa; o risco real é a consulta quebrar em produção para
@@ -151,7 +168,7 @@ experimento controlado do módulo.
 **Julgamento:** `03-Correction/01-CRAG-ReflectiveRetrieval.py` é o arquivo mais importante da
 Fase 6.
 
-O comentário da linha 68 nomeia o componente central sem rodeios: _"Part 2: Retrieval grader — the
+O comentário da linha 68 nomeia o componente central sem rodeios: _"Part 2: Retrieval grader - the
 core component of CRAG"_.
 
 A peça é um **avaliador estruturado** (linhas 72–74 e 93):
@@ -187,7 +204,7 @@ estado que a Aula 22 vai mostrar ser invisível em faithfulness.
 ### O que o CRAG faz com o veredito
 
 O arquivo carrega o acervo com `WebBaseLoader`, `RecursiveCharacterTextSplitter`, `Chroma` e
-`OpenAIEmbeddings` (linhas 24–27), e sobre isso monta o grafo. A lógica do paper CRAG, em três
+`OpenAIEmbeddings` (imports em 24–27, execução em 43–63), e sobre isso monta o grafo. A lógica do paper CRAG, em três
 saídas possíveis:
 
 | Veredito dos documentos | Ação                                             |
@@ -224,6 +241,12 @@ comportamento, focado no estágio de recuperação.
 
 ## Mão na massa
 
+⚠️ **Antes do primeiro comando.** O `requirements.txt` deste módulo declara `llama-index-core` e
+mais nada da família, e o `SimpleDirectoryReader` da linha 4 do script precisa de mais. Instale
+`llama-index-readers-file`, `llama-index-embeddings-openai` e `llama-index-llms-openai`. Sem isso o
+script morre na linha 4 com `ImportError: llama-index-readers-file package not found`, antes de
+tocar em qualquer chave de API.
+
 ```powershell
 cd RAG-from-First-Principles/07-PostRetrieval/02-Compression
 python 03-SentenceEmbeddingOptimizer-Compression.py
@@ -254,7 +277,7 @@ qualquer jeito.
 
 ## Quebre de propósito
 
-**1. Suba o `threshold_cutoff` até esvaziar o chunk.** Ponha `threshold_cutoff=0.95`. Você **não** vai
+**1. Suba o `threshold_cutoff` até derrubar a consulta.** Ponha `threshold_cutoff=0.95`. Você **não** vai
 ver o LLM responder com contexto vazio: como a Parte 3 desta aula registra, o otimizador levanta
 `ValueError("Optimizer returned zero sentences.")` **antes** da geração. Observe **onde** o traceback
 nasce — dentro do `node_postprocessors`, não no modelo — e tire a conclusão: limiar absoluto sem
@@ -265,16 +288,16 @@ que este corpus para de quebrar. Esse valor é propriedade do corpus, não da t�
 `Document` escritos no próprio arquivo, com `retriever.k = 3`: "recupere 20, rerank para 3" não é
 alcançável ali, e rerankear três para três não descarta nada, então a comparação com "só o rerank" é
 idêntica por construção. Faça o exercício sobre o corpus do `03`, que carrega o acervo de turismo
-inteiro: monte um motor com `similarity_top_k=20`, ponha um reranker como primeiro
+inteiro: monte um motor com `similarity_top_k=20`, ponha um `LLMRerank` (de `llama_index.core.postprocessor`, que já vem no `llama-index-core`) como primeiro
 `node_postprocessor` e o `SentenceEmbeddingOptimizer` como segundo, e compare com o mesmo motor sem o
 otimizador. Se a resposta não melhorar, você acabou de medir que a
-compressão era desnecessária ali — e a ordem da Aula 17 se justifica.
+compressão era desnecessária ali, e a ordem que esta aula propôs se justifica.
 
 **3. Force o grader do CRAG a reprovar tudo.** Faça uma pergunta sobre assunto ausente do acervo.
 Observe o caminho que o grafo toma quando nenhum documento é aprovado. Esse é o comportamento
 corretivo em ação.
 
-**4. Torne o critério do grader rigoroso.** Mude o prompt da linha 97 para exigir que o documento
+**4. Torne o critério do grader rigoroso.** Mude o prompt de `01-CRAG-ReflectiveRetrieval.py:97` para exigir que o documento
 **responda** à pergunta, não apenas se relacione. Mais documentos serão reprovados. O sistema passa
 a buscar fora com mais frequência — mais custo, possivelmente mais qualidade. Onde está o ponto
 certo?
@@ -334,7 +357,7 @@ diferença entre parecer bem e estar certo.
 6. O que o `ContextualCompressionRetriever` com `CohereRerank` como `base_compressor` revela sobre a
    abstração do LangChain?
 7. O que significa `question=""` no exemplo de LLMLingua, e por que isso muda a leitura da técnica?
-8. Diferencie `percentile_cutoff` de `threshold_cutoff`. Qual pode esvaziar o chunk, e por quê?
+8. Diferencie `percentile_cutoff` de `threshold_cutoff`. Qual pode derrubar a consulta, com que exceção, e em que ponto do pipeline?
 9. Qual é o componente central do CRAG, e o que `with_structured_output(GradeDocuments)` garante?
 10. Por que o critério do grader é deliberadamente generoso?
 11. O paper do CRAG prevê três saídas conforme o veredito. Quantas o `grade_documents` de
