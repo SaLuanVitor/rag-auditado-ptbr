@@ -2622,3 +2622,39 @@ este errou.
 E um efeito colateral que vale registrar: o conserto sistemático transformou uma emenda pontual
 feita horas antes numa frase absurda, que afirmava três vezes a mesma versão. **Conserto amplo
 invalida remendo estreito feito sobre o mesmo assunto**, e a ordem certa é medir o alcance primeiro.
+
+---
+
+## Oitava rodada, lote 1 das 21 não remedidas
+
+Lote escolhido por risco, não por ordem de aula: as duas mais próximas do portão (22 e 28, ambas
+em 6/12) e as duas com maior volume de conserto não verificado (20 com 137 linhas mexidas, 21 com
+77). Está medido nesta sessão que reescrita de seção tem 38% de defeito contra 26% de conserto
+pontual, então onde mais se mexeu é onde mais provavelmente se quebrou.
+
+| Aula | R6 | R8 | O que a rodada achou |
+|---|---|---|---|
+| [22](../AULA-22-avaliacao.md) | 6/12 | **10**/12 | O `CorrectnessEvaluator` **não** exige resposta de referência: substitui por `"(NO REFERENCE ANSWER SUPPLIED)"` e devolve nota. Dois dos três degradam em silêncio, e o argumento da aula fica mais forte. |
+| [21](../AULA-21-self-rag.md) | 8/12 | **9**/12 | Motivação inventada para o `partially supported` do paper: ele declara razão taxonômica, não de frequência. E `roteamento (Aula 19)` era Aula 14. |
+| [28](../AULA-28-projeto-final.md) | 6/12 | **8**/12 | O "12 GB permanentes" voltou na Etapa 6, contra quatro passagens da Aula 27 e contra a própria tabela da Fase 9 desta aula. |
+| [20](../AULA-20-saida-estruturada.md) | 8/12 | **8**/12 | Soma igual, composição diferente: os consertos subiram evidência e acionabilidade e derrubaram coerência a zero, com seis resíduos de duas inserções que não propagaram. |
+
+**Soma das quatro: 28/48 → 35/48.** Nenhuma caiu.
+
+### Duas promessas do curso que não se cumpriam
+
+A Aula 22 mandava a **calibração do juiz contra rótulo humano** "para o projeto final", e a Aula 28
+não a tem: `grep -i calibr` nela devolve zero. Passou a ser declarada como dívida aberta em vez de
+promessa quebrada em silêncio.
+
+E o catálogo de nomes que prometem o que o código não faz não fechava entre três aulas: a 25 dizia
+treze, a 26 cravava "décimo quarto caso" e a 28 somava quinze. A convenção de contagem nunca fora
+declarada. Agora está: a tabela é numerada por ordem de módulo, o caso da Aula 00 fica fora por ser
+sobre ambiente, e o caso da Aula 27 entrou como décimo quinto.
+
+### Achado falso de auditor, o segundo em 59 aplicados
+
+O auditor da Aula 28 localizou o placeholder de imagem em `01-Weaviate-Multimodal-Search.py:33`.
+Ele está no `02-Weaviate-Multimodal-RAG.py:33`; o `01` usa `to_base64` de verdade. **Taxa de achado
+falso: cerca de 3%** — baixa o bastante para aplicar sem conferir cada um, alta o bastante para não
+desligar a checagem.
