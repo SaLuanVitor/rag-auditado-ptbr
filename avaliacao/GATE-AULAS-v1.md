@@ -3001,3 +3001,149 @@ Soma: **170/348**. Remedidas na oitava rodada: **28 de 29**, faltando só a AULA
 
 `−1`: continua zero nas doze medidas por dimensão. **Treze aulas livres de `−1`**, uma por
 aritmética (22) e doze por medição direta. Restam 16 desconhecidas.
+
+## Oitava rodada, lote 8: a última das 29
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [03](../AULA-03-primeiro-rag.md) | 9/12 | **5**/12 | 1 | 0 | 1 | 2 | 1 | 0 | O corpus do exemplo que abre o curso tem **168 tokens e vira um nó**, então chunking, `top_k` e escolha de embedding são todos inertes ali. E a pergunta gravada no script não tem resposta no arquivo que o script carrega. |
+
+**A coerência dela é 2, a única nota 2 nessa dimensão em treze aulas**, e foi conferida nas duas
+direções contra treze aulas e o glossário sem uma divergência. As quatro contagens que o achado
+herdado da R6 mandava refazer estão todas certas: o conserto de lá pegou.
+
+**O que derruba é o mesmo da AULA-05 e da AULA-15:** a aula lê o código e não abre o corpus.
+Medido, `black_myth_wukong_setting.txt` tem 773 caracteres e 168 tokens, contra um `chunk_size`
+padrão de 1024. Três das seis decisões que a aula lista como escondidas nas cinco linhas **não têm
+efeito observável ali**, e a mais grave é a terceira: a aula anuncia que o modelo chinês sobre
+corpus inglês "vai obter recall pior", e com um nó único **o recall é 1,0 por construção** para o
+modelo chinês, para o inglês e para um gerador de números aleatórios.
+
+**E a tese da aula acontece nela, com 150 linhas de distância.** A pergunta gravada nos seis
+arquivos `01_*` é _"What combat tools are there in Black Myth: Wukong?"_, e o corpus tem zero
+ocorrências de _combat_, _weapon_, _staff_, _transformation_ e _tool_. O prompt padrão do
+LlamaIndex não instrui abstenção, então a saída ou é recusa ou é o modelo respondendo de memória.
+A aula chama isso de "um sistema de RAG funcionando" na linha 10, e na 161 escreve que a instrução
+de abstenção "é a diferença entre um RAG que admite ignorância e um que inventa".
+
+### Uma perícia do auditor que vale registrar
+
+O laudo dele fecha dizendo que o `git status` do repositório do curso **não** terminou vazio, com
+`?? ferramentas/portao.js`, e prova que não foi ele: os três scripts que rodou não têm chamada de
+escrita, ele não rodou os dois que têm, e o arquivo tem carimbo de tempo posterior às execuções
+dele. A conclusão dele estava certa, e o escritor concorrente **era eu**, construindo o contador do
+portão enquanto ele trabalhava.
+
+Fica a lição para o contrato: **auditor tem de poder distinguir o próprio rastro do alheio**, e o
+briefing manda ele conferir o `git status` do repositório do curso sem lhe dizer que outra coisa
+pode estar escrevendo ali ao mesmo tempo. Ou o briefing avisa, ou não se mexe no repositório
+enquanto há auditor em campo.
+
+---
+
+# Consolidação do portão ao fim da oitava rodada
+
+Os números abaixo saem de `node ferramentas/portao.js`, que lê este arquivo e conta. Não são
+somados à mão, e essa é a razão de a ferramenta existir: numa rodada de treze aulas, somar de
+cabeça é como o erro entra.
+
+```
+Notas gravadas: 29 de 29
+Soma: 166/348  (47,7%)
+
+Criterio 1, nenhuma abaixo de 6/12: REPROVA
+  14 abaixo: 01(5) 02(4) 03(5) 04(5) 05(3) 06(5) 07(4) 12(4)
+             13(5) 15(3) 16(4) 17(5) 18(5) 19(5)
+
+Criterio 2, no maximo um -1:
+  medidas por dimensao: 13    livres por aritmetica: 1    DESCONHECIDAS: 15
+  -1 contados: 0
+  veredito: PASSA no que foi medido, INCONCLUSIVO no resto
+
+PORTAO: FECHADO
+```
+
+## O que esta rodada mediu, e não foi o curso
+
+**Treze aulas remedidas nesta sessão, treze quedas. Nenhuma subiu, nenhuma empatou.**
+
+| Aula | R6 | R8 | Aula | R6 | R8 |
+| --- | --- | --- | --- | --- | --- |
+| 05 | 10 | **3** | 16 | 12 | **4** |
+| 15 | 10 | **3** | 01 | 8 | **5** |
+| 02 | 11 | **4** | 03 | 9 | **5** |
+| 07 | 10 | **4** | 13 | 10 | **5** |
+| 17 | 11 | **5** | 18 | 12 | **5** |
+| 19 | 11 | **5** | 10 | 11 | **6** |
+| | | | 14 | 11 | **6** |
+
+O curso saiu de 234/348 na sexta rodada para 166/348 agora. **Isso não é perda de qualidade: é
+ganho de medição.** A sexta rodada não mediu as aulas, mediu o próprio escrutínio, e a nota de lá
+era um teto de atenção. As duas aulas que ela deu como perfeitas caíram para 5 e para 4, e a mais
+tocada de todas, com 52 linhas de conserto acumulado, caiu 6 pontos.
+
+A hipótese foi declarada antes do primeiro lote e testada em ordem de risco decrescente. **Ela não
+tem uma exceção em treze tentativas.**
+
+## O que derrubou, por classe
+
+**Mecanismo lido em vez de medido é a causa dominante.** Nenhuma das treze marcou `−1`, ou seja,
+nada foi inventado: tudo rastreia a código real, e o defeito é de leitura. Três formas apareceram:
+
+1. **Ler o código e não abrir o dado.** Derrubou a 05 e a 15 para 3/12, e a 03 para 5. Na 05,
+   quinze dos dezesseis PDFs do módulo não têm camada de texto, e a aula abre dizendo que esse
+   caso existe. Na 15 e na 03, o corpus produz **um nó**, e Partes inteiras descrevem mecanismos
+   inertes. Nos três casos as citações de linha estavam certas.
+2. **Ler a documentação da fonte em vez de medir.** O `buffer_size` da 07 está descrito pelo
+   docstring do repositório, que erra o modelo; o `SentenceEmbeddingOptimizer` da 18 inverte de
+   sentido quando executado. Nos dois casos a aula tinha, no mesmo arquivo, a regra que a teria
+   salvado.
+3. **Aceitar o limite declarado.** A 18 escrevia `não executei` com honestidade e caiu 7 pontos,
+   porque a rodada anterior aceitou o limite em vez de levantá-lo. **Limite declarado protege o
+   autor, não o leitor.** A forma invertida também derruba: a 16 e a 10 afirmam resultado de
+   execução sem declarar execução, e na 10 eram números de um script sem semente.
+
+## O que a rodada ensinou sobre o próprio registro
+
+**Achado fora do laço de conserto é achado perdido.** A frase falsa da AULA-13 estava registrada
+neste arquivo, com estas palavras, numa seção que nunca entrou no laço, e sobreviveu à rodada que
+a apontou.
+
+**Achado sem o hash contra o qual foi medido é pior.** Os dois achados da AULA-10 na mesma seção
+foram refutados: `git show` no primeiro commit do repositório mostra a aula já nascendo correta.
+Eles mandavam consertar o que já estava certo.
+
+**Conserto de invenção não se faz negando.** O achado herdado da AULA-07 era razão fabricada numa
+ressalva; o conserto negou o termo em vez de apagá-lo, e o resultado é pior que o original.
+
+**Corrigir uma aula move a fronteira das vizinhas.** Três das quatro rupturas de coerência da
+AULA-17 não existiam antes desta sessão: nasceram dos consertos que a 13 e a 18 receberam. Não há
+ferramenta que avise disso; o que acha é `grep` pelo nome da aula nos 29 arquivos.
+
+## O que falta
+
+**Critério 1 reprova, e é o trabalho conhecido.** Catorze aulas abaixo de 6/12, contra três no
+início desta sessão. O portão piorou porque a medição melhorou, e o conserto delas é a próxima
+frente. Duas estão em 3/12 (05 e 15) e quatro em 4/12 (02, 07, 12, 16).
+
+**Critério 2 é inconclusivo em quinze aulas.** Zero `−1` no que foi medido por dimensão, mas
+quinze aulas nunca tiveram as seis dimensões gravadas, e desconhecido não é zero. Elas são as
+remedidas em rodadas anteriores ao registro por dimensão, que só passou a existir hoje.
+
+**Uma aula tem nota alta e nenhuma medição recente:** a 22, em 10/12, livre de `−1` por aritmética
+e a única do curso ainda acima de 9.
+
+## Instrumental construído nesta rodada
+
+| Ferramenta | O que resolve |
+| --- | --- |
+| `cauda.js` | A cauda que cola em forma de **oração** repetida, que a varredura por palavra não alcançava e que sobreviveu a duas rodadas na AULA-16 |
+| `requebra.js` | Requebra de parágrafo **provando** que a sequência de palavras não mudou. Ensaio por padrão desde que reescreveu uma aula em auditoria |
+| `portao.js` | Reconta o portão do que está gravado, com a regra da última ocorrência e a distinção entre zero e desconhecido |
+
+As três têm suíte com positivo plantado. São sete suítes, e a `rodar.sh` fecha em `SUITE VERDE`.
+
+**Seis expectativas erradas minhas apareceram nos próprios instrumentos**, todas pegas ao rodar.
+A mais instrutiva: um positivo plantado que não provava nada, porque mutei o índice de um array
+quando a regra que eu queria cegar vivia na sobrescrita de um `Map`. Verificador que aprova por não
+medir é a falha mais cara desta auditoria, e ela reincide no instrumento tanto quanto no conserto.

@@ -53,6 +53,10 @@ cd RAG-from-First-Principles/00-SimpleRAG
 python 01_01_LlamaIndex_5LineCode.py
 ```
 
+Se aparecer `ImportError: llama-index-readers-file package not found`, é lacuna do
+`requirements.txt` do módulo, que lista `llama-index-core` e não o metapacote: rode
+`pip install llama-index-readers-file` antes.
+
 ### O que está escondido nessas linhas
 
 Cada linha esconde decisões que as próximas **nove aulas** vão abrir uma a uma — em seis módulos do
@@ -68,11 +72,24 @@ repositório (`01-DataLoading`, `02-DocChunking`, `03-Embedding`, `04-VectorDB`,
 | `as_query_engine()`          | top-k, se há reranking, template de prompt        | 17, 19        |
 | `.query(...)`                | qual LLM, temperatura, como o contexto é montado  | 19            |
 
+⚠️ **Antes de seguir, abra o arquivo que `01_01_LlamaIndex_5LineCode.py:2` carrega.** São 773 bytes sobre capítulos, finais
+e cenários, e a pergunta gravada no script é _"What combat tools are there in Black Myth: Wukong?"_.
+Medido: zero ocorrências de _combat_, _weapon_, _staff_, _transformation_ ou _tool_ no corpus. **A
+pergunta não tem resposta ali.** O prompt padrão do LlamaIndex não manda admitir ignorância, então
+o que sair na sua tela ou é uma recusa, ou é o modelo respondendo de memória e passando por RAG.
+Guarde essa saída: a Parte 3 mostra a frase de uma linha que separa os dois casos, e este é o
+exemplo dela.
+
+**Três das seis ainda não agem aqui, e vale saber antes de procurá-las.** O arquivo que a linha 2
+carrega tem 773 caracteres, **168 tokens**, e o `SentenceSplitter` padrão devolve **um nó**: não há
+fatiamento, o `top_k = 2` escolhe entre um candidato só, e qualquer modelo de embedding recupera o
+mesmo nó. Você vê as três agirem a partir da Parte 3, cujo corpus se fatia de verdade.
+
 Os padrões do LlamaIndex: chunk de 1024 tokens com 20 de sobreposição e `top_k = 2` — os três estão
-no módulo `llama_index.core.constants` (fora deste repositório), conferíveis — mais índice em memória e, **segundo a documentação
-do pacote de integração** (que não vem no `core`, então não confirmei aqui),
-`text-embedding-ada-002` da OpenAI. Nenhum deles é
-o certo para o seu caso. Todos são razoáveis para começar.
+no módulo `llama_index.core.constants` (fora deste repositório), conferíveis — mais índice em
+memória e, **segundo a documentação do pacote de integração** (que não vem no `core`, então não
+confirmei aqui), `text-embedding-ada-002` da OpenAI. Nenhum deles é o certo para o seu caso. Todos
+são razoáveis para começar.
 
 **É por isso que "monta-se um RAG numa tarde".** E é por isso que ele funciona mal
 em produção: você aceitou seis decisões arquiteturais sem saber que as tomou.
@@ -94,13 +111,14 @@ decisões independentes:
 
 Rode `01_02` duas vezes. O esperado — comportamento padrão do cache do `huggingface_hub`, não
 medição minha — é a primeira execução baixar os pesos, com pausa, e a segunda reaproveitá-los do
-cache local, sem rebaixar nada. Duas qualificações que **não** valem, e as duas eu conferi. A
-execução não é gratuita: este script troca apenas o embedding, e a linha 26 usa o LLM padrão, que o
-`resolve_llm("default")` resolve para OpenAI validando a chave — a geração é cobrada nas duas vezes,
-como a própria linha 5 do arquivo avisa. E não é sem rede: a documentação do `huggingface_hub`
-registra que, mesmo com o arquivo em cache, a chamada de download ainda faz uma requisição HTTP para
-checar se há versão nova; `HF_HUB_OFFLINE=1` (ou `TRANSFORMERS_OFFLINE=1`) corta essa ida à rede, e `local_files_only=True`
-na chamada faz o mesmo.
+cache local, sem rebaixar nada. Duas qualificações que **não** valem: a primeira eu conferi, a
+segunda está na documentação do `huggingface_hub` e não medi. A execução não é gratuita: este script
+troca apenas o embedding, e a linha 26 usa o LLM padrão, que o `resolve_llm("default")` resolve para
+OpenAI validando a chave — a geração é cobrada nas duas vezes, como a própria linha 5 do arquivo
+avisa. E não é sem rede: a documentação do `huggingface_hub` registra que, mesmo com o arquivo em
+cache, a chamada de download ainda faz uma requisição HTTP para checar se há versão nova;
+`HF_HUB_OFFLINE=1` (ou `TRANSFORMERS_OFFLINE=1`) corta essa ida à rede, e `local_files_only=True` na
+chamada faz o mesmo.
 
 ### Duas ressalvas reais sobre este código
 
@@ -110,12 +128,17 @@ visíveis são `01_02`, `01_03_LlamaIndex_SwitchGenerationModel.py` e
 `03_LangChain_LCEL_RAG_v3.py`, mas também herdam o mesmo embedding os `01_04`, `01_05`, os quatro
 `02_0x` (`01`, `02`, `04`, `05`) e os três `04_*`. O embedding configurado é `BAAI/bge-small-zh` /
 `BAAI/bge-small-zh-v1.5`. O sufixo `zh` significa **chinês**: são modelos treinados
-para aquele idioma, resíduo da origem do livro. Como o corpus foi traduzido para
-inglês, você está embutindo texto inglês com um modelo chinês — e vai obter recall
-pior do que o exemplo sugere.
+para aquele idioma, resíduo da origem do livro. Como o corpus foi traduzido para inglês, você está
+embutindo texto inglês com um modelo chinês, e em acervo que se fatie isso custa recall.
+
+**Mas nos seis arquivos `01_*` o defeito é latente, não ativo, e é importante não prometer o que
+eles não mostram.** O corpus deles cabe num nó único, então a recuperação devolve sempre esse nó,
+com o modelo chinês, com o inglês ou com um gerador de números aleatórios: o recall é 1,0 por
+construção nos três casos. Para **ver** o defeito agir, use o `03_LangChain_LCEL_RAG_v3.py`, cujo
+corpus é maior e se fatia em cinco chunks. É por isso que o Exercício 3 aponta para o `v3`.
 
 Isso não é um defeito a lamentar: é seu primeiro exercício real de diagnóstico.
-Troque por `BAAI/bge-small-en-v1.5` e compare a qualidade da resposta. Para RAG em
+Troque por `BAAI/bge-small-en-v1.5` e compare, no `v3`, quais trechos voltam. Para RAG em
 português, `intfloat/multilingual-e5-small` ou
 `paraphrase-multilingual-MiniLM-L12-v2` são pontos de partida melhores.
 
@@ -133,8 +156,7 @@ contexto de quem o escreveu.** Ler criticamente é parte do ofício.
 Abra `03_LangChain_LCEL_RAG_v3.py`. Agora cada etapa é uma linha nomeada. Os comentários numerados
 vão de 1 a 9 — os oito abaixo montam o pipeline e o `# 9. Run the query` o executa, no fim do
 arquivo —, e entre eles há uma segunda série, de 1 a 5, que inspeciona a entrada e a saída de cada
-estágio. Aqui estão os oito, com
-comentários numerados de 1 a 8:
+estágio. Aqui estão eles:
 
 ```python
 loader = WebBaseLoader(web_paths=("https://en.wikipedia.org/wiki/Black_Myth:_Wukong",))
@@ -201,7 +223,8 @@ response = chat(model=os.getenv("OLLAMA_MODEL"), messages=[{"role": "user", "con
 ```
 
 **Não há chunking neste exemplo** — cada string já é um chunk. E é isso: RAG
-inteiro em 64 linhas (`awk` no `05_RAG_from_Scratch_Ollama.py`), sem abstração alguma.
+inteiro em 64 linhas (`awk` no `05_RAG_from_Scratch_Ollama.py`), sem LangChain nem LlamaIndex. Há
+abstração, e ela é de biblioteca: `SentenceTransformer` e `faiss` fazem o trabalho pesado.
 
 Três coisas para notar:
 
@@ -231,8 +254,11 @@ forma natural, e o pipeline linear não dá conta. É a base de Self-RAG (Aula 2
 CRAG (Aula 18) e Agentic RAG (Aula 26).
 
 Nesta aula, apenas rode e observe a estrutura de nós e arestas — que **não sai na tela**: o script
-imprime só a pergunta e a resposta. A estrutura está declarada no código, e para vê-la acrescente um
-`print(graph.get_graph().draw_ascii())` depois do `.compile()`. Voltaremos.
+imprime só a pergunta e a resposta. A estrutura está declarada no código, e para vê-la acrescente
+`print(graph.get_graph().draw_mermaid())` depois do `.compile()`. **Não use `draw_ascii()`**, que
+seria mais direto: ele levanta `ImportError: Install grandalf to draw graphs`, e o `grandalf` não
+está no `requirements.txt` do módulo. Se quiser só a estrutura, `list(graph.get_graph().nodes)` e
+`graph.get_graph().edges` bastam. Voltaremos.
 
 ---
 
@@ -242,9 +268,10 @@ Antes dos quatro, faça o script falar. O `03_LangChain_LCEL_RAG_v3.py` é o ún
 **não imprime a resposta**: a linha 99 calcula `response = chain.invoke(question)` e o arquivo acaba
 ali — o `v1` imprime na linha 66, o `v2` na 96. E os cinco `print` de inspeção das linhas 79-95 rodam
 sobre a string literal `"test question"` da linha 75, não sobre a pergunta da linha 98. Então, antes
-de mexer em `k`, prompt ou overlap: acrescente `print(response)` no fim do arquivo e troque a linha 75
-pela pergunta que você quer testar. Sem esses dois passos, os quatro exercícios abaixo não têm saída
-para comparar.
+de mexer em `k`, prompt ou overlap, **escolha um caminho e não misture**. Ou troque a **linha 75** e
+leia os cinco `print` de inspeção, que já mostram a saída de cada estágio. Ou troque a **linha 98** e
+acrescente `print(response)` no fim do arquivo. Trocar a 75 e acrescentar o `print(response)` faz
+você inspecionar uma pergunta e ler a resposta de outra, porque a linha 98 reatribui a variável.
 
 **1. Faça o retriever falhar por top-k.** Em `03_LangChain_LCEL_RAG_v3.py`, mude
 `k=3` para `k=1`. Pergunte algo que exija combinar dois trechos ("compare os estilos
@@ -289,8 +316,8 @@ descrito num trecho que atravessa fronteira de chunk. Prepara a Aula 07.
 
 ## Checkpoint
 
-1. Liste as seis decisões arquiteturais escondidas em
-   `VectorStoreIndex.from_documents(documents)`.
+1. Liste as seis decisões arquiteturais escondidas nas cinco linhas de `01_01`, e diga qual das
+   quatro chamadas esconde cada uma.
 2. Por que `01_02` e `01_03` são exemplos separados, e não um só?
 3. Em `05_RAG_from_Scratch_*.py`, o que `IndexFlatL2` faz, e por que a métrica L2
    não estraga o resultado ali?
