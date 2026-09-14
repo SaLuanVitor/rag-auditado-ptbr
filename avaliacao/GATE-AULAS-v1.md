@@ -2959,3 +2959,45 @@ Soma: **182/348**. Remedidas na oitava rodada: **26 de 29**.
 
 `−1`: continua zero nas dez medidas por dimensão. **Treze aulas livres de `−1`**, três por
 aritmética (07, 17, 22) e dez por medição direta. Restam 16 desconhecidas.
+
+## Oitava rodada, lote 7: a mais tocada também caiu, e a hipótese fecha em doze de doze
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [07](../AULA-07-chunking.md) | 10/12 | **4**/12 | 1 | 0 | 0 | 1 | 1 | 1 | A ressalva com razão fabricada que a R6 apontou foi **negada, não apagada**: o termo inventado continua no texto, e o parêntese que o nega é não-sequitur. E o `buffer_size` está descrito pelo docstring do repositório, que erra o modelo. |
+| [17](../AULA-17-reranking.md) | 11/12 | **5**/12 | 1 | 1 | 1 | 0 | 2 | 0 | Era **a mais tocada das restantes**, 52 linhas desde a R6, e a que tinha melhor chance de resistir. Coerência zero, e três das quatro rupturas foram criadas ou expostas pelos consertos de hoje. |
+
+### A hipótese não tem exceção
+
+Doze aulas remedidas nesta rodada, doze quedas: 01 (8→5), 02 (11→4), 05 (10→3), 07 (10→4),
+10 (11→6), 13 (10→5), 14 (11→6), 15 (10→3), 16 (12→4), 17 (11→5), 18 (12→5), 19 (11→5).
+**Nenhuma subiu, nenhuma empatou.** As duas notas máximas caíram para 5 e para 4, e a mais tocada
+de todas caiu 6 pontos.
+
+Isso encerra a leitura de que a sexta rodada mediu as aulas: ela mediu **o próprio escrutínio**. A
+nota de lá é um teto de atenção, não de qualidade.
+
+### O que a AULA-07 acrescenta, e é sobre conserto e não sobre aula
+
+O achado herdado dela era razão **fabricada** dentro de uma ressalva. O conserto negou o termo
+inventado em vez de removê-lo, e o resultado é pior que o original: o leitor recebe a associação
+errada junto com a negação dela, dentro de um parêntese que não explica o que a frase diz explicar.
+**Conserto de invenção não se faz negando: faz-se apagando.** E a mesma forma tinha se reproduzido
+numa segunda ressalva do mesmo arquivo.
+
+### O que a AULA-17 acrescenta, e é sobre esta rodada
+
+Três das quatro rupturas de coerência dela **não existiam ontem**: nasceram dos consertos que a
+Aula 13 e a Aula 18 receberam hoje. Corrigir uma aula move a fronteira das vizinhas, e a rodada não
+tem instrumento que avise: o `residuo.js` acha texto que sobrevive, não promessa que passou a
+existir. Por enquanto o que acha isso é `grep` pelo nome da aula, em 29 arquivos.
+
+### Estado do portão
+
+Soma: **170/348**. Remedidas na oitava rodada: **28 de 29**, faltando só a AULA-03.
+
+**Treze aulas abaixo de 6/12**: 01 (5), 02 (4), 04 (5), 05 (3), 06 (5), 07 (4), 12 (4), 13 (5),
+15 (3), 16 (4), 17 (5), 18 (5), 19 (5).
+
+`−1`: continua zero nas doze medidas por dimensão. **Treze aulas livres de `−1`**, uma por
+aritmética (22) e doze por medição direta. Restam 16 desconhecidas.
