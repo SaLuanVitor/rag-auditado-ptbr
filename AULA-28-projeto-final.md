@@ -96,7 +96,7 @@ Para cada uma: a pergunta, a aula que a trata, e o custo que a escolha carrega.
 | Tabela: virar texto ou virar consulta SQL  | cabeçalho separado das linhas; usar RAG onde SQL resolve (Aula 06)                          |
 | Que metadados sobrevivem à ingestão        | sem metadado de qualidade de extração, você não sabe o que foi mal lido (Aula 05)           |
 
-A primeira pergunta do diagnóstico, e a menos glamourosa. A Aula 12 tem a advertência mais direta do
+A primeira pergunta do diagnóstico, e a menos glamourosa. A Aula 12 tem, **julgamento**, a advertência mais direta do
 curso: se a pergunta é "quantos registros existem na categoria X", isso é `SELECT COUNT(*)`, não
 recuperação.
 
@@ -110,7 +110,7 @@ recuperação.
 | Denso, esparso ou os dois                                        | esparso mal tokenizado; ColBERT e armazenamento (Aula 08)                                           |
 
 Duas armadilhas se repetem nas Aulas 02, 03 e 08 porque são, **julgamento**, as mais caras: **trocar de modelo
-exige reindexar** (Aulas 02 e 08) e **modelo no idioma errado** (Aulas 03 e 08). As Aulas 07 e 10 trazem as variantes vizinhas — rechunkar exige reindexar, trocar de índice exige reconstruir. O segundo não é um caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
+exige reindexar** (Aulas 02 e 08) e **modelo no idioma errado** (Aulas 03 e 08). As Aulas 07 e 10 trazem as variantes vizinhas — rechunkar exige reindexar, trocar de índice exige reconstruir. A do idioma errado não é caso isolado do repositório: `grep -rliE "bge[a-z-]*-zh"` nos `.py` devolve
 **27 arquivos**, em sete módulos (`00-SimpleRAG` com 11, `06-Indexing` com 7, `05-PreRetrieval` com
 5, e um cada em `02-DocChunking`, `04-VectorDB`, `07-PostRetrieval` e `10-AdvanceRAG`) — modelos com
 sufixo `-zh` sobre corpus em inglês. É resíduo sistemático da origem, não descuido pontual.
@@ -214,8 +214,8 @@ versionado, com resultado datado. A Aula 22 deu o método; aqui está o mínimo 
 
 - **Vinte a cinquenta perguntas**, escritas por quem usa o sistema — não geradas por LLM.
 - Para cada uma, a **resposta correta** anotada à mão e, sempre que possível, **qual trecho** a
-  sustenta. Sem essa segunda parte, `context recall` não existe, e recall é a única métrica que mede
-  o que o sistema **deixou** de trazer.
+  sustenta. Sem essa segunda parte, `context recall` não existe, e recall é a única que quantifica
+  **quanto** ficou de fora: o `hit rate@k` detecta a perda total, não a parcial.
 - Guardado em arquivo, **versionado com o código**, tratado como teste.
 
 Duas proibições que a Aula 24 comprou com exemplo:
@@ -270,8 +270,10 @@ tabela acima: qual estágio o número acusa?
 
 ## Parte 3 — O hábito que vale mais que as técnicas
 
-Este curso catalogou **quinze** casos, no mesmo repositório, em que o nome de um arquivo ou
-diretório prometia o que o código não fazia. Quatorze estão na tabela abaixo; o décimo quinto é o
+Este curso catalogou **dezesseis** casos, no mesmo repositório, em que o nome de um arquivo ou
+diretório prometia o que o código não fazia. Quinze estão na tabela abaixo, numerados na ordem dos
+módulos — é essa numeração que a Aula 26 usa ao chamar o AdaptiveRAG de décimo quarto caso. O
+décimo sexto fica fora da tabela porque não é sobre um módulo e sim sobre o ambiente, e é o
 primeiro que o curso encontrou e está na Aula 00 — o par `01_02`/`01_03` de `00-SimpleRAG/`, cujo
 nome promete trocar uma variável e cujo
 `00-SimpleRAG/01_03_LlamaIndex_SwitchGenerationModel.py:9` troca duas. Não é um repositório ruim: é um
@@ -293,8 +295,9 @@ repositório normal, lido com cuidado.
 | 12  | O TruLens apaga o histórico que o próprio comentário promete usar para comparar versões            |
 | 13  | Um "Contextual Retrieval" cujo contexto são os 50 primeiros caracteres do próprio chunk            |
 | 14  | Um "AdaptiveRAG" que é roteamento de fonte, não retrieval adaptativo                               |
+| 15  | Um "Multimodal RAG" que insere um placeholder de texto no campo da imagem (`02-Weaviate-Multimodal-RAG.py:33`) |
 
-O que os quatorze da tabela têm em comum — e o décimo quinto, da Aula 00 — é o método que os
+O que os quinze da tabela têm em comum — e o décimo sexto, da Aula 00 — é o método que os
 encontrou. Cinco hábitos, e nenhum é difícil:
 
 1. **`ls` antes de contar.** Nenhum número de arquivos afirmado sem listar o diretório.
@@ -304,7 +307,7 @@ encontrou. Cinco hábitos, e nenhum é difícil:
    assim que os casos 9 e 10 apareceram — e o 10 desmentiu o que o nome sugeria.
 4. **`grep` de uso, não de declaração.** Import não é uso; função definida não é função chamada. Os
    casos 3, 11 e 13 são disso.
-5. **Ler o que está comentado.** Metade dos casos acima envolve código desligado: execuções
+5. **Ler o que está comentado.** Vários dos casos acima envolvem código desligado: execuções
    comentadas, URLs comentadas, blocos que o autor deixou para depois.
 
 Julgamento, e é a recomendação com que este curso se despede: esses cinco hábitos valem mais que
@@ -335,12 +338,13 @@ número depende):
 > contar por pontos de entrada em laço daria dois; mesma topologia, corte diferente. Self-RAG e AdaptiveRAG têm de fato as **mesmas
 > arestas de retorno**: `transform_query → retrieve` (`Self-RAG-FullImplementation.py:354` e
 > `02-LangChain-AdaptiveRAG.py:201`) e o condicional final que devolve para `generate` ou para
-> `transform_query` (`:355-364` e `:205-209`). Se você contar por outro critério, conte igual nas
+> `transform_query` (`:355-363` e `:205-209`). Se você contar por outro critério, conte igual nas
 > quatro linhas antes de comparar.
 
 Três com laço, nenhum com limite. E a Aula 25 mostrou, lendo o paper de Modular RAG, que o padrão
 canônico **especifica** o freio nos três subtipos — iterativo com número máximo de iterações,
-recursivo com profundidade máxima e condição de saída — e nomeia o componente responsável por decidir
+recursivo com profundidade máxima e condição de saída, e adaptativo com as duas coisas, critério de
+parada e o mesmo teto `T` — e nomeia o componente responsável por decidir
 quando cessar a geração.
 
 Se o seu projeto tiver aresta que volta, ele precisa de três coisas:
@@ -402,8 +406,9 @@ Imprima os trechos recuperados **antes** de olhar a resposta. Classifique cada f
 - estava no índice e **não voltou** → problema de recuperação (Fases 2 a 5)
 - voltou e a resposta o **ignorou ou contradisse** → problema de geração (Fase 7)
 
-Essa classificação decide o que fazer na etapa seguinte. Mexer no prompt antes de fazê-la é o erro de
-método que o curso repetiu como advertência da Aula 19 à 22.
+Essa classificação decide o que fazer na etapa seguinte. Mexer no prompt antes de fazê-la é o erro
+de método que a Aula 19 nomeou: prompt é o último estágio da ordem de diagnóstico, e mudá-lo antes
+de imprimir o que a recuperação devolveu troca a causa pelo que está visível.
 
 ### Etapa 5 — Uma mudança por vez, medida
 
@@ -426,8 +431,9 @@ encontrou uma função de decisão que gasta uma ou duas chamadas dentro de um l
 ninguém procura custo.
 
 Do lado da indexação: contextualizar chunk manda o documento inteiro por chunk; o GraphRAG do paper
-da Aula 23 levou 281 minutos para um corpus de ~1 milhão de tokens; o multimodal da Aula 27 pede 12
-GB de memória permanentes.
+da Aula 23 levou 281 minutos para um corpus de ~1 milhão de tokens; o multimodal da Aula 27 mantém
+um contêiner de inferência de pé, com teto de 12 GB declarado no compose (`mem_limit: 12g`) e
+consumo real não medido.
 
 ### Etapa 7 — Escreva a defesa
 
@@ -495,13 +501,13 @@ conteúdo. O que fica é isto: **cada peça de um RAG é uma decisão com custo,
 decisão é o número que a mediu.**
 
 E o hábito, que é a parte transferível: abrir o arquivo, rodar o `diff`, grepar o uso, contar com
-`ls`, ler o que está comentado. Foi assim que este curso encontrou quinze arquivos cujo nome
+`ls`, ler o que está comentado. Foi assim que este curso encontrou dezesseis casos de nome que
 prometia mais do que o código entregava — e é assim que você vai evitar que o décimo sexto seja seu.
 
 ---
 
 **Anterior:** [AULA 27 — Multimodal RAG com Weaviate](AULA-27-multimodal-rag.md)
 
-> **Curso concluído.** O plano, o glossário com todos os termos e as duas ferramentas de verificação
+> **Curso concluído.** O plano, o glossário com todos os termos e as ferramentas de verificação
 > estão em [`README.md`](README.md), [`GLOSSARIO.md`](GLOSSARIO.md) e `ferramentas/`. O `HANDOFF.md`
 > guarda os achados por módulo, os números extraídos dos papers e a lista do que ficou por verificar.

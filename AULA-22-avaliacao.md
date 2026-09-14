@@ -15,8 +15,10 @@ escrever cinco perguntas sobre um acervo seu, anotando **onde** no acervo está 
 uma, e disse que aquilo viraria seu conjunto de avaliação — é agora que vira. A Aula 15 prometeu que
 aqui se veria se a janela de sentenças está ajudando. A Aula 21 pediu para medir a qualidade dos
 próprios juízes — e o que esta aula entrega é um teste de **sensibilidade** ao juiz (o primeiro
-item de "Quebre de propósito"), não a calibração contra rótulo humano, que fica para o projeto
-final. A Aula 19 pediu para guardar a taxa de acerto do roteador "para a Aula 22": essa é acurácia
+item de "Quebre de propósito"), não a calibração contra rótulo humano. Essa fica **de fora do
+curso**: a Aula 28 exige juiz fixado e datado, mas não manda comparar os vereditos dele com
+julgamento humano, e o degrau mais próximo é o painel humano que a Aula 23 nomeia. Registre como
+dívida aberta. A Aula 19 pediu para guardar a taxa de acerto do roteador "para a Aula 22": essa é acurácia
 de classificação — `intent == scenario` sobre N perguntas rotuladas, com a matriz de confusão ao
 lado, porque a média esconde qual rota erra —, e é a única das quatro dívidas que **esta aula não
 paga**. Fica registrada como tal em vez de prometida.
@@ -24,9 +26,12 @@ paga**. Fica registrada como tal em vez de prometida.
 **Se você fez o exercício da Aula 01, pegue aquele documento agora** — e conte que falta um campo.
 As cinco perguntas com a **localização** da resposta já bastam para as métricas de recuperação desta
 aula: `hit rate@k` e `MRR` saem de comparar ids. Não bastam para o resto do capítulo. O
-`expected_output` do DeepEval, o `CorrectnessEvaluator` e o `SemanticSimilarityEvaluator` exigem a
-**resposta de referência** — o último levanta `ValueError("Must specify both response and
-reference")` sem ela —, e o documento da Aula 01 não a tem. Escreva as cinco à mão antes de seguir.
+`expected_output` do DeepEval e o `SemanticSimilarityEvaluator` exigem a **resposta de referência**,
+e o segundo levanta `ValueError("Must specify both response and reference")` sem ela. O
+`CorrectnessEvaluator` é pior: ele **não** exige. Sem referência, substitui o campo por
+`"(NO REFERENCE ANSWER SUPPLIED)"` e devolve uma nota assim mesmo, que passa a medir só relevância.
+O documento da Aula 01 não tem a resposta de referência. Escreva as cinco à mão antes de seguir: o
+erro barulhento avisa, o silencioso não.
 Sem gabarito não há medição, só impressão.
 
 A pergunta prática é uma: **como você sabe que a mudança de ontem melhorou algo?** E as três
@@ -57,7 +62,7 @@ resposta fiel é problema de recuperação; contexto bom com resposta infiel é 
 tudo bom e resposta que não responde é problema de prompt.
 
 Note o que **falta** na tríade: ela mede o que o sistema trouxe, nunca o que ele **deixou** de
-trazer. Para isso é preciso `context recall`, e `recall` exige saber qual era a resposta certa.
+trazer. Para isso é preciso `context recall`, e `recall` exige gabarito: ou a resposta de referência (`LLMContextRecall`), ou a lista dos trechos que deveriam ter vindo (`NonLLMContextRecall`, que dispensa juiz).
 
 ### Antes do juiz, as métricas que não precisam de juiz
 
@@ -87,7 +92,7 @@ recuperada. O primeiro é pré-requisito, nunca substituto.
 | Sintético (LLM gera pergunta e resposta a partir do corpus) | baixo                    | mede se o sistema recupera o que **um LLM achou notável**, não o que os usuários perguntam |
 | Perguntas reais de usuários, respostas anotadas depois      | médio                    | só existe depois de o sistema estar em produção                                            |
 
-O repositório usa as três primeiras linhas dessa tabela sem discutir a diferença. Esta aula discute.
+O repositório usa **duas** das três, em arquivos diferentes e sem discutir a diferença: o gabarito humano do `03-DeepEval.py` e o sintético do `04-LlamaIndexEvaluation.py`. A terceira não pode aparecer num repositório didático, por construção. Esta aula discute as três.
 
 ### Sem gabarito, você mede coerência, não correção
 
@@ -316,8 +321,8 @@ answer_relevancy = AnswerRelevancyMetric()
 
 `ContextualPrecisionMetric` é a métrica de **recuperação** que faltava no RAGAS deste módulo — ela
 avalia o contexto, e usa a resposta esperada como referência para decidir o que era relevante. O
-módulo, portanto, cobre a lacuna da Parte 1 em outro arquivo. Foi por isso que valeu abrir os quatro
-antes de escrever a aula: ler só o `01-RAGAS.py` sugeriria que o capítulo ignora recuperação, e não é
+módulo, portanto, cobre a lacuna da Parte 1 em outro arquivo. Ler só o `01-RAGAS.py` sugeriria que o
+capítulo ignora recuperação, e não é
 o caso.
 
 Três observações:
@@ -362,8 +367,12 @@ Repare no `similarity_top_k=2` **nos dois**. É o controle certo sobre o **núme
 recuperados — e é o máximo que este desenho permite, não uma comparação limpa. Os dois índices
 guardam unidades diferentes: `base_nodes` sai de um `SentenceSplitter()` sem argumentos, isto é
 `chunk_size=1024` tokens; os nós de janela são sentenças isoladas, expandidas para no máximo sete
-pelo `MetadataReplacementPostProcessor`. Com `k=2` nos dois, o motor base entrega ao gerador cerca de
-dez vezes mais texto que o motor de janela. Isso é inerente ao small-to-big — mas é uma segunda
+pelo `MetadataReplacementPostProcessor`. Com `k=2` nos dois, o motor base entrega dois chunks de até
+1024 tokens e o de janela entrega duas janelas de no máximo sete sentenças. A razão entre os dois
+volumes **não é propriedade do mecanismo**: é o comprimento médio da sentença do corpus. Com
+sentenças de 25 tokens a base entrega cerca de 6x mais; com prosa de sentenças longas a vantagem
+encolhe, e num corpus de sentenças muito longas ela inverte. Meça no seu antes de ler a tabela.
+Isso é inerente ao small-to-big — mas é uma segunda
 variável, do gênero exato que esta aula ensina a caçar, e qualquer diferença de `faithfulness` entre
 as duas linhas da tabela pode ser volume de contexto, não mecanismo. O `k` igual é o controle
 disponível; o orçamento de tokens não está controlado, e isso precisa entrar na leitura do resultado.
@@ -470,12 +479,13 @@ sample_eval_nodes = random.sample(base_nodes[:200], num_nodes_eval)
 deles. E, se o bloco fosse descomentado, a falta de `random.seed` faria cada execução gerar um
 benchmark diferente — um conjunto de avaliação que muda não serve para comparar duas versões.
 
-**Dois imports mortos**, no mesmo espírito da regra 8 do protocolo de citação: `DatasetGenerator`
+**Dois imports mortos** — import não é uso, e antes de citar um símbolo importado como evidência de arquitetura vale conferir se ele é exercitado: `DatasetGenerator`
 (`09-Evaluation/04-LlamaIndexEvaluation.py:18`) e `PairwiseComparisonEvaluator` (`09-Evaluation/04-LlamaIndexEvaluation.py:19`) só aparecem
 em linhas comentadas (`09-Evaluation/04-LlamaIndexEvaluation.py:111` e `09-Evaluation/04-LlamaIndexEvaluation.py:129`). Anotação de versão
 antes de ressuscitá-los: `DatasetGenerator` e `QueryResponseDataset` — o segundo usado na linha 121 —
-estão marcados `@deprecated` no `llama-index-core`, "deprecated in favor of `RagDatasetGenerator`",
-tanto na geração 0.11 quanto na 0.14. E o `09-Evaluation/requirements.txt:4` traz `llama-index-core`
+estão marcados `@deprecated` no `llama-index-core` 0.12.15, e para substitutos **diferentes**: o
+`DatasetGenerator` aponta `RagDatasetGenerator`, e o `QueryResponseDataset` (o usado de verdade, na
+linha 121) aponta `LabelledRagDataset`. E o `09-Evaluation/requirements.txt:4` traz `llama-index-core`
 **sem pin**, o oposto do cuidado que este mesmo módulo teve com o `ragas<0.3`. O import morto, quando
 ressuscitado, ressuscita numa API que a biblioteca já pediu para você abandonar. O segundo é uma pena: comparação pareada — mostrar ao juiz as
 duas respostas e perguntar qual é melhor — é frequentemente mais estável que pedir uma nota absoluta,
@@ -631,16 +641,19 @@ graders das aulas anteriores. Avaliação é barata comparada a decidir errado �
 conta que precisa ser feita antes, não descoberta na fatura.
 
 **Métrica única como gate.** Um limiar por métrica, e nunca uma média das quatro: a média deixa uma
-fidelidade péssima passar às costas de uma similaridade semântica ótima. É a mesma razão pela qual a
-rubrica de avaliação do agente deste projeto tem portas eliminatórias por capítulo.
+fidelidade péssima passar às costas de uma similaridade semântica ótima. Um buraco localizado não
+aparece na média, e é por isso que o limiar tem de ser por métrica.
 
 **Caminho absoluto no repositório.** `09-Evaluation/04-LlamaIndexEvaluation.py:47` é um dos **dois**
-caminhos absolutos em arquivos `.py` — o outro é
+caminhos absolutos que um `.py` deste repositório de fato **abre** (um `grep` por literal acha
+quatro; os outros dois são valores decorativos de `metadata` em
+`01-DataLoading/01-SimpleTextLoading/06-LlamaIndex-BuildDocumentObject.py:10,23`, nunca lidos do
+disco) — o outro é
 `03-Embedding/05-MultimodalEmbedding.py:20`, que aponta um `.pth` sob `/root/AI-BOX/code/rag/rag-in-action/`.
 Nos notebooks o problema é maior: quatro `.ipynb` trazem catorze linhas de código com caminho
 absoluto, inclusive `06-Indexing/01-FromSmallChunksToLargeContext/01-NodeSentenceSlidingWindow-EvalVersion.ipynb`,
 que repete **o mesmo** caminho do `04` deste módulo — é o gêmeo em notebook do A/B da Parte 4, com o
-mesmo defeito, e a restrição a `.py` que a Parte 5 declarou não vale para esta frase.
+mesmo defeito, e a restrição a `.py` que as duas frases anteriores declararam não vale para esta.
 Os dois trazem o nome antigo do projeto (`rag-in-action`) e cada um basta para o arquivo não rodar em
 nenhuma outra máquina. Antes de concluir que um exemplo está errado, confira se ele está apenas
 apontando para o lugar errado.
@@ -661,8 +674,8 @@ Responda sem consultar:
 6. O que o seletor `Select.RecordCalls.retrieve.rets[:]` faz, e por que isso distingue o TruLens dos
    outros três?
 7. Por que `reset_database()` contradiz o que o comentário final do mesmo arquivo promete?
-8. Quais são os quatro campos de um `LLMTestCase`, e qual deles os outros três scripts não têm?
-9. O que torna o `04-LlamaIndexEvaluation.py` uma comparação controlada? Que linha prova isso?
+8. Quais são os quatro campos de um `LLMTestCase`, e qual deles só o `03` traz escrito à mão? Qual outro script tem esse campo, e de onde ele veio?
+9. O que o `04-LlamaIndexEvaluation.py` controla na comparação, que linha prova isso, e qual variável continua solta?
 10. Descreva a circularidade do gabarito sintético. O que ela mede de fato?
 11. Que dois defeitos impedem o `04` de rodar, e por que eles são incoerentes entre si?
 12. Por que um limiar por métrica é melhor que um limiar sobre a média das métricas?
