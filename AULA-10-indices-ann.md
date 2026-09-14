@@ -75,8 +75,9 @@ você não sabe se seu HNSW está em 0,92 ou 0,99 — e essa diferença é a inf
 importante de um sistema de recuperação.
 
 Além disso, em acervo pequeno FLAT tende a ser mais rápido na prática: não há overhead de navegação,
-e a varredura de poucos vetores provavelmente cabe em cache — plausível, e não medido aqui. É por isso que `00-SimpleRAG/05_RAG_from_Scratch_Ollama.py:30` usa
-`faiss.IndexFlatL2` para nove documentos — ANN ali seria absurdo.
+e a varredura de poucos vetores provavelmente cabe em cache — plausível, e não medido aqui. É por
+isso que `00-SimpleRAG/05_RAG_from_Scratch_Ollama.py:30` usa `faiss.IndexFlatL2` para nove
+documentos — ANN ali seria absurdo.
 
 ### IVF_FLAT — particionar o espaço
 
@@ -108,9 +109,12 @@ Acrescenta **Product Quantization** ao IVF: o vetor é dividido em sub-vetores e
 substituído pelo centroide mais próximo de um pequeno dicionário. O resultado ocupa uma fração
 da memória original.
 
-O parâmetro novo é **`m`** — quantos sub-vetores. O comentário de `03-ivf_pq_index.py:39` traz
-a restrição e um exemplo: _"usually dim/m >= 2; here 128/32=4"_. Ou seja, com dimensão 128 e
-`m: 32`, cada sub-vetor tem 4 componentes.
+São **dois** parâmetros novos, `m` e `nbits` (`03-ivf_pq_index.py:39` e `:40`). O `m` diz em
+quantos sub-vetores o vetor é partido, e o comentário do arquivo traz a restrição com exemplo:
+_"usually dim/m >= 2; here 128/32=4"_, ou seja, com dimensão 128 e `m: 32` cada sub-vetor tem 4
+componentes. O `nbits` diz com quantos bits cada sub-vetor é codificado, e é o par que fixa a
+compressão: com `m: 32` e `nbits: 8`, um vetor de 128 dimensões passa de 512 bytes em float32 para
+32 bytes, **16 vezes menos**.
 
 A troca é explícita: **memória por precisão.** A quantização é lossy — vetores diferentes podem
 colapsar no mesmo código —, então o recall cai em relação ao IVF_FLAT com os mesmos `nlist` e
@@ -148,8 +152,8 @@ compara índices entre si. O que ele cobra:
 Para acervos que não caberiam em RAM. O parâmetro de busca é **`search_list: 32`** (linha 62) —
 o tamanho da lista de candidatos.
 
-Um detalhe do arquivo que vale registrar: a linha 34 traz o comentário _"Supports L2, IP, or
-COSINE"_ — é o único dos cinco que documenta explicitamente as métricas suportadas.
+Um detalhe que vale registrar: `05-DiskANN.py:34` traz o comentário _"Supports L2, IP, or
+COSINE"_, e é o único dos cinco que documenta explicitamente as métricas suportadas.
 
 A troca aqui é **latência por capacidade**: acesso a disco é ordens de magnitude mais lento que
 RAM, e o índice é desenhado para minimizar o número de leituras. Use quando o volume manda, não
@@ -159,7 +163,7 @@ por preferência.
 
 ## Métricas: o erro que não avisa
 
-`03-SearchAndMetrics/02-ann-diff-metrics.py` monta o experimento certo. Na linha 15:
+`03-SearchAndMetrics/02-ann-diff-metrics.py` monta o experimento certo. Nas linhas 15-16:
 
 ```python
 metric_types = ["L2", "IP", "COSINE"]
@@ -175,10 +179,18 @@ E o detalhe que considero mais instrutivo do arquivo, na linha 106:
 search_vectors = normalized_query_vectors if metric_type == "COSINE" else query_vectors
 ```
 
-O código **normaliza os vetores de consulta somente quando a métrica é COSINE**. É a Aula 02
-aplicada: cosseno compara direção e ignora magnitude; produto interno considera as duas. Com
-vetores normalizados, IP e cosseno coincidem — sem normalizar, IP passa a favorecer vetores de
-maior magnitude, e em texto magnitude correlaciona com comprimento.
+Parece a Aula 02 aplicada, e não é: **normalizar só a consulta não muda ranking nenhum.** Escalar
+a query por `1/‖q‖` multiplica todos os produtos internos pela mesma constante positiva, então a
+ordem sai idêntica. Medido com 1000 vetores em 128 dimensões: a permutação completa de IP com
+query crua e de IP com query normalizada é a mesma, até o último elemento.
+
+O que de fato separa IP de COSINE neste arquivo é a **linha 20**, onde os vetores **armazenados**
+são sorteados e nunca normalizados, somada à normalização que o Milvus aplica por dentro na
+collection COSINE. Com o mesmo dado e a mesma consulta, IP e COSINE dividiram 3 dos 10 primeiros.
+A lição da Aula 02 continua de pé, e a linha que a carrega é outra: **normalização é propriedade
+do acervo, não da consulta.** Com os dois lados normalizados, IP e cosseno coincidem; com nenhum
+dos dois, IP favorece vetores de maior magnitude, e em texto magnitude correlaciona com
+comprimento.
 
 Escolher a métrica errada **não lança erro**. O sistema devolve resultados, o ranking está
 comprometido, e nenhuma métrica de geração acusa. É a armadilha silenciosa do capítulo 4, e a
@@ -213,11 +225,12 @@ cometeu na primeira avaliação do agente `@rag-specialist` — registrada em
 [`avaliacao/GATE-RAG-SPECIALIST-v2.md`](avaliacao/GATE-RAG-SPECIALIST-v2.md).)
 
 Note também o que estes dois **não** são. O `07-text-match.py` usa `TEXT_MATCH` como **filtro
-dentro** de uma busca vetorial — `client.search(..., anns_field="vector", ..., filter=...)` na linha 112, com o `filter` definido
-na 107 (as linhas 59, 75 e 91 do mesmo arquivo são buscas vetoriais puras, sem `filter`) —, o mesmo padrão do filtro escalar de `03-filtered-search.py`, não um substituto da busca.
-Já em `09-metadata-query.py`, só os passos finais (`.get()`, `.query()`, `.query_iterator()`) são
-consulta sem vetor. Um vector DB moderno acumula os dois papéis, e é isso que permite o roteamento
-de fonte que a Aula 12 pediu, sem trocar de banco.
+dentro** de uma busca vetorial — `client.search(..., anns_field="vector", ..., filter=...)` na linha
+112, com o `filter` definido na 107 (as linhas 59, 75 e 91 do mesmo arquivo são buscas vetoriais
+puras, sem `filter`) —, o mesmo padrão do filtro escalar de `03-filtered-search.py`, não um
+substituto da busca. Já em `09-metadata-query.py`, só os passos finais (`.get()`, `.query()`,
+`.query_iterator()`) são consulta sem vetor. Um vector DB moderno acumula os dois papéis, e é isso
+que permite o roteamento de fonte que a Aula 12 pediu, sem trocar de banco.
 
 ### Filtro escalar
 
@@ -299,7 +312,7 @@ python 05-DiskANN.py
 Rode nesta ordem e **guarde os resultados do FLAT** — eles são o gabarito de recall dos outros
 quatro.
 
-Depois monte a medição que a aula pede — mas **três coisas nos arquivos impedem que ela funcione como
+Depois monte a medição que a aula pede — mas **cinco coisas nos arquivos impedem que ela funcione como
 estão escritos**, e consertá-las é a primeira parte do exercício:
 
 - **Os arquivos 01 a 04 usam a mesma collection.** Todos declaram
@@ -311,6 +324,21 @@ estão escritos**, e consertá-las é a primeira parte do exercício:
   FLAT e IVF respondem sobre acervos diferentes, a perguntas diferentes — a interseção de ids é quase
   zero por construção, e não mede aproximação nenhuma. Ponha `random.seed(42)` antes da linha 22 em
   todos.
+- **O dado é ruído uniforme, e é isso que decide o número.** Este é o bloqueio que domina os
+  outros, e o único que nenhum conserto de configuração resolve. Os vetores são `random.random()`
+  em 128 dimensões, sem agrupamento nenhum, e nesse dado o quinto vizinho fica cerca de 3% mais
+  longe que o primeiro: o k-means não tem estrutura para particionar, e a vizinhança verdadeira se
+  espalha por células que o `nprobe` não visita. Medido com um replicador de IVF em `numpy`, 100
+  mil vetores, `nlist: 64`, `nprobe: 10`, `k=5`: **recall 0,40 no dado uniforme e 1,00 no mesmo
+  tamanho com 200 clusters gaussianos.** O 0,40 mede a maldição da dimensionalidade, não o índice.
+  Substitua o sorteio uniforme por embeddings reais do seu acervo, ou ao menos por mistura de
+  gaussianas, antes de acreditar em qualquer linha da tabela.
+- **Os cinco escrevem `ann_field` onde o parâmetro é `anns_field`.** Ele cai no `**kwargs` do
+  `MilvusClient.search` e é descartado em silêncio; como há um campo vetorial só, o Milvus infere e
+  a busca funciona. Não quebra, e por isso passa despercebido. O `07-text-match.py` usa a forma
+  certa, nas linhas 62, 78, 94 e 111.
+- **Todos terminam em `release_collection`.** As coleções coexistem no disco depois do conserto do
+  primeiro item, mas para comparar numa sessão seguinte você precisa de `load_collection` antes.
 - **Mil vetores é pouco para o exercício 1.** Com `nlist: 1024` você pediria mais células do que há
   vetores. Suba `num_vectors` para algo como 100000 se quiser que a tabela recall × latência tenha o
   que mostrar.
@@ -356,19 +384,27 @@ aproxima.
 **3. Use a métrica errada de propósito.** Construa uma collection com `metric_type="IP"` e
 busque com vetores **não** normalizados, comparando com a versão COSINE do
 `02-ann-diff-metrics.py`. Nenhum erro é lançado; o ranking muda. Fixe esse sintoma: ranking
-sistematicamente estranho, sem exceção nenhuma, é suspeita de métrica incompatível.
+sistematicamente estranho, sem que nenhum erro seja lançado, é suspeita de métrica incompatível.
 
-**4. Filtre de forma muito seletiva.** Em `03-filtered-search.py`, mude o filtro para algo que
-elimine quase tudo (`likes > 999999`). Observe quantos resultados voltam, e depois compare com
-o comportamento sob `"hints": "iterative_filter"` — e note que o filtro está escrito **duas vezes** no
-arquivo, uma na busca padrão e outra na iterativa. Extraia-o para uma variável e passe-a nas duas
+**4. Filtre de forma muito seletiva.** Em `03-filtered-search.py`, dois avisos antes de mexer.
+O `likes` é sorteado em `[1, 1000]` na linha 27, então `likes > 999999` não elimina quase tudo:
+elimina **tudo**, deterministicamente, e as duas estratégias devolvem zero. Use algo como
+`likes > 990`, que deixa da ordem de 1% do acervo. E o arquivo constrói `FLAT` na linha 37 sobre
+mil vetores, que é exatamente o caso em que a ressalva desta aula já disse que as estratégias não
+divergem: troque para `IVF_FLAT` com `nlist: 64` antes de comparar, ou você mede duas vezes a
+mesma varredura exaustiva. Feito isso, compare o comportamento sob `"hints": "iterative_filter"`
+— e note que o filtro está escrito **duas vezes** no arquivo, uma na busca padrão e outra na
+iterativa. Extraia-o para uma variável e passe-a nas duas
 chamadas; trocando só a primeira, você compara filtros diferentes em vez de estratégias diferentes.
 
 **5. Inverta `radius` e `range_filter` — depois de fazer a busca devolver algo.** A janela do exemplo
 é vazia para o dado deste script, e isso não é bug de configuração: é a geometria do dado sintético.
-Os 1000 vetores e a consulta são uniformes em [0,1) com 128 dimensões, e a distância entre dois
-vetores assim fica em torno de 4,5 — o vizinho mais próximo mede 3,84, ou 14,75 na escala quadrática
-que o Milvus reporta para L2. Nenhum vetor cai entre 0,5 e 1,0, então a busca devolve lista vazia. Se
+Os 1000 vetores e a consulta são uniformes em [0,1) com 128 dimensões, e a distância média entre a
+consulta e um vetor assim é **4,62** (medido em 400 execuções). O vizinho mais próximo fica em
+torno de **15,0 na escala quadrática que o Milvus reporta para L2**, com desvio de 0,85 e faixa
+p5-p95 de 13,6 a 16,3, o que dá cerca de 3,87 na escala linear. **O script não tem semente**, então
+cada execução devolve um valor dessa faixa, não um número fixo. Nenhum vetor cai entre 0,5 e 1,0
+(zero em 400 mil sorteios), então a busca devolve lista vazia. Se
 você inverter a partir daí, compara vazio com vazio.
 
 Então: primeiro leia as distâncias que a busca top-k do mesmo arquivo imprime e escolha `radius` e

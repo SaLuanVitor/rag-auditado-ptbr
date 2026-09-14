@@ -15,7 +15,9 @@
 // Medido em 14/09/2026 sobre as 29 aulas e o glossario, os dois unicos achados
 // de duas palavras ou mais eram legitimos: "resumos de resumos" e o mecanismo do
 // RAPTOR na AULA-23, e "Function calling / Tool calling / Tool use" e uma lista
-// de sinonimos no GLOSSARIO. Leia antes de consertar.
+// de sinonimos no GLOSSARIO. Um terceiro apareceu depois, na AULA-10:
+// "- **Cronometrar so a media.** A media esconde a cauda" e o estilo de rotulo em
+// negrito da casa, rotulo e prosa comecando igual. Leia antes de consertar.
 //
 // Uso: node ferramentas/cauda.js <arquivo.md> [...]
 const fs = require('fs');

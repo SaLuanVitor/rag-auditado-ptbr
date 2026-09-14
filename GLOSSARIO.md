@@ -210,8 +210,10 @@ Parâmetros `nlist` (número de clusters) e `nprobe` (quantos visitar).
 **IVF_PQ** — IVF com Product Quantization: comprime os vetores. Economiza memória,
 perde precisão.
 
-**HNSW** — Grafo hierárquico navegável. Melhor equilíbrio recall/latência para a
-maioria dos casos. Parâmetros `M` e `efConstruction`/`ef`.
+**HNSW** — Grafo hierárquico navegável. Tem fama de melhor equilíbrio recall/latência na maioria
+dos casos, e isso é doutrina corrente de ANN, não medição deste repositório: nenhum dos cinco
+arquivos de `02-Indexes/` compara índices entre si, como a Aula 10 registra. Parâmetros `M` e
+`efConstruction`/`ef`.
 
 **DiskANN** — Índice em disco, para acervos que não caberiam em RAM.
 

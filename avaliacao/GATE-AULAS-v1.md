@@ -2856,3 +2856,68 @@ Soma: **207/348**. Remedidas na oitava rodada: **22 de 29**.
 `−1`: nenhum nas seis medidas hoje, e agora está registrado por dimensão. **Treze aulas livres de
 `−1`**, sete por aritmética (nota 10 ou mais: 05, 07, 10, 15, 17, 19, 22) e seis por medição
 direta (01, 02, 13, 14, 16, 18). Restam 16 desconhecidas.
+
+## Oitava rodada, lote 5, e uma correção sobre este arquivo
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [19](../AULA-19-modelo-e-prompt-engineering.md) | 11/12 | **5**/12 | 1 | 1 | 0 | 1 | 1 | 1 | Um parágrafo declara o mesmo fato como **medido** e como **não afirmável sem executar**, e o exercício ainda o chama de pergunta aberta. Três estatutos epistêmicos para um fato só. E "a importação falha" é falso: medido, o bloco inteiro sobe, com aviso de depreciação. |
+| [10](../AULA-10-indices-ann.md) | 11/12 | **6**/12 | 1 | 0 | 1 | 1 | 2 | 1 | A leitura central da seção de métricas descreve um **no-op**: normalizar só a consulta não muda ranking nenhum, porque escalar por `1/‖q‖` multiplica todos os produtos internos pela mesma constante. O que separa IP de COSINE ali é o acervo nunca normalizado. |
+
+**O primeiro `H` zero da rodada**, na 19, e a causa é de forma, não de conteúdo: a aula é honesta em
+cada frase e incoerente entre elas. Marcar limite e depois levantá-lo é o certo; o que faltou foi
+apagar a marca.
+
+### Correção sobre este arquivo, e ela é minha
+
+Ao lançar a auditoria da AULA-10 eu afirmei que ela tinha **dois achados registrados e nunca
+aplicados**, na seção "Achados de domínio (`@rag-specialist`), sem nota, por método". Estava
+errado, e a auditoria mediu:
+
+```
+git show 6658768:AULA-10-indices-ann.md | grep -n -i "bitset"
+  242: | **Pré-filtragem** | ... avaliada durante a travessia, como bitset | é o comportamento padrão do Milvus |
+```
+
+O `6658768` é o **primeiro commit do repositório**. A aula já nasceu dizendo pré-filtragem, e o
+achado descrevia um rascunho anterior ao git. O segundo, sobre o duplo sentido de `recall`, está
+resolvido nas três superfícies desde o mesmo commit: AULA-10 (309-313), AULA-22 (84-85) e
+`GLOSSARIO.md` (218-224).
+
+**Então a seção de achados de domínio tem dois estatutos misturados.** O da AULA-13 estava vivo e
+sobreviveu à rodada que o apontou; os dois da AULA-10 nunca tiveram objeto nesta versão do texto.
+A lição da AULA-13 continua de pé, e ganha uma segunda metade: **achado registrado fora do laço de
+conserto é achado perdido, e achado registrado sem o hash contra o qual foi medido é pior, porque
+manda consertar o que já está certo.**
+
+O que **procede** na AULA-10 é o método, e por isso ela ainda caiu: a frase "é o comportamento
+padrão do Milvus" é documentação da fonte copiada. Medido, o `pymilvus 2.5.4` reconhece a chave
+`hints` e não valida o valor nem sabe o que é bitset; a estratégia é decidida no servidor, e daqui
+não se verifica.
+
+### O que a AULA-10 mostra sobre medir com dado sintético
+
+O melhor achado dela não é um erro de texto, é um erro de experimento. A aula lista três coisas que
+impedem a medição de recall de funcionar, e nenhuma das três é a que domina. Medido com um
+replicador de IVF em `numpy`, 100 mil vetores, `nlist: 64`, `nprobe: 10`, `k=5`:
+
+| Dado | recall@5 |
+| --- | --- |
+| uniforme em [0,1), 128 dimensões | **0,40** |
+| 200 clusters gaussianos, mesmo tamanho | **1,00** |
+
+O 0,40 é propriedade do **dado**, não do índice: em 128 dimensões uniformes o quinto vizinho fica
+3% mais longe que o primeiro, e o k-means não tem estrutura para particionar. O aluno que
+consertasse os três itens da lista concluiria que IVF_FLAT perde três de cada cinco vizinhos, e o
+número não diria nada sobre IVF. A lista passou a ter cinco itens, com este em primeiro lugar.
+
+### Estado do portão
+
+Soma: **196/348**. Remedidas na oitava rodada: **24 de 29**.
+
+**Nove aulas abaixo de 6/12**: 01 (5), 02 (4), 04 (5), 06 (5), 12 (4), 13 (5), 16 (4), 18 (5),
+19 (5).
+
+`−1`: continua zero em todas as oito medidas por dimensão. **Treze aulas livres de `−1`**, cinco
+por aritmética (05, 07, 15, 17, 22) e oito por medição direta (01, 02, 10, 13, 14, 16, 18, 19).
+Restam 16 desconhecidas.
