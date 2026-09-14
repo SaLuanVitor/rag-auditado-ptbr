@@ -38,6 +38,20 @@ que continha a informação decisiva não entra.
 Nativo rende centenas; digitalizado rende zero ou lixo isolado. Um limiar simples separa o
 acervo inteiro em minutos. Faça por página, não por documento — é assim que o híbrido aparece.
 
+⚠️ **E o módulo é um exemplo dos três tipos, sem avisar.** Os PDFs de turismo que os arquivos
+`05-*` e `09-*` carregam são **digitalizados**. Medido nos bytes, sem biblioteca nenhuma:
+`Yungang Grottoes-en.pdf` tem 19 imagens, **zero fontes e zero operadores de texto**
+(`BT`, `Tj`, `TJ`), e o mesmo vale para 15 dos 16 PDFs daquela pasta. O único nativo é o
+`Shanxi-en.pdf`, com 145 fontes e 3108 `BT`, e nenhum script do módulo o usa. Já o
+`black_myth_wukong_slides.pdf`, que o `01`, o `02`, o `03` e o par `06` carregam, é nativo e
+sintético: 4759 bytes gerados pela ReportLab.
+
+**Três consequências.** O `strategy="hi_res"` sobre aqueles arquivos não é análise de layout sobre
+texto existente: é **OCR**, porque não há texto para analisar. Os títulos `Crint` e `ancient` na
+saída já gravada do `08-AnalyzePDFLayout.ipynb` são erro de OCR, não de parser. E a escada de
+fidelidade abaixo compara degraus que **nunca tocaram o mesmo arquivo**: os de baixo rodam sobre o
+deck sintético, os de cima sobre o scan.
+
 ### A escada de fidelidade
 
 O módulo está organizado por quanto de estrutura cada abordagem preserva:
@@ -45,20 +59,21 @@ O módulo está organizado por quanto de estrutura cada abordagem preserva:
 ```
 texto corrido  →  elementos tipados  →  hierarquia  →  layout com coordenadas
 
-(A escada ordena o **grau de estrutura que você obtém**, não a ordem dos arquivos: o
-`05-LangChain-Unstrucured-PDF-ExtractDocumentStructure.py` já sobe dois degraus de uma vez — tem
-reconstrução pai-filho por `parent_id`/`element_id` nas linhas 109-133 e uma função
-`analyze_layout()` na 53. Sobre esta última, uma ressalva com o que dá para saber daqui: a linha 7 do arquivo tem
-`# coordinates=True,` **comentada**. E o `08-AnalyzePDFLayout.ipynb`, no mesmo diretório e citado
-adiante nesta aula, liga o parâmetro **explicitamente** e traz coordenadas reais na saída
-(`points`, `layout_width`, `layout_height`). Isso é indício forte de que o parâmetro não vem ligado
-por padrão — logo, de que o `analyze_layout()` do `05` roda sobre metadado vazio. **Não é prova:**
-aquele notebook usa `partition_via_api=True`, então mede o caminho da API, não o `hi_res` local, e
-sem instalar o `unstructured` não fecho a pergunta. Mas a evidência estava na mesma pasta, e é mais
-honesto usá-la do que declarar a incerteza inteira.)
    PyPDF            partition()         parent-child      caixas na página
    PyMuPDF          Unstructured        Title→Text        fitz + matplotlib
 ```
+
+A escada ordena o **grau de estrutura obtido**, não a ordem dos arquivos: o
+`05-LangChain-Unstrucured-PDF-ExtractDocumentStructure.py` sobe dois degraus de uma vez, com
+`analyze_layout()` na linha 53 e reconstrução pai-filho por `parent_id`/`element_id` nas linhas
+109-132.
+
+Uma ressalva sobre essa função: a linha 7 do arquivo tem `# coordinates=True,` **comentada**, e a
+73 pula todo elemento sem `points`. Se o `hi_res` local não preencher coordenadas por padrão, o
+`analyze_layout()` não imprime nada. Quem liga o parâmetro é o `08-AnalyzePDFLayout.ipynb`, e ele o
+faz junto com `partition_via_api=True`, ou seja, mede a API e não o caminho local: **a pergunta fica
+em aberto**, e só se fecha rodando o `05` com o `unstructured` instalado. Ao rodar, descomente a
+linha 7 se a saída de layout vier vazia.
 
 Cada degrau custa mais e entrega mais contexto recuperável. A pergunta de engenharia não é
 "qual é o melhor", é **qual degrau o meu corpus exige** — e isso depende de quanta informação
@@ -97,7 +112,9 @@ Os dois extraem texto nativo. A diferença prática:
 - **PyPDF** vem embrulhado como loader do LangChain — devolve `Document` já com metadados de
   página, pronto para o pipeline.
 - **PyMuPDF** (importado como `pymupdf`, historicamente `fitz`) é biblioteca de baixo nível:
-  mais rápida, com acesso a coordenadas, imagens e anotações — e sem o embrulho. Você monta o
+  com acesso a coordenadas (linha 30), imagens (22) e links (26), e sem o embrulho. O próprio
+  arquivo, nos comentários das linhas 35-46, se declara mais rápido e mais econômico de memória que
+  o Unstructured; é alegação do autor, não medição desta aula. Você monta o
   `Document` à mão, como a Aula 04 mostrou.
 
 Julgamento: se você só precisa do texto e vai usar LangChain, PyPDF basta. Se precisa de
@@ -182,8 +199,12 @@ as regiões detectadas.
 
 **Julgamento:** é o exercício mais subestimado do módulo. Depurar ingestão de PDF lendo texto extraído é
 adivinhação; **ver as caixas desenhadas sobre a página** mostra na hora que a coluna da direita
-foi lida antes da esquerda, ou que a tabela virou um bloco só. Quando um PDF der problema no
-seu projeto, comece por aqui.
+foi lida antes da esquerda, ou que a tabela virou um bloco só.
+
+**Mas não comece rodando o `.py`.** Ele tem 52 linhas e é **só a definição** de
+`render_pdf_page()`: nenhuma chamada, e a última linha é `plt.tight_layout()`, sem `plt.show()` nem
+`savefig`. Rodá-lo sozinho não imprime nem desenha nada. Quem chama a função é a célula 5 do
+`08-AnalyzePDFLayout.ipynb`, com um `docs` carregado com `coordinates=True`.
 
 ### O par 09: hierarquia por dois caminhos
 
@@ -218,6 +239,12 @@ o jogo:
 O `03` é a abordagem mais recente e, **julgamento**, a mais poderosa: rasteriza a página, codifica em base64,
 manda para um modelo de visão e pede a **descrição do conteúdo**. Depois embrulha o resultado
 num `Document` (linha 59; a 56 é só o import).
+
+⚠️ **Um bug antes de rodar.** Na linha 52, o `results.append(...)` ficou na **coluna 0**, fora do
+`for image_path in image_paths:`. As chamadas ao modelo acontecem por página e custam por página,
+mas só a última resposta é guardada: um deck de N páginas produz **um** `Document`, e o
+`page_number: i + 1` da linha 61 sai sempre 1. Indente a 52 em quatro espaços antes de comparar as
+saídas.
 
 O que isso resolve que OCR não resolve: OCR lê caracteres; o modelo multimodal **interpreta**.
 Um gráfico de barras não tem texto além dos rótulos — o OCR devolve rótulos soltos, e o modelo
@@ -257,12 +284,22 @@ python 05-LangChain-Unstrucured-PDF-SimpleDisplay.py
 
 Primeira execução baixa modelos de layout — leva tempo. Compare a estrutura obtida com a saída
 crua do `01-UsingPyPDF.py` — e note que os dois **não leem o mesmo documento**: o `01` abre o PDF de
-slides do Black Myth Wukong na linha 2, e o `05` abre um PDF de turismo na linha 1. Para a comparação ser da
-estratégia de extração e não do documento, aponte a linha 1 do `05` para o mesmo PDF do `01` antes de
-rodar.
+slides do Black Myth Wukong na linha 2, e o `05` abre um PDF de turismo na linha 1.
 
-Depois abra `07-Unstructed-PDF-CompareVariousModes.ipynb`, que compara modos lado a lado, e
-`08-AnalyzePDFLayout.ipynb`, que é onde as caixas aparecem desenhadas.
+Aponte a **linha 2 do `01`** para o PDF de turismo do `05` e rode: o PyPDF devolve páginas vazias e
+não reclama, porque aquele arquivo não tem camada de texto. É a falha silenciosa da seção de
+abertura desta aula, em um comando. Depois, para comparar as **estratégias** sobre um documento que
+as duas conseguem ler, aponte as duas para `../../90-Data/Shanxi Cultural Tourism/Shanxi-en.pdf`,
+o único nativo daquela pasta. Apontar o `05` para o deck de slides faz o contrário do que o
+exercício quer: joga o `hi_res` sobre 4759 bytes sintéticos, onde não há estrutura para recuperar.
+
+Depois abra `08-AnalyzePDFLayout.ipynb`, que traz as caixas desenhadas e a saída já gravada. O
+`07-Unstructed-PDF-CompareVariousModes.ipynb` compara estratégias no código, mas foi commitado
+**sem nenhuma saída** e com sete caminhos absolutos da máquina do autor
+(`/home/huangj2/...`): abrir não mostra comparação alguma, e para rodá-lo você troca os sete e
+instala o `unstructured` antes. Note também que o `08` roda `partition_via_api=True` contra
+`api.unstructuredapp.io` e exige `UNSTRUCTURED_API_KEY`: o mesmo envio para fora que esta aula
+trata como decisivo ao discutir o LlamaParse.
 
 ---
 
@@ -282,15 +319,25 @@ texto e compare com a extração direta. Antes de rodar, troque o `lang` da cham
 linha 20, de `chi_sim` para `eng`: o arquivo herdou o modelo chinês da origem do repositório, e sobre
 um PDF em inglês ele devolve lixo pelo motivo errado — ou aborta, se o pacote de dados
 `tesseract-ocr-chi-sim` não estiver instalado. Com `eng`, o que sobra de divergência contra a extração
-direta é imperfeição de OCR, que é o que o exercício quer medir. O OCR vai introduzir erros num
-arquivo que não precisava dele — argumento empírico contra "OCR em tudo por segurança".
+direta é imperfeição de OCR, que é o que o exercício quer medir.
+
+E escolha o alvo: **não use o deck de slides do repositório.** Ele foi gerado pela ReportLab em
+Helvetica limpa, e é o caso quase ótimo para o Tesseract, que vai acertar quase tudo e produzir o
+argumento oposto ao que o exercício quer. Use `../../90-Data/ComplexPDF/uber_10q_march_2022_page1-3.pdf`,
+que tem dezenas de fontes e tabelas financeiras. Ali o OCR introduz erros num arquivo que não
+precisava dele, que é o argumento empírico contra "OCR em tudo por segurança".
 
 **4. Compare OCR com modelo multimodal na mesma página — e note que exige uma edição.** Os dois
 scripts não olham para o mesmo arquivo: o `01-Unstructured-ReadImages.py` tem **um caminho fixo** na
 linha 2 (um `.jpg` de `99-EN/assets/`), e o `03-LLM-ReadImagesAndText.py` rasteriza todas as páginas
-de um PDF diferente, gravando um `page_N.jpg` por página numa pasta chamada `temp_images` — o nome dela sai da linha 12 e
-o diretório é criado na 15. Então: rode primeiro o `03`, escolha uma das páginas que
-ele gerou com gráfico ou diagrama, **aponte a linha 2 do `01` para esse arquivo, dentro de `temp_images`** e rode o `01`.
+de um PDF diferente, gravando um `page_N.jpg` por página numa pasta chamada `temp_images` — o nome
+dela sai da linha 12 e o diretório é criado na 16, sob a guarda da 15.
+
+**E há uma armadilha que torna a receita óbvia impossível:** as linhas 72-75 do `03` **apagam**
+todos os `page_N.jpg` e removem o diretório quando o script termina. Quando ele devolve o prompt,
+`temp_images` não existe mais. Então: **comente as linhas 72-75 do `03`**, rode-o, escolha uma das
+páginas que sobraram com gráfico ou diagrama, **aponte a linha 2 do `01` para esse arquivo** e rode
+o `01`.
 Aí sim é a mesma página nos dois, e a diferença entre ler caracteres e interpretar conteúdo fica
 óbvia numa execução.
 
