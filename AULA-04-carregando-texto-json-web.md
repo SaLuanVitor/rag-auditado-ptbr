@@ -1,6 +1,6 @@
 # AULA 04 — Carregando texto, JSON, Markdown e páginas web
 
-**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/01-SimpleTextLoading/` e `/02-StructuredDocumentLoading/`
+**Fase 1 — Ingestão** · Módulo do repo: `01-DataLoading/01-SimpleTextLoading/` e `01-DataLoading/02-StructuredDocumentLoading/`
 
 ---
 
@@ -15,9 +15,8 @@ dependendo de qual loader você escolhe — e essa escolha acontece antes de qua
 antes de qualquer chunk, antes de qualquer decisão que os capítulos seguintes vão tomar.
 
 Esta é a origem de falha que a Aula 01 põe **em primeiro lugar na ordem de diagnóstico** (é a
-terceira na ordem em que aquela aula as apresenta) e, como lá, a mais silenciosa — julgamento, não
-medição: **falha de
-ingestão não gera erro.** Gera um acervo que o sistema simplesmente não conhece.
+terceira na ordem em que aquela aula as apresenta) e, como lá, a mais silenciosa (julgamento, não
+medição). **Falha de ingestão não gera erro.** Gera um acervo que o sistema simplesmente não conhece.
 
 ---
 
@@ -64,7 +63,7 @@ não os nomes:
 | **LlamaIndex**          | `05-LoadDirectoryDocumentsWithLlamaIndex.py`, `06-LlamaIndex-BuildDocumentObject.py`                                                                                                                                                                                                                                                               | 2     |
 | **Unstructured direto** | `07-UsingUnstructured_v1.py`, `07-UsingUnstructured_v2.py`                                                                                                                                                                                                                                                                                         | 2     |
 
-O par `01`/`02` e o par `05`/`06` são simétricos de propósito: cada biblioteca aparece
+O par `01`/`02` e o par `05`/`06` são simétricos, e o efeito é que cada biblioteca aparece
 **carregando** um arquivo e depois **construindo à mão** um objeto `Document`. Construir à mão
 é o exercício que revela que `Document` não tem mágica — é um par (texto, metadados) que você
 pode montar de qualquer fonte, inclusive de um banco ou de uma API que loader nenhum cobre.
@@ -76,8 +75,7 @@ diferentes — e **não** é uma escada aditiva, apesar de parecer. O `diff` mos
 acumulação: `03-01`→`03-02` acrescenta três parâmetros de uma vez (`glob`, `use_multithreading`,
 `show_progress`); `03-02`→`03-03` acrescenta `loader_cls` e **remove** os dois últimos;
 `03-03`→`03-04` acrescenta `silent_errors` e **remove** o `glob`, de modo que o último arquivo da
-série já não filtra por Markdown. **Julgamento:** ainda é a sequência mais gradual
-sequência didática do módulo:
+série já não filtra por Markdown. **Julgamento:** ainda é a sequência didática mais gradual do módulo:
 
 | Arquivo                                                      | Chamada                                                             | O que acrescenta                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------------- | ---------------------------------- |
@@ -87,26 +85,29 @@ sequência didática do módulo:
 | `03-04-SkipErrorsWhenLoadingDirectoryWithLangChain.py:12-15`    | `+ silent_errors=True` (13)                                         | não morre no primeiro arquivo ruim |
 
 O `loader_cls` do `03-03` existe porque o `DirectoryLoader` tem um default que muita gente
-não sabe que está usando: quando você não especifica, ele recorre ao **Unstructured** para
-formatos que o `TextLoader` não lê — `.pdf`, `.pptx`, `.jpg`. Por isso o `03-01` **depende** de
+não sabe que está usando: `loader_cls=UnstructuredFileLoader` (`directory.py:38`), aplicado a
+**todo** arquivo e não só aos exóticos. Não há despacho por extensão no `DirectoryLoader`: quem
+roteia por tipo é o Unstructured, por dentro. Por isso o `03-01` **depende** de
 `unstructured` sem que nada no código diga isso: `grep "^import unstructured"` no arquivo não
 encontra nada — os únicos imports são `os` e `DirectoryLoader` (linhas 57-58). A dependência é
 transitiva, do comportamento padrão do loader, e só está registrada em prosa, dentro do
 docstring de troubleshooting. O diretório-alvo contém de fato `.pptx` e `.pdf`. É um caso de
 manual: o que quebra a instalação não aparece na lista de imports.
 
-⚠️ **O `silent_errors=True` do `03-04` merece cautela em produção.** Ele resolve o sintoma
-certo — um arquivo corrompido não deve derrubar a ingestão de dez mil — mas engole a
-informação de _quais_ falharam. Sem log próprio, você fica com um acervo incompleto e nenhum
-registro de o que ficou de fora. Combine com contagem: quantos arquivos existem no diretório
-versus quantos `Document` voltaram. A diferença é o seu problema silencioso.
+⚠️ **O `silent_errors=True` do `03-04` merece cautela em produção, mas não pelo motivo mais
+óbvio.** Ele não é mudo: o `DirectoryLoader` emite `logger.warning("Error loading file
+<caminho>: <erro>")` para cada arquivo que falhou, e sem configuração de logging isso sai em
+stderr. O que ele de fato tira de você é o **fluxo de controle**: a ingestão termina com status de
+sucesso, e o aviso vira uma linha entre milhares num log que ninguém lê. O conserto não é "ter log
+próprio", é **transformar o aviso em número**: conte os arquivos do diretório e conte os
+`Document` devolvidos. A diferença é o buraco.
 
 ---
 
 ## Parte 2 — Dados estruturados
 
 `01-DataLoading/02-StructuredDocumentLoading/` tem **7 arquivos** — 6 de código e o `.env.example`
-oculto —, e os dois primeiros formam
+oculto, e os dois primeiros formam
 um contraste que vale ler com atenção.
 
 ### JSON como texto contra JSON como estrutura
@@ -180,7 +181,7 @@ loader = WebBaseLoader(
 
 O `SoupStrainer(id="bodyContent")` restringe o parsing ao corpo do artigo. Sem ele, você
 indexa menu de navegação, rodapé, barra lateral, avisos de licença — texto que compete no
-ranking sem responder pergunta nenhuma. O autor deixou as duas versões justamente para você
+ranking sem responder pergunta nenhuma. As duas versões estão lá, e o proveito é você
 rodar as duas e comparar o volume.
 
 Duas ressalvas que a aula precisa fazer e o arquivo não faz:
@@ -206,8 +207,8 @@ importam `unstructured.partition` sem wrapper nenhum. A Aula 05 mantém essa mes
   pai e seu `element_id` é guardado; os elementos seguintes cujo `parent_id` bate são
   associados a ele.
 
-⚠️ **Uma distinção que vale evitar confundir** — e que eu próprio confundi na primeira
-avaliação deste curso: isto **não é** a estratégia parent-child de indexação da Aula 15. Aqui
+⚠️ **Uma distinção fácil de confundir, e o nome é o culpado:** isto **não é** a estratégia
+parent-child de indexação da Aula 15. Aqui
 não há embedding, não há índice e não há recuperação. É reconstrução de **hierarquia
 documental** a partir dos metadados que o parser produziu. O nome é o mesmo, o mecanismo é
 outro. O que este código entrega é a informação estrutural que _permitiria_ fazer
@@ -272,18 +273,24 @@ Quanto do que você indexaria seria menu e rodapé?
 resultado: bytes binários como texto, ou erro. Isso fixa que loader não é intercambiável — e
 prepara a Aula 05.
 
-**3. Corrompa um arquivo e rode `03-04`.** Crie um arquivo inválido no diretório e rode a
-versão com `silent_errors=True`. Ela conclui sem reclamar. Agora conte quantos documentos
-voltaram — e note que o `03-04` **não imprime contagem nenhuma**: a única saída dele é o começo do
-primeiro documento. Acrescente um `print(len(docs))` antes do final do arquivo, e só então compare com
+**3. Rode o `03-04` como está.** O diretório-alvo, `../../99-EN/black-myth-wukong/` e não o do
+script, já tem um `.pptx` que o `TextLoader` não lê. Repare em três coisas: o script termina com
+código 0; o `DirectoryLoader` imprimiu em stderr `Error loading file ...slides.pptx`; e o `03-04`
+**não imprime contagem nenhuma** — as saídas próprias dele são o caminho do diretório (linha 7) e
+os 100 primeiros caracteres do primeiro documento. Acrescente um `print(len(docs))` antes do final do arquivo, e só então compare com
 quantos arquivos existem no diretório. É a diferença entre os dois números que mostra o buraco que o
 silêncio produziu.
 
-**4. Troque o `jq_schema` por `.` puro — e reporte o que aconteceu.** A previsão que esta aula fazia está **medida**, no `langchain-community` 0.3.16 que o repositório
+**4. Troque o `jq_schema` por `.` puro.** Medido no `langchain-community` 0.3.16 que o repositório
 pina: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
-`JSONLoader` levanta `ValueError: Expected page_content is string, got <class 'dict'> instead. Set
-`text_content=False` if the desired input for page_content is not a string`. Não é migração
-silenciosa para texto bruto — é exceção, com a instrução do conserto na própria mensagem. Em
+`JSONLoader` levanta:
+
+```
+ValueError: Expected page_content is string, got <class 'dict'> instead.
+Set `text_content=False` if the desired input for `page_content` is not a string
+```
+
+Não é migração silenciosa para texto bruto: é exceção, com a instrução do conserto na própria mensagem. Em
 `02-LangCHain-JSONLoader-JSON.py`, use
 `jq_schema='.'`. O ramo que serializa o objeto com `json.dumps` só é alcançado com
 `text_content=False`, então o desfecho esperado é a exceção, não o texto bruto. É a prova de que o
@@ -296,7 +303,7 @@ aceita o documento — ao contrário do `TextLoader`, que aceitaria qualquer coi
 
 - **Metadado perdido.** Se `metadata` sai vazio, você perdeu filtro, citação e diagnóstico de
   uma vez. Verifique o `metadata` do primeiro documento **sempre**, logo após carregar.
-- **`silent_errors` sem contagem.** Silenciar erro sem contar o que ficou de fora é criar um
+- **`silent_errors` sem contagem.** O aviso existe e vai para o log; o que se perde é o fluxo de controle. Não contar o que ficou de fora é criar um
   acervo incompleto sem registro.
 - **JSON achatado.** **Julgamento:** é a falha desta aula que mais aparece em produção, porque não dá erro:
   alguém aponta o `TextLoader` para um `.json`, o pipeline roda, e a recuperação fica ruim

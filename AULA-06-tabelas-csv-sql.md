@@ -93,7 +93,7 @@ Três arquivos, e a progressão é de infraestrutura para uso:
 Os dois testes de conexão existem porque a maior parte do tempo perdido aqui não é RAG — é
 driver, credencial e rede. Rodá-los antes economiza depuração no lugar errado.
 
-O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (as linhas 3 a 5 são
+O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (a linha 3 é o cabeçalho da seção, as 4 e 5 são
 as instruções de criação e uso do banco; a 6 é o cabeçalho que anuncia a tabela):
 
 ```sql
@@ -129,7 +129,7 @@ dado estruturado.
 `01-01-ImportCSV.py` aponta para `"../../99-EN/..."` e só roda **de dentro** desta pasta; já os
 arquivos de PDF (`03-01`, `04-01`, `04-02`, `05-02`, `05-03`, `06-01`) apontam para
 `"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A única exceção é o
-`05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. Rode o `01-01` daqui e faça `cd ../..` antes dos que
+`05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. E há um terceiro caso, que não roda de canto nenhum: o `01-02` aponta para `data/black myth`, diretório que o repositório não tem. Leia-o pelo padrão (`loader_cls`), não o execute. Rode o `01-01` daqui e faça `cd ../..` antes dos que
 leem PDF.
 
 Aqui estão sete dos treze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
@@ -144,9 +144,10 @@ tables = camelot.read_pdf(pdf_path, pages="all")
 
 Especializado em tabelas e só nisso. Devolve objetos com `.df` (DataFrame do pandas), o que
 significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7) e cronometra a
-própria execução — sinal de que a duração incomodou quem escreveu. **Não é medição:** nenhum número
-de tempo aparece no repositório nem nesta aula, e é justamente isso que o exercício 4 do "Quebre de
-propósito" manda você produzir. Trate como hipótese até cronometrar.
+própria execução. Isso não diz nada sobre o camelot em particular: o `04-01` e o `06-01`
+cronometram do mesmo jeito, então a instrumentação é hábito do módulo e não queixa sobre uma
+biblioteca. Nenhum número de tempo aparece no repositório nem nesta aula, e produzi-lo é o
+exercício 4 do "Quebre de propósito".
 
 Exige dependências de sistema, e isso **está** documentado: o
 `01-DataLoading/requirements.txt` registra na linha 6 que "camelot-py needs Ghostscript installed on
@@ -183,12 +184,13 @@ Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. O `dif
 
 O `infer_table_structure=True` do `05-03` é o parâmetro que faz o Unstructured tentar
 reconstruir a **grade** da tabela, e não apenas detectar que há uma. Com ele, o elemento
-`Table` ganha uma representação em HTML no metadado (`metadata.text_as_html`, segundo a
-documentação do Unstructured — nenhum dos três scripts imprime esse campo, então aqui não é
-comportamento observado) — linhas e células preservadas.
+`Table` ganha uma representação em HTML no metadado (`metadata.text_as_html`), com linhas e células
+preservadas. Os três scripts imprimem `vars(element.metadata)`, que despeja o metadado inteiro,
+então o campo sai no despejo do `05-03` e não no dos outros dois: é aí que você confere.
 
-E o `05-02` merece atenção pelo nome: **WithContext**. Ele extrai a tabela _junto com o texto
-ao redor_ — o parágrafo que a introduz, a legenda. É a resposta ao terceiro problema do modelo
+E o `05-02` merece atenção pelo nome: **WithContext**. Ele imprime, ao lado de cada tabela, os três
+elementos que a **precedem** — tipicamente o parágrafo que a introduz. Legenda posterior fica de
+fora, porque o laço só olha para trás. É a resposta ao terceiro problema do modelo
 mental: uma tabela sem o texto que a apresenta perde o referente. "Tabela 3" não diz do que
 trata; o parágrafo anterior diz.
 
@@ -216,7 +218,7 @@ registro específico; perde a visão do conjunto e multiplica o número de chunk
 
 **2. Manter a tabela inteira como HTML ou Markdown.** É o que `infer_table_structure=True`
 entrega. Bom para o LLM ler e comparar; ruim para o embedding, porque a tabela inteira vira um
-vetor difuso — o problema de média de direções da Aula 07.
+vetor difuso — o problema de média de direções da Aula 07, que é explicação corrente e não medição, como a ressalva de lá declara.
 
 **3. Gerar um resumo em linguagem natural e indexar o resumo**, guardando a tabela original
 para entrega. É multi-representação (Aula 16): indexa-se o texto descritivo, devolve-se a
@@ -235,11 +237,10 @@ cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
 python 01-01-ImportCSV.py
 ```
 
-Roda a parte 4 (`UnstructuredCSVLoader`). Agora **descomente a parte 1** e rode de novo — mas
-acrescente um `print(len(data))` em cada parte antes do laço, senão o exercício não tem como ser
-feito: as duas imprimem apenas `data[:2]`, então você vê dois registros dos seis que existem, e não a
-contagem que se pede. Com o `len` na tela: seis documentos na parte 1, um na parte 4 — a mesma fonte,
-duas granularidades.
+Roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na linha 43 de `01-01-ImportCSV.py`: um documento.
+Agora **descomente a parte 1** — ela imprime só `data[:2]`, então acrescente um `print(len(data))`
+antes do laço para ver a contagem. Seis documentos na parte 1, um na parte 4: a mesma fonte, duas
+granularidades.
 
 Depois descomente a parte 3 e olhe o campo `source` no metadado. Antes era o caminho do
 arquivo; agora é o nome do personagem.
@@ -267,7 +268,7 @@ O único que vai da tabela até a resposta. Faça uma pergunta cujo valor você 
 sem os nomes das colunas. Pergunte por um número. A resposta será errada ou ausente — e é a
 demonstração mais direta, na minha leitura, de por que representação importa mais que extração.
 
-**2. Rode `05-02` com e sem contexto.** Ative `strategy="hi_res"` na linha 20 e compare com a
+**2. Rode `05-02` com e sem `hi_res`.** Ative `strategy="hi_res"` na linha 20 e compare com a
 versão default. Depois compare o resultado do `05-02` com o do `05-01`. O `05-02` não responde nada — ele
 **imprime** os nós vizinhos da tabela; leia o que saiu e julgue se aquele entorno bastaria para
 responder uma pergunta sobre a tabela.
@@ -276,12 +277,14 @@ responder uma pergunta sobre a tabela.
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que
 veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, sentido na pele.
 
-**4. Meça o custo do camelot.** Os dois arquivos já cronometram, e é aí que está a armadilha: no
+**4. Meça o custo do camelot.** Os três arquivos de PDF já cronometram (`03-01`, `04-01`, `06-01`), e os dois que interessam aqui são os dois primeiros. É aí que está a armadilha: no
 `03-01` as marcas estão nas linhas 9 e 11, cercando **só** a chamada de leitura do PDF; no `04-01`
 estão nas linhas 6 e 39, cercando abertura, extração de todas as páginas, montagem dos DataFrames **e**
 a impressão de cada um. Comparar os dois números impressos não compara as duas bibliotecas. Iguale o
-escopo antes — mova o fim da medição do `04-01` para logo depois do laço de extração, ou estenda a do
-`03-01` até o fim do laço das tabelas — e rode os dois da raiz do repositório. Note também que o
+escopo pelo denominador comum, que é só a extração: no `03-01` a marca já está certa (linhas 9 e 11,
+cercando o `read_pdf`); no `04-01`, mova `end_time` para logo antes do `print(df)` e acumule o tempo
+por página. Não estenda a marca do `03-01` até o fim do laço, senão você inclui um `df.to_csv` por
+tabela que o `04-01` não faz, e a medida fica mais desigual. Rode os dois da raiz do repositório. Note também que o
 `03-01` grava um CSV por tabela no diretório de trabalho: rode-o onde esses arquivos não incomodem.
 
 ---
@@ -299,8 +302,9 @@ escopo antes — mova o fim da medição do `04-01` para logo depois do laço de
   a busca vetorial por Text2SQL não é sair do RAG, só recuperar por outro meio (Aula 12).
 - **Colunas numéricas como texto.** `difficulty_level` embutido como prosa não permite filtrar
   por faixa. Colunas escalares devem virar metadado filtrável.
-- **Camelot instalado junto do resto.** Dependências de sistema conflitantes; use o
-  requirements dedicado.
+- **Ghostscript esquecido.** O `camelot` não é pacote Python puro: sem Ghostscript no sistema, a
+  importação passa e a extração falha. É a única dependência de sistema que o repositório
+  documenta para ele (`01-DataLoading/requirements.txt`, linha 6).
 - **Confiar em extração sem amostragem.** Extraia, e **olhe** dez tabelas do seu acervo antes
   de rodar em cem mil. **Julgamento:** é a inspeção mais barata e a mais pulada.
 
