@@ -58,5 +58,15 @@ for (const b of alvos) {
 }
 
 if (!mudou) { console.log('Nada a requebrar.'); process.exit(0); }
+
+// Grava so com --gravar, e o padrao e ensaio. A razao esta medida: em 14/09/2026
+// um auditor sob contrato de NAO EDITAR NADA rodou esta ferramenta para ver o
+// que ela fazia, e ela reescreveu a aula que ele estava auditando no meio da
+// auditoria. Ferramenta de inspecao que grava por padrao e armadilha, nao
+// conveniencia, e quem cai nela e justamente quem esta explorando o diretorio.
+if (!process.argv.includes('--gravar')) {
+  console.log(`${mudou} paragrafo(s) A REQUEBRAR. Nada foi escrito: repita com --gravar.`);
+  process.exit(0);
+}
 fs.writeFileSync(alvo, linhas.join(crlf ? '\r\n' : '\n'), 'utf8');
 console.log(`${mudou} paragrafo(s) requebrado(s); sequencia de palavras identica em todos.`);

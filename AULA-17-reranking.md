@@ -115,9 +115,9 @@ RRF robusto — e é também o que ele perde.
 
 ### Por que RRF dispensa scores comparáveis
 
-O score de um documento é a **soma** de `1/(rank+k)` sobre todas as listas em que ele aparece — é
-isso que o `+=` de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:141` faz. Só a **posição**
-entra na conta.
+O score de um documento é a **soma** de `1/(rank+k)` sobre todas as listas em que ele aparece —
+é isso que o `+=` de
+`07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:141` faz. Só a **posição** entra na conta.
 
 Consequência: não importa que uma lista traga cosseno em [0,1], outra BM25 numa escala ilimitada, e
 uma terceira distância L2 onde menor é melhor. Todas são reduzidas a "1º, 2º, 3º".
@@ -192,10 +192,10 @@ comum e barato — o esparso é rápido e inspecionável, o reranker corrige a o
 Aqui o reranker é um LLM: ele recebe a query e a lista de documentos e **devolve a ordem**. Não há
 score por par; há uma permutação.
 
-Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é, **julgamento**, o
-mais caro e o mais lento dos cinco, e é **não determinístico** — a mesma lista pode sair ordenada
-diferente. Julgamento: reservaria para top-k pequeno em domínio onde a ordem importa muito, e
-mediria contra o cross-encoder antes de assumir que compensa.
+Vantagem: entende nuance que um cross-encoder pequeno não pega. Desvantagem: é, **julgamento**, o mais caro e o
+mais lento dos cinco, e é **não determinístico** — a mesma lista pode sair ordenada diferente.
+Julgamento: reservaria para top-k pequeno em domínio onde a ordem importa muito, e mediria contra o
+cross-encoder antes de assumir que compensa.
 
 Note o pacote: `document_compressors`. No LangChain, reranking e compressão são a mesma
 abstração — um compressor recebe documentos e devolve menos ou reordenados. Isso antecipa a Aula 18.
@@ -272,9 +272,8 @@ cd RAG-from-First-Principles/07-PostRetrieval/01-Reranking
 python 01-RRF-Reranking.py
 ```
 
-Comece aqui e leia a função de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` junto com a
-saída. Depois **calcule à mão** os scores das três primeiras posições com `k=60` e confira com o que
-o script imprime.
+Comece aqui e leia a função de `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` junto com a saída. Depois **calcule à mão** os scores das
+três primeiras posições com `k=60` e confira com o que o script imprime.
 
 ```powershell
 python 02-CrossEncoder-Reranking.py
@@ -293,13 +292,12 @@ python 05-RankLLM-Reranking.py
 python 06-RecencyWeightedReranking.py
 ```
 
-O `04` exige chave da Cohere. No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem
-**1,0000, sempre**, e vale entender por quê antes de tentar consertá-lo. O retriever reescreve o
-`last_accessed_at` para o instante da consulta nos documentos que devolve — o `_get_rescored_docs`
-faz isso **antes** do `return` —, e a linha 148 calcula o tempo decorrido contra esse valor
-recém-gravado: dá zero. Junte o `k_value = 1` da linha 74, que faz "para cada documento" ser um
-documento, e a similaridade do vetor, que nunca sai de `_get_combined_score` e portanto não está
-disponível para imprimir ao lado.
+O `04` exige chave da Cohere. No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem **1,0000, sempre**, e vale
+entender por quê antes de tentar consertá-lo. O retriever reescreve o `last_accessed_at` para o
+instante da consulta nos documentos que devolve — o `_get_rescored_docs` faz isso **antes** do
+`return` —, e a linha 148 calcula o tempo decorrido contra esse valor recém-gravado: dá zero. Junte o
+`k_value = 1` da linha 74, que faz "para cada documento" ser um documento, e a similaridade do vetor,
+que nunca sai de `_get_combined_score` e portanto não está disponível para imprimir ao lado.
 
 Para ver os dois números de fato, leia o estado **antes** da consulta: percorra o `memory_stream` do
 retriever calculando as horas desde o `last_accessed_at` de cada documento, e chame o

@@ -30,10 +30,12 @@ function checa(nome, ok, extra) {
 }
 
 // Grava `texto` num arquivo temporario e roda a ferramenta sobre ele.
-function roda(texto, ferramenta) {
+// A ferramenta so grava com --gravar, entao a suite o passa por padrao. O caso
+// 10 e o que confere que SEM ele nada e escrito.
+function roda(texto, ferramenta, extra = ['--gravar']) {
   const arq = path.join(TMP, 'caso-' + Math.random().toString(36).slice(2) + '.md');
   fs.writeFileSync(arq, texto, 'utf8');
-  const r = spawnSync('node', [ferramenta || path.join(FERR, 'requebra.js'), arq],
+  const r = spawnSync('node', [ferramenta || path.join(FERR, 'requebra.js'), arq, ...extra],
                       { encoding: 'utf8' });
   return { arq, saida: (r.stdout || '') + (r.stderr || ''), code: r.status,
            depois: fs.readFileSync(arq, 'utf8') };
@@ -48,7 +50,9 @@ const LONGA = Array(14).fill(P).join(' '); // 14*13-1 = 181 caracteres
 
 // ---------- 1. prosa longa e requebrada, e o texto nao muda ----------
 let r = roda(`abertura curta\n\n${LONGA}\n\nfecho curto\n`);
-checa('requebra o paragrafo de prosa', /1 paragrafo/.test(r.saida), r.saida);
+// "requebrado" e nao so "paragrafo": a mensagem do ensaio tambem diz
+// "1 paragrafo(s) A REQUEBRAR", e a assercao frouxa passava nos dois estados.
+checa('requebra o paragrafo de prosa', r.code === 0 && /paragrafo\(s\) requebrado/.test(r.saida), r.saida);
 checa('nenhuma linha passa de 100 colunas', maiorLinha(r.depois) <= 100, maiorLinha(r.depois));
 checa('a sequencia de palavras sobrevive', palavras(r.depois) === palavras(`abertura curta\n\n${LONGA}\n\nfecho curto\n`));
 
@@ -91,6 +95,15 @@ checa('a sequencia de palavras sobrevive a orfa',
 // requebraria o acervo inteiro e o diff cosmetico esconderia os consertos reais.
 r = roda(`abertura\n\n${CHEIA}\n${CHEIA}\nfecho\n`);
 checa('nao trata a ultima linha curta como orfa', r.code === 0 && /Nada a requebrar/.test(r.saida), r.saida);
+
+// ---------- 10. sem --gravar, nada e escrito ----------
+// Medido em 14/09/2026: um auditor sob contrato de nao editar nada rodou a
+// ferramenta para ver o que ela fazia, e ela reescreveu a aula em auditoria.
+// Este caso e o que impede a regressao.
+const ANTES = `abertura\n\n${LONGA}\n`;
+r = roda(ANTES, null, []);
+checa('sem --gravar o arquivo fica intacto', r.code === 0 && r.depois === ANTES, JSON.stringify(r.depois.slice(0, 60)));
+checa('e o ensaio diz que nada foi escrito', /Nada foi escrito/.test(r.saida), r.saida);
 
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {
