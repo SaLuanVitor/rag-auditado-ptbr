@@ -6,6 +6,12 @@
 # setima rodada declararam NAO_EXECUTADO por falta dele. Sem ambiente, alegacao
 # sobre comportamento de biblioteca vira leitura de codigo, que e hipotese.
 #
+# O 0.12.15 do llama-index-core e o que o repositorio pina, em cinco requirements.
+# Este script pinava 0.11.17, numero herdado da especificacao anterior e que o
+# repositorio nao pina em lugar nenhum. Medido em 14/09/2026: treze sondas de
+# comportamento sao identicas nas duas versoes, entao nenhuma medicao anterior
+# caiu; o que estava errado era a atribuicao.
+#
 # NAO sao os 274 pacotes do curso. Sao os que respondem perguntas de mecanismo.
 # Fora: torch, chromadb, onnxruntime, sentence-transformers, transformers,
 # weaviate, deepeval, trulens, camelot, unstructured, faiss, milvus_lite. A
@@ -36,7 +42,7 @@ PY="$DESTINO/Scripts/python.exe"
 
 PINS="langchain==0.3.17 langchain-core==0.3.33 langchain-community==0.3.16 \
 langchain-openai==0.3.3 langchain-text-splitters==0.3.5 langgraph==0.2.69 \
-pymilvus==2.5.4 llama-index-core==0.11.17 ragas==0.2.15 pydantic==2.13.4 \
+pymilvus==2.5.4 llama-index-core==0.12.15 ragas==0.2.15 pydantic==2.13.4 \
 openai==1.109.1 numpy==1.26.4 rank-bm25==0.2.2"
 
 # Um pip por pacote deixa o resolvedor promover dependencia. Medido em 14/09:
@@ -56,7 +62,7 @@ esperado = {
     "langchain": "0.3.17", "langchain-core": "0.3.33",
     "langchain-community": "0.3.16", "langchain-openai": "0.3.3",
     "langchain-text-splitters": "0.3.5", "langgraph": "0.2.69",
-    "pymilvus": "2.5.4", "llama-index-core": "0.11.17",
+    "pymilvus": "2.5.4", "llama-index-core": "0.12.15",
     "ragas": "0.2.15", "pydantic": "2.13.4",
     "openai": "1.109.1", "numpy": "1.26.4",
     "rank-bm25": "0.2.2",

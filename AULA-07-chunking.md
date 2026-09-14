@@ -71,7 +71,7 @@ está no 4, que faz chamadas de embedding durante a _ingestão_ e em acervo gran
 **julgamento**, o item mais caro do pipeline. Verificado em
 `llama_index.core.node_parser.text.semantic_splitter`, que chama
 `get_text_embedding_batch` sobre os grupos de sentenças e depois `similarity` por par de vizinhos,
-na 0.11.17 extraída. O custo do
+na 0.12.15 extraída. O custo do
 nível 3 não foi verificado por execução, mas é o mesmo algoritmo recursivo com outra lista de
 separadores.
 

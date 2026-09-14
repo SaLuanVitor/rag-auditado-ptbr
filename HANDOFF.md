@@ -133,7 +133,7 @@ reauditado: das 27, cerca de doze são falsos positivos do regex (títulos de ar
 checkpoint, "hipótese" descrevendo o modelo e não o autor), e o resto é ressalva honesta e tersa —
 **ressalva sem razão não pode ter razão falsa**
 **📌 A forma exemplar de ressalva já existia no curso**, na aula que tirou 12/12: `AULA-18:136` —
-"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.11.17; não executei."
+"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.12.15; não executei."
 Ela nomeia **o que leu** e **o que não fez**. É o padrão que os consertos desta varredura adotaram, e
 o que se deve exigir de qualquer ressalva nova
 **Varredura da classe 4: feita.** 595 contagens do curso reproduzidas por comando, em quatro lotes.
@@ -153,7 +153,7 @@ existe mais; três auditores da sétima rodada o procuraram, não acharam, e dec
 `NÃO_EXECUTADO` no eixo que dependia dele. As medições abaixo continuam válidas porque estão
 registradas, mas **não são reproduzíveis** sem remontar. Os **pins exatos** do curso: `langchain-core
 0.3.33`, `langchain-community 0.3.16`, `langchain-openai 0.3.3`, `langgraph 0.2.69`, `pymilvus 2.5.4`,
-`llama-index-core 0.11.17`, `ragas 0.2.15`, `numpy 1.26.4`, `jq 1.8.0`. **Não** os 274 pacotes: as
+`llama-index-core 0.12.15`, `ragas 0.2.15`, `numpy 1.26.4`, `jq 1.8.0`. **Não** os 274 pacotes: as
 perguntas em aberto eram sobre mecanismo e nenhuma exigia torch, chromadb ou onnxruntime — que são
 justamente os que travam o curso em Python 3.12. O miniconda base não foi tocado
 **📌 Oito limites declarados viraram medição**, e sete confirmam o que as aulas previram: o
@@ -173,7 +173,8 @@ rigoroso e tornei a frase falsa (o PDF casa `leiden`); e quase "corrigi" um acer
 comando de conferência era mais frouxo que o texto (`grep -c "^|"` conta o separador da tabela)
 
 **📌 O CLONE É O GABARITO, E O COMMIT DELE IMPORTA.** As 1830 citações do curso resolvem contra
-`E:ProjetosagRAG-from-First-Principles`, clone de
+`E:Projetos
+agRAG-from-First-Principles`, clone de
 `https://github.com/PacktPublishing/RAG-from-First-Principles.git`, **pinado em `17c6942`**
 (2026-06-23). É repositório vivo, com PRs sendo mesclados: reclonar traz o `HEAD` de então, e um
 commit upstream que insira linhas num arquivo desloca todas as citações dele — o `verify-citations`

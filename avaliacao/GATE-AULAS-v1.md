@@ -2569,3 +2569,56 @@ verificação da AULA-24 achou 7 achados em 12 blocos. A média da sessão sobe 
 
 **A cauda que cola apareceu sete vezes.** A trava de casamento único abortou em todas, sem
 escrever nada. Ela agora vive em `ferramentas/lock.js`, com suíte própria.
+
+---
+
+## O ambiente de medição estava na versão errada, e as medições sobreviveram
+
+Achado de 14/09/2026, durante a oitava rodada. O venv de medição pinava
+`llama-index-core==0.11.17`, **versão que o repositório do curso não pina em lugar nenhum**. Ele
+pina `0.12.15` em cinco requirements e `0.12.23.post2` em dois.
+
+O número veio da especificação do ambiente anterior e foi reproduzido na reconstrução sem ser
+conferido contra a fonte, que é o defeito que este projeto inteiro existe para caçar. Cinco aulas
+citavam a 0.11.17, e uma frase escrita no mesmo dia chegou a afirmar que ela era o que o
+repositório pina.
+
+### O que foi medido antes de consertar
+
+Um segundo venv foi montado em `0.12.15` e **treze sondas** rodaram idênticas nos dois ambientes:
+
+| Sonda | 0.11.17 | 0.12.15 |
+|---|---|---|
+| `ResponseMode`, número de membros | 9 | 9 |
+| `COMPACT_ACCUMULATE` presente | sim | sim |
+| ramos de `ResponseMode` na `factory` | 10 | 10 |
+| `CompactAndRefine.__bases__` | `Refine` | `Refine` |
+| `CompactAndAccumulate.__bases__` | `Accumulate` | `Accumulate` |
+| `PromptTemplate` descarta chave extra | sim | sim |
+| `TextNode.get_content`, default | `MetadataMode.NONE` | `MetadataMode.NONE` |
+| linha do `is_hit` em `HitRate.compute` | 70 | 70 |
+| `SentenceSplitter(256, 50)` sobre 1.200 chars | 3 nós | 3 nós |
+| `embedding_utils` existe | sim | sim |
+| `PrevNextNodePostprocessor` existe | sim | sim |
+| `semantic_splitter` chama `get_text_embedding_batch` | sim | sim |
+| `semantic_splitter` chama `similarity` | sim | sim |
+
+**Nenhuma medição anterior caiu.** O defeito era de **atribuição**, não de substância: as aulas
+descreviam comportamento correto e nomeavam a versão errada.
+
+### O que foi consertado
+
+As 13 citações nas cinco aulas passaram a nomear `0.12.15`, que é a versão pinada e na qual as
+sondas foram refeitas. O `ferramentas/montar-ambiente.sh` passou a pinar `0.12.15`, e o ambiente
+foi remontado do zero com todos os pins conferindo.
+
+### A regra que sai daqui
+
+**Número que descreve a fonte se lê na fonte.** Ela já valia para contagem e não estava sendo
+aplicada a versão. Nesta mesma sessão, três números de versão foram afirmados por inferência do
+padrão em vez de medição: dois acertaram por sorte (`langgraph` 0.3.18, `langchain-core` 0.3.47) e
+este errou.
+
+E um efeito colateral que vale registrar: o conserto sistemático transformou uma emenda pontual
+feita horas antes numa frase absurda, que afirmava três vezes a mesma versão. **Conserto amplo
+invalida remendo estreito feito sobre o mesmo assunto**, e a ordem certa é medir o alcance primeiro.

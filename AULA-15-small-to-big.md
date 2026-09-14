@@ -210,7 +210,7 @@ from llama_index.core.postprocessor import PrevNextNodePostprocessor, AutoPrevNe
 
 Dois pós-processadores, e a diferença entre eles é quem decide:
 
-- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está escrita, só para frente**. Determinístico, barato, previsível. A classe tem `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do script **não passa**. Então ela puxa os 2 nós seguintes, não 2 de cada lado. **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas `# Should look backward` (linhas 59-60). A incoerência é do repositório: o script pede comportamento para trás e a chamada não o habilita. _Limite: conferido lendo a fonte de `llama-index-core` (0.11.17 e 0.14.24, texto idêntico nas duas); não executei._
+- **`PrevNextNodePostprocessor(docstore=docstore, num_nodes=2)`** — expansão **fixa e, como está escrita, só para frente**. Determinístico, barato, previsível. A classe tem `mode: str = Field(default="next")`, e o `_postprocess_nodes` chama `get_forward_nodes` nesse modo; `get_backward_nodes` só entra com `mode="previous"` ou `mode="both"`, que a chamada do script **não passa**. Então ela puxa os 2 nós seguintes, não 2 de cada lado. **E o próprio script espera o contrário:** duas das três perguntas de teste estão anotadas `# Should look backward` (linhas 59-60). A incoerência é do repositório: o script pede comportamento para trás e a chamada não o habilita. _Limite: conferido lendo a fonte de `llama-index-core` (0.12.15 e 0.14.24, texto idêntico nas duas); não executei._
 - **`AutoPrevNextNodePostprocessor`** — expansão **decidida por LLM**: o modelo avalia se vale
   expandir e em qual direção. Adaptativo, e custa uma chamada de LLM **por nó recuperado** — o `_postprocess_nodes` tem um laço
 `for node in nodes` com a chamada dentro. No script isso dá uma por consulta só porque
@@ -290,7 +290,7 @@ cobrar, e prepara a Aula 17 (reranking) e a 18 (compressão).
 biblioteca se recusa a montar um expansor sem fonte de ordem, porque a informação de qual nó vem
 depois de qual não existe no índice vetorial. Para ver a expansão desligada e comparar contexto
 entregue, use `num_nodes=0`, que a classe aceita, ou o `base_engine` da linha 32, que já é o baseline.
-Medido no `llama-index-core` 0.11.17.
+Medido no `llama-index-core` 0.12.15.
 
 **5. Compare os três na mesma pergunta.** Rode uma consulta pelas três estratégias e compare o
 contexto entregue. Não há vencedor universal; o exercício é perceber **qual formato de contexto**

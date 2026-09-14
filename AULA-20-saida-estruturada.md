@@ -394,7 +394,7 @@ O conteúdo novo do arquivo são os cinco `ResponseMode`, um por bloco:
 | 5     | `SIMPLE_SUMMARIZE`   | `:82` | `text_qa_template=story_prompt` (`:83`)                            |
 
 O que os modos decidem: como juntar N chunks recuperados numa resposta. Não está neste arquivo, mas
-está legível na fonte do `llama-index-core` 0.11.17, em `llama_index.core.response_synthesizers`, e é
+está legível na fonte do `llama-index-core` 0.12.15, em `llama_index.core.response_synthesizers`, e é
 de lá que sai o que segue — lido, não executado.
 
 `SIMPLE_SUMMARIZE` concatena tudo (`"\n".join(text_chunks)`) e faz uma chamada. `REFINE` percorre
@@ -422,7 +422,7 @@ tamanho de prompt.
 🔴 **E há um problema anterior a todos esses, que invalida a comparação: os três templates não têm
 `{context_str}`.** As linhas 50, 64 e 79 declaram apenas `{query_str}`, e o `PromptTemplate` do
 LlamaIndex **descarta chave extra em silêncio** — verificado por execução no `llama-index-core`
-0.11.17: formatar um template de `{query_str}` passando também `context_str` devolve o prompt sem uma
+0.12.15: formatar um template de `{query_str}` passando também `context_str` devolve o prompt sem uma
 letra do contexto. O sintetizador passa o texto recuperado como `context_str`, e ele é jogado fora.
 
 Ou seja: os blocos 3, 4 e 5 respondem **sem o acervo**, de memória paramétrica do modelo, enquanto os
@@ -449,7 +449,7 @@ resultados você conseguiria consumir por programa sem escrever um parser à mã
 `08-Generation/03-ControllingFormatViaOutputParsing/02-LlamaIndex-OutputParsing.py`, o bloco 3
 passa `summary_template` (`:54`); os blocos 4 e 5 passam `text_qa_template` (`:68`, `:83`). São
 parâmetros distintos, e qual deles cada modo consome é decisão da biblioteca — **e a decisão está
-legível na fonte.** Em `llama_index.core.response_synthesizers.factory`, versão 0.11.17, a
+legível na fonte.** Em `llama_index.core.response_synthesizers.factory`, versão 0.12.15, a
 `get_response_synthesizer` declara os dois parâmetros na assinatura (`text_qa_template` e
 `summary_template`) e então ramifica por modo. `TREE_SUMMARIZE` é o **único** dos nove modos que
 recebe `summary_template`. Os que consomem o prompt de pergunta — `REFINE`, `COMPACT`,
@@ -552,7 +552,7 @@ o `02`, a necessidade da chave é verificável sem executar nada, e verifiquei: 
 `validate_openai_api_key(embed_model.api_key)` — o ramo `if embed_model == "default"` de
 `resolve_embed_model`, em `llama_index.core.embeddings.utils`.
 Sem chave, a própria mensagem do código diz o que acontece: "Could not load OpenAI embedding model
-(…) please check your OPENAI_API_KEY". Medido na 0.11.17. **O repositório pina a 0.12.15**, e esta medição é da 0.11.17: confira na versão que você instalar. O `02`
+(…) please check your OPENAI_API_KEY". Medido na 0.12.15, que é a versão que o repositório pina. O `02`
 precisa da chave, e o `.env.example` poderia tê-lo nomeado.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 

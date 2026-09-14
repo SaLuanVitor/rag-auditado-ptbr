@@ -134,7 +134,7 @@ alta e barulhenta, o que é melhor que silenciosa; o risco real é a consulta qu
 um documento cujo vocabulário se afasta do da pergunta, e você não saber disso até acontecer.
 
 _Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
-`llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.11.17; não executei._
+`llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.12.15; não executei._
 
 Isso é o problema de calibração de similaridade absoluta que a Aula 02 antecipou: o valor de cosseno
 não é calibrado entre modelos nem entre domínios. Um `threshold_cutoff` copiado de exemplo é chute.
