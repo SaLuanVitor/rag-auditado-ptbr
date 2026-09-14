@@ -37,7 +37,7 @@ PY="$DESTINO/Scripts/python.exe"
 PINS="langchain==0.3.17 langchain-core==0.3.33 langchain-community==0.3.16 \
 langchain-openai==0.3.3 langchain-text-splitters==0.3.5 langgraph==0.2.69 \
 pymilvus==2.5.4 llama-index-core==0.11.17 ragas==0.2.15 pydantic==2.13.4 \
-openai==1.109.1 numpy==1.26.4"
+openai==1.109.1 numpy==1.26.4 rank-bm25==0.2.2"
 
 # Um pip por pacote deixa o resolvedor promover dependencia. Medido em 14/09:
 # instalar em sequencia levou langchain-core de 0.3.33 para 0.3.86, porque um
@@ -59,6 +59,7 @@ esperado = {
     "pymilvus": "2.5.4", "llama-index-core": "0.11.17",
     "ragas": "0.2.15", "pydantic": "2.13.4",
     "openai": "1.109.1", "numpy": "1.26.4",
+    "rank-bm25": "0.2.2",
 }
 divergem, ausentes = [], []
 for nome, quer in sorted(esperado.items()):
