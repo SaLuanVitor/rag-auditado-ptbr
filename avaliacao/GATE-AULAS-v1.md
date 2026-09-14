@@ -2703,3 +2703,34 @@ porque a fonte parece autoritativa.
 `description` do `AttributeInfo` é prompt e pode divergir do dado, e então repete a string do
 `AttributeInfo` como se fosse o formato do dado. O loader grava `YYYY-MM-DD HH:MM:SS`; o
 `AttributeInfo` declara `YYYY-MM-DD`. O exemplo vivo da tese estava no arquivo.
+
+## O segundo critério eliminatório nunca foi contável, e 12 aulas se resolvem por aritmética
+
+O portão tem dois critérios. O primeiro, nenhuma aula abaixo de 6/12, vem sendo medido
+rodada a rodada. O segundo, **no máximo um `−1` no curso inteiro**, nunca foi medido, e a
+razão é de formato: este arquivo registra a **soma** de cada aula e não as seis dimensões.
+Medido hoje, `grep -cE "^\| *(E|C|H|O|D|A) *\|"` devolve **0** em 2.705 linhas. Os relatórios
+dos auditores traziam a tabela por dimensão; ela morria na conversa e só a soma era gravada.
+
+**Doze aulas ficam decididas sem remedição.** Uma dimensão em `−1` custa 3 pontos contra o
+teto dela, então o máximo possível de uma aula que contenha um `−1` é `5×2 + (−1) = 9`.
+Toda aula com **10 ou mais não pode conter nenhum `−1`**:
+
+| Aulas com 10 ou mais, logo sem `−1` possível | Nota |
+| --- | --- |
+| 16, 18 | 12/12 |
+| 02, 10, 14, 17, 19 | 11/12 |
+| 05, 07, 13, 15, 22 | 10/12 |
+
+**As outras 17 continuam desconhecidas**, e desconhecido não é o mesmo que zero: 00, 01, 03,
+04, 06, 08, 09, 11, 12, 20, 21, 23, 24, 25, 26, 27, 28. Nelas o `−1` é aritmeticamente
+possível, e o registro não diz se está lá.
+
+**Um `−1` está documentado em prosa neste arquivo**, na AULA-25 da oitava rodada, em correção
+técnica, quando ela marcou 2/12. Aquela medição foi superada por uma de 6/12 sem tabela por
+dimensão gravada, então nem esse caso é contável hoje: ele pode ter subido para 0 ou 1 sem
+que nada aqui registre.
+
+**A correção é de procedimento e vale da próxima medição em diante:** ao aplicar uma rodada,
+gravar as seis dimensões, não só a soma. Sem isso o critério continua incontável por mais 29
+aulas, e o custo de recuperá-lo é remedir tudo.

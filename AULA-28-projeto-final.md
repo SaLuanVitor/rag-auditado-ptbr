@@ -23,7 +23,7 @@ peça do seu sistema está do jeito que está** — e de mostrar o número que s
 Um RAG **defendido** é um que satisfaz quatro condições — a primeira é pré-requisito das outras três:
 
 0. **O acervo e as perguntas são seus.** Se você fez o exercício da Aula 01 — cinco perguntas sobre
-   um acervo real, com a localização da resposta de cada uma —, aquele documento é o **núcleo**
+   um acervo real, com a localização e a resposta de cada uma —, aquele documento é o **núcleo**
    deste projeto: a Etapa 1 o expande para as 20 a 50 perguntas que a Parte 2 exige, porque cinco é
    amostra pequena para veredito grande — a própria Parte 2 usa como advertência-mor um exemplo que
    declarou vencedor com diferença de 0,0861 em três perguntas. Se não fez, faça primeiro: o resto do
@@ -373,8 +373,10 @@ qualquer otimização de propósito.
 **Entregável:** um diretório com os documentos e uma lista de 20 a 50 perguntas reais.
 
 Comece pelas perguntas. Escreva-as antes de olhar o corpus, se possível com quem vai usar o sistema.
-Depois classifique cada uma: **local** (respondida por um trecho) ou **global** (propriedade do
-acervo, no sentido da Aula 23). Se a maioria for global, você tem um problema de sumarização, e a
+Depois classifique cada uma com os três rótulos da Aula 01: **local** (respondida por um trecho),
+**local composta** (vários trechos combinados) ou **global** (propriedade do
+acervo, no sentido da Aula 23). Se a maioria for local composta, o caminho é decomposição de query
+e reranking. Se a maioria for global, você tem um problema de sumarização, e a
 Fase 9 é o começo do caminho — não o `chunk_size`.
 
 ### Etapa 2 — Anote o gabarito

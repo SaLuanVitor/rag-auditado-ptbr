@@ -30,7 +30,8 @@ aula: `hit rate@k` e `MRR` saem de comparar ids. Não bastam para o resto do cap
 e o segundo levanta `ValueError("Must specify both response and reference")` sem ela. O
 `CorrectnessEvaluator` é pior: ele **não** exige. Sem referência, substitui o campo por
 `"(NO REFERENCE ANSWER SUPPLIED)"` e devolve uma nota assim mesmo, que passa a medir só relevância.
-O documento da Aula 01 não tem a resposta de referência. Escreva as cinco à mão antes de seguir: o
+O item 5 do exercício da Aula 01 é essa resposta de referência, e é o campo que se pula com mais
+facilidade. Se as suas cinco não a têm, escreva-as à mão antes de seguir: o
 erro barulhento avisa, o silencioso não.
 Sem gabarito não há medição, só impressão.
 

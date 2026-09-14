@@ -22,8 +22,8 @@ RAG existe para quando não cabe. E o "não cabe" tem quatro causas distintas.
 
 ### Os quatro limites que criam RAG
 
-**1. Limite de volume.** Um modelo com 200 mil tokens de contexto engole umas 500
-páginas. Sua base de conhecimento tem 50 mil documentos. Não há janela que resolva.
+**1. Limite de volume.** Um modelo com 200 mil tokens de contexto engole algumas centenas de
+páginas, dependendo da densidade. Sua base de conhecimento tem 50 mil documentos. Não há janela que resolva.
 
 **2. Limite de custo e latência.** Mesmo que caiba, você paga por token de entrada
 em _toda_ chamada. Enviar 200 mil tokens para responder "qual o prazo de garantia?"
@@ -41,7 +41,9 @@ Quando responde a partir de trecho recuperado, você cita a fonte. Em domínio
 jurídico, médico ou fiscal, isso não é conveniência — é requisito.
 
 O quarto limite é o que faz RAG sobreviver mesmo quando as janelas de contexto
-crescem. Janela maior resolve volume; não resolve proveniência.
+crescem. Janela maior alivia o volume na margem, mas não na escala do limite 1:
+cinquenta mil documentos continuam não cabendo. O custo ela agrava, porque você paga
+por token enviado. E a proveniência ela não toca.
 
 ### O loop, em três movimentos
 
@@ -62,7 +64,7 @@ Resposta ancorada, com fonte citável
 ```
 
 Isso é RAG por inteiro. Todo o resto do curso — 27 aulas, da 02 à 28 — é sobre **por que cada
-um desses três passos falha** e o que se faz a respeito.
+um desses três passos falha**, o que se faz a respeito, e como se mede se funcionou.
 
 ### O que RAG realmente muda no comportamento do modelo
 
@@ -90,16 +92,21 @@ tempo (Aulas 23 a 27).
 | **Chunking**        | fatiar em pedaços recuperáveis                 | `02-DocChunking`             |
 | **Embedding**       | virar vetor                                    | `03-Embedding`               |
 | **Indexação**       | armazenar para busca rápida                    | `04-VectorDB`                |
-| **Otimização de índice** | indexar de outra forma para recuperar melhor | `06-Indexing`           |
 | **Pré-recuperação** | tratar a query antes de buscar                 | `05-PreRetrieval`            |
+| **Otimização de índice** | indexar de outra forma para recuperar melhor | `06-Indexing`           |
 | **Recuperação**     | buscar top-k                                   | `04-VectorDB`                |
 | **Pós-recuperação** | reordenar, comprimir, corrigir                 | `07-PostRetrieval`           |
 | **Geração**         | montar prompt e responder                      | `08-Generation`              |
 | **Avaliação**       | medir se está bom                              | `09-Evaluation`              |
 
-Note a ordem: **avaliação vem por último no livro e deveria vir primeiro no seu
-projeto.** Sem conjunto de perguntas com resposta conhecida, você não otimiza — você
+Note a ordem: **avaliação é o penúltimo capítulo do livro e deveria vir primeiro no
+seu projeto.** Sem conjunto de perguntas com resposta conhecida, você não otimiza — você
 troca de configuração e acha que melhorou. Guarde isso; voltamos na Aula 22.
+
+Uma observação sobre os dois estágios do meio, porque a numeração engana. Otimização de
+índice acontece na ingestão, antes de qualquer pergunta chegar; pré-recuperação é trabalho
+de tempo de consulta. A tabela segue a numeração do livro e dos módulos, que é a ordem em
+que se estuda, não a ordem em que o dado passa.
 
 ---
 
@@ -135,8 +142,8 @@ resposta ignora ou distorce.
 
 ### Falha de ingestão — o dado nunca entrou de forma utilizável
 
-**Julgamento, e as duas metades são julgamento:** a mais silenciosa e, na minha experiência, a mais
-frequente em projetos reais. Não tenho número para nenhuma das duas.
+Esta é a mais silenciosa e, na minha experiência, a mais frequente em projetos reais.
+Não tenho número para nenhuma das duas afirmações.
 
 - PDF digitalizado sem OCR: o "texto" indexado é vazio
 - tabela virou papa de números sem cabeçalho
@@ -189,30 +196,33 @@ documentação do AIOX, qualquer acervo que você conheça — e escreva:
 
 1. **Cinco perguntas** que um usuário real faria a esse acervo.
 2. Para cada uma, **onde no acervo** está a resposta (qual arquivo, qual seção).
-3. Para cada uma, classifique: precisa de **um** trecho, de **vários trechos
-   combinados**, ou de **visão global do acervo inteiro**?
+3. Para cada uma, classifique: precisa de **um** trecho (*local*), de **vários trechos
+   combinados** (*local composta*), ou de **visão global do acervo inteiro** (*global*)?
+   Guarde os três rótulos: a Aula 28 pede esta classificação de volta.
 4. Identifique quais perguntas precisariam de **filtro por metadado** (data,
    autor, tipo de documento).
+5. Para cada uma, **a resposta correta**, escrita à mão em uma ou duas frases. É o campo
+   mais chato e o único sem o qual não há medição: é ele que a Aula 22 e a Aula 28 exigem.
 
 O item 3 é o que revela a arquitetura. Perguntas de um trecho: RAG básico resolve.
 Vários trechos: você vai precisar de decomposição de query (Aula 13) e reranking
 (Aula 17). Visão global: RAG vetorial vai falhar, e você vai precisar de GraphRAG
 (Aula 23) ou outra abordagem.
 
-Guarde esse documento. Ele vira seu conjunto de avaliação na Aula 22 e a base do
-projeto final na Aula 28.
+Guarde esse documento. Com os cinco campos ele já é o conjunto de avaliação da Aula 22 e
+a base do projeto final na Aula 28.
 
 ---
 
 ## Checkpoint
 
-1. Cite os quatro limites que justificam RAG. Qual deles **não** é resolvido por
-   janelas de contexto maiores?
+1. Cite os quatro limites que justificam RAG. Quais deles **não** são resolvidos por
+   janelas de contexto maiores, e qual deles elas **agravam**?
 2. RAG elimina alucinação? Justifique.
 3. Quais são as três origens de falha, e em que ordem se deve investigá-las?
 4. Qual a diferença entre o que RAG ensina ao modelo e o que fine-tuning ensina?
 5. Dê um exemplo concreto em que RAG é a escolha errada.
-6. Por que avaliação, último capítulo do livro, deveria ser a primeira coisa a
+6. Por que avaliação, penúltimo capítulo do livro, deveria ser a primeira coisa a
    construir no seu projeto?
 
 ---

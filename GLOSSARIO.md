@@ -280,7 +280,7 @@ fonte: SQL, Cypher, filtro de metadado. Não é busca vetorial. **Se ainda é "R
 definição, e o curso trata isso como fronteira aberta:** a Aula 12 **argumenta** que Text2SQL bem
 feito é RAG, porque o que se recupera vem de fora do modelo e entra no contexto — é a tese daquele
 módulo, não um fato assentado; a Aula 06 usa "RAG" no sentido estrito de busca vetorial e opõe os
-dois. A nota de fronteira da Aula 01 registra as duas leituras.
+dois. A Aula 01 traz a nota de fronteira, com a orientação prática de leitura.
 
 **HyDE (Hypothetical Document Embeddings)** — Gerar com o LLM um documento hipotético que
 _responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A intuição: resposta
