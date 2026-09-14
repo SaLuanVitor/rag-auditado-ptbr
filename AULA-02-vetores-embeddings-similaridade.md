@@ -133,8 +133,10 @@ entrega vetores normalizados, e para vetores normalizados a ordenação por L2 e
 equivalente — L2 crescente corresponde a cosseno decrescente. Por isso funciona. Mas é uma
 coincidência conveniente, não um princípio, e a condição não é a que o nome sugere: o que sustenta a
 equivalência é as normas serem todas **iguais**, e normalizar é só a forma usual de garantir isso.
-Medido com vetores de norma 3,0, as duas ordenações continuam idênticas. Elas divergem assim que a
-norma **varia** entre os documentos.
+Medido com vetores de norma 3,0, as duas ordenações continuam idênticas. Com a norma **variando**
+entre os documentos a equivalência deixa de ser garantida, e as duas passam a **poder** divergir:
+medido em vinte mil sorteios, elas ainda coincidem em cerca de 15% dos casos. Norma igual é
+condição suficiente, não necessária.
 
 ---
 
@@ -158,9 +160,9 @@ script:
 5. demonstra o caso da negação
 6. demonstra a falha com código de produto
 
-Quatro coisas para conferir na saída, e note que **só a segunda é garantida**: a primeira e a
-terceira são o que eu espero de um modelo treinado como este, não medição que eu tenha feito, e a
-quarta é medição sua.
+Quatro coisas para conferir na saída, e note que **só a segunda é garantida**. As outras três você
+mede na sua tela; a primeira e a terceira são, além disso, o que eu espero de um modelo treinado
+como este, não medição que eu tenha feito.
 
 - **Pares sinônimos** têm cosseno alto sem compartilhar palavra **de conteúdo** alguma (as
   stopwords "o" e "no" aparecem nos dois; nenhum substantivo ou verbo aparece). É a busca
@@ -197,12 +199,11 @@ entre eles.** Diferença de cosseno é tão propriedade do par (modelo, corpus) 
 espaço mais anisotrópico comprime todos os vãos sem piorar nada. Está medido, com a geometria
 semântica idêntica nos dois espaços e o ranking preservado em ambos, que o vão pode encolher
 sessenta vezes só por o cone ser mais fechado. O que se compara entre espaços é **ordenação**.
-Aplique aqui o procedimento da caixa de aviso: em cada modelo, separe pares que você sabe
-relevantes de pares que sabe irrelevantes, e veja em qual dos dois as duas distribuições se
-sobrepõem menos. Previsão, não medição minha, e o motivo é atribuível aos cartões de modelo: o do
-`all-MiniLM-L6-v2` declara `language: en` e
-lista datasets de treino anglófonos; o do `paraphrase-multilingual-MiniLM-L12-v2` declara cinquenta
-idiomas, incluindo `pt` e `pt-br`. Questão prática direta para qualquer RAG em português.
+Aplique aqui o procedimento da caixa de aviso, e veja em qual dos dois modelos as duas
+distribuições se sobrepõem menos. Previsão, não medição minha, e o motivo é atribuível aos cartões de modelo: o do
+`all-MiniLM-L6-v2` se declara de língua inglesa, e o do
+`paraphrase-multilingual-MiniLM-L12-v2` declara dezenas de idiomas, o português entre eles. Não
+conferi os cartões daqui, e o nome dos modelos já diz o essencial. Questão prática direta para qualquer RAG em português.
 
 **3. Adicione uma frase com jargão do seu domínio.** Algo como
 "o CFOP 5102 exige destaque de ICMS na nota". Compare com uma frase genérica sobre

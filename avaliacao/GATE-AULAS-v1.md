@@ -3265,3 +3265,43 @@ pretende produzir: o problema não é errar, é não dizer.
 Soma: **188/348**. **Nove aulas abaixo de 6/12**: 01 (5), 02 (4), 03 (5), 04 (5), 06 (5), 13 (5),
 17 (5), 18 (5), 19 (5). A AULA-02 continua em 4/12 porque a remedição dela **falhou por travamento
 do agente**, sem produzir laudo.
+
+## S6, AULA-02: a maior nota do curso, e a única explicação causal que resistiu
+
+| Aula | R8 | S6 | E | C | H | O | D | A |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [02](../AULA-02-vetores-embeddings-similaridade.md) | 4/12 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 |
+
+**Seis de seis remedições passaram o portão**, e esta é a mais alta do curso hoje. O `A` em 2 é o
+segundo do dia, e o `H` em 2 vem de uma recusa explícita que já estava no texto: a aula se nega a
+citar um piso de anisotropia sem corpus declarado, dizendo que "número de blog sem corpus declarado
+não serve".
+
+**E aqui uma explicação causal minha resistiu ao teste separado**, a primeira do dia. O auditor
+comprimiu os mesmos ângulos por um fator crescente e mediu o vão encolhendo 21x, 59x, 62x e 84x com
+o ranking preservado em todos. O "sessenta vezes" cai na faixa, e a causa que eu dei, "só por o cone
+ser mais fechado", é a causa.
+
+### Mas errei um quantificador, e é a mesma família
+
+Escrevi que as ordenações "divergem assim que a norma **varia** entre os documentos". Falso: norma
+igual é condição **suficiente**, não necessária. Medido em vinte mil sorteios com normas em
+`U(0,3, 3,0)`, as duas ordenações ainda coincidem em **14,8%** dos casos.
+
+É o formato já registrado: **a primeira metade da frase é medida e a segunda é uma recíproca que
+ninguém mediu**, e quem confere o 3,0 leva a recíproca junto.
+
+### E o discriminador que não discrimina, de novo
+
+A caixa de conferência passou de três para quatro itens, e a contagem fecha. O que não fecha é a
+frase que classifica os itens: ela diz que a quarta é medição do aluno e as outras são expectativa,
+enquanto o corpo do item 3 diz, com estas palavras, "aqui a medição é sua, na sua tela". **Conserto
+aplicado no corpo do item e não na frase que o classifica**, terceira ocorrência da forma hoje.
+
+### Estado do portão
+
+Soma: **194/348** (55,7%). **Oito aulas abaixo de 6/12**: 01 (5), 03 (5), 04 (5), 06 (5), 13 (5),
+17 (5), 18 (5), 19 (5). Todas em 5, a um ponto do portão.
+
+**As seis remedições da S6 levaram o curso de 166 para 194**, e tiraram catorze aulas de baixo do
+portão até sobrarem oito.
