@@ -1935,7 +1935,7 @@ Toda nota é **anterior** aos consertos daquela aula, como nas rodadas anteriore
 | [13](../AULA-13-query-translation.md) | **10**/12 | Dois termos centrais do corpo ausentes do Vocabulário e do glossário. |
 | [14](../AULA-14-query-routing.md) | **11**/12 | Três passagens dizendo o que o conserto de Parte 2 havia removido — inclusive o checkpoint. |
 | [15](../AULA-15-small-to-big.md) | **10**/12 | "chamada de LLM por consulta" — é por nó recuperado; coincide no script porque `similarity_top_k=1`. |
-| [16](../AULA-16-hierarquia-e-raptor.md) | **12**/12 | — |
+| [16](../AULA-16-indice-hierarquico-multi-representacao.md) | **12**/12 | — |
 | [17](../AULA-17-reranking.md) | **11**/12 | Excesso meu de um adjetivo ("não normalizada") que o hedge não cobria; exercícios pressupondo `k` ajustável em arquivo sem retriever. |
 | [18](../AULA-18-compressao-crag.md) | **12**/12 | Nada resistiu à checagem adversarial. O hedge do CRAG-vs-Self-RAG estava certo — e é o que a AULA-21 tentou "corrigir". |
 | [19](../AULA-19-modelo-e-prompt-engineering.md) | **11**/12 | Um `grep` citado como exaustivo que também acerta comentário de `.env.example`. |
@@ -2784,3 +2784,75 @@ Soma: **232/348**. Remedidas na oitava rodada: **18 de 29**.
 **O critério dos `−1` ganha as duas primeiras medições diretas.** Nenhuma das duas tem `−1`, e
 agora isso está registrado por dimensão em vez de inferido do total. Ficam **13 aulas livres de
 `−1`**, 11 por aritmética (nota 10 ou mais) e 2 por medição. Restam 16 desconhecidas.
+
+## Oitava rodada, lote 4: as duas notas máximas caíram, e há um padrão nas dimensões
+
+O lote 3 foi fechado (13 e 14) e o 4 abriu nas duas de maior risco entre as nove que
+faltavam: a 16, única nota máxima restante, e a 02, a menos tocada de todas.
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [13](../AULA-13-query-translation.md) | 10/12 | **5**/12 | 1 | 0 | 1 | 0 | 2 | 1 | Uma frase **que este arquivo já registrava como falsa** sobreviveu intacta. E os quatro scripts do módulo embutem um acervo em inglês com `BAAI/bge-small-zh`, na aula cujo argumento é onde as coisas caem no espaço vetorial. |
+| [14](../AULA-14-query-routing.md) | 11/12 | **6**/12 | 1 | 0 | 2 | 0 | 2 | 1 | "Há dois desfechos possíveis" é refutado por execução: são três, e o terceiro devolve `None` em silêncio. E o roteador lógico **não roteia nada**: o rótulo é devolvido e ninguém o consome. |
+| [02](../AULA-02-vetores-embeddings-similaridade.md) | 11/12 | **4**/12 | 1 | 0 | 1 | 0 | 1 | 1 | O experimento manda comparar entre dois modelos o vão entre pares, que é diferença de cossenos, doze linhas depois de a aula ensinar que cosseno não se compara entre modelos. Medido: com a semântica idêntica e o ranking preservado, o vão varia **65 vezes**. |
+| [16](../AULA-16-indice-hierarquico-multi-representacao.md) | 12/12 | **4**/12 | 1 | 0 | 1 | 0 | 2 | 0 | A versão que o repositório apresenta como bem-sucedida **apagou a discriminação do nível fino**: o `01` ordena dez candidatos para cinco, o `02` filtra com `limit=1`. E a Parte 2 demonstra multi-representação sobre um documento e uma representação. |
+
+### As seis dimensões contam uma história que a soma esconde
+
+Seis aulas remedidas hoje, e **as seis marcaram `C` zero e `O` zero**. Nenhuma marcou `−1`, o
+que quer dizer que nada foi inventado: o defeito não é alucinação, é **mecanismo lido em vez de
+medido, e promessa entre aulas que ninguém conferiu na volta**. As dimensões que seguraram foram
+`D` (2 em quatro das seis) e `H` (2 na 18 e na 14).
+
+A `H` alta na 18 é o caso mais instrutivo do dia. Ela declarava `não executei` em três lugares,
+com honestidade, e caiu de 12 para 5. **O erro não foi dela: foi da rodada que aceitou o limite
+declarado em vez de levantá-lo.** Bastou uma execução com um duplo de teste, sem rede e sem
+chave. Limite declarado protege o autor, não o leitor, e isso passou a ir em todo briefing.
+
+E a AULA-16 exibiu o mesmo defeito de cabeça para baixo: **resultado de execução enunciado como
+fato, sem declarar execução.** Ela afirma `você recebe KeyError`, `o resultado não muda` e
+`devolve lista vazia` sem um único `não executei` no arquivo.
+
+### A hipótese fechou em seis de seis
+
+Nota alta da sexta rodada mais pouco escrutínio prediz queda: 01 (8→5), 18 (12→5), 13 (10→5),
+14 (11→6), 02 (11→4), 16 (12→4). **As duas notas máximas do curso caíram para 5 e para 4.** Não há
+mais nenhuma aula em 12/12.
+
+### Um achado sobre o processo, não sobre as aulas
+
+A frase falsa da AULA-13 estava registrada **neste arquivo**, com estas palavras, na seção
+"Achados de domínio (`@rag-specialist`), sem nota, por método". Aquela seção nunca entrou no laço
+de conserto. Ela tem mais dois achados, ambos da AULA-10, e a AULA-10 está sendo remedida agora
+com esses dois no briefing. **Achado registrado fora do laço de conserto é achado perdido.**
+
+### Ferramenta nova, e por que ela faltava
+
+`ferramentas/cauda.js`. A varredura de cauda que cola era um `grep` por **palavra** repetida, e o
+defeito achado hoje na AULA-16 era uma **oração** repetida separada por travessão: `que são as
+abas — que são as abas do outro arquivo`. Nenhuma palavra aparecia duas vezes lado a lado, e por
+isso a varredura passou por cima dele em duas rodadas.
+
+O script procura n-gramas de 1 a 8 palavras e ignora pontuação entre as cópias. Ele é **alerta de
+leitura, não veredito**: sobre as 29 aulas e o glossário devolve 13, e os dois de duas palavras ou
+mais são legítimos (`resumos de resumos` é o mecanismo do RAPTOR, e a entrada de `Function
+calling` lista sinônimos). Filtra tabela, bloco de código e identificador repetido, sem os quais
+devolvia 38.
+
+**Limite declarado, e ele nasceu de um erro meu.** A suíte trazia, como caso que deveria passar,
+`A chamada de chamada que`, uma cauda real desta auditoria. Ela **não é pega**, nem por este
+script nem pela varredura antiga, porque as duas cópias têm uma palavra entre elas. A expectativa
+estava errada, não a ferramenta, e é a quarta vez nesta sessão que uma expectativa errada minha
+aparece no meu próprio instrumento. Alargar para aceitar um vão de uma palavra acusaria
+`resumos de resumos`. O limite ficou, e ficou escrito no teste.
+
+### Estado do portão
+
+Soma: **207/348**. Remedidas na oitava rodada: **22 de 29**.
+
+**Oito aulas abaixo de 6/12**, contra cinco antes deste lote: 01 (5), 02 (4), 04 (5), 06 (5),
+12 (4), 13 (5), 16 (4), 18 (5).
+
+`−1`: nenhum nas seis medidas hoje, e agora está registrado por dimensão. **Treze aulas livres de
+`−1`**, sete por aritmética (nota 10 ou mais: 05, 07, 10, 15, 17, 19, 22) e seis por medição
+direta (01, 02, 13, 14, 16, 18). Restam 16 desconhecidas.

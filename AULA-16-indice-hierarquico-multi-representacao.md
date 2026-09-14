@@ -96,18 +96,27 @@ no `03`, FAISS no `98`. A técnica é independente do banco; o que muda é onde 
 
 ### O que separa o imaturo do bem-sucedido
 
-O `diff` entre `01-...WorkingButImmatureVersion.py` e `02-...SuccessfulHierarchicalIndex.py` mostra
-a diferença no **schema do nível grosseiro**:
+O `diff` remove 73 linhas e acrescenta 28, e o peso da mudança **não está no nível grosseiro**,
+está no de detalhe. Duas leituras, e a segunda é a que importa.
 
-- O `01` declara `FieldSchema(name="summary", dtype=DataType.VARCHAR, max_length=500)` e insere
-  `"summary": sheet_name` — ou seja, o campo se chama resumo mas recebe **o nome da planilha**.
-- O `02` traz o comentário `# Insert the summary data - only store the table name`, tornando
-  explícito o que está sendo armazenado, e no nível de detalhe usa
-  `table_content = df.to_string(index=False)`.
+A primeira é de nomenclatura, e é real: o `01` declara `FieldSchema(name="summary",
+dtype=DataType.VARCHAR, max_length=500)` e insere `"summary": sheet_name`, ou seja, o campo se chama
+resumo e recebe **o nome da planilha**. O `02` traz o comentário `# Insert the summary data - only
+store the table name`, tornando explícito o que está armazenado. Um campo chamado `summary` que
+guarda um identificador induz quem lê a erro. Mas isso é **uma linha das 73**.
 
-Ou seja, a "imaturidade" do `01` é em boa parte de **honestidade de nomenclatura e de organização
-do que vai em cada nível** — um campo chamado `summary` que guarda um identificador induz quem lê
-a erro, e a busca no nível grosseiro passa a operar sobre algo que não é resumo.
+A segunda leitura é a que muda o veredito. O `01` insere **uma entidade por linha da planilha**
+(`01-...:93`, `for _, row in df.iterrows()`), dez por aba, e o segundo nível ordena dez candidatos
+para cinco (`:220-221`, o filtro por `table_name` com `limit=5`). O `02` insere **a tabela inteira
+como uma entidade só** (`02-...:80`, `df.to_string(index=False)`) e o segundo nível filtra com
+`limit=1` (`:180-181`). O conjunto filtrado tem cardinalidade **um**: o embedding da pergunta não
+decide nada ali.
+
+Ou seja, a versão apresentada como bem-sucedida simplificou o código e, no caminho, **apagou a
+discriminação do nível fino**. É exatamente o segundo nível decorativo que esta aula levanta como
+alerta central sobre o `98`, dentro do arquivo que o repositório apresenta como o certo. E a lição
+que sai daí é mais fina que a do `98`: um nível não precisa de código morto para ser decorativo,
+basta que a cardinalidade efetiva dele seja um.
 
 Isso conecta com o padrão que atravessa este repositório e este curso: **o nome promete o que o
 conteúdo não é.** Aqui o autor versionou as duas versões justamente para você ver a correção.
@@ -121,12 +130,19 @@ from llama_index.core.schema import IndexNode, Document
 from llama_index.core.retrievers import RecursiveRetriever
 ```
 
-O `IndexNode` é o mecanismo: é um nó que **aponta para outro índice** em vez de ser o texto final entregue (ele **herda** de `TextNode`, então carrega texto — o resumo que a busca de nível 1 usa).
-O `RecursiveRetriever` segue esses apontamentos — recupera no nível de cima, encontra um
-`IndexNode`, e desce recursivamente ao índice que ele referencia.
+O `IndexNode` é o mecanismo: é um nó que **aponta para outro índice** em vez de ser o texto final
+entregue (ele **herda** de `TextNode`, então carrega texto — o resumo que a busca de nível 1 usa). O
+`RecursiveRetriever` segue esses apontamentos — recupera no nível de cima, encontra um `IndexNode`,
+e desce recursivamente ao índice que ele referencia.
 
-É a implementação idiomática do modelo mental de dois níveis, e a recursão permite mais de dois:
-resumo de seção → resumo de subseção → chunk.
+A recursão permite mais de dois níveis: resumo de seção → resumo de subseção → chunk.
+
+**Mas o `04` não instancia o diagrama de forma estrita, e vale medir antes de tomá-lo como
+modelo.** A linha 78 junta num índice só os nós de texto final e os `IndexNode` (`all_nodes =
+doc_nodes + index_nodes`), e a linha 81 pede `similarity_top_k=2`. Com o `node_parser` padrão o
+arquivo produz três de cada, então os dois acertos do topo podem ser nós de texto comum, e aí o
+`RecursiveRetriever` **não desce**. É um dois-níveis opcional, não o dois-níveis do diagrama, em
+que o nível 1 só tem resumos.
 
 ### O segundo nível decorativo
 
@@ -144,6 +160,17 @@ presuma.
 ## Parte 2 — Multi-representação
 
 `03-BuildingMultiRepresentationIndex/` tem **2 arquivos**, e apenas um faz multi-representação.
+
+⚠️ **Duas medições antes de acreditar na demonstração.** O `WebBaseLoader` devolve **um**
+`Document` por URL, e o script passa uma URL só: o Chroma guarda **um vetor**, o docstore guarda
+**uma entrada**, e o retriever não escolhe entre nada. E há **uma** representação por documento,
+não várias, o que é o oposto do que o modelo mental desta aula desenha. Some-se que a linha 48
+passa `n_results=1`, que o `MultiVectorRetriever` **ignora em silêncio**: o
+`_get_relevant_documents` não aceita `**kwargs`, e o `k` real vem de `search_kwargs`, que ali está
+vazio. Para ver multi-representação de fato, carregue três ou quatro URLs e construa o retriever
+com `search_kwargs={"k": 1}`. O arquivo demonstra a **arquitetura** certa, artefato indexado
+diferente de artefato entregue, com uma representação só. O "multi" do nome ainda não aconteceu
+ali, que é o mesmo padrão que esta aula nomeia duas seções acima.
 
 ### O que faz de verdade
 
@@ -203,10 +230,10 @@ python 00-DirectlyLoadDocumentsIndexAndQA.py
 dentro desta pasta ela não resolve. Prefixe com `../../`.
 
 E o `98-TwoTierIndex-FAISS.py` tem o mesmo problema **mais um pior**: a linha 31 aponta para
-`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas 57 e 63 montam a chave
-`billionaires_table_{matched_year+2}` — `_2` a `_6`, que são as abas — que são as abas do **outro** arquivo da mesma pasta,
-`billionaires_merged.xlsx`. Com o caminho certo e o workbook errado você recebe
-`KeyError: 'billionaires_table_2'`. Troque a linha 31 por
+`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas
+57 e 63 montam a chave `billionaires_table_{matched_year+2}` — `_2` a `_6`, que são as abas do
+**outro** arquivo da mesma pasta, `billionaires_merged.xlsx`. Com o caminho certo e o workbook
+errado você recebe `KeyError: 'billionaires_table_2'`. Troque a linha 31 por
 `"../../90-Data/ComplexPDF/TopTenBillionaires/billionaires_merged.xlsx"`.
 
 **Comece pelo baseline** e guarde as respostas. É o número contra o qual tudo aqui deve ser
@@ -242,12 +269,17 @@ diferença em relação ao pai-filho: o resumo não é um trecho do documento.
 por documento. Faça uma pergunta sobre um detalhe específico que o resumo não menciona. O documento
 não é selecionado, e nenhum ajuste no nível 2 recupera. É a cascata cobrando.
 
-**2. Compare contra o baseline.** Rode a mesma pergunta pelo `00` e pelo two-tier. Se o plano
-vencer, você tem evidência de que a hierarquia não está pagando — e essa é a medição que quase
-ninguém faz.
+**2. Compare contra o baseline, depois de igualar o resto.** O `00` lê um PDF com `PyMuPDFReader`,
+embute com `text-embedding-3-small` e gera com `gpt-3.5-turbo`; os two-tier leem a planilha,
+embutem com `bge-m3` ou `all-MiniLM-L6-v2` e geram com `deepseek-chat`. Rodar a mesma pergunta nos
+dois compara **quatro coisas de uma vez**, e nenhuma delas é a hierarquia. Antes de comparar,
+aponte o `00` para a mesma planilha e iguale embedder e gerador; só então a diferença que sobrar é
+da arquitetura. A comparação continua sendo a medição que quase ninguém faz, e o repositório não a
+entrega pronta.
 
-**3. Conserte o segundo nível do `98` — e note que consertar o `return` não basta.** Use o `indices`
-que a linha 58 calcula e faça o retorno depender dele. O resultado **não muda**, e a razão é o que o
+**3. Conserte o segundo nível do `98` — e note que consertar o `return` não basta, e que o conserto
+óbvio é pior.** Use o `indices` que `98-TwoTierIndex-FAISS.py:58` calcula e faça o retorno depender dele. O resultado
+**não muda**, e a razão é o que o
 exercício ensina: a consulta do segundo nível é o embedding **da própria tabela já escolhida**, e essa
 tabela está indexada no `table_index` — buscar num `IndexFlatL2` um vetor idêntico a um vetor indexado
 devolve ele mesmo, a distância zero. O `indices[0][0]` reaponta para a mesma tabela.
@@ -257,16 +289,17 @@ uma lista que mapeie a posição do índice de volta ao nome da aba. Aí compare
 segundo nível decorativo e um funcional — e o exercício ensina duas coisas, porque a primeira
 tentativa mede zero.
 
-**4. Remova o docstore do multi-representação.** Sem ele, o retriever devolve **lista vazia** — e
+**4. Não popule o docstore do multi-representação.** Pule o `mset`, em vez de remover o
+`docstore`: sem ele o construtor recusa a montagem, pedindo um `byte_store`. Sem popular, o
+retriever devolve **lista vazia** — e
 não o resumo, que seria a suposição intuitiva. O `MultiVectorRetriever` busca no vetorstore, junta
 os ids e faz `docstore.mget(ids)`; sem docstore populado o `mget` devolve `None` para cada id, e a
 compreensão de lista que vem depois filtra todos. Some tudo, silenciosamente.
 
 Isso é mais instrutivo que o resumo teria sido: **o resumo nunca é entregue ao LLM em nenhum
 caminho.** Ele existe só para ser encontrado. Confirmado na fonte do `MultiVectorRetriever`, cujo
-`_get_relevant_documents` termina em
-`docs = self.docstore.mget(ids)` seguido de `return [d for d in docs if d is not None]` — sem
-docstore populado, a lista sai vazia.
+`_get_relevant_documents` termina em `docs = self.docstore.mget(ids)` seguido de `return [d for d in
+docs if d is not None]` — sem docstore populado, a lista sai vazia.
 
 **5. Adicione uma segunda representação.** Ao lado dos resumos, indexe palavras-chave extraídas dos
 mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índice passou a ter.
@@ -312,8 +345,8 @@ mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índi
 
 ## Vocabulário
 
-`multi-representação` · `parent-child` · `small-to-big` · `hybrid search` · `sparse vector` ·
-`dense vector` · `recall@k`
+`índice hierárquico` · `multi-representação` · `IndexNode` · `RecursiveRetriever` ·
+`MultiVectorRetriever` · `parent-child` · `small-to-big`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
@@ -322,6 +355,11 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 **Anterior:** [AULA 15 — Small-to-big](AULA-15-small-to-big.md)
 **Próxima:** [AULA 17 — Reranking: RRF, cross-encoder, ColBERT, Cohere, RankLLM e recência](AULA-17-reranking.md)
 
-> **Fase 5 concluída.** As Aulas 15 e 16 cobrem os três primeiros subdiretórios de `06-Indexing/`: desacoplar índice de entrega, subir
-> um nível de busca, e indexar o mesmo conteúdo de várias formas. A Fase 6 muda de estágio — não
-> mais como buscar, mas o que fazer com o que voltou.
+> **Fase 5 concluída.** As Aulas 15 e 16 cobrem os três primeiros subdiretórios de `06-Indexing/`,
+> com uma exceção declarada: o `05-HierarchicalMergingExample.py`, que aplica `AutoMergingRetriever`
+> sobre `HierarchicalNodeParser`, fica de fora do curso, e nenhuma aula o trata. Quem quiser seguir
+> por ali tem no small-to-big da Aula 15 o modelo mental mais próximo. O que as duas aulas cobrem é
+> desacoplar índice de entrega, subir
+> um nível de busca, e indexar o mesmo conteúdo de várias formas. A Fase 6 muda de estágio: a Fase
+> 5 reorganiza **o que entra no índice**, na ingestão, antes de qualquer pergunta chegar; a Fase 6
+> trata do que fazer com o que voltou.
