@@ -85,7 +85,7 @@ Anotação de nome, do gênero que este curso vem catalogando: a primeira linha 
 O nome interno não é o nome do arquivo. Detalhe inofensivo, e vale como aviso de que o cabeçalho veio de outro lugar — o que a linha 3 confirma, creditando o cookbook oficial. Crédito dado é uma virtude; este curso registra as duas coisas.
 
 Detalhe honesto a favor do módulo: aqui o `10-AdvanceRAG/02-ContextRetrieval/.env.example:2`
-**está correto**, e é um dos casos em que está: a Aula 27 mediu a frase como falsa em 15 dos 23 módulos testáveis, e verdadeira em 8. Os dois scripts chamam `load_dotenv()` — `LlamaIndex-Implementation.py:20-21` e `Milvus-Implementation.py:161-162`. Depois de cinco módulos, a frase é verdadeira.
+**está correto**, e é um dos casos em que está: a Aula 27 mediu a frase como falsa em 15 dos 23 módulos testáveis, e verdadeira em 8. Os dois scripts chamam `load_dotenv()` — `LlamaIndex-Implementation.py:20-21` e `Milvus-Implementation.py:161-162`.
 
 ---
 
@@ -296,7 +296,10 @@ tenham ao menos dois chunks cada, o que não confirmei, porque o `codebase_chunk
 tempo de execução e não está em disco aqui. Cada uma é um prefixo literal do seu alvo.
 
 Julgamento, e é o ponto central desta aula: nenhuma técnica de recuperação pode se distinguir de outra nesse teste. Buscar um texto usando a sua própria primeira metade é o caso mais fácil que existe — denso acha, esparso acha, e a contextualização não tem como ajudar porque não havia dificuldade a resolver. Os três experimentos vão reportar valores próximos, e a "melhoria" impressa no fim
-(`Milvus-Implementation.py:970-976`) será ruído — e a terceira delas, por construção, será zero.
+(`Milvus-Implementation.py:970-976`) será ruído, e as três linhas imprimirão o mesmo número: o
+`rerank_improvement` de `:971` é `reranker − standard` e, sob a identidade do Ato 4, isso é o mesmo
+que o `context_improvement`. O incremento do reranking, que é o que seria zero, nunca chega a ser
+calculado.
 
 Repare também que o comentário da linha 891 admite o problema: _"In actual applications, a specially designed evaluation dataset should be used"_. O autor sabe. O que o arquivo não diz é que o conjunto especialmente desenhado **já estava em disco**: o
 `download_data()` da linha 843 baixa o `evaluation_set.jsonl` do repositório da Anthropic (linhas
@@ -339,8 +342,8 @@ e as três linhas de `:974-976` imprimem o mesmo número. Note **qual** número:
 é impresso. A seção "Um rótulo errado no relatório" volta a isso.
 
 E a assinatura de `retrieve_base` mostra que o desenho previa outra coisa: `k: int = 20` (`:698`).
-Era a janela de candidatos, da qual o reranker escolheria os cinco melhores. A chamada de
-chamada que `evaluate_retrieval` faz ao `retrieve_base` (`:665`) passa o `k` da métrica por cima dela, e a janela desaparece.
+Era a janela de candidatos, da qual o reranker escolheria os cinco melhores. A chamada
+que `evaluate_retrieval` faz ao `retrieve_base` (`:665`) passa o `k` da métrica por cima dela, e a janela desaparece.
 
 A identidade depende de uma premissa que vale nomear: o `self.rerank_function(query, docs)` de `:555` é chamado **sem `top_k`** — `grep -n "top_k"` no arquivo não devolve nada —, então ela vale enquanto o padrão da biblioteca devolver todos os candidatos que recebeu. Se ele truncasse, o `pass_at_n` do reranker **cairia** abaixo do contextual, o que seria pior ainda.
 
