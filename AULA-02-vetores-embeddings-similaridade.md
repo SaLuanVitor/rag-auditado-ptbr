@@ -55,7 +55,7 @@ Busca por palavra-chave falha em três situações que embedding resolve:
 | Paráfrase ("como devolvo?" vs. "política de devolução") | falha         | acerta    |
 | Outro idioma (com modelo multilíngue)                   | falha         | acerta    |
 
-E **falha** onde palavra-chave é imbatível:
+E **falha** onde palavra-chave vence, ou ao menos empata:
 
 | Situação                                        | Palavra-chave | Embedding           |
 | ----------------------------------------------- | ------------- | ------------------- |
@@ -65,8 +65,10 @@ E **falha** onde palavra-chave é imbatível:
 | Negação ("contratos **sem** cláusula de multa") | parcial       | erra feio           |
 
 **Julgamento:** esta tabela é o argumento central a favor de **busca híbrida** (Aula 11), e é uma
-das lições mais rentáveis do curso. O fato por trás dela, esse sim verificável: não é que uma
-abordagem seja melhor — elas falham em conjuntos disjuntos de casos.
+das lições mais rentáveis do curso. O fato por trás dela: não é que uma abordagem seja melhor, é
+que elas falham em conjuntos de casos em boa parte diferentes. A interseção existe, e a linha da
+negação é ela: ali as duas degradam, e busca híbrida não resolve. Por isso a Aula 11 é ganho, não
+solução.
 
 O caso da negação merece destaque, porque surpreende: o embedding de "contrato com
 cláusula de multa" e o de "contrato sem cláusula de multa" são **muito parecidos**,
@@ -126,12 +128,13 @@ FAISS, usado em `00-SimpleRAG/05_RAG_from_Scratch_*.py`, tem
 `IndexFlatL2` (euclidiana) e `IndexFlatIP` (produto interno) como classes
 separadas — a métrica é escolhida no tipo do índice.
 
-Note que o script do repositório usa `IndexFlatL2` com vetores do
-`all-MiniLM-L6-v2`. Esse modelo entrega vetores normalizados, e para vetores
-normalizados a ordenação por L2 e por cosseno é equivalente — L2 crescente
-corresponde a cosseno decrescente. Por isso funciona. Mas é uma coincidência
-conveniente, não um princípio: com vetores não normalizados, o resultado
-divergiria.
+Note que o script do repositório usa `IndexFlatL2` com vetores do `all-MiniLM-L6-v2`. Esse modelo
+entrega vetores normalizados, e para vetores normalizados a ordenação por L2 e por cosseno é
+equivalente — L2 crescente corresponde a cosseno decrescente. Por isso funciona. Mas é uma
+coincidência conveniente, não um princípio, e a condição não é a que o nome sugere: o que sustenta a
+equivalência é as normas serem todas **iguais**, e normalizar é só a forma usual de garantir isso.
+Medido com vetores de norma 3,0, as duas ordenações continuam idênticas. Elas divergem assim que a
+norma **varia** entre os documentos.
 
 ---
 
@@ -148,14 +151,16 @@ Ele usa apenas `sentence-transformers` e `numpy`, já instalados na Aula 00. O
 script:
 
 1. gera embeddings de um punhado de frases em português
-2. mostra a dimensão do vetor e um recorte dos primeiros valores
-3. calcula cosseno, produto interno e L2 entre a consulta e cada frase
-4. ranqueia as frases contra uma consulta pelas três métricas, lado a lado
+2. mostra a dimensão do vetor, um recorte dos primeiros valores e a **norma** de cada um
+3. calcula cosseno, produto interno e L2 entre a consulta e cada frase, e ranqueia as frases
+   pelas três métricas lado a lado
+4. imprime o top-1 do L2 nas duas ordenações, a errada e a certa
 5. demonstra o caso da negação
 6. demonstra a falha com código de produto
 
-Três coisas para conferir na saída — e note que **só a segunda é garantida**: as outras duas são o
-que eu espero de um modelo treinado como este, não medição que eu tenha feito.
+Quatro coisas para conferir na saída, e note que **só a segunda é garantida**: a primeira e a
+terceira são o que eu espero de um modelo treinado como este, não medição que eu tenha feito, e a
+quarta é medição sua.
 
 - **Pares sinônimos** têm cosseno alto sem compartilhar palavra **de conteúdo** alguma (as
   stopwords "o" e "no" aparecem nos dois; nenhum substantivo ou verbo aparece). É a busca
@@ -164,6 +169,11 @@ que eu espero de um modelo treinado como este, não medição que eu tenha feito
   produz a ordem inversa nos números, mas o mesmo ranking depois de inverter.
 - A frase com **negação** deve ficar próxima da sua afirmativa. Exatamente o problema descrito
   acima — e aqui a medição é sua, na sua tela.
+- **O piso.** Olhe o cosseno da consulta contra a frase que não tem nada a ver com ela, e depois a
+  coluna inteira da seção do código de produto. Aquele é o seu valor de "nenhuma relação" para este
+  modelo. Anote-o: qualquer limiar que você venha a escolher nas Aulas 11 e 14 se mede a partir
+  dele, não a partir de zero. É a única medição da caixa de aviso que já existe na sua tela, e vale
+  mais que qualquer número que eu escrevesse aqui.
 
 ---
 
@@ -182,11 +192,15 @@ esse sintoma na memória: quando um RAG seu retornar resultados sistematicamente
 absurdos, essa é a primeira hipótese.
 
 **2. Troque o modelo por um multilíngue.** Substitua `all-MiniLM-L6-v2` por
-`paraphrase-multilingual-MiniLM-L12-v2`. **Não compare os cossenos absolutos dos dois modelos** —
-valor de cosseno não é comparável entre espaços vetoriais diferentes, e é a própria regra que esta
-aula estabelece mais acima: o que se compara é ranking. Compare a **distância entre os pares**: o vão
-entre o par sinônimo e o par não relacionado deve abrir. Previsão, não medição minha — e o motivo é
-atribuível aos cartões de modelo, não a mim: o cartão do `all-MiniLM-L6-v2` declara `language: en` e
+`paraphrase-multilingual-MiniLM-L12-v2`. **Não compare os cossenos dos dois modelos, e nem o vão
+entre eles.** Diferença de cosseno é tão propriedade do par (modelo, corpus) quanto o cosseno: um
+espaço mais anisotrópico comprime todos os vãos sem piorar nada. Está medido, com a geometria
+semântica idêntica nos dois espaços e o ranking preservado em ambos, que o vão pode encolher
+sessenta vezes só por o cone ser mais fechado. O que se compara entre espaços é **ordenação**.
+Aplique aqui o procedimento da caixa de aviso: em cada modelo, separe pares que você sabe
+relevantes de pares que sabe irrelevantes, e veja em qual dos dois as duas distribuições se
+sobrepõem menos. Previsão, não medição minha, e o motivo é atribuível aos cartões de modelo: o do
+`all-MiniLM-L6-v2` declara `language: en` e
 lista datasets de treino anglófonos; o do `paraphrase-multilingual-MiniLM-L12-v2` declara cinquenta
 idiomas, incluindo `pt` e `pt-br`. Questão prática direta para qualquer RAG em português.
 
@@ -236,8 +250,8 @@ para busca híbrida (Aula 11).
 
 ## Vocabulário
 
-`embedding` · `dimension` · `dense vector` · `sparse vector` ·
-`cosine similarity` · `dot product` · `euclidean distance (L2)` · `metric type`
+`embedding` · `dimension` · `anisotropia` · `cosine similarity` ·
+`dot product` · `euclidean distance (L2)` · `metric type`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 

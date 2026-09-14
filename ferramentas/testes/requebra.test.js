@@ -77,6 +77,21 @@ checa('nao mexe em arquivo que ja cabe', r.depois === curto && /Nada a requebrar
 r = roda(`abertura\r\n\r\n${LONGA}\r\n`);
 checa('preserva CRLF', r.code === 0 && r.depois.includes('\r\n') && !/[^\r]\n/.test(r.depois), JSON.stringify(r.depois.slice(0, 60)));
 
+// ---------- 8. quebra orfa: linha curta no meio de paragrafo largo ----------
+// Assinatura de texto inserido sem requebrar em volta. O diff parece cosmetico
+// igual ao da linha longa, e nenhuma linha passa de 108.
+const CHEIA = Array(8).fill(P).join(' '); // 103 caracteres, acima de 90 e abaixo de 108
+r = roda(`abertura\n\n${CHEIA}\n${CHEIA}\ncurta no meio\n${CHEIA}\nfecho do paragrafo\n`);
+checa('requebra paragrafo com quebra orfa', r.code === 0 && /1 paragrafo/.test(r.saida), r.saida);
+checa('a sequencia de palavras sobrevive a orfa',
+      palavras(r.depois) === palavras(`abertura\n\n${CHEIA}\n${CHEIA}\ncurta no meio\n${CHEIA}\nfecho do paragrafo\n`));
+
+// ---------- 9. controle: ultima linha curta NAO e orfa ----------
+// Todo paragrafo termina numa linha curta. Sem esta excecao a ferramenta
+// requebraria o acervo inteiro e o diff cosmetico esconderia os consertos reais.
+r = roda(`abertura\n\n${CHEIA}\n${CHEIA}\nfecho\n`);
+checa('nao trata a ultima linha curta como orfa', r.code === 0 && /Nada a requebrar/.test(r.saida), r.saida);
+
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {
   console.log('\n-- positivo plantado: quebra que apaga uma palavra --');

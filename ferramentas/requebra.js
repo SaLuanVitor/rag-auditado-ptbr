@@ -19,7 +19,14 @@ linhas.forEach((l, i) => {
 
 const alvos = blocos.filter(b => {
   const ls = linhas.slice(b.ini, b.fim + 1);
-  return ls.some(l => l.length > 108) && ls.every(prosa);
+  if (!ls.every(prosa)) return false;
+  if (ls.some(l => l.length > 108)) return true;
+  // A quebra orfa: linha curta no MEIO de um paragrafo largo. E a assinatura de
+  // texto inserido sem requebrar o paragrafo em volta, e o diff dela parece
+  // cosmetico do mesmo jeito que o da linha longa. A ultima linha fica de fora
+  // porque toda ultima linha de paragrafo e curta por construcao.
+  const mx = Math.max(...ls.map((l) => l.length));
+  return mx > 90 && ls.slice(0, -1).some((l) => l.length < 75);
 });
 
 let mudou = 0;
