@@ -12,7 +12,7 @@ compressão, prompt, schema, três graders. Cada uma foi apresentada como um tra
 
 Dez aulas anteriores adiaram a medição para cá; quatro deixaram tarefa explícita. A Aula 01 mandou
 escrever cinco perguntas sobre um acervo seu, anotando **onde** no acervo está a resposta de cada
-uma, e disse que aquilo viraria seu conjunto de avaliação — é agora que vira. A Aula 15 prometeu que
+uma e qual é essa resposta, e disse que aquilo viraria seu conjunto de avaliação — é agora que vira. A Aula 15 prometeu que
 aqui se veria se a janela de sentenças está ajudando. A Aula 21 pediu para medir a qualidade dos
 próprios juízes — e o que esta aula entrega é um teste de **sensibilidade** ao juiz (o primeiro
 item de "Quebre de propósito"), não a calibração contra rótulo humano. Essa fica **de fora do
@@ -23,7 +23,7 @@ de classificação — `intent == scenario` sobre N perguntas rotuladas, com a m
 lado, porque a média esconde qual rota erra —, e é a única das quatro dívidas que **esta aula não
 paga**. Fica registrada como tal em vez de prometida.
 
-**Se você fez o exercício da Aula 01, pegue aquele documento agora** — e conte que falta um campo.
+**Se você fez o exercício da Aula 01, pegue aquele documento agora** — e confira o item 5.
 As cinco perguntas com a **localização** da resposta já bastam para as métricas de recuperação desta
 aula: `hit rate@k` e `MRR` saem de comparar ids. Não bastam para o resto do capítulo. O
 `expected_output` do DeepEval e o `SemanticSimilarityEvaluator` exigem a **resposta de referência**,
