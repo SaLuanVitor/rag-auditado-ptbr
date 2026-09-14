@@ -51,7 +51,13 @@ para mostrar que **a falha está em outro lugar**:
    antes e depois. Jogar isso direto no driver quebra.
 3. **Junção errada não dá erro.** Retorna um número plausível, e ninguém percebe.
 
-Os **dois primeiros** aparecem no código, com o "antes" e o "depois" versionados lado a lado. O terceiro não tem par antes/depois, mas tem exemplo, e é o da Parte 1: os dois `02-*` instruem a junção em prosa (`02-Text2SQL-LLM-DeepSeek.py:41`), casando `scenic_spots.city` com `city_info.city_name` por igualdade de string, entre colunas de nomes diferentes e sem chave estrangeira. Um erro de grafia devolve menos linhas sem levantar exceção. Um `grep` por `JOIN` em caixa alta não encontra nenhuma cláusula de junção, nem par antes/depois. Fica como alerta conceitual, sem exemplo — e é justamente o mais difícil de pegar.
+Os **dois primeiros** aparecem no código, com o "antes" e o "depois" versionados lado a lado. O
+terceiro não tem par antes/depois, mas tem exemplo, e é o da Parte 1: os dois `02-*` instruem a
+junção em prosa (`02-Text2SQL-LLM-DeepSeek.py:41`), casando `scenic_spots.city` com
+`city_info.city_name` por igualdade de string, entre colunas de nomes diferentes e sem chave
+estrangeira. Um erro de grafia devolve menos linhas sem levantar exceção. Um `grep` por `JOIN` em
+caixa alta não encontra nenhuma cláusula de junção, nem par antes/depois. Fica como alerta
+conceitual, sem exemplo — e é justamente o mais difícil de pegar.
 
 ---
 
@@ -103,23 +109,28 @@ SELECT COUNT(*) FROM film;
 
 o driver recebe a cerca de markdown e a frase em português junto com o SQL, e estoura.
 
-A correção do `v2` tem duas frentes, e é importante notar que são **duas** e não uma. O `diff`, porém, traz mais duas mudanças que não são o conserto e confundem a comparação: `gpt-4o` vira `o4-mini`, o `top_k` das descrições vai de 5 para 8, e `temperature=0` é **comentada**, devolvendo o padrão da API. O `v2` é menos determinístico que o `v1`, o que importa para o exercício 1, que manda rodar várias vezes.
+A correção do `v2` tem duas frentes, e é importante notar que são **duas** e não uma. O `diff`,
+porém, traz mais duas mudanças que não são o conserto e confundem a comparação: `gpt-4o` vira
+`o4-mini`, o `top_k` das descrições vai de 5 para 8, e `temperature=0` é **comentada**, devolvendo o
+padrão da API. O `v2` é menos determinístico que o `v1`, o que importa para o exercício 1, que manda
+rodar várias vezes.
 
 1. **No prompt** — instruir o modelo a devolver só o SQL.
 2. **No código** — extrair o SQL de qualquer forma, com regex, caso o modelo desobedeça.
 
-Essa redundância é o desenho certo. Instrução de prompt é probabilística: funciona quase sempre,
-e "quase sempre" em produção significa falhar todo dia. O `extract_sql()` é a rede de baixo —
-mesmo desenho de qualquer validação que não pode confiar na fonte: instrução do lado de quem gera, verificação do lado de quem consome. Regra em prosa depende de
-memória.
+Essa redundância é o desenho certo. Instrução de prompt é probabilística: funciona quase sempre, e
+"quase sempre" em produção significa falhar todo dia. O `extract_sql()` é a rede de baixo — mesmo
+desenho de qualquer validação que não pode confiar na fonte: instrução do lado de quem gera,
+verificação do lado de quem consome. Regra em prosa depende de memória.
 
 Julgamento: eu acrescentaria uma terceira camada que o exemplo não tem — **validar a consulta
 antes de executar**. Verificar que é um `SELECT` (e não um `DROP`), que as tabelas citadas
 existem, e rodar com usuário somente-leitura. Text2SQL executa código gerado por LLM contra o
 seu banco; tratar isso como entrada não confiável não é paranoia.
 
-Há ainda o `05-text2sql-rag-v3-agent.py`, a versão agêntica, que itera quando a consulta falha —
-um retry **com limite** (`max_retries: int = 3`). A Aula 26 mostra o contraste: os laços de LangGraph do repositório não têm contador próprio e dependem do limite de recursão da plataforma para parar.
+Há ainda o `05-text2sql-rag-v3-agent.py`, a versão agêntica, que itera quando a consulta falha — um
+retry **com limite** (`max_retries: int = 3`). A Aula 26 mostra o contraste: os laços de LangGraph
+do repositório não têm contador próprio e dependem do limite de recursão da plataforma para parar.
 
 ---
 
@@ -161,10 +172,10 @@ prompt — que estoura o contexto num banco com 200 tabelas e dilui a atenção 
   **prompt renderizado** — montado na linha 110 e passado direto na 122, sem log. Acrescentar essa
   linha é o primeiro ajuste que eu faria antes de depurar qualquer Text2SQL.
 
-O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL significa que,
-quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a solução anterior
-como exemplo. **O sistema melhora à medida que consultas corretas são acumuladas** — e isso é
-uma decisão de arquitetura, não um truque de prompt.
+O `03-ingest-q2sql.py` é, **julgamento**, o mais engenhoso dos três. Indexar pares pergunta→SQL
+significa que, quando alguém faz uma pergunta parecida com uma já resolvida, o modelo recebe a
+solução anterior como exemplo. **O sistema melhora à medida que consultas corretas são acumuladas**
+— e isso é uma decisão de arquitetura, não um truque de prompt.
 
 Julgamento: se eu fosse levar Text2SQL a produção, esse seria o primeiro investimento — um
 acervo de pares pergunta→SQL validados, crescendo com o uso. Vale mais que trocar de modelo.
@@ -174,8 +185,8 @@ acervo de pares pergunta→SQL validados, crescendo com o uso. Vale mais que tro
 ## Parte 3 — Text2Cypher: o schema que mente
 
 `Text2Cypher/` tem dois arquivos, e os nomes já contam o desfecho:
-`03-Text2Cypher-SNOMED-v1-Failed.py` e `03-Text2Cypher-SNOMED-v2-Succeeded.py`. O alvo é um
-grafo Neo4j com SNOMED CT (terminologia clínica).
+`03-Text2Cypher-SNOMED-v1-Failed.py` e `03-Text2Cypher-SNOMED-v2-Succeeded.py`. O alvo é um grafo
+Neo4j com SNOMED CT (terminologia clínica).
 
 A diferença é onde o schema vem:
 
@@ -241,7 +252,8 @@ Um exemplo concreto do que acontece com "vídeos do canal X sobre LangChain publ
 | "publicados em 2024" | filtro sobre `publish_date`, e não é direto: o `AttributeInfo` declara `YYYY-MM-DD` (linha 64) enquanto o loader grava `YYYY-MM-DD HH:MM:SS` (`youtube.py:328`) |
 
 **Sem self-query, "2024" entra na busca semântica** — e você recupera vídeos de 2021 que
-mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É o recorte que o espaço vetorial não captura: ele guarda assunto, não data. A Aula 14 volta a este
+mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É o recorte
+que o espaço vetorial não captura: ele guarda assunto, não data. A Aula 14 volta a este
 ponto, classificando recorte temporal como roteamento lógico, condição dura que não se resolve
 por similaridade.
 
@@ -286,7 +298,8 @@ python 02-Text2SQL-LLM-DeepSeek.py
 porque o `01-*` grava o banco numa pasta chamada `90-Data`, relativa ao diretório de trabalho, e
 essa pasta não existe dentro de `Text2SQL` — o `sqlite3` não cria diretório, então sem o `mkdir` o
 passo 1 já quebra. E o `02-*` escolhido é o **DeepSeek**, não o OpenAI: o OpenAI procura o banco numa
-pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha do `sqlite3.connect` antes de rodar — linha 3 no `01-*` e no `02-*-DeepSeek`, linha 9
+pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha do `sqlite3.connect` antes de
+rodar: linha 3 no `01-*` e no `02-*-DeepSeek`, linha 9
 no `02-*-OpenAI`, que tem imports e `load_dotenv()` antes. Os dois `02-*` divergem entre si, como
 a Parte 1 mostrou.
 
@@ -354,7 +367,8 @@ relacional em `04-VectorDB/` contra o que comparar.
   prompt e itere.
 - **Recorte temporal virando busca semântica.** "2024" no texto da query recupera menções ao ano
   em vez de documentos do ano.
-- **Não acumular pares pergunta→SQL.** Você joga fora o que considero o ativo mais valioso do sistema. Toda
+- **Não acumular pares pergunta→SQL.** Você joga fora o que considero o ativo mais valioso do
+  sistema. Toda
   consulta validada deveria voltar para o índice.
 
 ---

@@ -230,7 +230,8 @@ python 00-DirectlyLoadDocumentsIndexAndQA.py
 dentro desta pasta ela não resolve. Prefixe com `../../`.
 
 E o `98-TwoTierIndex-FAISS.py` tem o mesmo problema **mais um pior**: a linha 31 aponta para
-`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto as linhas
+`WorldTopTenBillionaires.xlsx`, cujas abas têm nome em chinês (`2023年10大首富`, …), enquanto
+as linhas
 57 e 63 montam a chave `billionaires_table_{matched_year+2}` — `_2` a `_6`, que são as abas do
 **outro** arquivo da mesma pasta, `billionaires_merged.xlsx`. Com o caminho certo e o workbook
 errado você recebe `KeyError: 'billionaires_table_2'`. Troque a linha 31 por
@@ -278,7 +279,8 @@ da arquitetura. A comparação continua sendo a medição que quase ninguém faz
 entrega pronta.
 
 **3. Conserte o segundo nível do `98` — e note que consertar o `return` não basta, e que o conserto
-óbvio é pior.** Use o `indices` que `98-TwoTierIndex-FAISS.py:58` calcula e faça o retorno depender dele. O resultado
+óbvio é pior.** Use o `indices` que `98-TwoTierIndex-FAISS.py:58` calcula e faça o retorno
+depender dele. O resultado
 **não muda**, e a razão é o que o
 exercício ensina: a consulta do segundo nível é o embedding **da própria tabela já escolhida**, e essa
 tabela está indexada no `table_index` — buscar num `IndexFlatL2` um vetor idêntico a um vetor indexado

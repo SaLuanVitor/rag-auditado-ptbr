@@ -10,11 +10,10 @@ Você tem um documento de 40 páginas e um modelo de embedding que aceita 512 to
 cortar. Onde?
 
 Parece decisão de implementação, um parâmetro a preencher. **É, no meu julgamento, a decisão de
-maior impacto em qualidade de resposta de todo o pipeline, e a mais negligenciada.** Ela determina
-o que é
-possível recuperar: **informação cortada ao meio não é recuperável por nenhum modelo de
-embedding, nenhum reranking e nenhum prompt.** Os capítulos seguintes só conseguem trabalhar
-com o que esta aula deixou intacto.
+maior impacto em qualidade de resposta de todo o pipeline, e a mais negligenciada.** Ela determina o
+que é possível recuperar: **informação cortada ao meio não é recuperável por nenhum modelo de
+embedding, nenhum reranking e nenhum prompt.** Os capítulos seguintes só conseguem trabalhar com o
+que esta aula deixou intacto.
 
 ---
 
@@ -29,12 +28,12 @@ Escolher `chunk_size` é escolher entre dois objetivos que puxam em direções o
 | **Embedding preciso**  | **menor**   | um chunk sobre um assunto só produz vetor bem localizado |
 | **Geração competente** | **maior**   | o LLM precisa do entorno para responder                  |
 
-O lado do embedding merece cuidado, porque a intuição engana. Um chunk grande não produz "um
-vetor com mais informação" — produz um vetor que se aproxima da **média** das direções
-dos assuntos que ele contém. (Isto vale para modelos que reduzem os tokens por média; não medi qual dos modelos deste curso o
-faz.) Média de direções distintas aponta para o meio de lugar nenhum:
-o vetor fica equidistante de tudo e próximo de nada. É por isso que chunk grande degrada
-recuperação em vez de melhorá-la.
+O lado do embedding merece cuidado, porque a intuição engana. Um chunk grande não produz "um vetor
+com mais informação" — produz um vetor que se aproxima da **média** das direções dos assuntos que
+ele contém. (Isto vale para modelos que reduzem os tokens por média; não medi qual dos modelos deste
+curso o faz.) Média de direções distintas aponta para o meio de lugar nenhum: o vetor fica
+equidistante de tudo e próximo de nada. É por isso que chunk grande degrada recuperação em vez de
+melhorá-la.
 
 Do outro lado, a sentença isolada "o prazo é de 30 dias" tem embedding lindo e é inútil na
 geração: prazo de quê?
@@ -124,9 +123,9 @@ Em `02-LangChain-RecursiveharacterTextSplitter.py:6`:
 separators = ["\n\n", ".", "，", " "] # . is period, ， is comma, " " is space
 ```
 
-O terceiro separador é `，` — a **vírgula de largura total** (U+FF0C, _fullwidth comma_), usada em chinês, não a
-vírgula latina `,`. Num corpus em inglês ou português ela nunca casa, então a lista efetiva
-é `["\n\n", ".", " "]`.
+O terceiro separador é `，` — a **vírgula de largura total** (U+FF0C, _fullwidth comma_), usada em
+chinês, não a vírgula latina `,`. Num corpus em inglês ou português ela nunca casa, então a lista
+efetiva é `["\n\n", ".", " "]`.
 
 É resíduo da origem do livro, da mesma família do `bge-small-zh` que você viu na Aula 03. Não
 quebra nada — só faz um separador ser decorativo. Para um corpus em português, a lista útil
@@ -134,16 +133,15 @@ seria `["\n\n", "\n", ".", ",", " ", ""]`.
 
 ### O par que isola a variável
 
-`04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são, **julgamento**, o experimento
-mais bem construído do módulo. Rodando `diff` entre os dois, a diferença **relevante** está no
-splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também. O `diff` cru
-mostra mais que isso: **dois** blocos de import extras — `Language` na linha 2 e um import agrupado
-nas linhas 6-9 que reimporta `Language` e o `RecursiveCharacterTextSplitter` que já vinha na linha 1
-—, a chamada de
-`get_separators_for_language(Language.JS)` que só existe no primeiro, comentários e nomes de
-variável diferentes (`python_docs` vs. `text_chunks`). Nada disso muda o experimento. A tabela
-abaixo é leitura da **configuração** dos dois arquivos, não do que eles imprimem — na tela saem os
-chunks (`Content:` e `Metadata:`), não estes parâmetros:
+`04-LangChain-ChunkingForCode.py` e `04-LangChain-PlainChunkingForCode.py` são, **julgamento**, o
+experimento mais bem construído do módulo. Rodando `diff` entre os dois, a diferença **relevante**
+está no splitter — o corpo de código de exemplo (`GAME_CODE`) é o mesmo, e o tamanho também. O
+`diff` cru mostra mais que isso: **dois** blocos de import extras — `Language` na linha 2 e um
+import agrupado nas linhas 6-9 que reimporta `Language` e o `RecursiveCharacterTextSplitter` que já
+vinha na linha 1 —, a chamada de `get_separators_for_language(Language.JS)` que só existe no
+primeiro, comentários e nomes de variável diferentes (`python_docs` vs. `text_chunks`). Nada disso
+muda o experimento. A tabela abaixo é leitura da **configuração** dos dois arquivos, não do que eles
+imprimem — na tela saem os chunks (`Content:` e `Metadata:`), não estes parâmetros:
 
 |                 | `04-LangChain-ChunkingForCode.py`                                                            | `04-LangChain-PlainChunkingForCode.py`                    |
 | --------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -212,9 +210,8 @@ page_numbers)`. É utilitário de preparação de dados, não estratégia de cor
 
 O prefixo `99` marca o que fica **fora da sequência numerada**: aqui uma ferramenta, no
 `01-DataLoading` um diretório `99-Others`, e na raiz o próprio `99-EN` de onde vêm os textos deste
-módulo. Registro isto porque é o
-tipo de coisa que faz alguém perder meia hora procurando a estratégia de chunking que o
-arquivo não contém.
+módulo. Registro isto porque é o tipo de coisa que faz alguém perder meia hora procurando a
+estratégia de chunking que o arquivo não contém.
 
 ---
 
@@ -228,7 +225,8 @@ python 01-LangChain-CharacterTextSplitter.py
 python 02-LangChain-RecursiveharacterTextSplitter.py
 ```
 
-Compare as saídas. E prepare-se para o resultado contrariar a intuição — o que segue foi **medido** no ambiente pinado
+Compare as saídas. E prepare-se para o resultado contrariar a intuição: o que segue foi **medido**
+no ambiente pinado
 do curso. O `CharacterTextSplitter` do `01` usa o separador default `"\n\n"`: corta **só** em linha
 em branco, **ignora** o `chunk_size=100` (a saída traz nove avisos `Created a chunk of size 779,
 which is longer than the specified 100`) e produz 20 chunks de tamanho selvagemente desigual — 16,
@@ -353,7 +351,8 @@ contagem com a do `base_splitter`. Em que ponto os chunks ficam grandes demais p
 embedding útil?
 
 **4. Corrija os comentários errados.** Edite mentalmente as linhas 7 e 8 do arquivo `01` para
-que digam a verdade. É trivial — e é, **julgamento**, o exercício de leitura crítica mais valioso do módulo,
+que digam a verdade. É trivial, e é, **julgamento**, o exercício de leitura crítica mais valioso
+do módulo,
 porque a próxima divergência entre comentário e código que você encontrar estará no seu
 código, e ninguém vai apontá-la.
 
@@ -419,7 +418,5 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 curso. Na ordem de **dependência**, esta aula só precisa das Aulas 00 a 03 (ver nota abaixo)
 **Próxima:** [AULA 08 — Embeddings na prática, BM25 esparso e BGE-M3 híbrido](AULA-08-embeddings-bm25-bge-m3.md)
 
-> **Nota de ordem:** esta aula foi escrita antes das Aulas 04 a 06 (ingestão), por ser o
-> capítulo em que o agente `@rag-specialist` teve o pior desempenho na primeira avaliação e o
-> um dos quatro que zeraram a distância para o máximo na segunda — ver [`avaliacao/GATE-RAG-SPECIALIST-v2.md`](avaliacao/GATE-RAG-SPECIALIST-v2.md).
-> Ela é autossuficiente: depende apenas das Aulas 00 a 03.
+> **Nota de ordem:** esta aula é autossuficiente e depende apenas das Aulas 00 a 03, embora venha
+> depois das Aulas 04 a 06 no pipeline.
