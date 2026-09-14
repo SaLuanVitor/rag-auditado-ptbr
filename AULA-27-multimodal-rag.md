@@ -161,7 +161,7 @@ E aqui está o detalhe que denuncia a origem do código: os blocos comentados us
 
 Consequência prática: descomentar qualquer um desses blocos não funciona sem trocar o nome da variável. Um aluno que tente ligar a busca por áudio recebe `NameError`, não um erro sobre áudio.
 
-Duas anotações finais sobre o `01`:
+Três anotações finais sobre o `01`:
 
 - **`NearMediaType` é import morto na prática.** Ele é importado (`:5`) e usado apenas nas linhas comentadas `:102` e `:113`.
 - **A coleção é destruída e recriada a cada execução** (`:12-13`). Correto para reprodutibilidade, e cada execução paga a vetorização das três imagens outra vez — no ImageBind, em CPU.

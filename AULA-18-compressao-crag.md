@@ -129,11 +129,14 @@ prev/next, e aqui aquela expansão está rodando por dentro do próprio otimizad
 
 **A consequência derruba a expectativa criada pelo nome.** Como as janelas se sobrepõem, o texto que
 sai pode ser maior que o que entrou, com sentenças repetidas e fora da ordem de leitura. Medido no
-ambiente pinado do curso, com um embedder controlado, seis sentenças e `percentile_cutoff=0.5`:
+ambiente pinado do curso, com seis sentenças curtas e um embedder de teste de duas dimensões, que
+devolve o vetor da consulta para as sentenças-alvo e o ortogonal para as demais, e
+`percentile_cutoff=0.5`:
 entrada de 123 caracteres, saída de **162**, três sentenças irrelevantes preservadas e duas
 duplicadas. A mesma chamada com `context_before=0, context_after=0` devolve 63 caracteres. O corte
 seleciona âncoras; quem decide o tamanho final é a janela. Se você quer compressão de fato, passe os
-dois zeros explicitamente, e saiba que aí perde a coesão que a janela dava.
+dois zeros explicitamente, e saiba que aí perde a vizinhança local que cada âncora trazia, que é a
+única coesão que a janela dava.
 
 A diferença entre os dois cortes é de natureza, não de valor:
 
@@ -154,8 +157,11 @@ geração. A falha é alta e barulhenta, o que é melhor que silenciosa; o risco
 quebrar em produção para um documento cujo vocabulário se afasta do da pergunta, e você não saber
 disso até acontecer.
 
-_Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
-`llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.12.15; não executei._
+_Limite, e ele não alcança a medição acima: o percentil, o limiar e o zero falsy foram conferidos
+lendo `llama_index.core.postprocessor.optimizer` e
+`llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.12.15. A contagem de
+caracteres da Parte 3 **foi executada**; o que não foi é rodar as três configurações do arquivo
+contra o corpus real, que precisa de chave._
 
 Isso é o problema de calibração de similaridade absoluta que a Aula 02 antecipou: o valor de cosseno
 não é calibrado entre modelos nem entre domínios. Um `threshold_cutoff` copiado de exemplo é chute.
@@ -218,7 +224,7 @@ paper CRAG, em três saídas possíveis:
 | ambíguo                 | combinar: usar o que serve, complementar o resto |
 
 > ⚠️ **A terceira linha é do paper, não deste arquivo.** O `grade_documents` de
-> `01-CRAG-ReflectiveRetrieval.py:296-321` só produz
+> `01-CRAG-ReflectiveRetrieval.py:275-321` só produz
 > **dois** resultados possíveis — e quem roteia com base neles é `decide_to_generate` (`:383-411`),
 > passada como função de decisão em `add_conditional_edges` (441-448): zero documentos aprovados →
 > busca na web; um ou mais aprovados → gera direto com os que sobraram. Não existe caminho que "complemente o resto" — o ambíguo desaparece
@@ -295,7 +301,9 @@ inteiro: monte um motor com `similarity_top_k=20`, ponha um `LLMRerank` (de
 `llama_index.core.postprocessor`, que já vem no `llama-index-core`) como primeiro
 `node_postprocessor` e o `SentenceEmbeddingOptimizer` como segundo, e compare com o mesmo motor
 sem o otimizador. Se a resposta não melhorar, você acabou de medir que a
-compressão era desnecessária ali, e a ordem que esta aula propôs se justifica.
+compressão era desnecessária ali **naquela pergunta**: repita com cinco de tipos diferentes antes
+de concluir, porque uma consulta não separa "compressão desnecessária" de "esta pergunta é
+insensível". Feito isso, a ordem que esta aula propôs se justifica.
 
 **3. Force o grader do CRAG a reprovar tudo.** Faça uma pergunta sobre assunto ausente do acervo.
 Observe o caminho que o grafo toma quando nenhum documento é aprovado. Esse é o comportamento

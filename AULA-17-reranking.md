@@ -111,9 +111,11 @@ você usa antes de comparar os dois casos.) Com `k` pequeno — digamos 1 — o 
 0,5: uma diferença de 50%.
 
 E note de onde vêm as "várias listas" deste arquivo: das linhas 158-178, que pedem ao LLM quatro
-consultas de ângulos diferentes, e das 207-211, que recuperam para cada uma. **É a decomposição de
-query da Aula 13**, e o RRF é a metade que falta a ela: unir N subconsultas devolve até N×k trechos
-deduplicados e não ordenados. A Aula 13 manda as duas como par, e este arquivo é o par montado.
+consultas de ângulos diferentes, e das 207-211, que recuperam para cada uma. **É o multi-query da
+Aula 13**, na variante multi-perspectiva que ela separa da decomposição real: quatro paráfrases da
+mesma pergunta, não quatro subperguntas distintas. O que a Aula 13 pede como par vale igual nas
+duas, porque o problema é o mesmo: unir N listas devolve até N×k trechos deduplicados e não
+ordenados. Este arquivo é esse par montado, com a metade de cima na variante mais fraca.
 
 Isso é uma **aposta deliberada**: com `k=60`, um único retriever muito confiante não domina a
 fusão. **Concordância entre listas passa a valer mais que convicção de uma só.** É o que torna o
@@ -221,8 +223,11 @@ cross-encoder antes de assumir que compensa.
 Note o pacote: `document_compressors`. No LangChain, reranking e compressão são a mesma
 abstração: um compressor recebe uma lista de documentos e devolve outra, com **menos documentos, em
 outra ordem, ou com o texto de cada um encurtado**. O `RankLLMRerank` faz as duas primeiras; o
-`LLMChainExtractor`, do mesmo pacote, reescreve o `page_content`. Isso antecipa a Aula 18, que
-trabalha as três.
+`LLMChainExtractor` reescreve o `page_content`. **E os dois não moram no mesmo lugar**: o
+`RankLLMRerank` está em `langchain_community.document_compressors` e o `LLMChainExtractor` em
+`langchain.retrievers.document_compressors`. Os rerankers de terceiros ficam no `langchain_community`,
+os compressores de texto no `langchain`, e o contrato comum é o `BaseDocumentCompressor`. Isso
+antecipa a Aula 18, que trabalha as três.
 
 ---
 
@@ -323,9 +328,9 @@ segue o nome do SDK e não o padrão das outras; o `05` e o `06` exigem `OPENAI_
 ainda o pacote `rank_llm`, que puxa `torch`.
 
 No `06`, rode como está e olhe o `Time decay factor` impresso: ele vem **1,0000, sempre**, e vale
-entender por quê antes de tentar consertá-lo. **Quatro fórmulas circulam neste arquivo e só uma
-ordena:** o docstring da linha 26 e o `print` da linha 78 anunciam decaimento exponencial e nenhum
-dos dois executa, são texto; a linha 150 calcula um decaimento hiperbólico, rotulado _"Simplified
+entender por quê antes de tentar consertá-lo. **Três fórmulas distintas disputam este arquivo e só
+uma ordena:** a exponencial, anunciada duas vezes, no docstring da linha 26 e no `print` da linha
+78, e que não executa em lugar nenhum; a hiperbólica da linha 150, rotulada _"Simplified
 decay calculation"_, que só alimenta outro `print`; e quem ordena é `(1.0 - decay_rate) **
 hours_passed`, dentro da biblioteca. Com `decay_rate=0.5` isso é perda de **50%** por hora, não os
 "about 39%" que a linha 79 promete. O retriever reescreve o `last_accessed_at` para o instante da

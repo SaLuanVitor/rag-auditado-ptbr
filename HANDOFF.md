@@ -132,7 +132,7 @@ precisa varrer os irmãos, inclusive os do próprio parágrafo
 reauditado: das 27, cerca de doze são falsos positivos do regex (títulos de armadilha, perguntas de
 checkpoint, "hipótese" descrevendo o modelo e não o autor), e o resto é ressalva honesta e tersa —
 **ressalva sem razão não pode ter razão falsa**
-**📌 A forma exemplar de ressalva já existia no curso**, na aula que tirou 12/12: `AULA-18:136` —
+**📌 A forma exemplar de ressalva já existia no curso**, na aula que tirou 12/12: `AULA-18:157` —
 "Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.12.15; não executei."
 Ela nomeia **o que leu** e **o que não fez**. É o padrão que os consertos desta varredura adotaram, e
 o que se deve exigir de qualquer ressalva nova

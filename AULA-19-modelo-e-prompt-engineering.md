@@ -253,6 +253,12 @@ produzindo texto coerente. Compare com a Aula 03, onde a instrução de admitir 
 escrita. Aqui, se a recuperação trouxer o personagem errado, o relatório sai completo, formatado e
 falso.
 
+**E não é hipótese: já está acontecendo no exemplo entregue.** A consulta da linha 22 pergunta pelas
+características e pelo estilo de combate de Baigujing, e `grep -o -i` no corpus devolve **zero**
+ocorrências de `Baigujing`, `character`, `skill`, `combat` e `ability`. Os 771 caracteres falam de
+capítulos, finais, cinemáticas e templos. O relatório que sai é inteiramente da memória do modelo, e
+a Aula 03 mediu a mesma coisa neste mesmo arquivo.
+
 ### O detalhe aritmético: a recuperação é decorativa neste exemplo
 
 Três fatos, cada um verificável:
@@ -448,8 +454,12 @@ O contraste vale a comparação explícita:
 | Já resolvido na Aula 14 | limiar mínimo, que o exemplo não tem | saída estruturada com `temperature=0` (Parte 1), que este exemplo não usa                                             |
 
 **A Parte 1 da Aula 14 é roteamento por LLM feito de outro jeito**, com `with_structured_output` e
-`temperature=0`, e ali os dois modos de falha da coluna direita simplesmente não existem: o rótulo
-não pode sair do conjunto e a decodificação é reprodutível. O que este arquivo demonstra, então,
+`temperature=0`, e ali os dois modos de falha da coluna direita mudam de natureza. Texto extra na
+saída deixa de existir, porque o rótulo vem dos argumentos de uma tool e não de prosa livre, e a
+decodificação é reprodutível. Rótulo fora do conjunto **não fica impossível**: é o grau 4a da Aula
+20, indução forte mais validação, e o que você recebe é uma **exceção de validação** em vez de rota
+inválida seguindo em silêncio. Mesmo destino do `raise ValueError` da linha 91, por um caminho mais
+confiável. O que este arquivo demonstra, então,
 não é "roteamento por LLM", é a versão frágil dele.
 
 Julgamento: o roteador por LLM em texto livre é mais flexível para rótulos que dependem de nuance, e
@@ -514,7 +524,7 @@ mas só é atribuído depois, no corpo do módulo
 Funciona porque a primeira chamada acontece na linha 123, depois da atribuição. Mova a linha 106
 para o fim do arquivo e o script quebra com `NameError`.
 
-**Um limite que a rodada anterior deixou, e que se levanta em um comando:** o dicionário passado
+**Um limite que se levanta em um comando:** o dicionário passado
 ao template tem quatro chaves
 (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. A pergunta era se o `format` do `PromptTemplate` rejeita chaves extras ou as ignora, e agora está
 **medida** no `langchain-core` 0.3.33, uma das duas versões que o repositório pina (a outra é 0.3.47): **ignora em silêncio.** Um
@@ -523,9 +533,10 @@ aviso. É a pior das duas respostas possíveis, porque o dicionário errado não
 primeira coisa que você confirma ao rodar o arquivo, motivo pelo qual está na lista da Mão na massa.
 
 Um detalhe de dependência do mesmo arquivo, que envelhece: ele importa `OpenAIEmbeddings` de
-`langchain_community.embeddings` (linha 3). Nos pins do curso a importação **funciona**, e o bloco
-inteiro das linhas 1 a 4 sobe sem exceção; o que ela emite é `LangChainDeprecationWarning`, porque a
-classe foi depreciada na LangChain 0.0.9 e sai na 1.0. O substituto é `from langchain_openai import
+`langchain_community.embeddings` (linha 3). Nos pins do curso a importação **funciona**: o bloco
+inteiro das linhas 1 a 4 sobe sem exceção e **sem aviso nenhum**. O `LangChainDeprecationWarning` só
+aparece quando a classe é **instanciada**, na linha 96, e diz que ela foi depreciada na LangChain
+0.0.9 e sai na 1.0. O substituto é `from langchain_openai import
 OpenAIEmbeddings`. É aviso, não erro: o script roda.
 
 ---
@@ -566,7 +577,7 @@ geração sai errada — não o código que o montou.
 **5. Chaves extras no template, sem chave de API.** Num interpretador, faça
 `PromptTemplate.from_template(templates['customer_service']).format(**template_vars)` com as quatro
 chaves. Confirme o que a Parte 6 afirma: devolve a string formatada, sem erro e sem aviso. Agora
-ligue isso ao bug do roteador, que é o que esta aula tem de mais útil e não diz em voz alta: **é
+ligue isso ao bug do roteador da Parte 6: **é
 esse silêncio que faz um erro de rota atravessar o script sem levantar exceção**, porque um
 dicionário de quatro chaves serve qualquer um dos três templates de duas.
 
@@ -635,7 +646,7 @@ recuperação, com saída em texto livre. Se o rótulo vier fora do conjunto, de
 quase sempre preferível — julgamento.
 
 **Nome de variável não é contrato.** `retrieved_content` recebendo string literal
-(`08-Generation/02-OptimizingResponseViaPrompts/03-IncreaseComprehensivenessAndDiversityOfResponse.py:34`) é inofensivo num exemplo de 53
+(`08-Generation/02-OptimizingResponseViaPrompts/03-IncreaseComprehensivenessAndDiversityOfResponse.py:34`) é inofensivo num exemplo de 54
 linhas e caro num sistema em que alguém confia no nome para saber de onde o dado veio.
 
 **Documentação que descreve a intenção.** O `.env.example:2` deste módulo afirma que todos os

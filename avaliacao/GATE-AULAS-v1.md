@@ -563,7 +563,7 @@ também são pré-correção, e nove delas têm duas notas conflitantes.
 
 | Aula | Dim | Defeito que a produziu                                                                                                                                                                         | Estado     |
 | ---- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 16   | H   | `:133` "Vale registrar aqui, **pela primeira vez no curso**, um achado" — falso: AULA-04:100, AULA-09:191, AULA-10:169 e AULA-13:195 vêm antes                                                 | corrigido  |
+| 16   | H   | `:133` "Vale registrar aqui, **pela primeira vez no curso**, um achado" — falso: AULA-04:100, AULA-09:191, AULA-10:169 e AULA-13:196 na versão anterior; a palavra foi removida em 7d516c0 vêm antes                                                 | corrigido  |
 | 20   | O   | `:372` "4.462 bytes — **dez vezes** maior que o da aula anterior"; a razão real é 5,73, e a própria aula cita os 779 bytes em `:417`. E `:111` "exemplo de **17** linhas" contra "18" em `:85` | corrigidos |
 | 22   | O   | `:452` a linha "Linhas" da tabela trazia 142/123/20/181, os valores de `wc -l`; `awk` dá 143/124/21/182, e a prosa da própria aula já dizia 143                                                | corrigido  |
 
@@ -2100,7 +2100,7 @@ deixei de pé a ressalva que dizia não saber.
 
 Na aula que tirou 12/12:
 
-> **AULA-18:136** — _"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
+> **AULA-18:157** — _"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e
 > `llama_index.core.indices.query.embedding_utils` do `llama-index-core` 0.11.17; não executei."_
 
 Ela nomeia **o que leu** e **o que não fez**. É o padrão contra o qual as outras 45 deveriam ser
@@ -3305,3 +3305,73 @@ Soma: **194/348** (55,7%). **Oito aulas abaixo de 6/12**: 01 (5), 03 (5), 04 (5)
 
 **As seis remedições da S6 levaram o curso de 166 para 194**, e tiraram catorze aulas de baixo do
 portão até sobrarem oito.
+
+## S6, lote das oito em 5/12: três passam, e a primeira remedição que PIORA a aula
+
+| Aula | R8 | S6 | E | C | H | O | D | A | O que mudou |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [18](../AULA-18-compressao-crag.md) | 5/12 | **9**/12 | 2 | 2 | 0 | 1 | 2 | 2 | **`C` chegou a 2**, o primeiro do curso nessa dimensão. O mecanismo central resistiu a cinco formatos de teste. Mas ganhou um `H` **zero**. |
+| [17](../AULA-17-reranking.md) | 5/12 | **9**/12 | 2 | 1 | 2 | 1 | 1 | 2 | Saiu de `O` zero e `A` zero. Três BLOCK, os três do conserto. |
+| [13](../AULA-13-query-translation.md) | 5/12 | **8**/12 | 2 | 1 | 1 | 1 | 1 | 2 | `C` e `O` saíram de zero. Um BLOCK: a explicação nova do HyDE também estava errada. |
+| [19](../AULA-19-modelo-e-prompt-engineering.md) | 5/12 | **4**/12 | 1 | 0 | 1 | 0 | 1 | 1 | **Caiu.** O `H` saiu de zero, que era o objetivo, e `C` e `O` caíram de 1 para 0 pelo que o conserto trouxe. |
+
+### A AULA-19 é o contraexemplo, e ele importa mais que as oito que passaram
+
+Nove remedições, oito acima do portão e **uma que piorou a aula**. É a primeira vez, e desfaz a
+leitura confortável de que consertar converge sempre. Dos três BLOCK dela, **dois são do meu
+conserto**:
+
+- Escrevi que na Aula 14 "o rótulo **não pode sair** do conjunto". Falso, e contradiz duas aulas: a
+  AULA-14 diz, com estas palavras, que "não é impossibilidade de gerar", e a AULA-20 classifica isso
+  como grau 4a, indução mais validação. Só o 4b torna impossível, e nenhum arquivo do repositório o
+  usa. **Corrigi uma ruptura de coerência criando outra.**
+- Escrevi que a importação "emite `LangChainDeprecationWarning`". Medido: o bloco das linhas 1 a 4
+  sobe **sem aviso nenhum**. O aviso nasce na **instanciação**, na linha 96. Os fatos colados (0.0.9,
+  saída na 1.0, o substituto) estão certos; errei o evento a que os atribuí.
+
+O terceiro é pré-existente e é o melhor achado do lote: **a consulta gravada no exemplo-bandeira não
+tem resposta no corpus dele.** `grep -o -i` devolve zero para `Baigujing`, `character`, `skill`,
+`combat` e `ability` nos 771 caracteres. O relatório que sai é inteiramente da memória do modelo, e
+a aula apresentava isso como hipótese condicional, escrevendo "**se** a recuperação trouxer o
+personagem errado". É a terceira aula do curso com a tese acontecendo nela, depois da 03 e da 05, e
+as três pelo mesmo motivo: o corpus nunca foi aberto.
+
+### Um `C` 2 e um `H` 0 na mesma aula
+
+A AULA-18 é o primeiro `C` **2** do curso: o auditor testou o mecanismo central contra os cinco
+formatos de defeito conhecidos e ele resistiu a todos, com o windowing, o `ValueError`, o zero falsy
+e o `top_n=3` reproduzidos. E na mesma aula o `H` foi a **zero**, por uma causa que é inteiramente
+minha: inseri o parágrafo medido **acima** da nota de limite pré-existente e não toquei nela, então
+a mesma Parte 3 passou a dizer "Medido no ambiente pinado" e "não executei" com 27 linhas de
+distância.
+
+**Inserir acima de uma ressalva é editá-la.** Passa a ir no briefing.
+
+### Três âncoras de fora quebradas, e agora são cinco no dia
+
+Duas apontavam para `AULA-18:136`, a nota de limite, hoje na 157, e as duas a citavam como **forma
+exemplar de ressalva**, que é justamente o que ela deixou de ser. A terceira, no `GATE:566`, citava
+`AULA-13:195` por uma palavra que o conserto **apagou**: o referente não existe mais em lugar nenhum
+da aula.
+
+Nenhuma das cinco foi pega por ferramenta. O `verify-citations.js` valida citação de aula para
+código, não de aula para aula nem de registro para aula.
+
+### Ferramenta nova, e a medição que quase a reprovou
+
+`ferramentas/contagem.js`, para a forma "conserto no corpo e não no título", que apareceu quatro
+vezes hoje. Ele acha numeral que promete uma contagem e lista que entrega outra.
+
+**A primeira versão devolveu 534 alertas no acervo e era inútil.** Numeral em prosa quase nunca
+anuncia a lista seguinte: "rodando `diff` entre os dois" fala de dois arquivos, não da tabela
+abaixo. O que separa os casos reais do ruído é a **posição**: o numeral está em cabeçalho ou numa
+frase que fecha em dois-pontos logo antes da lista. Com esse filtro, mais o desconto de tabela de
+comparação (onde o numeral nomeia as **colunas**), caiu para 11.
+
+**Limites declarados, e eles são grandes.** O caso que motivou a ferramenta, o "Dois comentários que
+mentem" da AULA-07, **não é pego**: o corpo dele é prosa, não lista. E o numeral 1 ficou de fora
+inteiro, porque dobrava o ruído, o que tira do alcance o "com uma exceção declarada" da AULA-16. A
+ferramenta cobre uma fatia estreita da classe, e isso está escrito nela.
+
+Ela achou um defeito real numa aula que ninguém estava auditando: a AULA-27 prometia "Duas anotações
+finais" e entregava três.

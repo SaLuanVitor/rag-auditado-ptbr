@@ -98,7 +98,7 @@ parsing nenhum: ele expõe o gancho e o preenche com o default. E o `parser_key=
 O que muda de fato é o **prompt**: o `DEFAULT_QUERY_PROMPT` pede três versões genéricas, e o do
 `-2` pede cinco, com papel de domínio e eixos declarados.
 
-Por que o parser precisa ser customizável: o LLM devolve as subconsultas como texto — uma por
+Por que o gancho existe, mesmo que este arquivo não o use: o LLM devolve as subconsultas como texto — uma por
 linha, ou numeradas, ou com bullet. O parser default assume um formato. Quando o modelo varia, a
 lista sai errada ou vazia, e o retriever silenciosamente busca menos do que deveria. É o mesmo
 problema da Aula 12, seção Text2SQL: **a saída do LLM não vem no formato que você espera**, e a
@@ -141,11 +141,17 @@ embutir, `TextLoader` e `RecursiveCharacterTextSplitter` para o acervo, e `Chrom
 
 ### Por que funciona
 
-A explicação curta não é que o espaço de embedding ignore a pergunta: bi-encoders modernos como a
-família BGE são treinados justamente em pares consulta-passagem, como a Aula 08 mostra e como a
-entrada `Assimetria consulta/passagem` do glossário registra. O que o treino não cobre é a
-distância de **forma e extensão** entre uma pergunta curta e interrogativa e um parágrafo
-declarativo, e é isso que a tabela abaixo mede:
+A explicação curta não é que o espaço de embedding ignore a pergunta, nem que ele não saiba ligar
+pergunta a passagem: bi-encoders como a família BGE são treinados **exatamente** em pares
+consulta-passagem, como a Aula 08 mostra e como a entrada `Assimetria consulta/passagem` do
+glossário registra, e é esse treino que aproxima a pergunta curta do parágrafo longo.
+
+**O HyDE nasceu para o caso em que essa supervisão não vale**: recuperação zero-shot, domínio fora
+da distribuição de treino, consulta subespecificada. Aí o ganho vem de a resposta hipotética
+**acrescentar conteúdo** que a pergunta não carregava, e de ela cair na mesma forma dos documentos
+indexados. Neste módulo as condições estão presentes, e por defeito: o embedder é chinês sobre
+corpus inglês, e nenhum dos cinco scripts aplica a instrução de consulta que a Aula 08 registra para
+BGE v1/v1.5. A tabela abaixo descreve a distância que a sonda fecha:
 
 |             | Pergunta      | Documento   | Resposta hipotética |
 | ----------- | ------------- | ----------- | ------------------- |
@@ -165,10 +171,10 @@ A resposta hipotética **pode estar factualmente errada e HyDE ainda funciona** 
 Isso é o que confunde quem vê a técnica pela primeira vez: parece que se está indexando ou
 respondendo com invenção. Não — a resposta final vem dos documentos **reais** recuperados.
 
-**Antes de rodar, troque o embedder.** Os quatro scripts executáveis deste módulo embutem um acervo
-em inglês (`99-EN/black-myth-wukong/`) com `BAAI/bge-small-zh`, que é um modelo chinês. É a
-armadilha que a Aula 03 e a Aula 08 nomeiam: degrada recall **sem lançar erro**. Ela pesa mais aqui
-do que em qualquer outro módulo, porque o argumento desta aula é exatamente onde as coisas caem no
+**Antes de rodar, troque o embedder.** Quatro dos cinco scripts executáveis deste módulo embutem um
+acervo em inglês (`99-EN/black-myth-wukong/`) com `BAAI/bge-small-zh`, que é um modelo chinês. É a
+armadilha que a Aula 03 e a Aula 08 nomeiam: degrada recall **sem lançar erro**. Ela pesa
+particularmente aqui porque o argumento desta aula é exatamente onde as coisas caem no
 espaço vetorial. Troque por `BAAI/bge-small-en-v1.5` antes do exercício 4, ou a comparação entre
 HyDE e busca direta sai degradada nos dois braços e não mede nada.
 
@@ -251,8 +257,8 @@ segundo é o caro. Sem `OPENAI_API_KEY` no ambiente, o construtor da linha 4 est
 import com `OpenAIError: The api_key client option must be set`, mensagem que ainda nomeia
 `OPENAI_API_KEY` porque vem da SDK e não do script. **Com** `OPENAI_API_KEY` presente, que é o caso
 de quem fez as aulas anteriores, a SDK cai silenciosamente nela: o script sobe, manda a chave da
-OpenAI para `api.deepseek.com` e só falha na requisição, com 401, num ponto onde a causa não é
-legível. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
+OpenAI para `api.deepseek.com` e só falha na requisição, com erro de autenticação do lado do DeepSeek, num
+ponto onde a causa não é legível. O `.env.example` desta pasta afirma que todos os scripts carregam o `.env`; este não.
 
 Comece por aqui e **leia o prompt completo** antes de rodar. Depois teste com perguntas de
 qualidade decrescente: uma bem formulada, uma coloquial, uma com erro de digitação, uma com gíria.
@@ -341,7 +347,8 @@ geradas separam A de B ou se todas herdam a comparação. É a distinção da Pa
 3. O que o papel de domínio no prompt de reescrita acrescenta?
 4. Qual a diferença entre multi-perspectiva e decomposição real? O `MultiQueryRetriever` resolve
    as duas igualmente bem?
-5. O que o arquivo `02-...-2` acrescenta em relação ao `-1`, e que problema isso previne?
+5. O `02-...-2` acrescenta um `PromptTemplate` e um parser. Qual dos dois muda o comportamento, e
+   como você provou?
 6. Explique por que HyDE funciona, usando a assimetria pergunta↔documento.
 7. Por que a resposta hipotética pode estar errada sem invalidar a técnica?
 8. Cite três situações em que HyDE atrapalha.
