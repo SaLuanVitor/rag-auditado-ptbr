@@ -98,16 +98,26 @@ manual: o que quebra a instalação não aparece na lista de imports.
 óbvio.** Ele não é mudo: o `DirectoryLoader` emite `logger.warning("Error loading file
 <caminho>: <erro>")` para cada arquivo que falhou, e sem configuração de logging isso sai em
 stderr. O que ele de fato tira de você é o **fluxo de controle**: a ingestão termina com status de
-sucesso, e o aviso vira uma linha entre milhares num log que ninguém lê. O conserto não é "ter log
-próprio", é **transformar o aviso em número**: conte os arquivos do diretório e conte os
-`Document` devolvidos. A diferença é o buraco.
+sucesso, e o aviso vira uma linha entre milhares num log que ninguém lê. A correção que ocorre
+primeiro, contar os arquivos do diretório contra os `Document` devolvidos, é necessária e não
+basta. Neste próprio diretório ela mede 9 contra 8, e o 1 de diferença é o `.pptx` que o aviso já
+tinha nomeado. Quem escapa dos dois instrumentos é o `black_myth_wukong_slides.pdf`: o
+`TextLoader` o decodifica sem erro e devolve 4609 caracteres de encanamento de PDF
+(`%PDF-1.4`, `ReportLab`, `FlateDecode`), sem uma palavra do slide, porque os fluxos de texto
+estão comprimidos. Ele entra na contagem como sucesso. O buraco real é 2 e a régua acusa 1.
+Contagem pega o arquivo que falhou; ela não pega o arquivo que "carregou" lixo. Para esse, a
+verificação é olhar o `page_content` do primeiro documento de cada extensão presente.
 
 ---
 
 ## Parte 2 — Dados estruturados
 
 `01-DataLoading/02-StructuredDocumentLoading/` tem **7 arquivos** — 6 de código e o `.env.example`
-oculto, e os dois primeiros formam um contraste que vale ler com atenção.
+oculto, e os dois primeiros formam um contraste que vale ler com atenção. Com uma ressalva que o
+repositório não sinaliza: eles apontam para **arquivos JSON diferentes**, o `01` para
+`journey_to_the_west_characters.json` e o `02` para `black_myth_wukong_characters.json`. A
+diferença de saída entre os dois, então, mistura o efeito do loader com o efeito do arquivo. Para
+isolar o loader, aponte os dois para o mesmo arquivo antes de comparar.
 
 ### JSON como texto contra JSON como estrutura
 
@@ -186,8 +196,12 @@ rodar as duas e comparar o volume.
 Duas ressalvas que a aula precisa fazer e o arquivo não faz:
 
 - **Reprodutibilidade.** A página muda. Seu teste de hoje não é o teste de amanhã, e a
-  Wikipédia pode bloquear requisições automatizadas. Para desenvolver, prefira a cópia
-  offline em `99-EN/black-myth-wukong/black_myth_wukong_wiki.txt`.
+  Wikipédia pode bloquear requisições automatizadas. O repositório traz
+  `99-EN/black-myth-wukong/black_myth_wukong_wiki.txt`, que serve para os exercícios de texto,
+  mas não substitui esta página: são 40 linhas e 666 palavras de resumo em prosa, sem nenhum
+  HTML. Justamente por isso ele não serve ao exercício 1 da próxima seção, que precisa de menu e
+  rodapé para medir o que o `SoupStrainer` corta. Para ter reprodutibilidade de verdade aqui, o
+  caminho é você mesmo guardar o HTML da página no dia em que rodar.
 - **O seletor é específico do site.** `id="bodyContent"` é da Wikipédia. Em outro site você
   precisa inspecionar o HTML e descobrir o seletor certo — e ele quebra quando o site muda de
   layout. Scraping para RAG é manutenção contínua, não configuração única.
@@ -204,7 +218,10 @@ importam `unstructured.partition` sem wrapper nenhum. A Aula 05 mantém essa mes
 - **`05-02-Unstrutured-OrganizeParentChildElements.py`** agrupa elementos em pares pai-filho.
   A lógica está nas linhas 12 a 17: quando a categoria é `Title` ou `Table`, o elemento vira
   pai e seu `element_id` é guardado; os elementos seguintes cujo `parent_id` bate são
-  associados a ele.
+  associados a ele. Repare nas linhas 8 e 9: o autor **comentou** a inicialização de
+  `parent_id` e `current_parent`. O script só sobrevive se o primeiro elemento devolvido for
+  `Title` ou `Table`; se não for, a linha 16 lê uma variável local ainda não atribuída e o
+  script morre com `UnboundLocalError`. Descomente as duas antes de rodar.
 
 ⚠️ **Uma distinção fácil de confundir, e o nome é o culpado:** isto **não é** a estratégia
 parent-child de indexação da Aula 15. Aqui
@@ -225,8 +242,12 @@ python 01-LoadTxtFileWithLangChain.py
 python 02-BuildLangChainDocumentObject.py
 ```
 
-Compare: o primeiro carrega, o segundo constrói. Olhe o `metadata` de cada — quais campos o
-loader preencheu sozinho?
+Compare: o primeiro carrega, o segundo constrói. Olhe o `metadata` de cada. A resposta é magra de
+propósito: o `TextLoader` preenche **um** campo, `source`, e nada mais, que é exatamente o que o
+objeto construído à mão também tem. Riqueza de metadado não vem do loader por padrão, vem de você
+pedir. Agora olhe de perto as duas entradas do `02`: a segunda é `"master_and_disciples.txt "`,
+com um espaço no fim. Dois documentos da mesma fonte, com `source` diferente, e nenhum filtro por
+fonte vai casar os dois.
 
 ```powershell
 python 03-01-LoadAllDocumentsInDirectoryWithLangChain.py
@@ -244,8 +265,11 @@ python 01-LangChain-TextLoader-JSON.py
 python 02-LangCHain-JSONLoader-JSON.py
 ```
 
-Conte os `Document` que cada um produziu e leia o `page_content` do primeiro de cada. O
-`TextLoader` produz um blob com sintaxe JSON no meio; o `JSONLoader` produz frases limpas.
+Antes de comparar, troque o caminho do `01` para `black_myth_wukong_characters.json`, o mesmo que
+o `02` usa: como estão, os dois leem arquivos diferentes e a comparação mede duas coisas ao mesmo
+tempo. Com o arquivo igualado, conte os `Document` que cada um produziu e leia o `page_content` do
+primeiro de cada. O `TextLoader` produz um blob com sintaxe JSON no meio; o `JSONLoader` produz
+frases limpas.
 Pergunte-se qual dos dois você gostaria de ter no índice quando alguém perguntar "quem é o
 personagem principal?".
 
@@ -276,9 +300,12 @@ prepara a Aula 05.
 script, já tem um `.pptx` que o `TextLoader` não lê. Repare em três coisas: o script termina com
 código 0; o `DirectoryLoader` imprimiu em stderr `Error loading file ...slides.pptx`; e o `03-04`
 **não imprime contagem nenhuma** — as saídas próprias dele são o caminho do diretório (linha 7) e
-os 100 primeiros caracteres do primeiro documento. Acrescente um `print(len(docs))` antes do final do arquivo, e só então compare com
-quantos arquivos existem no diretório. É a diferença entre os dois números que mostra o buraco que o
-silêncio produziu.
+os 100 primeiros caracteres do primeiro documento. Acrescente um `print(len(docs))` antes do final
+do arquivo: dá 8, contra 9 arquivos no diretório. Agora faça a segunda metade, que é a que ensina:
+imprima o `source` e os 200 primeiros caracteres de **cada** documento. Você vai achar o
+`black_myth_wukong_slides.pdf` entre os 8 "sucessos", com 4609 caracteres que começam em
+`%PDF-1.4` e não contêm uma palavra do slide. A contagem viu um buraco; havia dois, e o que ela
+deixou passar é o pior, porque vai para o índice.
 
 **4. Troque o `jq_schema` por `.` puro.** Medido no `langchain-community` 0.3.16 que o repositório
 pina: com `text_content=True` (linha 7) e um schema que devolve objeto em vez de string, o
@@ -302,16 +329,23 @@ aceitaria qualquer coisa.
 
 - **Metadado perdido.** Se `metadata` sai vazio, você perdeu filtro, citação e diagnóstico de
   uma vez. Verifique o `metadata` do primeiro documento **sempre**, logo após carregar.
-- **`silent_errors` sem contagem.** O aviso existe e vai para o log; o que se perde é o fluxo de controle. Não contar o que ficou de fora é criar um
-  acervo incompleto sem registro.
+- **`silent_errors` sem contagem.** O aviso existe e vai para o log; o que se perde é o fluxo de
+  controle. Não contar o que ficou de fora é criar um acervo incompleto sem registro. E contar não
+  fecha a conta: o arquivo que o parser aceita e transforma em lixo entra na contagem como
+  sucesso. Inspecione uma amostra do `page_content`, não só o total.
 - **JSON achatado.** **Julgamento:** é a falha desta aula que mais aparece em produção, porque não dá erro:
   alguém aponta o `TextLoader` para um `.json`, o pipeline roda, e a recuperação fica ruim
   sem explicação.
 - **Scraping como fonte permanente.** Site muda, bloqueia, muda de layout. Se o conteúdo
   importa, capture uma cópia e versione — não dependa da página no momento da ingestão.
-- **Encoding.** `TextLoader` assume UTF-8. Arquivo em Latin-1 vira mojibake sem erro, e
-  acentuação quebrada destrói a tokenização de qualquer texto em português. O parâmetro
-  `encoding=` existe; use-o quando a origem for incerta.
+- **Encoding.** `TextLoader` não assume UTF-8: com `encoding=None`, que é o default
+  (`text.py:30`), ele abre o arquivo com a codificação padrão do sistema (`text.py:42`, e o
+  docstring diz isso em `text.py:20`). Qual é ela depende da máquina, então o mesmo arquivo lido
+  no Linux e no Windows pode dar textos diferentes sem erro em nenhum dos dois. Medido no Windows
+  desta aula, onde `locale.getpreferredencoding(False)` devolve `cp1252`: um arquivo Latin-1 lê
+  correto e um arquivo **UTF-8** é que vira mojibake, com `ção` saindo como `Ã§Ã£o`. Acentuação
+  quebrada destrói a tokenização de qualquer texto em português. Passe `encoding=` sempre, e não
+  só quando a origem for incerta: sem ele o resultado depende da máquina de quem roda.
 - **Ordem e duplicata em diretório.** `DirectoryLoader` não garante ordem, e o mesmo conteúdo
   em dois arquivos vira dois documentos que competem no ranking. Deduplicar é trabalho da
   ingestão, não da recuperação.
@@ -322,7 +356,8 @@ aceitaria qualquer coisa.
 
 1. Quais são os dois campos de um `Document`, e por que o segundo é mais negligenciado do que
    deveria?
-2. Por que existem quatro arquivos `03-*` em vez de um? O que cada parâmetro acrescenta?
+2. Por que existem quatro arquivos `03-*` em vez de um? Cite um parâmetro que um deles acrescenta
+   e um que o seguinte remove, e diga o que o último da série deixa de fazer por causa disso.
 3. O que acontece quando você carrega um `.json` com `TextLoader`? Por que isso não dá erro?
 4. O que o `jq_schema` faz além de extrair campos? Por que o exemplo precisa de **dois**
    loaders sobre o mesmo arquivo?

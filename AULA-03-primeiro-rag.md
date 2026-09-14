@@ -23,14 +23,15 @@ do mais alto ao mais baixo. Percorra nessa ordem:
 | Grupo  | Arquivos                                          | Nível de abstração                             |
 | ------ | ------------------------------------------------- | ---------------------------------------------- |
 | `01_*` | 6 variantes LlamaIndex (dois com prefixo `01_03`) | **altíssimo** — 5 linhas, tudo implícito       |
-| `02_*` | 5 pipelines LangChain completos                   | médio-baixo — oito passos explícitos, sem LCEL |
-| `03_*` | 3 versões LCEL                                    | médio-baixo — pipeline explícito               |
+| `02_*` | 5 pipelines LangChain completos                   | **baixo** — oito passos imperativos, sem composição |
+| `03_*` | 3 versões LCEL                                    | médio — os mesmos passos, compostos com `\|`        |
 | `04_*` | LangGraph (dois `.py` — OpenAI e Ollama — e um `.ipynb`) | baixo — grafo de estados                 |
 | `05_*` | 3 variantes "from scratch"                        | **mais baixo** — sem framework de RAG          |
 
-A numeração não é arbitrária: é uma escada descendente de abstração. Você vai
-subir por ela ao contrário — do topo (`01`) ao chão (`05`) — porque o mais
-instrutivo é ver a mágica primeiro e depois desmontá-la.
+A numeração quase não é arbitrária: é uma escada descendente de abstração, com um degrau ao
+contrário. O `02` é mais cru que o `03`, porque o LCEL recompõe atrás do `|` os oito passos que o
+`02` deixa à mão. Você vai subir por ela ao contrário — do topo (`01`) ao chão (`05`) — porque o
+mais instrutivo é ver a mágica primeiro e depois desmontá-la.
 
 ---
 
@@ -72,24 +73,32 @@ repositório (`01-DataLoading`, `02-DocChunking`, `03-Embedding`, `04-VectorDB`,
 | `as_query_engine()`          | top-k, se há reranking, template de prompt        | 17, 19        |
 | `.query(...)`                | qual LLM, temperatura, como o contexto é montado  | 19            |
 
-⚠️ **Antes de seguir, abra o arquivo que `01_01_LlamaIndex_5LineCode.py:2` carrega.** São 773 bytes sobre capítulos, finais
+⚠️ **Antes de seguir, abra o arquivo que `01_01_LlamaIndex_5LineCode.py:19` carrega, o passo que o comentário chama de "Line 2".** São 773 bytes sobre capítulos, finais
 e cenários, e a pergunta gravada no script é _"What combat tools are there in Black Myth: Wukong?"_.
 Medido: zero ocorrências de _combat_, _weapon_, _staff_, _transformation_ ou _tool_ no corpus. **A
-pergunta não tem resposta ali.** O prompt padrão do LlamaIndex não manda admitir ignorância, então
-o que sair na sua tela ou é uma recusa, ou é o modelo respondendo de memória e passando por RAG.
+pergunta não tem resposta ali.** Vale ler o prompt padrão do LlamaIndex antes de julgar a saída:
+medido, o `DEFAULT_TEXT_QA_PROMPT_TMPL` diz "Given the context information and not prior knowledge,
+answer the query", e não diz mais nada. Ele **proíbe** responder de memória e **não oferece** saída
+para quando o contexto não serve, então deixa o modelo sem instrução justamente no caso que você
+acabou de criar. O que sair na sua tela ou é uma recusa improvisada, ou é memória vazando apesar da
+proibição e passando por RAG.
 Guarde essa saída: a Parte 3 mostra a frase de uma linha que separa os dois casos, e este é o
 exemplo dela.
 
-**Três das seis ainda não agem aqui, e vale saber antes de procurá-las.** O arquivo que a linha 2
+**Três das seis ainda não agem aqui, e vale saber antes de procurá-las.** O arquivo que a linha 19
 carrega tem 773 caracteres, **168 tokens**, e o `SentenceSplitter` padrão devolve **um nó**: não há
 fatiamento, o `top_k = 2` escolhe entre um candidato só, e qualquer modelo de embedding recupera o
 mesmo nó. Você vê as três agirem a partir da Parte 3, cujo corpus se fatia de verdade.
 
-Os padrões do LlamaIndex: chunk de 1024 tokens com 20 de sobreposição e `top_k = 2` — os três estão
-no módulo `llama_index.core.constants` (fora deste repositório), conferíveis — mais índice em
-memória e, **segundo a documentação do pacote de integração** (que não vem no `core`, então não
-confirmei aqui), `text-embedding-ada-002` da OpenAI. Nenhum deles é o certo para o seu caso. Todos
-são razoáveis para começar.
+Os padrões do LlamaIndex: chunk de 1024 tokens, sobreposição de **200** e `top_k = 2` — e os três
+não moram no mesmo lugar, o que é uma armadilha de conferência. `llama_index.core.constants` define
+`DEFAULT_CHUNK_SIZE = 1024` e `DEFAULT_SIMILARITY_TOP_K = 2`, que valem. Define também
+`DEFAULT_CHUNK_OVERLAP = 20`, que **não** vale aqui: quem o usa é o `TokenTextSplitter`, e quem
+`from_documents` roda é o `SentenceSplitter`, cuja constante própria é `SENTENCE_CHUNK_OVERLAP = 200`.
+Medido no `llama-index-core 0.12.15`, `SentenceSplitter().chunk_overlap` devolve `200`, e é o mesmo
+200 que o Exercício 4 vai mandar você zerar. Falta o modelo de embedding e, **segundo a documentação
+do pacote de integração** (que não vem no `core`, então não confirmei aqui), é `text-embedding-ada-002`
+da OpenAI. Nenhum deles é o certo para o seu caso. Todos são razoáveis para começar.
 
 **É por isso que "monta-se um RAG numa tarde".** E é por isso que ele funciona mal
 em produção: você aceitou seis decisões arquiteturais sem saber que as tomou.
@@ -134,17 +143,28 @@ embutindo texto inglês com um modelo chinês, e em acervo que se fatie isso cus
 **Mas nos seis arquivos `01_*` o defeito é latente, não ativo, e é importante não prometer o que
 eles não mostram.** O corpus deles cabe num nó único, então a recuperação devolve sempre esse nó,
 com o modelo chinês, com o inglês ou com um gerador de números aleatórios: o recall é 1,0 por
-construção nos três casos. Para **ver** o defeito agir, use o `03_LangChain_LCEL_RAG_v3.py`, cujo
-corpus é maior e se fatia em cinco chunks. É por isso que o Exercício 3 aponta para o `v3`.
+construção nos três casos. Para **ver** o defeito agir, use o `03_LangChain_LCEL_RAG_v3.py`, que
+fatia um corpus grande o bastante para o `k=3` ter de escolher. Quantos chunks, não dá para fixar
+aqui: a linha 10 busca a página da Wikipédia pela rede, e ela muda. Se quiser um número estável,
+troque o `WebBaseLoader` pela cópia offline `99-EN/black-myth-wukong/black_myth_wukong_wiki.txt`,
+que tem 4.422 caracteres e dá exatamente cinco chunks com os mesmos `chunk_size=1000,
+chunk_overlap=200`. Ela serve **aqui** e não serve na Aula 04: são 40 linhas de resumo em prosa,
+sem uma tag de HTML, então dá o corpus estável que este exercício quer e não dá o menu e o rodapé
+que aquele outro precisa medir. É por isso que o Exercício 3 aponta para o `v3`.
 
 Isso não é um defeito a lamentar: é seu primeiro exercício real de diagnóstico.
 Troque por `BAAI/bge-small-en-v1.5` e compare, no `v3`, quais trechos voltam. Para RAG em
 português, `intfloat/multilingual-e5-small` ou
 `paraphrase-multilingual-MiniLM-L12-v2` são pontos de partida melhores.
 
-**Ressalva 2 — o espelho do HuggingFace.** `01_02` define
-`os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'`, um espelho usado quando o
-HuggingFace está bloqueado. No Brasil, isso só adiciona latência. Comente a linha.
+**Ressalva 2 — o espelho do HuggingFace, que nem chega a ser usado.** `01_02` define
+`os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'` na linha 11, um espelho para quando o
+HuggingFace está bloqueado. Só que a linha 3 já importou `HuggingFaceEmbedding`, e o
+`huggingface_hub` lê essa variável uma vez só, no momento do import: `constants.py:69` faz
+`ENDPOINT = os.getenv("HF_ENDPOINT", ...)` e nada relê depois. Medido: setar a variável depois do
+import deixa `ENDPOINT` em `https://huggingface.co`. A linha 11 é inerte, comentá-la não muda nada,
+e o espelho de verdade se liga exportando `HF_ENDPOINT` **antes** de rodar o script. Guarde o
+mecanismo, porque ele reaparece: variável de ambiente lida no import não se corrige por código.
 
 **Julgamento:** estas duas observações valem mais que a aula que as cerca — **código de exemplo carrega o
 contexto de quem o escreveu.** Ler criticamente é parte do ofício.
@@ -178,10 +198,14 @@ Compare com as cinco linhas de `01_01`. **É o mesmo pipeline.** A diferença é
 aqui `chunk_size=1000`, `chunk_overlap=200` e `k=3` estão escritos, portanto podem
 ser mudados com intenção.
 
-Repare também no template de prompt: ele instrui explicitamente a dizer
-_"I cannot find relevant information in the provided context."_ quando o contexto
-não serve. Essa instrução é a diferença entre um RAG que admite ignorância e um que
-inventa. Guarde para a Aula 19.
+Repare também no template de prompt: ele instrui explicitamente a dizer _"I cannot find relevant
+information in the provided context."_ quando o contexto não serve. Essa instrução é a diferença
+entre um RAG que admite ignorância e um que inventa, e o módulo inteiro é a demonstração disso.
+Medido, `grep -rl "I cannot find relevant"` devolve oito dos scripts, os cinco `02_*` e os três
+`03_*`, e os três `05_*` dizem o equivalente com outras palavras. Os únicos que **não** têm a
+cláusula são os seis `01_*` da Parte 1, que rodam com o prompt padrão do LlamaIndex. São os mesmos
+seis que perguntam por `combat tools` a um corpus sem a palavra `combat`. Volte à saída que você
+guardou lá atrás: ela é o lado errado desta linha. Guarde para a Aula 19.
 
 E note o operador `|` do LCEL: é encadeamento no estilo dos pipes do Unix, como o
 próprio comentário do arquivo aponta. Cada estágio recebe a saída do anterior.
@@ -272,6 +296,9 @@ de mexer em `k`, prompt ou overlap, **escolha um caminho e não misture**. Ou tr
 leia os cinco `print` de inspeção, que já mostram a saída de cada estágio. Ou troque a **linha 98** e
 acrescente `print(response)` no fim do arquivo. Trocar a 75 e acrescentar o `print(response)` faz
 você inspecionar uma pergunta e ler a resposta de outra, porque a linha 98 reatribui a variável.
+Qual caminho cada exercício quer: o **3** julga o que foi recuperado, então é a linha 75; o **1**, o
+**2** e o **4** julgam a resposta, então são a linha 98 mais o `print`. Faça o 3 numa passada e os
+outros três noutra.
 
 **1. Faça o retriever falhar por top-k.** Em `03_LangChain_LCEL_RAG_v3.py`, mude
 `k=3` para `k=1`. Pergunte algo que exija combinar dois trechos ("compare os estilos

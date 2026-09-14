@@ -33,12 +33,23 @@ for (const m of txt.matchAll(/^\|\s*\[(\d{2})\]\(\.\.\/AULA-[^)]+\)\s*\|(.*)$/gm
 }
 
 // Linha que traz as seis dimensoes logo depois da nota.
+//
+// O numero de colunas ANTES da nota varia por rodada: a oitava trazia so a R6,
+// a S6 traz R6, R8 e S6. A versao anterior desta regra exigia exatamente uma
+// coluna intermediaria, entao as tabelas da S6 nao alimentavam o criterio 2 e
+// duas aulas ficavam DESCONHECIDAS com as seis dimensoes gravadas logo ali.
+// Agora a ancora e a ULTIMA nota em negrito da linha, e as seis dimensoes tem
+// de vir imediatamente depois dela.
 const dim = new Map();
-const reDim = /^\|\s*\[(\d{2})\]\(\.\.\/AULA-[^)]+\)\s*\|[^|]*\|\s*\*\*(-?\d+)\*\*\/12\s*\|((?:\s*[-−]?\d\s*\|){6})/gm;
-for (const m of txt.matchAll(reDim)) {
-  const vals = m[3].split('|').map((s) => s.trim()).filter(Boolean)
+const reLinha = /^\|\s*\[(\d{2})\]\(\.\.\/AULA-[^)]+\)\s*\|(.*)$/gm;
+const reCauda = /\*\*(-?\d{1,2})\*\*\s*\/\s*12\s*\|((?:\s*[-−]?\d\s*\|){6})/g;
+for (const m of txt.matchAll(reLinha)) {
+  const caudas = [...m[2].matchAll(reCauda)];
+  if (!caudas.length) continue;
+  const c = caudas[caudas.length - 1];
+  const vals = c[2].split('|').map((s) => s.trim()).filter(Boolean)
                    .map((s) => Number(s.replace(MENOS, '-')));
-  dim.set(m[1], { total: Number(m[2]), vals });
+  dim.set(m[1], { total: Number(c[1]), vals });
 }
 
 const aulas = [...notas.keys()].sort();

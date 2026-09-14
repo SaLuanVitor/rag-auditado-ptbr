@@ -78,6 +78,17 @@ const TORTA = `| [09](../AULA-09-x.md) | 5/12 | **9**/12 | 1 | 1 | 1 | 1 | 1 | 1
 r = roda(gate(TORTA));
 checa('denuncia dimensoes que nao somam o total gravado', /DIVERGENCIA/.test(r.saida), r.saida);
 
+// ---------- 6b. o numero de colunas antes da nota varia por rodada ----------
+// A oitava rodada gravava "| aula | R6 | nota | dims |", uma coluna intermediaria.
+// A S6 grava "| aula | R6 | R8 | nota | dims |", tres. A regra antiga exigia
+// exatamente uma, entao duas aulas ficaram DESCONHECIDAS com as seis dimensoes
+// gravadas logo ali ao lado, e o criterio 2 media menos do que o arquivo trazia.
+const TRES_COLUNAS = '| [11](../AULA-11-x.md) | 9/12 | 5/12 | **7**/12 | 2 | 1 | 1 | 1 | 1 | 1 | tres colunas antes |\n';
+r = roda(gate(TRES_COLUNAS));
+checa('le as dimensoes com tres colunas antes da nota',
+  /medidas por dimensao: 1 -> 11\b/.test(r.saida), r.saida);
+checa('e nao a deixa entre as DESCONHECIDAS', !/DESCONHECIDAS:[^\n]*\b11=/.test(r.saida), r.saida);
+
 // ---------- 7. aula sem nota fecha o portao ----------
 r = roda('# vazio\n');
 checa('aula sem nota gravada fecha o portao', r.code === 1 && /SEM NOTA/.test(r.saida), r.saida);

@@ -3443,3 +3443,103 @@ outros três são alerta de leitura legítimo, não achado.
 A suíte do `contagem.js` foi escrita, com dez casos e o positivo plantado. **Metade dos casos
 existe para fixar o que a ferramenta não pode acusar**, que é o que a separa da primeira versão de
 534 alertas.
+
+## S6, as três últimas: a 03 passa na margem zero, e a 06 cai de novo
+
+| Aula | R6 | R8 | S6 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [03](../AULA-03-primeiro-rag.md) | 9/12 | 5/12 | **6**/12 | 2 | 0 | 1 | 2 | 1 | 0 | Passa pela margem zero, carregada por `O` e `E`. O `C` e o `A` são zero, e por prescrições erradas, não por prosa. |
+| [04](../AULA-04-carregando-texto-json-web.md) | 7/12 | 5/12 | **5**/12 | 1 | 0 | 2 | 0 | 1 | 1 | Fica onde estava, pelas mesmas duas dimensões da oitava rodada e por causas diferentes. O remédio que eu prescrevi lá não pega o pior arquivo. |
+| [06](../AULA-06-tabelas-csv-sql.md) | 9/12 | 5/12 | **4**/12 | 1 | 0 | 1 | 0 | 1 | 1 | **Cai de novo.** Segunda remedição a piorar uma aula, e a sétima superfície de fecho que a rodada anterior deixou. |
+
+### O achado do lote é que a fonte pode confirmar o erro
+
+A AULA-03 dizia que a sobreposição padrão do LlamaIndex é 20 e mandava conferir em
+`llama_index.core.constants`. A constante está lá, `DEFAULT_CHUNK_OVERLAP = 20`, e **quem a usa é o
+`TokenTextSplitter`**. Quem o `from_documents` roda é o `SentenceSplitter`, com constante própria,
+`SENTENCE_CHUNK_OVERLAP = 200`. Medido, `SentenceSplitter().chunk_overlap` devolve 200.
+
+É a forma 1 na pior versão dela: a aula manda conferir, o leitor confere, acha o número errado no
+lugar certo e **sai confirmado no erro**. E é o 200 que o Exercício 4 da mesma aula manda zerar, sem
+que o aluno tenha de onde tirar esse número.
+
+### Três defeitos que a oitava rodada CRIOU e que só a nona viu
+
+- **"cinco chunks"** (AULA-03): número medido na cópia offline e atribuído ao `v3`, que busca a
+  Wikipédia **pela rede**. A mesma aula declara esse corpus irreproduzível 170 linhas adiante.
+- **"transformar o aviso em número"** (AULA-04): o remédio que eu promovi a tese não discrimina no
+  corpus da própria aula. Medido, 9 arquivos contra 8 documentos, e o 1 de diferença é o `.pptx`
+  que o `logger.warning` **já tinha nomeado**. Quem escapa dos dois instrumentos é o
+  `black_myth_wukong_slides.pdf`, que o `TextLoader` decodifica sem erro em 4609 caracteres de
+  `%PDF-1.4`, `ReportLab` e `FlateDecode`, sem uma palavra do slide, e que entra na contagem **como
+  sucesso**. O arquivo que produz lixo puro é exatamente o que a régua abençoa.
+- **A receita do exercício 4** (AULA-06): ela declara o denominador ("só a extração") e não o
+  entrega. Pôr o `end_time` antes do `print(df)` deixa dentro da marca o `pd.DataFrame` e a promoção
+  de cabeçalho, cujo equivalente do lado do `camelot` está **fora** da marca dele.
+
+**Os três são a mesma coisa:** conserto escrito com o código na mão e sem o dado na frente. O
+primeiro mediu o arquivo errado, o segundo mediu o sintoma errado, o terceiro mediu meia execução.
+
+### A AULA-06 usa "RAG" no sentido que ela própria proibiu
+
+A linha 43 declara: _"RAG aqui e no resto desta aula quer dizer RAG vetorial"_. A linha 303 afirma
+que trocar busca vetorial por Text2SQL **não é sair do RAG**, que sob a convenção declarada é falso.
+`grep -n "RAG" | grep -v "RAG vetorial"` devolve 11 linhas e **só a 303** usa o sentido amplo.
+
+E o meu conserto da AULA-01, de hoje, **agravou isto**: a nota de fronteira de lá perdeu a instrução
+de leitura ("quando a Aula 06 disser 'aí sim RAG', leia 'aí sim RAG vetorial'") e passou a se apoiar
+inteiramente em "quem declara a convenção é a Aula 06", que é a aula que a violava. Segunda vez hoje
+em que consertar uma aula move a fronteira da vizinha, e a primeira em que o conserto retira a
+muleta de que a vizinha dependia.
+
+### O melhor achado do dia nem é de texto
+
+O CSV que a AULA-06 entrega ao aluno **está corrompido numa linha**, e a aula não avisa. A linha do
+`Wukong` tem uma vírgula sem aspas dentro da descrição, então os campos deslocam:
+`Description: The protagonist`, o resto do texto em `PowerLevel`, e o `100` numa chave `None`. O
+loader não reclama, a contagem continua em seis, e o registro entraria no índice assim.
+
+Numa aula cujo tema é **o que o loader descarta não volta**, o exemplo vivo estava no arquivo desde
+sempre, e três rodadas passaram por cima dele. Junto com o `.pdf` da AULA-04, são dois casos em que
+a tese da aula está acontecendo no dado que ela entrega.
+
+### Uma tensão entre dois consertos do mesmo dia, achada por ferramenta
+
+O `residuo.js` apontou que a frase que saiu da AULA-04 sobrevive na AULA-03, e a leitura importava:
+a AULA-04 passou a dizer que a cópia offline **não substitui** a página da Wikipédia, e o meu
+conserto da AULA-03 mandava substituí-la por ela, para a mesma página. As duas coisas são
+verdadeiras por motivos diferentes, e a AULA-03 passou a dizer o motivo. **É a primeira vez que uma
+ferramenta pega a colisão entre dois consertos simultâneos**, e ela só pegou porque o texto removido
+de uma aula era literal na outra.
+
+### Estado do portão
+
+Soma: **209/348**, a mesma da manhã: a 03 subiu um e a 06 desceu um. Três abaixo de 6/12:
+**04 (5), 06 (4), 19 (4)**.
+
+`−1`: continua zero nas **16** medidas por dimensão, e são 16 porque o contador passou a enxergar
+duas que já estavam gravadas. A regra dele exigia exatamente uma coluna entre o nome da aula e a
+nota, que era o formato da oitava rodada; as tabelas da S6 trazem três, e por isso a 04 e a 06
+apareciam como DESCONHECIDAS com as seis dimensões escritas ao lado. **Instrumento que mede menos
+do que o arquivo traz é a forma mais barata de perder achado**, e esta é a segunda ferramenta hoje
+em que o defeito era exatamente esse.
+
+### Duas ferramentas mediram menos do que o arquivo trazia, e as duas no mesmo dia
+
+O `portao.js` exigia **exatamente uma coluna** entre o nome da aula e a nota, que era o formato da
+oitava rodada. As tabelas da S6 trazem três, R6, R8 e S6, então a AULA-04 e a AULA-06 entravam como
+DESCONHECIDAS **com as seis dimensões escritas ao lado**. A âncora passou a ser a última nota em
+negrito da linha, e o critério 2 subiu de 14 para 16 aulas medidas sem que nada fosse auditado.
+
+O `lock.js` abortava com `casou 0x` diante de um arquivo com os dois fins de linha. O GATE tinha
+**2786 quebras CRLF e 545 LF**, porque as seções desta rodada entraram por heredoc do bash enquanto
+o resto do arquivo veio do checkout com `core.autocrlf=true`. O `eol()` via o CRLF dominante,
+convertia a âncora, e ela não casava no trecho em LF. A trava abortava, que é o certo, mas o
+relatório mandava procurar erro de digitação num texto correto até o último caractere. Agora ela
+nomeia a causa.
+
+**O padrão do dia é esse, em três instrumentos:** o `contagem.js` com o desconto de coluna
+calculado e não ligado, o `portao.js` com a âncora rígida demais e o `lock.js` com o diagnóstico
+errado. Nenhum dos três estava quebrado de forma visível; os três **passavam** e mediam menos do
+que podiam. É a mesma forma de defeito que a rodada persegue no texto, agora nas ferramentas que a
+perseguem.

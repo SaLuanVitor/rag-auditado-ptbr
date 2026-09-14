@@ -78,6 +78,16 @@ monta({ 'a.md': 'alfa' });
 r = aplica([['a.md', 'inexistente', 'X']]);
 checa('o abort diz quantas vezes casou', /casou 0x/.test(r.saida), r.saida.trim());
 
+// ---------- 6b. fim de linha misturado se anuncia, em vez de virar "casou 0x" ----------
+// O GATE chegou a 2786 quebras CRLF e 545 LF, porque as secoes novas entravam
+// por heredoc e o resto vinha do checkout. A ancora certa nao casava no trecho
+// LF, e o relatorio mandava procurar erro de digitacao onde nao havia nenhum.
+monta({ 'misto.md': 'linha CRLF\r\nlinha LF\noutra\r\n' });
+r = aplica([['misto.md', 'linha LF', 'X']]);
+checa('denuncia o fim de linha misturado', /MISTURADO/.test(r.saida), r.saida.trim());
+checa('e nao o disfarça de âncora errada', !/casou 0x/.test(r.saida), r.saida.trim());
+checa('e nada foi escrito', le('misto.md') === 'linha CRLF\r\nlinha LF\noutra\r\n', JSON.stringify(le('misto.md')));
+
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {
   console.log('\n-- positivo plantado: removendo a guarda do lock.js --');

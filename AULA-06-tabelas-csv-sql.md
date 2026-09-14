@@ -63,9 +63,12 @@ ativa:
 | 3 (linha 29, comentada)     | `CSVLoader(file_path=file_path, source_column="Name")` | define qual coluna vira o `source` no metadado      |
 | 4 (linhas 39–40, **ativa**) | `UnstructuredCSVLoader(file_path=file_path)`           | trata o CSV como tabela, não como linhas            |
 
-**Julgamento:** a parte 3 é a mais importante, e é a que passa despercebida. `source_column="Name"` faz o
-metadado `source` de cada documento apontar para o nome do personagem em vez do caminho do
-arquivo. Consequência prática: quando o sistema citar a fonte, ele diz _qual registro_, não
+**Julgamento:** a parte 3 é a mais importante, e é a que passa despercebida. `source_column="Name"`
+faz o metadado `source` de cada documento apontar para o valor da coluna `Name` em vez do caminho
+do arquivo. Vale olhar o arquivo antes de chamar essa coluna de "nome do personagem": das seis
+linhas, quatro são equipamento ou habilidade (`Bronzecloud Staff`, `Folk Opera Armor`,
+`Heavenly Thunder Strike`, `Flame Dance`) e só duas são personagem. É o rótulo do registro,
+qualquer que seja a categoria dele. Consequência prática: quando o sistema citar a fonte, ele diz _qual registro_, não
 _qual arquivo_. Isso é rastreabilidade em nível de linha, decidida com um parâmetro na
 ingestão.
 
@@ -130,7 +133,11 @@ dado estruturado.
 `01-01-ImportCSV.py` aponta para `"../../99-EN/..."` e só roda **de dentro** desta pasta; já os
 arquivos de PDF (`03-01`, `04-01`, `04-02`, `05-02`, `05-03`, `06-01`) apontam para
 `"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A única exceção é o
-`05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. E há um terceiro caso, que não roda de canto nenhum: o `01-02` aponta para `data/black myth`, diretório que o repositório não tem. Leia-o pelo padrão (`loader_cls`), não o execute. Rode o `01-01` daqui e faça `cd ../..` antes dos que
+`05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. E há
+um terceiro caso, que não roda de canto nenhum: o `01-02` aponta para `data/black myth`, diretório
+que o repositório não tem. O parecido que existe é `90-Data/BlackMythWukong/`, com outro nome. Leia
+o `01-02` pelo padrão (`loader_cls`), não o execute. Rode o `01-01` daqui e faça `cd ../..` antes
+dos que
 leem PDF.
 
 Aqui estão sete dos treze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
@@ -173,9 +180,11 @@ extração sozinha não dá.
 
 ### Unstructured, em três degraus
 
-Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. O `diff` entre eles
-**não** mostra isso de forma limpa — é dominado por um docstring de troubleshooting e por blocos de
-`os.chdir`; a escada aparece quando você compara só as chamadas:
+Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. Todo `diff` que envolve o
+`05-01` esconde a escada, porque é dominado pelo docstring de troubleshooting de 38 linhas e pelo
+bloco de `os.chdir` que só ele tem: 97 linhas de saída contra o `05-02`, 78 contra o `05-03`. Já o
+par `05-02` contra `05-03` sai limpo, em 28 linhas, e o degrau aparece de cara. A tabela abaixo
+compara só as chamadas:
 
 | Arquivo                                                    | `strategy`               | `infer_table_structure` |
 | ---------------------------------------------------------- | ------------------------ | ----------------------- |
@@ -186,8 +195,10 @@ Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. O `dif
 O `infer_table_structure=True` do `05-03` é o parâmetro que faz o Unstructured tentar
 reconstruir a **grade** da tabela, e não apenas detectar que há uma. Com ele, o elemento
 `Table` ganha uma representação em HTML no metadado (`metadata.text_as_html`), com linhas e células
-preservadas. Os três scripts imprimem `vars(element.metadata)`, que despeja o metadado inteiro,
-então o campo sai no despejo do `05-03` e não no dos outros dois: é aí que você confere.
+preservadas. Isso é o que a documentação do Unstructured descreve, e não foi medido aqui: o
+ambiente de verificação do curso deixa o `unstructured` de fora. O que se confirma por leitura é
+onde olhar. Os três scripts imprimem `vars(element.metadata)`, então o campo, se aparecer, aparece
+nesse despejo, e comparar o do `05-03` com o dos outros dois é o teste que fecha a questão.
 
 E o `05-02` merece atenção pelo nome: **WithContext**. Ele imprime, ao lado de cada tabela, os três
 elementos que a **precedem** — tipicamente o parágrafo que a introduz. Legenda posterior fica de
@@ -219,7 +230,9 @@ registro específico; perde a visão do conjunto e multiplica o número de chunk
 
 **2. Manter a tabela inteira como HTML ou Markdown.** É o que `infer_table_structure=True`
 entrega. Bom para o LLM ler e comparar; ruim para o embedding, porque a tabela inteira vira um
-vetor difuso — o problema de média de direções da Aula 07, que é explicação corrente e não medição, como a ressalva de lá declara.
+vetor difuso, que é o problema de média de direções da Aula 07. A ressalva de lá é mais estreita do
+que "explicação corrente": ela diz que o mecanismo vale para os modelos que reduzem os tokens por
+média, e que não foi medido quais dos modelos deste curso fazem isso.
 
 **3. Gerar um resumo em linguagem natural e indexar o resumo**, guardando a tabela original
 para entrega. É multi-representação (Aula 16): indexa-se o texto descritivo, devolve-se a
@@ -238,13 +251,20 @@ cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
 python 01-01-ImportCSV.py
 ```
 
-Roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na linha 43 de
-`01-01-ImportCSV.py`: um documento. Agora **descomente a parte 1** — ela imprime só `data[:2]`,
-então acrescente um `print(len(data))` antes do laço para ver a contagem. Seis documentos na parte
-1, um na parte 4: a mesma fonte, duas granularidades.
+O `01-01-ImportCSV.py` roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na
+linha 43: um documento. Agora **descomente a parte 1**, que imprime só `data[:2]`, e acrescente um
+`print(len(data))` antes do laço para ver a contagem. Seis documentos na parte 1, um na parte 4: a
+mesma fonte, duas granularidades.
+
+Olhe os seis, não só os dois que o script imprime. O quinto vem torto: a linha do `Wukong` tem uma
+vírgula sem aspas dentro da descrição, então os campos deslocam e o documento sai com
+`Description: The protagonist`, o resto do texto em `PowerLevel` e o `100` numa chave `None`. O
+loader não reclama, a contagem continua em seis, e o registro corrompido entraria no índice. É a
+armadilha de CSV que nenhuma contagem mostra.
 
 Depois descomente a parte 3 e olhe o campo `source` no metadado. Antes era o caminho do
-arquivo; agora é o nome do personagem.
+arquivo; agora é o valor da coluna `Name`, que no primeiro registro é `Bronzecloud Staff`, um
+equipamento.
 
 ```powershell
 python 05-01-unstructured-TableExtraction.py
@@ -278,15 +298,20 @@ responder uma pergunta sobre a tabela.
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que
 veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, sentido na pele.
 
-**4. Meça o custo do camelot.** Os três arquivos de PDF já cronometram (`03-01`, `04-01`, `06-01`), e os dois que interessam aqui são os dois primeiros. É aí que está a armadilha: no
+**4. Meça o custo do camelot.** Três dos sete arquivos de PDF já cronometram, `03-01`, `04-01` e
+`06-01`, e os dois que interessam aqui são os dois primeiros. É aí que está a armadilha: no
 `03-01` as marcas estão nas linhas 9 e 11, cercando **só** a chamada de leitura do PDF; no `04-01`
-estão nas linhas 6 e 39, cercando abertura, extração de todas as páginas, montagem dos DataFrames **e**
-a impressão de cada um. Comparar os dois números impressos não compara as duas bibliotecas. Iguale o
-escopo pelo denominador comum, que é só a extração: no `03-01` a marca já está certa (linhas 9 e 11,
-cercando o `read_pdf`); no `04-01`, mova `end_time` para logo antes do `print(df)` e acumule o tempo
-por página. Não estenda a marca do `03-01` até o fim do laço, senão você inclui um `df.to_csv` por
-tabela que o `04-01` não faz, e a medida fica mais desigual. Rode os dois da raiz do repositório. Note também que o
-`03-01` grava um CSV por tabela no diretório de trabalho: rode-o onde esses arquivos não incomodem.
+estão nas linhas 6 e 39, cercando abertura, extração de todas as páginas, montagem dos DataFrames
+**e** a impressão de cada um. Comparar os dois números impressos não compara as duas bibliotecas.
+Iguale o escopo pelo denominador comum, que é só a extração: no `03-01` a marca já está certa,
+cercando o `read_pdf`; no `04-01`, tire as marcas das linhas 6 e 39 e cerque apenas a linha 14, a
+chamada `page.extract_tables()`, somando o tempo de cada página numa variável. Não basta mover o
+`end_time` para antes do `print(df)`: dali para trás sobram o `pd.DataFrame(table)` da linha 25 e a
+promoção de cabeçalho das linhas 29 e 30, e o equivalente disso no `03-01`, o `table.df` da linha
+19, está fora da marca dele. Pelo mesmo motivo não estenda a marca do `03-01` até o fim do laço,
+senão você inclui um `df.to_csv` por tabela que o `04-01` não faz. Rode os dois da raiz do
+repositório, e note que o `03-01` grava um CSV por tabela no diretório de trabalho: rode-o onde
+esses arquivos não incomodem.
 
 ---
 
@@ -299,13 +324,14 @@ tabela que o `04-01` não faz, e a medida fica mais desigual. Rode os dois da ra
 - **Células mescladas.** Comuns em relatório corporativo, e a maior fonte de grade corrompida.
   Vale inspecionar manualmente uma amostra antes de confiar na extração em lote.
 - **Usar busca vetorial onde SQL resolve.** Pergunta sobre valor exato, agregação ou contagem pede
-  consulta estruturada. RAG vetorial devolve o trecho mais parecido, não o cálculo correto — e trocar
-  a busca vetorial por Text2SQL não é sair do RAG, só recuperar por outro meio (Aula 12).
+  consulta estruturada. RAG vetorial devolve o trecho mais parecido, não o cálculo correto. Trocar
+  a busca vetorial por Text2SQL é sair do RAG vetorial, que é o sentido em uso nesta aula; pela
+  tese ampla da Aula 12 você continua dentro de RAG, só recuperando por outro meio.
 - **Colunas numéricas como texto.** `difficulty_level` embutido como prosa não permite filtrar
   por faixa. Colunas escalares devem virar metadado filtrável.
 - **Ghostscript esquecido.** O `camelot` não é pacote Python puro: sem Ghostscript no sistema, a
-  importação passa e a extração falha. É a única dependência de sistema que o repositório
-  documenta para ele (`01-DataLoading/requirements.txt`, linha 6).
+  importação passa e a extração falha. O `03-01` guarda o vestígio disso nas linhas 3 e 4, um
+  `find_library("gs")` comentado que alguém deixou ali depois de tropeçar.
 - **Confiar em extração sem amostragem.** Extraia, e **olhe** dez tabelas do seu acervo antes
   de rodar em cem mil. **Julgamento:** é a inspeção mais barata e a mais pulada.
 
@@ -323,7 +349,8 @@ tabela que o `04-01` não faz, e a medida fica mais desigual. Rode os dois da ra
 7. Por que existe um arquivo chamado `TableExtractionWithContext`? Que problema o contexto
    resolve?
 8. Cite as três formas de representar uma tabela para o embedding e o trade-off de cada.
-9. Quando você **não** deve usar RAG para responder sobre uma tabela?
+9. Quando você **não** deve usar RAG vetorial para responder sobre uma tabela? E por que a Aula 12
+   diria que a alternativa ainda é RAG?
 
 ---
 

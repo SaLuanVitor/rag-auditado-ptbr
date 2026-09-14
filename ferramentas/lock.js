@@ -17,6 +17,16 @@ const path = require('path');
 const eol = (c) => (c.includes('\r\n') ? '\r\n' : '\n');
 const adapta = (s, fim) => s.split('\n').join(fim);
 
+// Arquivo com os dois fins de linha faz esta trava mentir sobre a causa.
+//
+// Medido em 14/09/2026: o GATE tinha 2786 quebras CRLF e 545 LF, porque as
+// secoes da rodada foram acrescentadas por heredoc do bash enquanto o resto do
+// arquivo vinha do checkout com `core.autocrlf=true`. O `eol()` acima ve o CRLF
+// dominante, converte a ancora para CRLF, e ela nao casa no trecho que esta em
+// LF. A trava aborta, que e o certo, mas dizendo `casou 0x`, que manda procurar
+// erro de digitacao num texto que esta correto ate o ultimo caractere.
+const misturado = (c) => /\r\n/.test(c) && /(^|[^\r])\n/.test(c);
+
 module.exports = function aplicar(raiz, edicoes, rotulo) {
   const cache = new Map();
   const erros = [];
@@ -26,6 +36,12 @@ module.exports = function aplicar(raiz, edicoes, rotulo) {
     const p = path.join(raiz, arq);
     if (!cache.has(p)) cache.set(p, fs.readFileSync(p, 'utf8'));
     const c = cache.get(p);
+    if (misturado(c)) {
+      const m = `${arq}: FIM DE LINHA MISTURADO (CRLF e LF no mesmo arquivo). Normalize antes: `
+        + `node -e "const f=require('fs');f.writeFileSync(p,f.readFileSync(p,'utf8').replace(/\\r?\\n/g,'\\r\\n'))"`;
+      if (!erros.includes(m)) erros.push(m);
+      continue;
+    }
     const n = c.split(adapta(de, eol(c))).length - 1;
     if (n !== 1) erros.push(`${arq}: casou ${n}x -> ${JSON.stringify(de.slice(0, 60))}`);
   }
