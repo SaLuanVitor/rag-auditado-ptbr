@@ -2921,3 +2921,41 @@ Soma: **196/348**. Remedidas na oitava rodada: **24 de 29**.
 `−1`: continua zero em todas as oito medidas por dimensão. **Treze aulas livres de `−1`**, cinco
 por aritmética (05, 07, 15, 17, 22) e oito por medição direta (01, 02, 10, 13, 14, 16, 18, 19).
 Restam 16 desconhecidas.
+
+## Oitava rodada, lote 6: as duas mais baixas do curso, e as duas por não medir o corpus
+
+| Aula | R6 | R8 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [05](../AULA-05-pdf-layout-ocr-hierarquia.md) | 10/12 | **3**/12 | 0 | 0 | 1 | 1 | 1 | 0 | **Seis rodadas de auditoria e ninguém abriu um PDF.** Quinze dos dezesseis PDFs de turismo do módulo têm zero fontes e zero operadores de texto: são digitalizações. O `hi_res` ali não analisa layout, faz OCR. |
+| [15](../AULA-15-small-to-big.md) | 10/12 | **3**/12 | 1 | 0 | 1 | 0 | 1 | 0 | O corpus do `03` produz **um** nó, sem `NEXT` nem `PREVIOUS`. A Parte 3 inteira, mais dois exercícios e dois checkpoints, descreve um mecanismo que naquele script é inerte. |
+
+**As duas caíram pelo mesmo motivo, e ele é novo nesta rodada:** as duas leram o **código** com
+cuidado e nunca olharam o **dado**. A AULA-05 cita linha por linha e acerta quase todas; a AULA-15
+tem 33 citações válidas de 35. O que faltou nas duas foi abrir o arquivo que o script carrega.
+
+Na AULA-05 isso custou a tese: ela abre dizendo que "parte dos PDFs não tem camada de texto
+nenhuma, a extração devolve string vazia sem erro", e o módulo inteiro é esse caso, sem que a aula
+perceba. Os títulos `Crint` e `ancient` na saída gravada do notebook que ela cita como boa evidência
+são erro de OCR, e ela reproduz a evidência sem ler o que a evidência mostra.
+
+Na AULA-15 custou uma Parte inteira. `SentenceSplitter()` tem `chunk_size=1024` **tokens** e o
+corpus tem 731: um nó, relacionamento só `SOURCE`. Os três motores devolvem a mesma coisa, e o
+`Auto` paga uma chamada de LLM para decidir uma expansão que não tem para onde ir.
+
+### Uma medição minha divergiu do auditor, e o errado era eu
+
+Ao conferir a razão filho/pai da AULA-15 eu obtive 6,5, contra os 8,0 do laudo. A causa: omiti os
+`separators` customizados que o arquivo passa aos dois splitters (linhas 25 e 31). Com eles, os
+números batem ao último: pais de 889 e 966 caracteres, 15 filhos do documento, 16 dos pais, razão
+8,0. **Réplica que não copia a configuração inteira não é réplica**, e o desvio dela é plausível o
+bastante para passar por achado.
+
+### Estado do portão
+
+Soma: **182/348**. Remedidas na oitava rodada: **26 de 29**.
+
+**Onze aulas abaixo de 6/12**: 01 (5), 02 (4), 04 (5), 05 (3), 06 (5), 12 (4), 13 (5), 15 (3),
+16 (4), 18 (5), 19 (5).
+
+`−1`: continua zero nas dez medidas por dimensão. **Treze aulas livres de `−1`**, três por
+aritmética (07, 17, 22) e dez por medição direta. Restam 16 desconhecidas.
