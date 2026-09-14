@@ -371,7 +371,7 @@ meio do caminho.
 
 > ⚠️ **Precisão sobre o risco.** O LangGraph tem um `recursion_limit` padrão de **25**
 > super-steps — valor da documentação da biblioteca, e agora **medido**: num grafo de laço infinito, o `langgraph` 0.2.69 — a
-> versão que este repositório pina — levanta `GraphRecursionError: Recursion limit of 25 reached
+> uma das duas versões que o repositório pina (a outra é 0.3.18) — levanta `GraphRecursionError: Recursion limit of 25 reached
 > without hitting a stop condition` — e `grep -rn "recursion_limit"` não encontra nenhuma configuração em nenhum `.py`
 > do repositório. Ou seja: existe um freio, ele é da plataforma, e o pior caso não é gasto
 > ilimitado — é uma `GraphRecursionError` depois de ~25 passos, com custo limitado e mensagem

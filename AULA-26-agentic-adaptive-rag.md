@@ -240,7 +240,7 @@ wf.add_conditional_edges(
 )
 ```
 
-`retry` volta a `generate` com o mesmo `documents`, a mesma `question` e `temperature=0` — o cenário que a Aula 21 descreveu e que a Aula 25 mostrou ser a omissão do `scheduling module`. Os outros dois ciclos são `generate → transform_query → retrieve → grade_documents → generate` e `grade_documents → transform_query → retrieve → grade_documents`. Nenhum contador em nenhum dos três.
+`retry` volta a `generate` com o mesmo `documents`, a mesma `question` e `temperature=0` — o cenário que a Aula 21 descreveu e que a Aula 25 mostrou ser a omissão do limite de voltas, não a do `scheduling module`, cujo `LLM judge` este arquivo já exerce. Os outros dois ciclos são `generate → transform_query → retrieve → grade_documents → generate` e `grade_documents → transform_query → retrieve → grade_documents`. Nenhum contador em nenhum dos três.
 
 **A função de decisão tem forma de nó e não é um nó.** `grade_generation_node` (`02-LangChain-AdaptiveRAG.py:170`) devolve `{"decision": ...}`, e `decision` **não existe** no `GraphState` (`:121-124`, que tem `question`, `generation` e `documents`). Ela também não está entre os cinco `add_node` (`:181-185`). Funciona porque o lambda da linha 207 lê a chave direto do dicionário devolvido — mas o nome, o comentário `# Hallucination and Answer Evaluation Node` (`:169`) e o formato de retorno dizem "nó", e ela é uma aresta. Custo real: cada avaliação dispara uma ou duas chamadas de LLM dentro de um lambda de roteamento, onde ninguém procura custo.
 
@@ -301,7 +301,7 @@ Três arquivos deste repositório implementam laço, e nenhum implementa limite 
 | `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`                                  | 1 (`:174`)                                    | ausente       |
 | `10-AdvanceRAG/04-AgenticRAG/02-LangChain-AdaptiveRAG.py`                                 | 3 (`:201`, `:208`)                            | ausente       |
 
-O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Nenhum dos três arquivos o tem.
+O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Os três têm o **juízo** desse módulo, que é o `LLM judge` identificado na Aula 25. O que nenhum deles tem é o **limite de voltas**, que os algoritmos 5 e 6 do paper exigem na entrada (`maximum iterative times T`, `maximum recursive depth Kmax`).
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 

@@ -247,7 +247,7 @@ não o instala (confira com `grep -i llama`). Este script importa `llama_index.c
 ambiente do outro framework primeiro. Repare no caminho: os venvs foram criados na **raiz** do
 clone, no Passo 1, e você está um nível abaixo.
 
-Faltam ainda **dois** pacotes, e este é o defeito mais sério deste módulo. **Nenhum arquivo de
+Faltam ainda **dois** pacotes, e essa ausência é o defeito mais sério deste módulo. **Nenhum arquivo de
 `91-Environment/` instala cliente de Ollama**, em nenhuma das trilhas: `grep -rn -i ollama
 91-Environment/` não devolve nada. O `01_05` importa `llama_index.llms.ollama`, e o comentário na
 linha 24 do próprio script já avisa que isso pede instalação à parte. E o
@@ -263,8 +263,9 @@ pip install llama-index-llms-ollama python-dotenv
 python 01_05_LlamaIndex_5LineCode_Ollama.py
 ```
 
-Se você optou pelo caminho do Passo 3, o `00-SimpleRAG/requirements.txt` já traz
-`llama-index-llms-ollama`, `langchain-ollama` e `ollama`, e nada falta.
+Se você optou pelo caminho do Passo 3, o `00-SimpleRAG/requirements.txt` já traz os dois:
+`llama-index-llms-ollama` na linha 16 e `python-dotenv` na linha 27, além de `langchain-ollama` e
+`ollama`. Nada falta.
 
 Se você optou por OpenAI e preencheu `OPENAI_API_KEY`:
 
