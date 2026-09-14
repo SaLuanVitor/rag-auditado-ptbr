@@ -50,9 +50,10 @@ construído**:
 | **Expansão para frente/trás** | os N nós adjacentes no docstore | na **recuperação** |
 
 A terceira linha é a exceção à regra da Aula 01, e vale dizê-la em voz alta: otimização de índice
-acontece na ingestão, antes de qualquer pergunta chegar, e a expansão para frente e para trás mora
-em `06-Indexing/` mas roda **depois** da recuperação, como um `node_postprocessors`. É por isso que
-a Aula 18 a encontra do outro lado do pipeline.
+acontece na ingestão, antes de qualquer pergunta chegar. As três rodam parte do trabalho depois da
+recuperação, como `node_postprocessors`, e não é isso que as separa. Nas duas primeiras o conteúdo
+entregue já estava montado no índice; só na expansão para frente e para trás **o quanto entregar é
+decidido com a pergunta na mão**. É por isso que a Aula 18 a encontra do outro lado do pipeline.
 
 As duas primeiras decidem o contexto quando o documento entra; a terceira decide na hora da
 consulta. Isso tem consequência prática: mudar o tamanho da janela ou o pai exige **reindexar**;
@@ -276,12 +277,14 @@ cada lado. Ver a substituição acontecer é o que torna o small-to-big concreto
 python 02-ParentChildTextChunkRetrieval.py
 ```
 
-Conte quantos filhos e quantos pais o retriever guardou de fato — `len(list(store.yield_keys()))`
-para os pais, e o número de vetores no `vectorstore` para os filhos. (Não conte `parent_docs` e
+Conte quantos filhos e quantos pais o retriever guardou de fato: `vectorstore._collection.count()`
+para os filhos, `len(list(store.yield_keys()))` para os pais. (Não conte `parent_docs` e
 `child_docs` de `02-ParentChildTextChunkRetrieval.py:34-35`: são código morto, como a ressalva acima
-explica.) **A razão medida é 8**, dezesseis filhos para dois pais, e não os 5 que `1000/200` sugere:
-o `chunk_overlap` de 200 no pai e de 50 no filho desloca os dois passos, e os pais reais saem com
-889 e 966 caracteres, não com 1000. Vale perguntar por que antes de aceitar o número. Depois faça
+explica.) **A razão medida é 8**, dezesseis filhos para dois pais, e não os 5 que `1000/200` sugere.
+A causa **não** são os `chunk_overlap`: zerando os dois, a razão só cai para 7,0. É que o filho
+nominal de 200 sai com **126 caracteres em média** (mediana 123, máximo 194), porque a lista
+`separators` das linhas 25 e 31 corta em vírgula e em espaço, e a fusão recursiva para antes de
+encher o chunk. **`chunk_size` é teto, não tamanho**, e essa é a lição que o número esconde. Depois faça
 uma query e observe: quantos filhos casaram, e quantos pais distintos voltaram? A diferença é a
 deduplicação em ação.
 
@@ -311,8 +314,9 @@ exija o entorno e veja a resposta ficar incompleta.
 **2. Iguale pai e filho.** No `02`, ponha `chunk_size=1000` nos dois splitters. Você desmontou o
 small-to-big: agora indexa e entrega o mesmo objeto, e está de volta à tensão da Aula 07.
 
-**3. Exagere o pai — e primeiro dê texto a ele.** O corpus embutido no `02` é uma string de 1.745
-caracteres, então com `chunk_size=8000` o divisor devolve **um** pai, que é o documento inteiro: o
+**3. Exagere o pai — e primeiro dê texto a ele.** O corpus embutido no `02` tem 1.745 caracteres de
+texto, 1.748 com as quebras de linha das pontas, então com `chunk_size=8000` o divisor devolve
+**um** pai, que é o documento inteiro: o
 contexto entregue passa a ser o mesmo para toda pergunta, e nada fica "enorme". E o repositório não
 resolve isso sozinho: o maior **corpus de texto corrido** de `99-EN/` tem 4.462 bytes (o
 `README.md` de lá é maior, e os PDFs de `assets/shanxi-tourism/` são muito maiores, mas nenhum dos
@@ -329,8 +333,8 @@ _lost in the middle_ começa a cobrar, e prepara a Aula 17 (reranking) e a 18 (c
 **4. Remova o docstore da expansão. Não funciona, e é isso que se aprende:** no `03`, apague o
 `docstore=docstore` da linha 40 e o Pydantic levanta `ValidationError` (campo obrigatório ausente) na
 **construção** do `PrevNextNodePostprocessor` — antes de indexar ou consultar qualquer coisa. A
-biblioteca se recusa a montar um expansor sem fonte de ordem, porque a informação de qual nó vem
-depois de qual não existe no índice vetorial. Para ver a expansão desligada e comparar contexto
+biblioteca se recusa a montar um expansor sem meio de resolver o vizinho: o id que as
+`relationships` guardam só vira nó através do docstore, e o índice vetorial não faz essa busca. Para ver a expansão desligada e comparar contexto
 entregue, use `num_nodes=0`, que a classe aceita, ou o `base_engine` da linha 32, que já é o
 baseline. Com o `chunk_size` padrão da linha 16 os três já são o mesmo baseline, o que torna a
 comparação vazia: reduza o `chunk_size` antes.
@@ -338,8 +342,10 @@ Medido no `llama-index-core` 0.12.15.
 
 **5. Compare os três na mesma pergunta, depois de unificar o corpus.** O `01` e o `02` usam o
 `game_knowledge`; o `03` usa um `game_story` narrativo e disjunto, então nenhuma pergunta é
-respondível pelos três como estão. Cole o `game_knowledge` no `03` e reduza o `chunk_size` da
-linha 16. Só então rode uma consulta pelas três estratégias e compare o contexto entregue. Não há
+respondível pelos três como estão. Cole o `game_knowledge` no `03` e ponha `chunk_size=100` na
+linha 16, **não 200**: o `game_knowledge` tem 334 tokens, e a 200 ele vira só dois nós, com que
+`num_nodes=2` entrega o corpus inteiro em toda consulta e a comparação degenera outra vez. A 100
+são quatro nós, e a expansão volta a escolher. Só então rode uma consulta pelas três estratégias e compare o contexto entregue. Não há
 vencedor universal; o exercício é perceber **qual formato de contexto**
 sua pergunta precisava.
 

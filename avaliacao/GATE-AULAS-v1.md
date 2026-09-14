@@ -3147,3 +3147,62 @@ As três têm suíte com positivo plantado. São sete suítes, e a `rodar.sh` fe
 A mais instrutiva: um positivo plantado que não provava nada, porque mutei o índice de um array
 quando a regra que eu queria cegar vivia na sobrescrita de um `Map`. Verificador que aprova por não
 medir é a falha mais cara desta auditoria, e ela reincide no instrumento tanto quanto no conserto.
+
+## S6, remedição das duas em 3/12: as duas passam o portão
+
+| Aula | R8 | S6 | E | C | H | O | D | A | O que mudou |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [05](../AULA-05-pdf-layout-ocr-hierarquia.md) | 3/12 | **8**/12 | 2 | 1 | 1 | 1 | 2 | 1 | Sete alegações do bloco novo reproduzem no byte, e o eixo `E` foi de 0 a 2. `A` saiu de 0 mas não chega a 2: dois dos oito itens executáveis ainda não entregavam. |
+| [15](../AULA-15-small-to-big.md) | 3/12 | **8**/12 | 2 | 1 | 1 | 1 | 2 | 1 | Nenhum "não executei" restou, e cada número do cabeçalho reproduz. `C` fica em 1 por três afirmações novas erradas, todas minhas. |
+
+**As duas saíram de 3/12, a nota mais baixa do curso, e passaram.** É o primeiro dado real sobre a
+pergunta que ficou no plano, a de que consertar pode não convergir: **converge, em um ciclo, quando
+o conserto é feito sobre laudo medido.**
+
+### Minha previsão estava errada, e por margem larga
+
+Declarei antes de ver que as duas subiriam **sem chegar a 6/12**, e que o defeito novo estaria
+concentrado nas medições que converti de limites declarados. Errei nas duas metades: as duas
+chegaram a 8, e **as conversões de limite foram justamente o que mais resistiu**. O auditor da 15
+reproduziu as duas ao literal, e o da 05 confirmou sete de sete alegações do bloco novo no byte.
+
+### Mas cinco dos seis achados novos da 15 eram do meu conserto
+
+E o mais instrutivo é de uma classe nova: **explicação causal errada colada a um número certo.** A
+razão filho/pai é 8, e eu escrevi que a causa eram os `chunk_overlap` e os pais saírem com 889 e
+966 caracteres. Medido, nenhum dos dois: zerando os dois overlaps a razão só cai para 7,0, e a
+causa dominante é o filho nominal de 200 sair com **126 caracteres em média**, porque a lista
+`separators` corta em vírgula e em espaço e a fusão recursiva para antes de encher o chunk.
+`chunk_size` é teto, não tamanho.
+
+**O número estava certo e a explicação dele estava errada**, e um leitor que confira o número
+aceita a explicação junto. Passou a ir em todo briefing: se o texto explica por que um número é o
+que é, teste a explicação separadamente do número.
+
+Duas outras formas apareceram, e nenhuma ferramenta pega:
+
+- **A proposição corrigida reapareceu reescrita** 86 linhas adiante. Não é cauda literal, é a mesma
+  ideia dita de novo com outras palavras, e o `cauda.js` não tem como ver.
+- **O discriminador que eu escrevi não discriminava.** Justifiquei a exceção da Fase 5 dizendo que a
+  expansão "roda depois da recuperação, como `node_postprocessors`", e o
+  `MetadataReplacementPostProcessor` da mesma aula satisfaz esse critério inteiro. O que separa é
+  outra coisa, e já estava escrita duas linhas abaixo.
+
+### E um BLOCK contra mim na AULA-05
+
+Escrevi "**15 dos 16** PDFs daquela pasta" e carimbei de **"Medido nos bytes"**. São **14 de 15**:
+contei o deck de slides no denominador. É a forma mais cara de erro desta auditoria, porque a
+palavra "medido" é o que faz o leitor parar de conferir.
+
+O mesmo laudo achou que eu nomeava o arquivo pela cópia errada: os scripts abrem
+`99-EN/assets/shanxi-tourism/云冈石窟-en.pdf`, e eu citei o `Yungang Grottoes-en.pdf` de outra
+pasta. São byte a byte o mesmo (`md5` igual), então a medição transfere, mas o leitor procura no
+lugar errado.
+
+### Duas caudas que cola minhas, no lote do próprio conserto
+
+Ao aplicar os achados da 15 eu ancorei em prefixo duas vezes e deixei a cauda colada nas duas: `e o
+número de vetores no vectorstore para os filhos` depois de já ter dito para os filhos, e `uma
+string de 1.745 caracteres` depois de já ter dado o número. **É a regra que eu mesmo derivei nesta
+sessão**, a de ancorar na frase inteira, e violei duas vezes no mesmo lote. As duas foram pegas
+pelo `cauda.js` na verificação seguinte.

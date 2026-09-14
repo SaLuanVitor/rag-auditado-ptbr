@@ -39,12 +39,15 @@ Nativo rende centenas; digitalizado rende zero ou lixo isolado. Um limiar simple
 acervo inteiro em minutos. Faça por página, não por documento — é assim que o híbrido aparece.
 
 ⚠️ **E o módulo é um exemplo dos três tipos, sem avisar.** Os PDFs de turismo que os arquivos
-`05-*` e `09-*` carregam são **digitalizados**. Medido nos bytes, sem biblioteca nenhuma:
-`Yungang Grottoes-en.pdf` tem 19 imagens, **zero fontes e zero operadores de texto**
-(`BT`, `Tj`, `TJ`), e o mesmo vale para 15 dos 16 PDFs daquela pasta. O único nativo é o
-`Shanxi-en.pdf`, com 145 fontes e 3108 `BT`, e nenhum script do módulo o usa. Já o
-`black_myth_wukong_slides.pdf`, que o `01`, o `02`, o `03` e o par `06` carregam, é nativo e
-sintético: 4759 bytes gerados pela ReportLab.
+`05-*` e `09-*` carregam são **digitalizados**. O que eles abrem é
+`../../99-EN/assets/shanxi-tourism/云冈石窟-en.pdf`, cópia byte a byte do
+`Yungang Grottoes-en.pdf` de `90-Data/Shanxi Cultural Tourism/` (mesmo `md5`), e é por esse nome
+que você o encontra. Medido nos bytes, sem biblioteca nenhuma: ele tem 19 imagens, **zero fontes e
+zero operadores de texto** (`BT`, `Tj`, `TJ`), e o mesmo vale para **14 dos 15** PDFs de
+`90-Data/Shanxi Cultural Tourism/`. O único nativo é o `Shanxi-en.pdf`, com 145 fontes, e nenhum
+script do módulo o usa. Já o `black_myth_wukong_slides.pdf`, que o `01`, o `02`, o `03`, o `04` e
+o par `06` carregam, é nativo e sintético: 4759 bytes gerados pela ReportLab, sem uma única
+imagem.
 
 **Três consequências.** O `strategy="hi_res"` sobre aqueles arquivos não é análise de layout sobre
 texto existente: é **OCR**, porque não há texto para analisar. Os títulos `Crint` e `ancient` na
@@ -84,8 +87,7 @@ está na estrutura em vez de estar no texto.
 ## Parte 1 — Extração: as seis abordagens
 
 `04-PDFFileLoading/` tem **14 arquivos** — 13 de código e o `.env.example` —, e a contagem por
-_abordagem de biblioteca_ é seis —
-o resto são comparações, análise de layout e hierarquia:
+_abordagem de biblioteca_ é seis — o resto são comparações, análise de layout e hierarquia:
 
 | #   | Abordagem                        | Arquivo                                                          | Import-chave                                   |
 | --- | -------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
@@ -100,10 +102,9 @@ Mais três propósitos distintos: comparação de modos (`07-*.ipynb`), análise
 (`08-AnalyzePDFLayout.ipynb`, `08-RenderPDFPageLayout.py`) e hierarquia (`09-Parent-Child-*.py`,
 2 arquivos).
 
-Note as grafias do repositório: `Unstrucured` no `05` (sem o segundo `t`), `Unstrctured` no
-`06` (sem o `u`), `Unstructed` no `07`, e `ParitionPDF` no `09`. Quatro
-erros de digitação diferentes na mesma pasta. Preservo aqui porque é assim que você vai
-encontrá-los ao navegar.
+Note as grafias do repositório: `Unstrucured` no `05` (sem o segundo `t`), `Unstrctured` no `06`
+(sem o `u`), `Unstructed` no `07`, e `ParitionPDF` no `09`. Quatro erros de digitação diferentes na
+mesma pasta. Preservo aqui porque é assim que você vai encontrá-los ao navegar.
 
 ### PyPDF contra PyMuPDF
 
@@ -286,12 +287,14 @@ Primeira execução baixa modelos de layout — leva tempo. Compare a estrutura 
 crua do `01-UsingPyPDF.py` — e note que os dois **não leem o mesmo documento**: o `01` abre o PDF de
 slides do Black Myth Wukong na linha 2, e o `05` abre um PDF de turismo na linha 1.
 
-Aponte a **linha 2 do `01`** para o PDF de turismo do `05` e rode: o PyPDF devolve páginas vazias e
-não reclama, porque aquele arquivo não tem camada de texto. É a falha silenciosa da seção de
-abertura desta aula, em um comando. Depois, para comparar as **estratégias** sobre um documento que
-as duas conseguem ler, aponte as duas para `../../90-Data/Shanxi Cultural Tourism/Shanxi-en.pdf`,
-o único nativo daquela pasta. Apontar o `05` para o deck de slides faz o contrário do que o
-exercício quer: joga o `hi_res` sobre 4759 bytes sintéticos, onde não há estrutura para recuperar.
+Aponte a **linha 2 do `01`** para `../../99-EN/assets/shanxi-tourism/云冈石窟-en.pdf`, que é o PDF de
+turismo do `05`, e rode: o PyPDF devolve páginas vazias e não reclama, porque aquele arquivo não tem
+camada de texto. É a falha silenciosa da seção de abertura desta aula, em um comando. Depois, para
+comparar as **estratégias** sobre um documento que as duas conseguem ler, aponte as duas para
+`../../90-Data/Shanxi Cultural Tourism/Shanxi-en.pdf`, o único nativo daquela pasta. As duas pastas
+guardam as mesmas cópias com nomes diferentes, uma em chinês e outra em inglês, então não estranhe
+reencontrar o mesmo arquivo. Apontar o `05` para o deck de slides faz o contrário do que o exercício
+quer: joga o `hi_res` sobre 4759 bytes sintéticos, onde não há estrutura para recuperar.
 
 Depois abra `08-AnalyzePDFLayout.ipynb`, que traz as caixas desenhadas e a saída já gravada. O
 `07-Unstructed-PDF-CompareVariousModes.ipynb` compara estratégias no código, mas foi commitado
@@ -317,9 +320,12 @@ imprimindo `len(page.get_text())`. É o classificador nativo/digitalizado da se�
 mental", em cinco linhas. Rode nos PDFs de `../../90-Data/ComplexPDF/` — o caminho é relativo a
 `04-PDFFileLoading/`, onde a receita anterior deixou você — e veja a distribuição.
 
-**2. Troque `hi_res` pela estratégia rápida.** Em `05-LangChain-Unstrucured-PDF-SimpleDisplay.py`,
-mude `strategy="hi_res"` para `"fast"`. Cronometre os dois e compare a estrutura. Quanto de
-fidelidade o tempo comprou?
+**2. Troque `hi_res` pela estratégia rápida — e antes troque o alvo.** Em
+`05-LangChain-Unstrucured-PDF-SimpleDisplay.py`, aponte primeiro para
+`../../90-Data/Shanxi Cultural Tourism/Shanxi-en.pdf`. Sobre o scan original a estratégia rápida
+não devolve **menos** fidelidade, devolve **nada**: ela extrai texto, e ali não há texto para
+extrair, então a comparação some. Com o arquivo nativo, mude `strategy="hi_res"` para `"fast"`,
+cronometre os dois e compare a estrutura. Quanto de fidelidade o tempo comprou?
 
 **3. Rode OCR num PDF nativo.** Aplique `03-UsingPytesseract+pdf2image.py` a um PDF que já tem
 texto e compare com a extração direta. Antes de rodar, troque o `lang` da chamada do Tesseract, na
@@ -340,13 +346,23 @@ linha 2 (um `.jpg` de `99-EN/assets/`), e o `03-LLM-ReadImagesAndText.py` raster
 de um PDF diferente, gravando um `page_N.jpg` por página numa pasta chamada `temp_images` — o nome
 dela sai da linha 12 e o diretório é criado na 16, sob a guarda da 15.
 
-**E há uma armadilha que torna a receita óbvia impossível:** as linhas 72-75 do `03` **apagam**
-todos os `page_N.jpg` e removem o diretório quando o script termina. Quando ele devolve o prompt,
-`temp_images` não existe mais. Então: **comente as linhas 72-75 do `03`**, rode-o, escolha uma das
-páginas que sobraram com gráfico ou diagrama, **aponte a linha 2 do `01` para esse arquivo** e rode
-o `01`.
-Aí sim é a mesma página nos dois, e a diferença entre ler caracteres e interpretar conteúdo fica
-óbvia numa execução.
+**E há duas armadilhas.** A primeira torna a receita óbvia impossível: as linhas 73 a 75 do `03`
+(a 72 é o comentário) **apagam** todos os `page_N.jpg` e removem o diretório quando o script
+termina, então quando ele devolve o prompt o `temp_images` não existe mais.
+
+A segunda é do alvo, e é a mesma do exercício 3: o `03` rasteriza o deck de slides, e **medido nos
+bytes o deck não tem uma única imagem nem um retângulo vetorial**, só cinco páginas de Helvetica
+com duas linhas cada. Não há página "com gráfico ou diagrama" para escolher, e sobre texto limpo o
+OCR acerta e o modelo multimodal não tem o que interpretar: os dois caminhos devolvem a mesma
+coisa, e o exercício não mostra nada.
+
+Então: **comente as linhas 72-75 do `03`**, aponte a linha 18 dele para
+`../../90-Data/ComplexPDF/billionaires_page-1-5.pdf`, que tem imagens embutidas, rode-o, escolha uma
+das páginas que sobraram com gráfico, **aponte a linha 2 do `01` para esse arquivo** e rode o `01`.
+Se você só quer os JPEGs, interrompa depois do `Successfully converted N pages`: as chamadas ao
+modelo vêm depois e custam uma por página. E sem `OPENAI_API_KEY` o script aborta antes delas, caso
+em que o `temp_images` sobrevive sozinho e comentar as linhas foi inócuo. Aí sim é a mesma página
+nos dois, e a diferença entre ler caracteres e interpretar conteúdo fica óbvia numa execução.
 
 ---
 

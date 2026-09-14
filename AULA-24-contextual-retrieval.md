@@ -31,7 +31,7 @@ Quatro respostas para o mesmo problema, três já vistas:
 | Multi-representação (Aula 16) | indexação   | um resumo **ao lado** do texto                |
 | **Contextual Retrieval**      | indexação   | o chunk **reescrito** com o contexto embutido |
 
-¹ A família small-to-big se divide em três, e a Aula 15 faz a distinção (`AULA-15:46-54`): **janela
+¹ A família small-to-big se divide em três, e a Aula 15 faz a distinção (`AULA-15:46-60`): **janela
 deslizante e pai-filho são decididos na indexação** — indexa-se a sentença ou o chunk filho,
 entrega-se a janela ou o pai, e trocá-los obriga a reindexar. Só a **expansão para frente e para
 trás** é decidida na recuperação: indexa-se o nó e entregam-se os vizinhos, ajustável sem reindexar.
