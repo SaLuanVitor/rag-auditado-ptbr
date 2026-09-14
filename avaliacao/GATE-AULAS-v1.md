@@ -2658,3 +2658,48 @@ O auditor da Aula 28 localizou o placeholder de imagem em `01-Weaviate-Multimoda
 Ele está no `02-Weaviate-Multimodal-RAG.py:33`; o `01` usa `to_base64` de verdade. **Taxa de achado
 falso: cerca de 3%** — baixa o bastante para aplicar sem conferir cada um, alta o bastante para não
 desligar a checagem.
+
+---
+
+## Oitava rodada, lote 2 — e o portão reabre
+
+| Aula | R6 | R8 | O que a rodada achou |
+|---|---|---|---|
+| [11](../AULA-11-busca-hibrida-multimodal.md) | 8/12 | **6**/12 | O exercício 1 prescreve o **inverso** do que a aula prova 130 linhas antes. E a comparação visual que é o centro da Parte 2 é degenerada: o filtro seleciona **uma** imagem de dez. |
+| [04](../AULA-04-carregando-texto-json-web.md) | 7/12 | **5**/12 | `silent_errors=True` **não** engole quais arquivos falharam: emite `logger.warning` nomeando cada um. E não há despacho por extensão no `DirectoryLoader`. |
+| [06](../AULA-06-tabelas-csv-sql.md) | 9/12 | **5**/12 | Superfície de fecho não varrida: reescrevi o parágrafo do camelot e a armadilha de produção ficou apontando para a versão anterior. |
+| [12](../AULA-12-query-construction.md) | 7/12 | **4**/12 | **Abaixo do portão.** A advertência que a Aula 28 chama de "a mais direta do curso" era o item 5 de um exercício opcional, e o exercício não roda: não há banco relacional em `04-VectorDB/`. |
+
+**Soma das quatro: 31/48 → 20/48. Todas caíram.**
+
+### O contraste entre os dois lotes é o achado
+
+O lote 1 (22, 28, 20, 21) subiu ou ficou em todas as quatro. O lote 2 caiu em todas. Os dois foram
+escolhidos pelo mesmo critério de risco, então a diferença não está na escolha.
+
+**A diferença está em quanto escrutínio cada aula já tinha recebido.** As quatro do lote 1 vinham
+de rodadas recentes e de varreduras por classe que as revisitaram várias vezes. As do lote 2 têm
+nota alta da sexta rodada e nunca passaram por olhar profundo: a AULA-06 caiu de 9 para 5.
+
+A leitura honesta: **nota alta da R6 media, em parte, que a R6 não olhou fundo.** O instrumento
+atual acha coisas que o anterior não achava, e onde ele nunca passou é onde mais acha.
+
+### O portão eliminatório reabriu
+
+A AULA-12 está em 4/12. Ele havia caído hoje pela manhã, com as oito abaixo de 50% resolvidas, e
+volta a reprovar com uma aula que a sexta rodada dava como 7/12.
+
+**Isso era previsto e está orçado**: é exatamente para isso que a sprint de folga existe no plano.
+O que ele muda é a estimativa de tamanho dela, e para cima.
+
+### Duas classes de defeito que este lote acrescentou
+
+**Mecanismo copiado da documentação da própria fonte.** A AULA-04 reproduziu a prosa do docstring
+do repositório em vez de medir, e o docstring está errado: não há despacho por extensão no
+`DirectoryLoader`. É uma variante de "mecanismo inferido da presença de código", e mais traiçoeira,
+porque a fonte parece autoritativa.
+
+**A tese da aula acontecendo na própria aula, sem ela perceber.** A AULA-12 argumenta que a
+`description` do `AttributeInfo` é prompt e pode divergir do dado, e então repete a string do
+`AttributeInfo` como se fosse o formato do dado. O loader grava `YYYY-MM-DD HH:MM:SS`; o
+`AttributeInfo` declara `YYYY-MM-DD`. O exemplo vivo da tese estava no arquivo.

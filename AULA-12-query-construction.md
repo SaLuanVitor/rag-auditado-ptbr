@@ -1,6 +1,6 @@
 # AULA 12 — Query construction: Text2SQL, Text2Cypher e filtros de metadados
 
-**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (15 arquivos, contando o `.env.example` da raiz; 7 deles em `Text2SQL/Sakila/`)
+**Fase 4 — Pré-recuperação** · Módulo do repo: `05-PreRetrieval/01-QueryConstruction/` (15 arquivos, contando o `.env.example` do próprio módulo; 7 deles em `Text2SQL/Sakila/`)
 
 ---
 
@@ -51,7 +51,7 @@ para mostrar que **a falha está em outro lugar**:
    antes e depois. Jogar isso direto no driver quebra.
 3. **Junção errada não dá erro.** Retorna um número plausível, e ninguém percebe.
 
-Os **dois primeiros** aparecem no código, com o "antes" e o "depois" versionados lado a lado. O terceiro não: `grep -rn "JOIN"` no módulo não encontra nenhuma cláusula de junção, nem par antes/depois. Fica como alerta conceitual, sem exemplo — e é justamente o mais difícil de pegar.
+Os **dois primeiros** aparecem no código, com o "antes" e o "depois" versionados lado a lado. O terceiro não tem par antes/depois, mas tem exemplo, e é o da Parte 1: os dois `02-*` instruem a junção em prosa (`02-Text2SQL-LLM-DeepSeek.py:41`), casando `scenic_spots.city` com `city_info.city_name` por igualdade de string, entre colunas de nomes diferentes e sem chave estrangeira. Um erro de grafia devolve menos linhas sem levantar exceção. Um `grep` por `JOIN` em caixa alta não encontra nenhuma cláusula de junção, nem par antes/depois. Fica como alerta conceitual, sem exemplo — e é justamente o mais difícil de pegar.
 
 ---
 
@@ -103,14 +103,14 @@ SELECT COUNT(*) FROM film;
 
 o driver recebe a cerca de markdown e a frase em português junto com o SQL, e estoura.
 
-A correção do `v2` tem duas frentes, e é importante notar que são **duas** e não uma:
+A correção do `v2` tem duas frentes, e é importante notar que são **duas** e não uma. O `diff`, porém, traz mais duas mudanças que não são o conserto e confundem a comparação: `gpt-4o` vira `o4-mini`, o `top_k` das descrições vai de 5 para 8, e `temperature=0` é **comentada**, devolvendo o padrão da API. O `v2` é menos determinístico que o `v1`, o que importa para o exercício 1, que manda rodar várias vezes.
 
 1. **No prompt** — instruir o modelo a devolver só o SQL.
 2. **No código** — extrair o SQL de qualquer forma, com regex, caso o modelo desobedeça.
 
 Essa redundância é o desenho certo. Instrução de prompt é probabilística: funciona quase sempre,
 e "quase sempre" em produção significa falhar todo dia. O `extract_sql()` é a rede de baixo —
-mesmo padrão do verificador de citações deste curso, que existe porque regra em prosa depende de
+mesmo desenho de qualquer validação que não pode confiar na fonte: instrução do lado de quem gera, verificação do lado de quem consome. Regra em prosa depende de
 memória.
 
 Julgamento: eu acrescentaria uma terceira camada que o exemplo não tem — **validar a consulta
@@ -119,7 +119,7 @@ existem, e rodar com usuário somente-leitura. Text2SQL executa código gerado p
 seu banco; tratar isso como entrada não confiável não é paranoia.
 
 Há ainda o `05-text2sql-rag-v3-agent.py`, a versão agêntica, que itera quando a consulta falha —
-um retry **com limite** (`max_retries: int = 3`) — exatamente o freio que a Aula 26 mostra estar ausente nos laços de LangGraph do repositório.
+um retry **com limite** (`max_retries: int = 3`). A Aula 26 mostra o contraste: os laços de LangGraph do repositório não têm contador próprio e dependem do limite de recursão da plataforma para parar.
 
 ---
 
@@ -238,11 +238,12 @@ Um exemplo concreto do que acontece com "vídeos do canal X sobre LangChain publ
 | -------------------- | ----------------------------- |
 | "sobre LangChain"    | consulta semântica            |
 | "do canal X"         | filtro `author == "X"`        |
-| "publicados em 2024" | filtro sobre `publish_date` — não é direto: o campo é string `YYYY-MM-DD`, não um ano inteiro |
+| "publicados em 2024" | filtro sobre `publish_date`, e não é direto: o `AttributeInfo` declara `YYYY-MM-DD` (linha 64) enquanto o loader grava `YYYY-MM-DD HH:MM:SS` (`youtube.py:328`) |
 
 **Sem self-query, "2024" entra na busca semântica** — e você recupera vídeos de 2021 que
-mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É a mesma armadilha do recorte temporal — e nenhuma aula posterior a retoma: o espaço vetorial
-captura assunto, não recorte.
+mencionam 2024, enquanto perde vídeos de 2024 que não escrevem o ano na transcrição. É o recorte que o espaço vetorial não captura: ele guarda assunto, não data. A Aula 14 volta a este
+ponto, classificando recorte temporal como roteamento lógico, condição dura que não se resolve
+por similaridade.
 
 A qualidade do `AttributeInfo` é o que decide se funciona. A `description` de cada campo é lida
 pelo LLM para decidir quando usá-lo — descrição vaga produz filtro errado. É prompt engineering
@@ -259,8 +260,12 @@ cd RAG-from-First-Principles/05-PreRetrieval/01-QueryConstruction/BuildingMetada
 python 01-LoadYoutubeExample.py
 ```
 
-Comece aqui — só precisa de rede. Olhe o `metadata` do documento carregado e liste quais campos
-existem. Esses são os seus candidatos a filtro.
+Antes de rodar, dois pacotes que os pins da Aula 00 não trazem: `pip install
+youtube-transcript-api pytube`. O `pytube` quebra com frequência contra o YouTube; se
+`add_video_info=True` falhar, troque para `False` e leia só a transcrição, porque o ponto do
+metadado se entende pelo fonte do loader. Para o `02-*`, some `langchain-deepseek`,
+`langchain-chroma` e `langchain-huggingface`. Feito isso, olhe o `metadata` do documento
+carregado e liste quais campos existem. Esses são os seus candidatos a filtro.
 
 ```powershell
 python 02-GenerateMetadataInQuery.py
@@ -318,13 +323,21 @@ vem errado — prova de que aquele texto é prompt, não documentação.
 **4. Pergunte sem recorte a um self-query.** Faça uma pergunta puramente semântica e confirme
 que nenhum filtro é gerado. Self-query não deve inventar filtro onde não há recorte.
 
-**5. Peça uma agregação ao RAG vetorial.** Volte ao pipeline da Aula 11 e pergunte "quantos
-registros existem na categoria X". Compare com o que um `SELECT COUNT(*)` daria. É o argumento
-desta aula, medido.
+**5. Peça uma agregação ao RAG vetorial.** Use o banco que esta aula cria: o
+`Text2SQL/01-Text2SQL-CreateDatabaseTable.py` popula `scenic_spots` com 5 linhas, 4 delas
+`level = 'AAAAA'`. Indexe as 5 como texto, pergunte ao RAG (quantos pontos AAAAA existem), e
+compare com `SELECT COUNT(*) FROM scenic_spots WHERE level='AAAAA'`, que devolve 4. O RAG
+devolve top-k, nunca uma contagem. Não use o pipeline da Aula 11 para isto: não há banco
+relacional em `04-VectorDB/` contra o que comparar.
 
 ---
 
 ## Armadilhas de produção
+
+- **Pedir agregação a um RAG vetorial.** Se a pergunta é "quantos registros existem na categoria
+  X", isso é `SELECT COUNT(*)`, não recuperação. O RAG devolve os k mais parecidos e nunca uma
+  contagem, e a resposta sai plausível: o modelo conta o que veio no top-k e apresenta como total.
+  É a decisão que vem antes de escolher índice, embedding ou reranker.
 
 - **Executar SQL gerado sem validar.** É código de LLM contra o seu banco. Usuário
   somente-leitura, allowlist de operações, verificação de que as tabelas existem, e timeout. O
@@ -360,6 +373,7 @@ desta aula, medido.
 8. Por que a `description` de um `AttributeInfo` é prompt e não documentação?
 9. Que camada de segurança o exemplo de Text2SQL não tem, e que você deveria acrescentar?
 10. Por que indexar pares pergunta→SQL faz o sistema melhorar com o uso?
+11. Por que "quantos registros existem na categoria X" não é pergunta de RAG vetorial, e o que ela é?
 
 ---
 

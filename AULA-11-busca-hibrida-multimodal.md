@@ -59,7 +59,7 @@ a isso com a aritmética do `k=60`.
 
 ---
 
-## Parte 1 — Os três arquivos, e o que o nome esconde
+## Parte 1 — Os três scripts, e o que o nome esconde
 
 `HybridRetrieval/` tem três variantes que usam BGE-M3 (o modelo da Aula 08, que emite denso e
 esparso de uma vez) sobre Milvus:
@@ -169,14 +169,14 @@ imagem e texto no mesmo espaço vetorial:
 | `Milvus+Visual-BGE-MultimodalRetrieval-English.py` | o mesmo, outra variante       |
 | `Milvus+Visual-BGE-PureRetrievalProgram.py`        | só a recuperação, sobre um store já construído¹ |
 
-E — prática rara, mas não exclusiva, no repositório — **três imagens de saída** versionadas:
+E — prática rara, mas não exclusiva: o `10-AdvanceRAG/04-AgenticRAG/` também versiona os PNGs do grafo que o `02-LangChain-AdaptiveRAG.py:220` gera — **três imagens de saída** versionadas:
 
 - `search_results.jpg`
 - `search_without_filter.jpg`
 - `search_with_filter.jpg`
 
 Os dois últimos nomes contam a história do módulo: é uma comparação **com e sem filtro
-escalar**, aplicada a busca de imagens. O autor guardou o resultado visual porque aqui a saída
+escalar**, aplicada a busca de imagens, e vale saber o que cada lado mostra antes de abri-las. O acervo tem 9 imagens, mas o `metadata.json` traz 10 entradas, porque `09.jpg` aparece duas vezes com títulos diferentes, e as 10 são inseridas. Com `limit=9`, o lado **sem filtro** devolve praticamente o acervo inteiro: não é demonstração de ordenação, é o corpus. O lado **com filtro** aplica `environment == "snowfield" and category == "combat"`, e como `category` vale `combat` nas 10 linhas, só o `environment` seleciona: **uma imagem**, com oito células vazias na grade. A comparação é entre os dois extremos, e é isso que ela ensina bem: filtro escalar não reordena, ele corta o candidato antes de a distância entrar na conta. Guardar o resultado visual faz sentido aqui, e é julgamento meu sobre o motivo: a saída
 é visual — você _vê_ quais imagens foram recuperadas, e vê o filtro mudar o conjunto.
 
 Isso conecta com a Aula 10 de forma direta: `03-filtered-search.py` mostrou a mecânica do
@@ -209,7 +209,7 @@ responde `no configuration file provided`.
 
 ⚠️ **E instale uma dependência que a Aula 00 não instalou.** Os três scripts de `HybridRetrieval/`
 importam `milvus_model.hybrid` (linha 30 do `v2`), e o `milvus-model` **não** está em nenhum dos dois
-`requirements_*_NoGPU_Mac-Win.txt` — só em `04-VectorDB/requirements.txt`. Sem ele o import falha
+`requirements_*_NoGPU_Mac-Win.txt` — mas está em `04-VectorDB/requirements.txt`, em `10-AdvanceRAG/requirements.txt` e nos dois requirements de Ubuntu. Se você instalou pelo caminho Ubuntu da Aula 00, já tem. Sem ele o import falha
 antes de qualquer conexão:
 
 ```powershell
@@ -258,10 +258,14 @@ economiza um parágrafo de explicação.
 
 ## Quebre de propósito
 
-**1. Zere um dos pesos.** No `v2`, ponha o peso esparso em 0. Você reduziu o híbrido a busca
-densa pura. Depois zere o denso. Faça uma consulta com paráfrase e outra com **termo raro e literal**
+**1. Zere um dos pesos, e leia o nome da chave com desconfiança.** No `v2`, ponha
+`weights["sparse"]` em 0. Pelo alerta da Parte 1, esse valor ocupa a **primeira** posição do
+ranker, e a primeira requisição de `reqs=[dense_req, sparse_req]` é a densa: se a correspondência
+for posicional, você acabou de zerar o **denso** e ficou com busca esparsa pura. Depois zere
+`weights["dense"]` e confira que o comportamento troca. O resultado observado é, ele próprio, a
+medição do pareamento que a aula deixou em aberto. Faça uma consulta com paráfrase e outra com **termo raro e literal**
 do corpus — e note que o exemplo de identificador da tabela do "Modelo mental" (`SKU-88213-B`) **não
-se reproduz aqui**: o corpus é o `battle_scenes.json`, cinco registros de cenas de combate, e o único
+se reproduz aqui**: o corpus é o `battle_scenes.json`, cinco registros, e apesar do nome do arquivo só dois são de categoria `combat` (os outros são `scene`, `ability` e `story`); o único
 campo parecido com identificador (`id`, valores como `COMBAT_001`) **nunca entra no texto indexado** —
 o `v2` monta os documentos a partir de `title`, `description`, `combat_details` e `scene_info`. Para
 ver o esparso ganhar, use um nome próprio que caia em **um só documento indexado**: `White Bone
@@ -275,7 +279,7 @@ de verdade exigiria um corpus com identificadores indexados.
 `WeightedRanker(weights["sparse"], weights["dense"])` do `v2`, troque os dois argumentos para
 `(weights["dense"], weights["sparse"])`, deixando `reqs=[dense_req, sparse_req]` como está. Se a
 correspondência for posicional, é **isto** que faz os nomes das chaves valerem o que dizem — o
-estado original é que estava trocado (ver o alerta da Parte 2). Rode antes e depois com a mesma
+estado original é que estava trocado (ver o alerta da Parte 1). Rode antes e depois com a mesma
 consulta e compare os rankings. Fixe o sintoma na direção certa: híbrido que se comporta como o
 oposto do configurado é suspeita de ordem trocada, e aqui a suspeita se confirma **antes** de você
 mexer em nada.
@@ -287,8 +291,9 @@ controle.
 
 **4. Busque imagem por texto que não existe no acervo.** No multimodal, procure algo
 claramente ausente. O sistema devolve as imagens **menos distantes**, não "nada" — porque
-top-k sempre devolve k. É o argumento para range search (Aula 10) ou para um limiar de
-similaridade.
+top-k devolve k sempre que houver k candidatos. Repare que o `search_with_filter.jpg` deste mesmo
+módulo é o contraexemplo: com o filtro cortando para uma linha, ele devolveu 1, não 9. É o
+argumento para range search (Aula 10) ou para um limiar de similaridade.
 
 ---
 
