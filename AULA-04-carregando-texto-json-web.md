@@ -107,8 +107,7 @@ próprio", é **transformar o aviso em número**: conte os arquivos do diretóri
 ## Parte 2 — Dados estruturados
 
 `01-DataLoading/02-StructuredDocumentLoading/` tem **7 arquivos** — 6 de código e o `.env.example`
-oculto, e os dois primeiros formam
-um contraste que vale ler com atenção.
+oculto, e os dois primeiros formam um contraste que vale ler com atenção.
 
 ### JSON como texto contra JSON como estrutura
 
@@ -166,9 +165,9 @@ diferença no mesmo arquivo.
 
 ### Página web: o que carregar e o que descartar
 
-`03-LangChain-WebBaseLoader.py` carrega
-`page_url = "https://en.wikipedia.org/wiki/Black_Myth:_Wukong"` (linha 4). O arquivo traz a
-versão ingênua **comentada** nas linhas 5 a 11, e a versão boa ativa a partir da linha 15:
+`03-LangChain-WebBaseLoader.py` carrega `page_url =
+"https://en.wikipedia.org/wiki/Black_Myth:_Wukong"` (linha 4). O arquivo traz a versão ingênua
+**comentada** nas linhas 5 a 11, e a versão boa ativa a partir da linha 15:
 
 ```python
 loader = WebBaseLoader(
@@ -290,12 +289,12 @@ ValueError: Expected page_content is string, got <class 'dict'> instead.
 Set `text_content=False` if the desired input for `page_content` is not a string
 ```
 
-Não é migração silenciosa para texto bruto: é exceção, com a instrução do conserto na própria mensagem. Em
-`02-LangCHain-JSONLoader-JSON.py`, use
-`jq_schema='.'`. O ramo que serializa o objeto com `json.dumps` só é alcançado com
-`text_content=False`, então o desfecho esperado é a exceção, não o texto bruto. É a prova de que o
-ganho do `JSONLoader` está no esquema, não na classe: sem um `jq_schema` que produza string, ele não
-aceita o documento — ao contrário do `TextLoader`, que aceitaria qualquer coisa.
+Não é migração silenciosa para texto bruto: é exceção, com a instrução do conserto na própria
+mensagem. Em `02-LangCHain-JSONLoader-JSON.py`, use `jq_schema='.'`. O ramo que serializa o objeto
+com `json.dumps` só é alcançado com `text_content=False`, então o desfecho esperado é a exceção, não
+o texto bruto. É a prova de que o ganho do `JSONLoader` está no esquema, não na classe: sem um
+`jq_schema` que produza string, ele não aceita o documento — ao contrário do `TextLoader`, que
+aceitaria qualquer coisa.
 
 ---
 

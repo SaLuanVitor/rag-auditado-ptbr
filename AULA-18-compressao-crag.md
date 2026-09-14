@@ -52,9 +52,9 @@ curso — refaz a busca, reformula a pergunta, ou vai buscar fora do acervo.
 Isso exige algo que nenhuma técnica anterior tinha: **um desvio condicional decidido depois da
 recuperação**. A Aula 14 decidia com base só na pergunta, e em nenhum dos dois exemplos dela a
 decisão ramificava uma recuperação: o rótulo do roteador lógico não é consumido, e o semântico
-escolhe prompt no estágio de geração. Aqui o grafo escolhe o que fazer depois de olhar o que
-voltou. Um pipeline linear vai da
-recuperação à geração e termina. Correção precisa fazer outra coisa antes de gerar.
+escolhe prompt no estágio de geração. Aqui o grafo escolhe o que fazer depois de olhar o que voltou.
+Um pipeline linear vai da recuperação à geração e termina. Correção precisa fazer outra coisa antes
+de gerar.
 
 ---
 
@@ -237,9 +237,8 @@ LangGraph tão cedo, em `00-SimpleRAG/04_LangGraph_RAG.py`.
 A diferença entre CRAG e Self-RAG, em uma linha: **CRAG critica o que foi recuperado; Self-RAG
 critica também a própria resposta e decide se precisa recuperar.** Essa é a diferença **entre os
 dois papers**; a Aula 21 vai abrir a implementação do repositório e mostrar que ela recupera sempre,
-sem decidir nada — leia esta frase como descrição da técnica, não do código que vem a seguir. CRAG
-é um subconjunto do
-comportamento, focado no estágio de recuperação.
+sem decidir nada — leia esta frase como descrição da técnica, não do código que vem a seguir. CRAG é
+um subconjunto do comportamento, focado no estágio de recuperação.
 
 ---
 

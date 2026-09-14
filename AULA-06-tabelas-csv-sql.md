@@ -14,9 +14,9 @@ cabeçalho da coluna, ao rótulo da linha e, muitas vezes, a um título acima da
 como texto corrido e você indexa `1.842` solto — um token sem semântica, que nenhum embedding
 consegue conectar à pergunta "qual foi a receita do segundo trimestre?".
 
-Este é o segundo módulo mais numeroso da Fase 1: **13 arquivos** — mais que os 12 de texto
-simples, menos que os 14 de PDF da Aula 05.
-Não é acaso. **Julgamento:** é o reconhecimento de que tabela é onde a ingestão mais falha.
+Este é o segundo módulo mais numeroso da Fase 1: **13 arquivos** — mais que os 12 de texto simples,
+menos que os 14 de PDF da Aula 05. Não é acaso. **Julgamento:** é o reconhecimento de que tabela é
+onde a ingestão mais falha.
 
 ---
 
@@ -93,8 +93,9 @@ Três arquivos, e a progressão é de infraestrutura para uso:
 Os dois testes de conexão existem porque a maior parte do tempo perdido aqui não é RAG — é
 driver, credencial e rede. Rodá-los antes economiza depuração no lugar errado.
 
-O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (a linha 3 é o cabeçalho da seção, as 4 e 5 são
-as instruções de criação e uso do banco; a 6 é o cabeçalho que anuncia a tabela):
+O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (a linha 3 é o
+cabeçalho da seção, as 4 e 5 são as instruções de criação e uso do banco; a 6 é o cabeçalho que
+anuncia a tabela):
 
 ```sql
 CREATE TABLE game_scenes (
@@ -149,13 +150,13 @@ cronometram do mesmo jeito, então a instrumentação é hábito do módulo e n�
 biblioteca. Nenhum número de tempo aparece no repositório nem nesta aula, e produzi-lo é o
 exercício 4 do "Quebre de propósito".
 
-Exige dependências de sistema, e isso **está** documentado: o
-`01-DataLoading/requirements.txt` registra na linha 6 que "camelot-py needs Ghostscript installed on
-the system". Existe também um `91-Environment/requirements_camelot_20250413.txt` à parte — mas isso
-não é isolamento: o mesmo `01-DataLoading/requirements.txt` lista `camelot-py[cv]` na linha 25, junto
-do resto do capítulo, e o `requirements_marker_20250413.txt` também traz `camelot-py`. Por que existe
-um arquivo dedicado, o repositório não diz. Instale por onde preferir; o que você precisa garantir é
-o Ghostscript no sistema.
+Exige dependências de sistema, e isso **está** documentado: o `01-DataLoading/requirements.txt`
+registra na linha 6 que "camelot-py needs Ghostscript installed on the system". Existe também um
+`91-Environment/requirements_camelot_20250413.txt` à parte — mas isso não é isolamento: o mesmo
+`01-DataLoading/requirements.txt` lista `camelot-py[cv]` na linha 25, junto do resto do capítulo, e
+o `requirements_marker_20250413.txt` também traz `camelot-py`. Por que existe um arquivo dedicado, o
+repositório não diz. Instale por onde preferir; o que você precisa garantir é o Ghostscript no
+sistema.
 
 ### `pdfplumber`
 
@@ -237,10 +238,10 @@ cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
 python 01-01-ImportCSV.py
 ```
 
-Roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na linha 43 de `01-01-ImportCSV.py`: um documento.
-Agora **descomente a parte 1** — ela imprime só `data[:2]`, então acrescente um `print(len(data))`
-antes do laço para ver a contagem. Seis documentos na parte 1, um na parte 4: a mesma fonte, duas
-granularidades.
+Roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na linha 43 de
+`01-01-ImportCSV.py`: um documento. Agora **descomente a parte 1** — ela imprime só `data[:2]`,
+então acrescente um `print(len(data))` antes do laço para ver a contagem. Seis documentos na parte
+1, um na parte 4: a mesma fonte, duas granularidades.
 
 Depois descomente a parte 3 e olhe o campo `source` no metadado. Antes era o caminho do
 arquivo; agora é o nome do personagem.

@@ -171,14 +171,13 @@ Ser especialista inclui recusar a ferramenta:
 | Precisa mudar o _comportamento_ ou o _estilo_ do modelo                     | Fine-tuning, não RAG                       |
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
 
-¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que
-vem antes) usa "RAG" no sentido estrito de _busca
-vetorial sobre prosa_. A Aula 12 (que vem depois) argumenta que Text2SQL bem feito **é** RAG, porque
-o que se recupera vem de fora do modelo e entra no contexto. O `GLOSSARIO.md` não decide entre as
-duas: a entrada `Query construction` registra a tese da Aula 12 **como tese** e a leitura estrita da
-Aula 06 ao lado dela.
-As duas leituras são defensáveis e a diferença é de definição, não de fato. Quando a Aula 06 disser
-"aí sim RAG", leia "aí sim RAG vetorial".
+¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que vem
+antes) usa "RAG" no sentido estrito de _busca vetorial sobre prosa_. A Aula 12 (que vem depois)
+argumenta que Text2SQL bem feito **é** RAG, porque o que se recupera vem de fora do modelo e entra
+no contexto. O `GLOSSARIO.md` não decide entre as duas: a entrada `Query construction` registra a
+tese da Aula 12 **como tese** e a leitura estrita da Aula 06 ao lado dela. As duas leituras são
+defensáveis e a diferença é de definição, não de fato. Quando a Aula 06 disser "aí sim RAG", leia
+"aí sim RAG vetorial".
 
 A confusão que mais encontro no mercado — julgamento, não dado: RAG ensina **fatos** ao modelo, fine-tuning
 ensina **comportamento**. Tentar ensinar fato via fine-tuning é caro e vaza; tentar
