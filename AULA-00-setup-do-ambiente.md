@@ -6,7 +6,7 @@
 
 ## Pergunta motivadora
 
-Você tem 396 arquivos à disposição (`git ls-files | wc -l`) — dos quais **189 são código** (`.py` e `.ipynb`); o resto
+Você tem 396 arquivos à disposição (`git ls-files | wc -l`) — dos quais **189 são código** (`.py` e `.ipynb`); dos 207 restantes, o maior grupo é configuração, com **40 `.env.example`**, um por módulo, e é de um deles que você vai copiar no Passo 5; o resto
 é dado, PDF e imagem — e 12 arquivos de `requirements` em `91-Environment/` — dois deles em
 `archive/`, que você não vai usar. Qual instalar, e por que existem tantos?
 
@@ -65,8 +65,9 @@ que você vai ver rodando nos `01_0x` que usam embedding local é o `BAAI/bge-sm
 
 **E não leia ausência de sufixo como OpenAI.** Na série `03_*` do mesmo diretório, o `v1` é OpenAI,
 o `v2` é DeepSeek (`:50`) e o `v3` é Ollama (`:54`), sem que o nome diga. Confira o `os.getenv` do
-arquivo antes de preencher chave: `grep -n getenv <arquivo>`. Você vai querer um modelo bom quando estiver
-julgando qualidade de resposta.
+arquivo antes de preencher chave: `grep -n getenv <arquivo>`. E note que o `v2` troca só a
+**geração** para DeepSeek (`:50`) e mantém o embedding na OpenAI (`:22`), então quer as duas
+chaves; o `v3` (`:54`) não quer nenhuma, porque o embedding dele é local.
 
 Uma nuance que vale saber desde já: **embedding e geração são decisões independentes**, e cada uma
 pesa numa etapa diferente. O modelo de **embedding** entra duas vezes: na indexação, quando os
@@ -135,7 +136,12 @@ um pacote compilado.
 deactivate
 .\.venv-langchain\Scripts\Activate.ps1
 pip install -r 91-Environment/requirements_langchain_NoGPU_Mac-Win.txt
+pip install langchain-ollama langchain-deepseek
 ```
+
+A segunda linha de instalação não é opcional, e é a mesma lacuna do Passo 6 noutra trilha: o
+`requirements_langchain_NoGPU_Mac-Win.txt` **não** traz `langchain-ollama` nem `langchain-deepseek`,
+e a Aula 03 usa os dois sem repetir instalação. Deixe este ambiente pronto agora.
 
 Escolha o arquivo conforme sua máquina:
 
@@ -160,15 +166,23 @@ dependências pinadas — a instalação demora, `torch` é grande.
 Existem ainda requirements especializados que você só instala quando a aula pedir:
 `requirements_camelot_20250413.txt` (extração de tabelas, Aula 06); o par
 `requirements_{langchain,llamaindex}_SimpleRAG_AdditionalPackagesNeededForLaterModules.txt`, que
-acrescenta pouca coisa e quase nada em comum entre os dois — o do LangChain traz `colorama`,
+acrescenta pouco em **nomes** e muito em **versões**: 3 pacotes novos no do LangChain e 5 no do
+LlamaIndex, mas **39 e 35 pins alterados** sobre o `NoGPU_Mac-Win` correspondente. Entre eles o
+`numpy`, que o do LangChain leva de **1.26.4 a 2.2.4** — a mesma travessia de ABI que justifica os
+dois ambientes, agora dentro de um deles. Não instale o arquivo inteiro num venv que você quer
+preservar: leia o pacote que falta e instale só ele, pinado. Dos nomes novos, o do LangChain traz
+`colorama`,
 `langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz o mesmo `colorama` —
 que é o **único** acréscimo comum aos dois — mais
 `llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos **sete** pacotes
 distintos, dois têm uso amplo e antecipado: o `python-dotenv`, que **83** arquivos importam, e o
 `langchain-deepseek`, importado por **15** — entre eles o
 `00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03. O
-`langgraph-prebuilt` aparece uma vez só, em
-`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`, o módulo da Aula 26. E `colorama`,
+o `langgraph-prebuilt` não é acréscimo de capacidade: o
+`10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py:18` importa o **módulo** `langgraph.prebuilt`,
+que sob o `langgraph==0.2.69` da linha 110 já vem dentro do pacote base. A distribuição separada só
+existe porque o `Additional` sobe o `langgraph` para 0.3.18, versão que extraiu o subpacote, e você
+não precisa instalar nada para a Aula 26. E `colorama`,
 `sounddevice` e `llama-cloud-services` não são importados em lugar nenhum do repositório.
 **Os dois `04_LangGraph_RAG*.py` não precisam deste arquivo.** Do que ele acrescenta eles não
 importam nada: o único pacote de LangGraph que usam é o base, por `from langgraph.graph import
@@ -247,7 +261,7 @@ não o instala (confira com `grep -i llama`). Este script importa `llama_index.c
 ambiente do outro framework primeiro. Repare no caminho: os venvs foram criados na **raiz** do
 clone, no Passo 1, e você está um nível abaixo.
 
-Faltam ainda **dois** pacotes, e essa ausência é o defeito mais sério deste módulo. **Nenhum arquivo de
+Faltam ainda **dois** pacotes. **Julgamento:** é a ausência que mais custa neste módulo, porque bloqueia justamente o caminho que esta aula recomenda. **Nenhum arquivo de
 `91-Environment/` instala cliente de Ollama**, em nenhuma das trilhas: `grep -rn -i ollama
 91-Environment/` não devolve nada. O `01_05` importa `llama_index.llms.ollama`, e o comentário na
 linha 24 do próprio script já avisa que isso pede instalação à parte. E o

@@ -85,7 +85,7 @@ Anotação de nome, do gênero que este curso vem catalogando: a primeira linha 
 O nome interno não é o nome do arquivo. Detalhe inofensivo, e vale como aviso de que o cabeçalho veio de outro lugar — o que a linha 3 confirma, creditando o cookbook oficial. Crédito dado é uma virtude; este curso registra as duas coisas.
 
 Detalhe honesto a favor do módulo: aqui o `10-AdvanceRAG/02-ContextRetrieval/.env.example:2`
-finalmente **está correto**. Os dois scripts chamam `load_dotenv()` — `LlamaIndex-Implementation.py:20-21` e `Milvus-Implementation.py:161-162`. Depois de cinco módulos, a frase é verdadeira.
+**está correto**, e é um dos casos em que está: a Aula 27 mediu a frase como falsa em 15 dos 23 módulos testáveis, e verdadeira em 8. Os dois scripts chamam `load_dotenv()` — `LlamaIndex-Implementation.py:20-21` e `Milvus-Implementation.py:161-162`. Depois de cinco módulos, a frase é verdadeira.
 
 ---
 
@@ -162,7 +162,7 @@ Este é o defeito que invalida os números, e é independente do anterior. O dat
 
 A pergunta 1 é declarada relevante ao nó 1, a 2 ao nó 2, a 3 ao nó 3 — **por posição**. Nada verifica que o nó `i` responde à pergunta `i`. Se o `SentenceSplitter` produzir os chunks em outra ordem, ou se o texto mudar, o gabarito continua "válido" e passa a apontar para outro lugar.
 
-Só que há um defeito **anterior** a esse, e ele é pior: o corpus tem exatamente três nós e `adjusted_top_k = min(similarity_top_k, len(nodes))` (linha 59) com `similarity_top_k=3` por padrão, então todo retriever que **completa** devolve o corpus inteiro. O ensaio da linha 36 não chega a quatro chunks com `chunk_size=256`, e se produzir dois o `while` da linha 191 completa até três. O `hit_rate` do LlamaIndex é `any(id in expected_ids for id in retrieved_ids)` (`llama_index.core.evaluation.retrieval.metrics`, linha 70 da fonte da 0.11.17) — com o corpus inteiro no top-k ele vale **1,0 para todos os seis retrievers, sempre**, gabarito certo ou errado.
+Só que há um defeito **anterior** a esse, e ele é pior: o corpus tem exatamente três nós e `adjusted_top_k = min(similarity_top_k, len(nodes))` (linha 59) com `similarity_top_k=3` por padrão, então todo retriever que **completa** devolve o corpus inteiro. O ensaio das linhas 36-42 produz **exatamente 2** nós com `chunk_size=256`, medido no `llama-index-core` 0.11.17, e o `while` da linha 191 completa até três. O `hit_rate` do LlamaIndex é `any(id in expected_ids for id in retrieved_ids)` (`llama_index.core.evaluation.retrieval.metrics`, linha 70 da fonte da 0.11.17) — com o corpus inteiro no top-k ele vale **1,0 para todos os seis retrievers, sempre**, gabarito certo ou errado.
 
 Quem varia é só o `mrr`, porque só o MRR olha posição — e é o glossário deste curso que está certo, não a leitura intuitiva: `hit rate` é "algum relevante apareceu no top-k", `MRR` é o que "penaliza acerto que vem em posição ruim". Ou seja: o gabarito posicional corrompe o `mrr`; o `hit_rate` já não media nada antes dele. A comparação de seis retrievers não consegue distinguir nenhum par na métrica que a tabela imprime primeiro. A Aula 22 tinha um nome para o gabarito: gabarito ruim reprova sistema bom, e é a falha mais cara de uma avaliação. Aqui há uma anterior — a métrica que não pode discriminar.
 
@@ -212,7 +212,7 @@ Documento inteiro em `<document>`, chunk em `<chunk>`, e a instrução de enriqu
 A chamada usa `gpt-3.5-turbo` com `temperature=0` e `max_tokens=1000` (`Milvus-Implementation.py:447-455`), e o resultado é o texto que vai ser embutido (`:458`).
 
 **Uma diferença em relação ao método original, que vale conhecer:** o prompt pede que a resposta **contenha o chunk completo** enriquecido — ou seja, uma reescrita. A formulação original da Anthropic gera um contexto curto para ser **prefixado** ao chunk, preservando o original — conhecimento de domínio, e o cabeçalho deste arquivo confirma a filiação ao método (`Milvus-Implementation.py:6` e `:20`). Que aqui o texto indexado passe a ser produção do modelo, isso **é leitura deste arquivo**, não domínio: a linha 458 grava `contextualized_chunk = response.choices[0].message.content.strip()`, e as linhas 475 e 484 embutem exatamente esse texto no vetor denso e no esparso. **Julgamento:** reescrever é mais fluido e mais arriscado — o que o índice passa a conter é o que o modelo escreveu, e a instrução do prompt na linha 440 ("keep the core information unchanged") é pedido, não garantia. A boa decisão que este arquivo toma é guardar **os dois** campos, `content` e `contextualized_content` — a gravação está em
-`Milvus-Implementation.py:476-480`, e a linha 540 mostra os dois sendo lidos de volta em
+`Milvus-Implementation.py:478` para o enriquecido, enquanto o `content` chega pelo `**metadata` da linha 479, montado em `:931-937` (a chave em `:936`); e a linha 540 mostra os dois sendo lidos de volta em
 `output_fields` —, o que mantém o original recuperável.
 
 **A troca de provedor está documentada e reversível.** O cabeçalho avisa (`Milvus-Implementation.py:19-22`) que a versão original usava Claude e que o código do Claude foi comentado — e ele está lá, em `Milvus-Implementation.py:462-468`, com `claude-3-haiku-20240307`. Julgamento: manter a alternativa comentada ao lado, com a razão declarada, é melhor que apagá-la.
@@ -247,9 +247,9 @@ O comentário assume o que o nome do modelo diz: `-zh` é chinês. E o corpus s�
 
 ---
 
-## Parte 4 — A avaliação que se sabota, em três atos
+## Parte 4 — A avaliação que se sabota, em quatro atos
 
-Esta é a parte que a Aula 22 preparou. O arquivo Milvus tem uma estrutura de avaliação séria — `evaluate_retrieval` (`Milvus-Implementation.py:568`), `evaluate_db` (`:718`), casamento contra gabarito, `tqdm`, relatório comparativo no fim. E ela mede muito pouco, por três razões independentes.
+Esta é a parte que a Aula 22 preparou. O arquivo Milvus tem uma estrutura de avaliação séria — `evaluate_retrieval` (`Milvus-Implementation.py:568`), `evaluate_db` (`:718`), casamento contra gabarito, `tqdm`, relatório comparativo no fim. E ela mede muito pouco, por quatro razões independentes.
 
 ### Ato 1 — O gabarito oficial é baixado e sobrescrito
 
@@ -333,17 +333,20 @@ cinco hits** — `:546-563` reconstrói `res` a partir de `result.index` —, e 
 se o chunk-ouro **está** entre os cinco, não em que posição. Uma permutação não muda pertinência.
 
 A consequência é exata, não aproximada: o `pass_at_n` do reranker é **idêntico** ao do contextual,
-e as três linhas de `:974-976` imprimem o mesmo número. O _"Reranking further improved by"_ não
-está só com o rótulo errado, e a Parte 5 volta a isso: ele reporta zero por construção.
+e as três linhas de `:974-976` imprimem o mesmo número. Note **qual** número: `rerank_improvement`
+é `reranker − standard`, e sob a identidade acima isso vale `contextual − standard`, o mesmo de
+`context_improvement`. O incremento que o rótulo promete é que é zero por construção, e ele nunca
+é impresso. A seção "Um rótulo errado no relatório" volta a isso.
 
 E a assinatura de `retrieve_base` mostra que o desenho previa outra coisa: `k: int = 20` (`:698`).
 Era a janela de candidatos, da qual o reranker escolheria os cinco melhores. A chamada de
-`evaluate_retrieval` (`:665`) passa o `k` da métrica por cima dela, e a janela desaparece.
+chamada que `evaluate_retrieval` faz ao `retrieve_base` (`:665`) passa o `k` da métrica por cima dela, e a janela desaparece.
+
+A identidade depende de uma premissa que vale nomear: o `self.rerank_function(query, docs)` de `:555` é chamado **sem `top_k`** — `grep -n "top_k"` no arquivo não devolve nada —, então ela vale enquanto o padrão da biblioteca devolver todos os candidatos que recebeu. Se ele truncasse, o `pass_at_n` do reranker **cairia** abaixo do contextual, o que seria pior ainda.
 
 **A forma da lição vale mais que o defeito:** isolar a variável certa e medir com um instrumento
 que não a distingue produz um experimento que parece rigoroso e não informa nada. O rigor do
-desenho não compensa a cegueira da métrica — e foi o rigor que fez esta aula elogiar o
-experimento 3 antes de conferir o que a métrica podia ver.
+desenho não compensa a cegueira da métrica.
 
 ### Duas métricas que são a mesma
 
@@ -365,7 +368,7 @@ O fim do `main` calcula (`Milvus-Implementation.py:970-971`):
     rerank_improvement = reranker_results['pass_at_n'] - standard_results['pass_at_n']
 ```
 
-E imprime `rerank_improvement` como _"Reranking further improved by"_ (`Milvus-Implementation.py:975`). Dois defeitos empilhados aqui, e o primeiro é o do Ato 4: o valor é **sempre zero**, porque a métrica não vê permutação. O segundo é o rótulo: "Further" sugere ganho **sobre o contextual**, mas a conta é contra o **padrão** — é o ganho acumulado, não o incremental. A linha seguinte (`:976`) imprime o mesmo valor como _"Overall improvement"_. O incremento real do reranking seria `reranker - contextual`, e ele não é calculado em lugar nenhum.
+E imprime `rerank_improvement` como _"Reranking further improved by"_ (`Milvus-Implementation.py:975`). Dois defeitos empilhados aqui, e o primeiro é o do Ato 4: o incremento que o rótulo promete é zero por construção, porque a métrica não vê permutação — mas o número impresso **não** é zero, é `contextual − standard`. O segundo é o rótulo: "Further" sugere ganho **sobre o contextual**, mas a conta é contra o **padrão** — é o ganho acumulado, não o incremental. A linha seguinte (`:976`) imprime o mesmo valor como _"Overall improvement"_. O incremento real do reranking seria `reranker - contextual`, e ele não é calculado em lugar nenhum.
 
 ### Um detalhe de acoplamento
 
@@ -417,7 +420,7 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 **5. Descubra se a fabricação de nós já está ligada.** Rode e leia o `Created N nodes` da linha 185. O ensaio das linhas 36-42 tem 1.615 caracteres, e o `SentenceSplitter(chunk_size=256, chunk_overlap=50)` produz **exatamente 2** nós — medido no `llama-index-core` 0.11.17, não estimado, e o `while` da linha 191 já injetou `"Sample text 3: …"` no corpus sem você fazer nada. Como o top-k iguala o corpus, esse nó fabricado aparece em **todo** resultado de **toda** consulta. Confirme imprimindo os ids recuperados. Só se N já for 3 ou mais é que faz sentido reduzir o texto para forçar o caminho.
 
-**6. Aponte o gabarito para fora do dataset.** No Milvus, mantenha `dataset[:5]` e escreva um `evaluation_set.jsonl` cujas referências apontem para o sexto documento. Todas as queries serão puladas — e o `Pass@5` sairá **0,00%**, não "sem dados". Erro de configuração vestido de resultado.
+**6. Aponte o gabarito para fora do dataset.** No Milvus, mantenha `dataset[:5]`, **comente as linhas 892-906** — senão o `main` sobrescreve o arquivo antes da primeira avaliação, que é exatamente o Ato 1 — e escreva à mão um `evaluation_set.jsonl` cujas referências apontem para o sexto documento. Todas as queries serão puladas — e o `Pass@5` sairá **0,00%**, não "sem dados". Erro de configuração vestido de resultado.
 
 ---
 
@@ -458,7 +461,7 @@ Responda sem consultar:
 7. Quais são as três fabricações de dado do arquivo LlamaIndex, e qual delas é a mais perigosa em produção?
 8. Que duas coisas o prompt do arquivo Milvus recebe, e por que a segunda é o que dá nome à técnica?
 9. Por que a avaliação do Milvus compara o campo `content` e não o `contextualized_content`?
-10. Descreva os três atos da sabotagem da avaliação no arquivo Milvus.
+10. Descreva os quatro atos da sabotagem da avaliação no arquivo Milvus.
 11. Por que o gabarito oficial nunca mais é baixado depois da primeira execução?
 12. `Pass@K` e `Average Score` medem coisas diferentes neste arquivo? E o que o rótulo "Reranking further improved by" está de fato reportando?
 

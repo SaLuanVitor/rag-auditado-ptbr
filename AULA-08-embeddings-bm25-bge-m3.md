@@ -83,9 +83,9 @@ do `game_guide.json` (linha 31). O texto da avaliação **nunca é embutido**: `
 têm zero usos no arquivo, e o vetor do usuário é a **média das descrições dos jogos que ele
 avaliou** (linha 41). Depois compara com `cosine_similarity` do scikit-learn (linha 50, com o
 `[0,0]` para extrair o escalar da matriz 1×1). E a saída não recomenda jogos a um usuário: fixa um
-jogo-alvo (linha 25) e ranqueia os **top-5 usuários** mais propensos a gostar dele (linhas 54-57).
+jogo-alvo (linha 25) e ranqueia os usuários mais propensos a gostar dele (linhas 54-57) — e o corpus tem exatamente 5, então o `head()` devolve a lista inteira, sem seleção.
 
-E aí está o defeito real do exemplo, que vale mais que o acerto: uma avaliação `rating=1` entra na
+E aí está o defeito real do exemplo, que vale mais que o acerto: uma avaliação `rating=2` entra na
 média exatamente como uma `rating=5`. O sinal usado é "quais jogos este usuário tocou", não "o que
 ele achou".
 
@@ -165,7 +165,7 @@ Um detalhe fácil de passar batido, na linha 23:
 tf = Counter(log.split(","))
 ```
 
-A tokenização é por **vírgula**, não por espaço. Faz sentido para o corpus do exemplo — logs de
+A tokenização é por **vírgula**, não por espaço. É deliberado e cobra caro, como a seção "Quebre de propósito" vai medir: cada campo vira um termo, nenhum se repete, e isso zera a saturação. Faz sentido para o formato do exemplo — logs de
 batalha em campos separados por vírgula — e é um lembrete útil: **BM25 depende inteiramente da
 tokenização**, e ela é escolha sua. Tokenizar mal destrói a técnica, e é por isso que BM25 em
 idiomas sem separação por espaço exige segmentação dedicada.
@@ -266,12 +266,14 @@ python 03-BM25.py
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
 **fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
 tem variável de consulta nenhuma. Ele calcula o **vetor esparso de cada documento**, com o IDF do
-próprio corpus. Pontuar uma consulta contra documentos aparece em outros dois lugares: no
+próprio corpus. Pontuar uma consulta contra documentos é o que o repositório inteiro faz, em 67
+scripts que chamam retriever ou `search`. O que é raro é ver a **conta escrita à mão**, e isso
+aparece em outro lugar além deste: no
 `03-LangChain-BM25.py`, por biblioteca (`BM25Retriever`), e no `calculate_similarity()` de
 `07-PostRetrieval/01-Reranking/03-CoBERT-Reranking.py:106-145`, à mão — normalização L2 nas linhas
 137-138 e `torch.mm` na 141, mas sobre vetores já reduzidos por mean pooling, não token a token. O
 que o `03-BM25.py` tem de particular é a fórmula clássica inteira — IDF, saturação por `k1` e
-normalização de comprimento por `b` — num só lugar. Um **terceiro** algoritmo de ranking escrito à
+normalização de comprimento por `b` — num só lugar. **Outro** algoritmo de ranking escrito à
 mão é o `reciprocal_rank_fusion` de
 `07-PostRetrieval/01-Reranking/01-RRF-Reranking.py:98` — mas ele refunde posições de listas já
 recuperadas, em vez de pontuar relevância; são estágios diferentes do pipeline. Leia a saída
@@ -282,9 +284,9 @@ junto com a fórmula da linha 29.
 python 03-LangChain-BM25.py
 ```
 
-Este é o primeiro script do módulo que gasta chave: ele embute com `OpenAIEmbeddings` (linhas 27-31)
+Este é o primeiro script desta sequência que gasta chave: ele embute com `OpenAIEmbeddings` (linhas 27-31)
 e gera com `gpt-4o` (linhas 49-52), ambos lendo `O3_API_KEY`/`O3_BASE_URL`. Sem o `.env`, o `print`
-do BM25 (linha 21) sai e o script morre no Chroma.
+do BM25 (linha 21) sai e o script morre ao construir o `OpenAIEmbeddings` das linhas 27-31, com `OpenAIError: The api_key client option must be set`, antes de o Chroma ser chamado.
 
 Compare os resultados do `BM25Retriever` com os do Chroma para a mesma consulta. Anote uma
 consulta em que discordam — ela é o seu argumento a favor do híbrido.
@@ -303,8 +305,8 @@ chave e **não chama `load_dotenv()`**, então a variável tem de estar no ambie
 a falha vem da SDK, antes de qualquer embedding: `OpenAIError: The api_key client option must be
 set`. O que o `.env.example` **não** declara é `OPENAI_API_KEY`: os nomes que ele traz são
 `O3_API_KEY`/`O3_BASE_URL`, do `03-LangChain-BM25.py`. E não confie no cabeçalho dele, que afirma
-"Every script here loads this file via `load_dotenv()`" — é falso para quatro dos seis. Se estiver no caminho local, leia
-os arquivos e rode os outros — o mecanismo já está claro pela Aula 02.
+"Every script here loads this file via `load_dotenv()`" — é falso para quatro dos seis. Se não quiser gastar chave nestes dois, leia os
+arquivos em vez de rodá-los: o mecanismo já está claro pela Aula 02.
 
 ```powershell
 python 04-BGE-M3.py
@@ -320,19 +322,24 @@ diferença de **tipo**, e não a de número, é o que separa as duas famílias n
 
 ## Quebre de propósito
 
-**1. Mexa no `b`, e entenda por que o `k1` não tem o que mostrar aqui.** Em `03-BM25.py`, teste
-`b=0` (sem normalização por comprimento) e compare os **pesos** de um termo entre execuções.
-**Não espere um ranking:** o `print` da linha 35 está fora do laço das linhas 33-34, então a
-execução imprime um único vetor — o do último log. **E não espere sentir a saturação por `k1`:**
+**1. Mexa no `b`, e veja por que ele só aparece comparando documentos.** Em `03-BM25.py`, duas
+coisas atrapalham antes de você começar. O `print` da linha 35 está fora do laço das linhas 33-34,
+então a execução imprime um vetor só, o do último log: mova-o para dentro do laço. E `vocabulary` é
+um `set` (linha 13), então os índices impressos **mudam a cada execução** — rode o script duas
+vezes e confira. Troque a linha 13 por `sorted(set(...))`, ou imprima `{word: score}` alterando a
+linha 30 para `embedding[word] = score`.
+
+Feito isso, rode com `b=0.75` e com `b=0`, e compare o peso de `Flaming Fist` no **log 3** (11
+campos) com o do **log 1** (9 campos). Com `b=0.75` o log longo é penalizado; com `b=0` os dois
+recebem o mesmo `idf`. **Dentro** de um único log a mudança não diz nada, e é a mesma razão pela
+qual o `k1` não serve aqui: **E não espere sentir a saturação por `k1`:**
 neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
 frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
 `Flaming Fist.` são termos diferentes. Com a frequência sempre em 1, mudar `k1` reescala tudo por
-igual e a curva não aparece. Para vê-la, duplique um campo num dos logs (`,Flaming Fist,` duas
-vezes) e só então varie `k1` entre 0.1 e 3.0. Ranking de verdade é no `03-LangChain-BM25.py`, que
-tem consulta.
-Você acabou de sentir o que cada hiperparâmetro
-faz — algo que a maioria dos tutoriais de BM25 não mostra, porque chamam a biblioteca com os
-padrões e seguem adiante.
+igual e a curva não aparece. Para vê-la, duplique um campo no **terceiro** log (`,Flaming Fist,`
+duas vezes, e é o terceiro porque é o que o `print` mostra) e só então varie `k1` entre 0.1 e 3.0:
+a razão entre `Flaming Fist` e `summons` vai de 0,505 a 0,783. Ranking de verdade é no
+`03-LangChain-BM25.py`, que tem consulta.
 
 **2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()` e rode. O vetor
 impresso fica **vazio** — `Sparse embedding: {}` —, e o motivo é mais instrutivo que uma degradação:
@@ -354,7 +361,7 @@ abaixo.
 
 **3. Consulte por identificador.** No `03-LangChain-BM25.py`, faça uma consulta com um código
 ou nome próprio raro. Compare BM25 e Chroma. **Julgamento:** é a demonstração mais rápida do ponto cego do
-denso — o mesmo que o exercício da Aula 02 mostrou com `SKU-88213-B`.
+denso — o mesmo ponto cego que a **tabela** da Aula 02 registra com `SKU-88213-B`, e que o exercício 3 de lá prevê com `CFOP 5102`.
 
 **4. Mude `n_clusters`.** Em `02-jina-embeddings-v3-clustering.py`, teste 2 e 6 em vez de 3.
 Os agrupamentos ainda fazem sentido? Se nenhum valor produzir clusters reconhecíveis, o modelo

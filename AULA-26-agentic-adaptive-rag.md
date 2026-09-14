@@ -301,7 +301,7 @@ Três arquivos deste repositório implementam laço, e nenhum implementa limite 
 | `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`                                  | 1 (`:174`)                                    | ausente       |
 | `10-AdvanceRAG/04-AgenticRAG/02-LangChain-AdaptiveRAG.py`                                 | 3 (`:201`, `:208`)                            | ausente       |
 
-O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Os três têm o **juízo** desse módulo, que é o `LLM judge` identificado na Aula 25. O que nenhum deles tem é o **limite de voltas**, que os algoritmos 5 e 6 do paper exigem na entrada (`maximum iterative times T`, `maximum recursive depth Kmax`).
+O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Os três têm o **juízo** desse módulo, que é o `LLM judge` identificado na Aula 25. O que nenhum deles tem é o **limite de voltas**, que os algoritmos 5, 6 e 7 do paper exigem na entrada (`maximum iterative times T` no iterativo e no ativo, `maximum recursive depth Kmax` no recursivo).
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 
