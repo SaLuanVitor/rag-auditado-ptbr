@@ -3375,3 +3375,71 @@ ferramenta cobre uma fatia estreita da classe, e isso está escrito nela.
 
 Ela achou um defeito real numa aula que ninguém estava auditando: a AULA-27 prometia "Duas anotações
 finais" e entregava três.
+
+## S6, AULA-01: passa em 10, e o item 5 que eu escrevi contradiz a aula que ele servia
+
+| Aula | R6 | R8 | S6 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [01](../AULA-01-o-que-e-rag.md) | 8/12 | 5/12 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 | Seis consertos, quatro valeram inteiros, **dois introduziram defeito**. Portão: passa. |
+
+**O conserto que mais casou superfícies foi o que mais quebrou.** Eu acrescentei o item 5 ao
+exercício da Aula 01 (a resposta de referência escrita à mão), alinhei a Aula 22 e a Aula 28 a ele,
+e escrevi que era "o campo mais chato e **o único sem o qual não há medição**". A Aula 22 diz o
+contrário no parágrafo que o item foi escrito para casar:
+
+```
+As cinco perguntas com a localização da resposta já bastam para as métricas de recuperação
+desta aula: hit rate@k e MRR saem de comparar ids.
+```
+
+Dois erros numa cláusula: **há** medição sem o item 5, e ele não é **o único** indispensável,
+porque aquelas duas métricas dependem do item 2. A origem é rastreável e é da própria Aula 22, que
+oito linhas abaixo escreve "Sem gabarito não há medição, só impressão", sem escopar. O absoluto
+migrou de lá para cá. As duas foram corrigidas, e a da 22 ganhou o escopo que faltava,
+"medição **de geração**".
+
+**A tabela do pipeline deixou de estar em ordem de pipeline.** Eu tinha trocado `05-PreRetrieval`
+com `06-Indexing` para acertar a numeração do livro, numa seção chamada "O pipeline que você vai
+realmente construir", com a coluna chamada "Estágio" e uma linha acima anunciando dez estágios. A
+ordem anterior estava **certa como pipeline** e errada só quanto a uma numeração que a tabela nunca
+prometeu seguir, e o conserto trocou uma verdade pela outra. Pior: ele pagou com uma nota de
+rodapé que **admitia** o problema em vez de resolvê-lo. A tabela voltou à ordem do dado e a nota
+passou a declarar a divergência de numeração, não a de fluxo.
+
+**A cláusula causal do custo não estabelecia o que afirmava.** "O custo ela agrava, porque você
+paga por token enviado": a premissa é sobre preço por token, não sobre a janela. Janela maior não
+encarece o mesmo prompt, ela permite enviar mais. A aula sabe disso 120 linhas adiante, onde
+recomenda prompt caching. O Checkpoint 1 cobrava o aluno exatamente pela cláusula que caiu, e caiu
+junto.
+
+### Duas lições novas sobre o próprio conserto
+
+**Alinhar N superfícies num conserto multiplica a chance de escrever uma falsidade nova.** Os
+consertos que só corrigiram um fato local (o penúltimo capítulo, a faixa de páginas, o ponteiro do
+glossário) valeram inteiros. Os dois que reescreveram para casar com outra aula erraram os dois. A
+razão é simples e vale para o resto da sprint: ao casar superfícies você escreve **prosa nova sobre
+a outra aula**, sem estar lendo a outra aula com o mesmo cuidado com que leu esta.
+
+**Uma quarta referência fechou por efeito colateral, e ninguém tinha medido.** O conserto da
+taxonomia de três vias alinhou a Aula 01 com a Aula 28, e com isso passou a valer a afirmação da
+`AULA-13:109` de que "a Aula 01 **e a Aula 28** mandam quem tem maioria de perguntas local composta
+para decomposição e reranking". Era falsa antes do conserto. Fechar por sorte conta como fechar,
+e não conta como método.
+
+### A ferramenta nova quase reprovou de novo, e num ponto que já estava escrito
+
+O `contagem.js` tinha o desconto de coluna **calculado e não ligado**: ele computava quantas
+colunas a tabela tem, com o comentário explicando por que isso importa, e nunca comparava o numeral
+contra esse número. O bug só apareceu depois de a ferramenta já ter achado um defeito real. Ligado
+o desconto, e estreitado para a forma em que o numeral de fato nomeia colunas (primeira célula do
+cabeçalho vazia), o acervo caiu de 11 alertas para 4, e o estreitamento veio de um caso de teste:
+"Duas estratégias" sobre uma tabela Nome/O-que-faz de três linhas tem duas colunas e **é defeito
+real**. Descontar coluna em qualquer tabela o engolia.
+
+Dos 4 alertas restantes, um era defeito e foi consertado: a `AULA-26:295` promete três arquivos com
+laço e a tabela traz quatro, porque a primeira linha é o CRAG, que está ali como contraste. Os
+outros três são alerta de leitura legítimo, não achado.
+
+A suíte do `contagem.js` foi escrita, com dez casos e o positivo plantado. **Metade dos casos
+existe para fixar o que a ferramenta não pode acusar**, que é o que a separa da primeira versão de
+534 alertas.

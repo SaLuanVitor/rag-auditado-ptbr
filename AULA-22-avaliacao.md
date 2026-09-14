@@ -31,9 +31,9 @@ e o segundo levanta `ValueError("Must specify both response and reference")` sem
 `CorrectnessEvaluator` é pior: ele **não** exige. Sem referência, substitui o campo por
 `"(NO REFERENCE ANSWER SUPPLIED)"` e devolve uma nota assim mesmo, que passa a medir só relevância.
 O item 5 do exercício da Aula 01 é essa resposta de referência, e é o campo que se pula com mais
-facilidade. Se as suas cinco não a têm, escreva-as à mão antes de seguir: o
-erro barulhento avisa, o silencioso não.
-Sem gabarito não há medição, só impressão.
+facilidade. Se as suas cinco não a têm, escreva **as respostas** à mão antes de
+seguir: o erro barulhento avisa, o silencioso não.
+Sem gabarito não há medição **de geração**, só impressão.
 
 A pergunta prática é uma: **como você sabe que a mudança de ontem melhorou algo?** E as três
 subperguntas que decidem se a resposta é confiável:

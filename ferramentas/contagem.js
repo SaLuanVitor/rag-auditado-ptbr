@@ -64,8 +64,13 @@ function itens(linhas, ini) {
           // linha (celula vazia). Tabela de comparacao e o maior gerador de
           // falso positivo aqui: "Duas familias" nomeia as COLUNAS, e contar
           // linhas acusava toda tabela de comparacao do acervo.
+          // So conta como "tabela de comparacao" a que tem a PRIMEIRA CELULA DO
+          // CABECALHO VAZIA, que e a forma em que o numeral nomeia as colunas e
+          // a coluna 1 e so o rotulo da linha. Descontar coluna em qualquer
+          // tabela engolia o caso legitimo: "Duas estrategias" sobre uma tabela
+          // Nome/O-que-faz de tres linhas tem duas colunas e o defeito e real.
           const cs = linhas[j].split('|').slice(1, -1);
-          colunas = cs.length - (cs[0].trim() === '' ? 1 : 0);
+          colunas = cs[0].trim() === '' ? cs.length - 1 : 0;
         }
         n++;
       }
@@ -109,6 +114,11 @@ for (const arq of alvos) {
     // Se QUALQUER numeral da linha bate com a contagem, a linha esta coerente:
     // os outros sao referencia interna ("Tres coisas, e as duas primeiras...").
     if (achados.some((a) => a.v === bloco.n)) return;
+    // Em tabela, o numeral pode nomear as COLUNAS em vez das linhas: "Os quatro,
+    // lado a lado" sobre uma tabela de comparacao de quatro arquivos em quatro
+    // colunas. O desconto estava calculado e nao estava sendo usado, e por isso
+    // a ferramenta acusava toda tabela de comparacao do acervo.
+    if (bloco.tipo === 'tabela' && achados.some((a) => a.v === bloco.colunas)) return;
 
     const a = achados[0];
     total++;

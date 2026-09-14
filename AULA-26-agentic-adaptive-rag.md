@@ -292,7 +292,9 @@ Duas conclusões que valem mais que a tabela.
 
 ## Parte 5 — O freio ausente, terceira vez
 
-Três arquivos deste repositório implementam laço, e nenhum implementa limite de iteração:
+Três arquivos deste repositório implementam laço, e nenhum implementa limite de iteração. A
+tabela traz quatro linhas: a primeira é o CRAG, que entra como contraste por ser acíclico por
+construção.
 
 | Arquivo                                                                                   | Ciclos                                        | Contador      |
 | ----------------------------------------------------------------------------------------- | --------------------------------------------- | ------------- |

@@ -22,14 +22,15 @@ RAG existe para quando não cabe. E o "não cabe" tem quatro causas distintas.
 
 ### Os quatro limites que criam RAG
 
-**1. Limite de volume.** Um modelo com 200 mil tokens de contexto engole algumas centenas de
-páginas, dependendo da densidade. Sua base de conhecimento tem 50 mil documentos. Não há janela que resolva.
+**1. Limite de volume.** Um modelo com 200 mil tokens de contexto engole algumas centenas
+de páginas, dependendo da densidade. Sua base de conhecimento tem 50 mil documentos. Não há
+janela que resolva.
 
 **2. Limite de custo e latência.** Mesmo que caiba, você paga por token de entrada
 em _toda_ chamada. Enviar 200 mil tokens para responder "qual o prazo de garantia?"
-é desperdício de duas a três ordens de magnitude — estimativa de ordem de grandeza, não medição:
-compare o tamanho da pergunta e da resposta úteis com os 200 mil tokens enviados. Além disso, prompt gigante é
-prompt lento.
+é desperdício de duas a três ordens de magnitude — estimativa de ordem de grandeza, não
+medição: compare o tamanho da pergunta e da resposta úteis com os 200 mil tokens enviados.
+E prompt gigante é prompt lento.
 
 **3. Limite temporal.** O modelo tem um `knowledge cutoff`. Informação criada depois
 dele — ou que muda toda semana, como preço e estoque — não existe para o modelo.
@@ -41,9 +42,9 @@ Quando responde a partir de trecho recuperado, você cita a fonte. Em domínio
 jurídico, médico ou fiscal, isso não é conveniência — é requisito.
 
 O quarto limite é o que faz RAG sobreviver mesmo quando as janelas de contexto
-crescem. Janela maior alivia o volume na margem, mas não na escala do limite 1:
-cinquenta mil documentos continuam não cabendo. O custo ela agrava, porque você paga
-por token enviado. E a proveniência ela não toca.
+crescem. Janela maior alivia o volume na margem, mas não na escala do limite 1: cinquenta
+mil documentos continuam não cabendo. E ela não baixa o custo: quem a usa até o fim paga
+por cada token enviado, em toda chamada, com ou sem cache. A proveniência ela não toca.
 
 ### O loop, em três movimentos
 
@@ -92,8 +93,8 @@ tempo (Aulas 23 a 27).
 | **Chunking**        | fatiar em pedaços recuperáveis                 | `02-DocChunking`             |
 | **Embedding**       | virar vetor                                    | `03-Embedding`               |
 | **Indexação**       | armazenar para busca rápida                    | `04-VectorDB`                |
-| **Pré-recuperação** | tratar a query antes de buscar                 | `05-PreRetrieval`            |
 | **Otimização de índice** | indexar de outra forma para recuperar melhor | `06-Indexing`           |
+| **Pré-recuperação** | tratar a query antes de buscar                 | `05-PreRetrieval`            |
 | **Recuperação**     | buscar top-k                                   | `04-VectorDB`                |
 | **Pós-recuperação** | reordenar, comprimir, corrigir                 | `07-PostRetrieval`           |
 | **Geração**         | montar prompt e responder                      | `08-Generation`              |
@@ -103,10 +104,12 @@ Note a ordem: **avaliação é o penúltimo capítulo do livro e deveria vir pri
 seu projeto.** Sem conjunto de perguntas com resposta conhecida, você não otimiza — você
 troca de configuração e acha que melhorou. Guarde isso; voltamos na Aula 22.
 
-Uma observação sobre os dois estágios do meio, porque a numeração engana. Otimização de
-índice acontece na ingestão, antes de qualquer pergunta chegar; pré-recuperação é trabalho
-de tempo de consulta. A tabela segue a numeração do livro e dos módulos, que é a ordem em
-que se estuda, não a ordem em que o dado passa.
+Uma observação sobre os dois estágios do meio, porque a numeração engana. A tabela está na
+ordem em que o dado passa: otimização de índice acontece na ingestão, antes de qualquer
+pergunta chegar, e pré-recuperação é trabalho de tempo de consulta. O livro e os módulos os
+numeram ao contrário, capítulo 5 Pre-Retrieval e capítulo 6 Index Optimization, porque
+aquela é a ordem em que se estuda. É a única linha da tabela em que as duas ordens
+divergem, e a Aula 15 volta a ela.
 
 ---
 
@@ -171,17 +174,17 @@ Ser especialista inclui recusar a ferramenta:
 | Precisa mudar o _comportamento_ ou o _estilo_ do modelo                     | Fine-tuning, não RAG                       |
 | Pergunta é raciocínio puro, sem fato externo                                | Só o LLM                                   |
 
-¹ **Aviso de fronteira, porque você vai encontrar as duas leituras nesta ordem.** A Aula 06 (que vem
-antes) usa "RAG" no sentido estrito de _busca vetorial sobre prosa_. A Aula 12 (que vem depois)
-argumenta que Text2SQL bem feito **é** RAG, porque o que se recupera vem de fora do modelo e entra
-no contexto. O `GLOSSARIO.md` não decide entre as duas: a entrada `Query construction` registra a
-tese da Aula 12 **como tese** e a leitura estrita da Aula 06 ao lado dela. As duas leituras são
-defensáveis e a diferença é de definição, não de fato. Quando a Aula 06 disser "aí sim RAG", leia
-"aí sim RAG vetorial".
+¹ **Aviso de fronteira, porque as duas aulas usam a palavra em escalas diferentes.** A Aula 06 (que
+vem antes) abrevia "RAG" para _busca vetorial sobre prosa_, e o faz **declarando a abreviação**: a
+própria aula avisa que a oposição dela é entre busca vetorial e consulta estruturada, não entre RAG
+e não-RAG, e remete à Aula 12. A Aula 12 (que vem depois) sustenta a tese ampla, de que Text2SQL
+bem feito **é** RAG, porque o que se recupera vem de fora do modelo e entra no contexto. O
+`GLOSSARIO.md` registra a tese da Aula 12 **como tese**, com a convenção estrita ao lado. Não há
+divergência de fato entre as duas, só de vocabulário, e quem a declara é a Aula 06.
 
-A confusão que mais encontro no mercado — julgamento, não dado: RAG ensina **fatos** ao modelo, fine-tuning
-ensina **comportamento**. Tentar ensinar fato via fine-tuning é caro e vaza; tentar
-ensinar estilo via RAG não funciona.
+A confusão que mais encontro no mercado — julgamento, não dado: RAG ensina **fatos** ao
+modelo, fine-tuning ensina **comportamento**. Tentar ensinar fato via fine-tuning é caro e
+vaza; tentar ensinar estilo via RAG não funciona.
 
 ---
 
@@ -201,7 +204,8 @@ documentação do AIOX, qualquer acervo que você conheça — e escreva:
 4. Identifique quais perguntas precisariam de **filtro por metadado** (data,
    autor, tipo de documento).
 5. Para cada uma, **a resposta correta**, escrita à mão em uma ou duas frases. É o campo
-   mais chato e o único sem o qual não há medição: é ele que a Aula 22 e a Aula 28 exigem.
+   mais chato, e o que separa medir recuperação de medir geração: sem ele a Aula 22 ainda
+   calcula `hit rate@k` e `MRR` pela localização, e nada da qualidade da resposta.
 
 O item 3 é o que revela a arquitetura. Perguntas de um trecho: RAG básico resolve.
 Vários trechos: você vai precisar de decomposição de query (Aula 13) e reranking
@@ -216,7 +220,7 @@ a base do projeto final na Aula 28.
 ## Checkpoint
 
 1. Cite os quatro limites que justificam RAG. Quais deles **não** são resolvidos por
-   janelas de contexto maiores, e qual deles elas **agravam**?
+   janelas de contexto maiores?
 2. RAG elimina alucinação? Justifique.
 3. Quais são as três origens de falha, e em que ordem se deve investigá-las?
 4. Qual a diferença entre o que RAG ensina ao modelo e o que fine-tuning ensina?
