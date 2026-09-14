@@ -158,8 +158,9 @@ a documentação está correta aqui.
 ## Parte 2 — O único fine-tuning do repositório
 
 `08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py` tem 112 linhas e é o **único
-arquivo do repositório** que treina um modelo — `grep -rln "TrainingArguments\|SFTTrainer\|peft\|LoraConfig"`
-sobre todos os `.py` retorna esse caminho e nenhum outro.
+arquivo do repositório** que treina um modelo — `grep -rln
+"TrainingArguments\|SFTTrainer\|peft\|LoraConfig"` sobre todos os `.py` retorna esse caminho e
+nenhum outro.
 
 O dado de treino é SQuAD, cem exemplos, formatados assim
 (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:14` e `:18`):
@@ -177,7 +178,8 @@ um turno de RAG. O que este fine-tuning ensina não é o conteúdo do SQuAD — 
 fato nenhum. Ele ensina **a se comportar como um modelo que responde a partir de um contexto dado**.
 É a Aula 01 em código: RAG traz o fato, fine-tuning fixa o comportamento.
 
-Os hiperparâmetros estão todos explícitos (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:60-71`), o que é a virtude
+Os hiperparâmetros estão todos explícitos
+(`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:60-71`), o que é a virtude
 pedagógica do arquivo. Quatro observações de custo:
 
 **Treino é completo, não adaptador.** Não há PEFT nem LoRA — o mesmo `grep` acima confirma a
@@ -206,9 +208,10 @@ dilui o sinal, e vale saber que ela está aí.
 exemplo para 512 tokens, curtos inclusive. Paga-se computação em preenchimento.
 
 Julgamento: como material didático o arquivo cumpre — mostra o ciclo inteiro, de dataset a modelo
-salvo (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:93-94`) e teste (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:98-106`). Como receita
-de produção, não: cem exemplos, uma época, sem divisão de validação e sem métrica. Não há como
-saber se o treino melhorou algo — o script imprime uma resposta e termina.
+salvo (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:93-94`) e teste
+(`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:98-106`). Como receita de
+produção, não: cem exemplos, uma época, sem divisão de validação e sem métrica. Não há como saber se
+o treino melhorou algo — o script imprime uma resposta e termina.
 
 ---
 
@@ -217,8 +220,9 @@ saber se o treino melhorou algo — o script imprime uma resposta e termina.
 `08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py`
 tem 53 linhas e é o pipeline completo: carrega, divide, indexa, busca, monta prompt, gera.
 
-O template (`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:31-39`) é a parte que dá nome ao
-arquivo:
+O template
+(`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:31-39`)
+é a parte que dá nome ao arquivo:
 
 ```python
 Please analyze in detail and generate a character analysis report in the following format:
@@ -236,8 +240,8 @@ Isso é o trabalho "fixar o formato" da tabela do modelo mental, feito com clare
 seção, escopo de cada seção, ordem. Uma saída assim é comparável entre consultas e utilizável por
 quem lê. Vale copiar o padrão.
 
-O que **não** está no template: nenhuma instrução de abstenção. Nenhum "se o contexto não contiver
-a informação, diga que não contém". A linha 39 pede o oposto —
+O que **não** está no template: nenhuma instrução de abstenção. Nenhum "se o contexto não contiver a
+informação, diga que não contém". A linha 39 pede o oposto —
 `08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:39`:
 
 ```python
@@ -254,8 +258,9 @@ falso.
 Três fatos, cada um verificável:
 
 1. O corpus é `99-EN/black-myth-wukong/black_myth_wukong_setting.txt`
-   (`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:10`), e `wc -c` nesse arquivo devolve
-   **779 bytes**.
+   (`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:10`), e o blob versionado tem
+   **773 bytes**. Num checkout Windows com `core.autocrlf=true`, o `wc -c` mostra 779, porque os
+   seis fins de linha viram CRLF no disco.
 2. O divisor é `CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)`
    (`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:14`).
 3. A busca não passa `k`, e só o primeiro resultado é usado
@@ -266,8 +271,10 @@ docs = db.similarity_search(query)
 retrieved_content = docs[0].page_content
 ```
 
-Um documento de 779 caracteres (o arquivo é ASCII puro, então bytes e caracteres coincidem aqui) com `chunk_size=1000` produz **um chunk**. A busca por similaridade
-sobre um índice de um elemento devolve esse elemento. `docs[0]` é o documento inteiro.
+Um documento dessa ordem com `chunk_size=1000` produz **um chunk**, e os três números que você pode
+ver (773 no repositório, 779 num checkout Windows, 771 no `page_content` depois de o divisor aparar
+o branco) são todos muito menores que mil, que é de tudo o que a conta precisa. A busca por
+similaridade sobre um índice de um elemento devolve esse elemento. `docs[0]` é o documento inteiro.
 
 Ou seja: neste exemplo, `retrieved_content` não é resultado de recuperação — é o arquivo. O
 pipeline está sintaticamente completo e semanticamente inerte. Isso não invalida a lição sobre
@@ -276,8 +283,8 @@ Um aluno que troque o corpus por um PDF de 300 páginas e mantenha `docs[0]` vai
 mudar de comportamento — e é por isso que essa aritmética merece ser feita.
 
 Anotação de dependência: este arquivo usa `OpenAI` de `langchain_openai`
-(`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:6`), que é a interface de _completion_, não de
-_chat_.
+(`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:6`),
+que é a interface de _completion_, não de _chat_.
 
 ---
 
@@ -324,15 +331,15 @@ demonstrar-se. A técnica é boa; a escala do exemplo não a exercita.
 vai concluir que o script carrega arquivo e faz chunking. Não faz nenhum dos dois.
 
 Nota didática do arquivo, essa a favor: ele imprime o prompt montado antes de chamar o modelo
-(`08-Generation/02-OptimizingResponseViaPrompts/02-UseFewShotsToProvideReferenceForResponse.py:78`). Ver o prompt final é o hábito que mais
-economiza tempo em depuração de geração.
+(`08-Generation/02-OptimizingResponseViaPrompts/02-UseFewShotsToProvideReferenceForResponse.py:78`).
+Ver o prompt final é o hábito que mais economiza tempo em depuração de geração.
 
 ---
 
 ## Parte 5 — A diversidade que o código não produz
 
 `08-Generation/02-OptimizingResponseViaPrompts/03-IncreaseComprehensivenessAndDiversityOfResponse.py`
-tem 54 linhas e é o terceiro caso deste módulo em que o nome promete mais que o código entrega.
+tem 54 linhas e é o segundo caso deste módulo em que o nome promete mais que o código entrega.
 
 **Não há recuperação nenhuma.** A função devolve uma string literal
 (`08-Generation/02-OptimizingResponseViaPrompts/03-IncreaseComprehensivenessAndDiversityOfResponse.py:6` e `:34`):
@@ -365,13 +372,15 @@ for i, choice in enumerate(response.choices):
 ```
 
 Fato do código, verificado por `grep -n "n=\|choices"` no arquivo: **o parâmetro `n` não existe**;
-`choices` aparece só na linha 53. Conhecimento de domínio: numa API de _chat completions_ no formato da OpenAI, `choices` traz um
-elemento quando `n` não é informado. Vale nomear de quem é o contrato aqui, porque não é da OpenAI: a
-chamada aponta para `https://api.deepseek.com` na linha 31, com `model="deepseek-chat"` na 43, então
-quem responde é a camada de compatibilidade da DeepSeek, e essa eu não verifiquei: o SDK `openai`
-está instalado (1.109.1), mas confirmar quantos elementos vêm em `choices` exigiria uma chamada real
-à API, com chave. Logo o laço "Candidate Analysis" itera uma vez —
-o rótulo plural descreve uma intenção que a chamada não solicitou.
+`choices` aparece só na linha 53. Conhecimento de domínio: numa API de _chat completions_ no formato
+da OpenAI, `choices` traz um elemento quando `n` não é informado. Vale nomear de quem é o contrato
+aqui, porque não é da OpenAI: a chamada aponta para `https://api.deepseek.com` na linha 31, com
+`model="deepseek-chat"` na 43, então quem responde é a camada de compatibilidade da DeepSeek. O lado
+do **pedido** eu medi, e ele não precisa de chave: no SDK `openai` 1.109.1 o default de `n` é
+`Omit`, e o parâmetro não é enviado no corpo. O que falta é o **contrato do servidor**, quantos
+elementos a DeepSeek devolve nesse caso, e para isso seria preciso uma chamada com chave. Pelo
+formato OpenAI, provavelmente um, e então o laço "Candidate Analysis" iteraria uma vez — o rótulo
+plural descreve uma intenção que a chamada não solicitou.
 
 A distinção que fica: pedir múltiplas perspectivas **dentro de uma resposta** (o que o prompt faz)
 e gerar múltiplas respostas **independentes** (o que `n>1`, ou várias chamadas, faria) são
@@ -400,12 +409,22 @@ client = OpenAI(base_url="https://api.deepseek.com",
 Trocar o `base_url` é o padrão para provedores com API compatível, e é a razão pela qual "escolha
 de modelo" muitas vezes é uma linha de configuração — não uma reescrita.
 
+⚠️ **Antes de rodar os dois scripts do `01-ModelSelectionAndInvocation/`.** O
+`08-Generation/requirements.txt` declara `transformers`, `torch` e `datasets`, e **`accelerate` não
+aparece em nenhum arquivo de dependência do repositório**: `grep -rn -i accelerate .` devolve uma
+linha, e é um comentário sobre índice vetorial. Tanto o `device_map="auto"` do `from_pretrained`
+quanto o `Trainer` do arquivo seguinte pedem esse pacote nas versões de `transformers` que o
+repositório pina. Instale-o à parte, ou os dois param antes de carregar o modelo. Vale como
+lembrete de que "o código está escrito" e "o código roda" são medições diferentes, e esta aula
+leu o `device_map` sem conferir que a linha executa.
+
 ---
 
 ## Parte 6 — Roteamento de prompt, e um teste que não testa o roteador
 
 `08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py` tem
-143 linhas e fecha o gancho que a Aula 14 deixou. Lá, o roteamento escolhia prompt por **geometria**
+143 linhas e fecha o gancho que a Aula 14 deixou. Na **Parte 2** dela, o roteamento escolhia prompt
+por **geometria**
 (argmax do cosseno entre a pergunta e os templates embutidos). Aqui, escolhe por **classificação com
 LLM** (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:83` e `:86`):
 
@@ -419,18 +438,25 @@ intent = llm.invoke(intent_prompt).strip()
 
 O contraste vale a comparação explícita:
 
-|                    | Aula 14 — semântico                      | Aqui — por LLM                                                                                                          |
+|                    | Aula 14 — semântico (Parte 2)            | Aqui — por LLM em texto livre                                                                                           |
 | ------------------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Mecanismo          | cosseno entre pergunta e prompts         | LLM classifica em rótulo                                                                                                |
 | Custo por consulta | um embedding                             | uma chamada de LLM completa                                                                                             |
 | Falha típica       | rota vizinha ganha por pouco, sem limiar | rótulo fora do conjunto, texto extra na saída                                                                           |
 | Tratamento no repo | `argmax`, sem empate nem limiar          | `raise ValueError` (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:91`) |
 | Auditável          | similaridades são inspecionáveis         | decisão em texto livre                                                                                                  |
+| Já resolvido na Aula 14 | limiar mínimo, que o exemplo não tem | saída estruturada com `temperature=0` (Parte 1), que este exemplo não usa                                             |
 
-Julgamento: o roteador por LLM é mais flexível para rótulos que dependem de nuance, e mais caro e
-menos determinístico. O `.strip()` da linha 86 é a única defesa contra saída suja; qualquer
-explicação adicional do modelo derruba a comparação `intent in templates`
-(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:88`) e o `ValueError` estoura.
+**A Parte 1 da Aula 14 é roteamento por LLM feito de outro jeito**, com `with_structured_output` e
+`temperature=0`, e ali os dois modos de falha da coluna direita simplesmente não existem: o rótulo
+não pode sair do conjunto e a decodificação é reprodutível. O que este arquivo demonstra, então,
+não é "roteamento por LLM", é a versão frágil dele.
+
+Julgamento: o roteador por LLM em texto livre é mais flexível para rótulos que dependem de nuance, e
+mais caro e menos determinístico. O `.strip()` da linha 86 é a única defesa contra saída suja;
+qualquer explicação adicional do modelo derruba a comparação `intent in templates`
+(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:88`)
+e o `ValueError` estoura.
 
 ### O bug que ensina mais que o exemplo
 
@@ -461,8 +487,9 @@ Consequências, em ordem de gravidade:
    precisa usar o `intent` do roteador para escolher a base de casos — e aí o erro de roteamento
    passa a custar recuperação errada, não só template errado.
 
-Este é, **julgamento**, o exercício de leitura crítica mais valioso do módulo: o arquivo demonstra a técnica e ao
-mesmo tempo demonstra como um teste pode passar sem exercitar o que ele parece exercitar.
+Este é, **julgamento**, o exercício de leitura crítica mais valioso do módulo: o arquivo demonstra a
+técnica e ao mesmo tempo demonstra como um teste pode passar sem exercitar o que ele parece
+exercitar.
 
 ### Custo de recuperação escondido numa função
 
@@ -475,27 +502,31 @@ db = FAISS.from_texts(case_database[scenario], embeddings)
 ```
 
 Três textos são re-embutidos por consulta. Com três casos por cenário
-(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:53-69`) isso é irrelevante em custo e fatal
-como padrão: a mesma estrutura com dez mil casos re-indexa dez mil textos a cada pergunta. Índice
-se constrói uma vez e se reusa — foi o que a Fase 3 inteira tratou.
+(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:53-69`)
+isso é irrelevante em custo e fatal como padrão: a mesma estrutura com dez mil casos re-indexa dez
+mil textos a cada pergunta. Índice se constrói uma vez e se reusa — foi o que a Fase 3 inteira
+tratou.
 
-Detalhe de estilo com consequência: `llm` é usado dentro de
-`get_prompt_template_by_question` (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:86`) mas só
-é atribuído depois, no corpo do módulo
-(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:106`). Funciona porque a primeira chamada
-acontece na linha 123, depois da atribuição. Mova a linha 106 para o fim do arquivo e o script
-quebra com `NameError`.
+Detalhe de estilo com consequência: `llm` é usado dentro de `get_prompt_template_by_question`
+(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:86`)
+mas só é atribuído depois, no corpo do módulo
+(`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:106`).
+Funciona porque a primeira chamada acontece na linha 123, depois da atribuição. Mova a linha 106
+para o fim do arquivo e o script quebra com `NameError`.
 
-**Um limite que declaro em vez de afirmar:** o dicionário passado ao template tem quatro chaves
+**Um limite que a rodada anterior deixou, e que se levanta em um comando:** o dicionário passado
+ao template tem quatro chaves
 (`08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138`) e cada template declara duas. A pergunta era se o `format` do `PromptTemplate` rejeita chaves extras ou as ignora, e agora está
 **medida** no `langchain-core` 0.3.33, uma das duas versões que o repositório pina (a outra é 0.3.47): **ignora em silêncio.** Um
 template que declara duas variáveis, recebendo quatro, devolve a string formatada sem erro e sem
 aviso. É a pior das duas respostas possíveis, porque o dicionário errado não se anuncia — e é a
 primeira coisa que você confirma ao rodar o arquivo, motivo pelo qual está na lista da Mão na massa.
 
-O que continua valendo do parágrafo antigo é só o caminho do import: a importação
-falha. Não vou afirmar o resultado sem executar. É a primeira coisa que você descobre ao rodar o
-arquivo, e está na lista da Mão na massa por isso.
+Um detalhe de dependência do mesmo arquivo, que envelhece: ele importa `OpenAIEmbeddings` de
+`langchain_community.embeddings` (linha 3). Nos pins do curso a importação **funciona**, e o bloco
+inteiro das linhas 1 a 4 sobe sem exceção; o que ela emite é `LangChainDeprecationWarning`, porque a
+classe foi depreciada na LangChain 0.0.9 e sai na 1.0. O substituto é `from langchain_openai import
+OpenAIEmbeddings`. É aviso, não erro: o script roda.
 
 ---
 
@@ -504,11 +535,11 @@ arquivo, e está na lista da Mão na massa por isso.
 O subdiretório 01 não precisa de chave; o 02 precisa. Comece pelo que roda sem conta.
 
 E rode **de dentro do subdiretório do script**, não da raiz: o
-`01-UsePromptTemplateToClarifyGenerationGoal.py` carrega o corpus por caminho relativo na linha 10, que
-só resolve com o diretório de trabalho em `08-Generation/02-OptimizingResponseViaPrompts`. Da raiz do
-repositório ele levanta `FileNotFoundError` antes de chegar a qualquer coisa que os itens abaixo pedem
-para observar. Ou seja: `cd` para `01-ModelSelectionAndInvocation` nos itens 1 e 2, e `cd
-../02-OptimizingResponseViaPrompts` nos itens 3 a 6.
+`01-UsePromptTemplateToClarifyGenerationGoal.py` carrega o corpus por caminho relativo na linha 10,
+que só resolve com o diretório de trabalho em `08-Generation/02-OptimizingResponseViaPrompts`. Da
+raiz do repositório ele levanta `FileNotFoundError` antes de chegar a qualquer coisa que os itens
+abaixo pedem para observar. Ou seja: `cd` para `01-ModelSelectionAndInvocation` nos itens 1 e 2, e
+`cd ../02-OptimizingResponseViaPrompts` nos itens 3 a 6.
 
 **1. Invocação local, e a diferença do formato de conversa.** Rode
 `08-Generation/01-ModelSelectionAndInvocation/01-UsingQwen3.py`. Observe duas coisas: quanto tempo a carga leva no
@@ -532,9 +563,12 @@ arquivo.
 que a linha 78 imprime, antes de olhar a resposta. Esse é o artefato que você depura quando a
 geração sai errada — não o código que o montou.
 
-**5. Chaves extras no template.** Rode `04-SelectAppropriatePromptTemplateViaRouting.py` e registre
-o que acontece com as quatro chaves de `template_vars` contra templates de duas. É a pergunta que
-esta aula deixou aberta de propósito.
+**5. Chaves extras no template, sem chave de API.** Num interpretador, faça
+`PromptTemplate.from_template(templates['customer_service']).format(**template_vars)` com as quatro
+chaves. Confirme o que a Parte 6 afirma: devolve a string formatada, sem erro e sem aviso. Agora
+ligue isso ao bug do roteador, que é o que esta aula tem de mais útil e não diz em voz alta: **é
+esse silêncio que faz um erro de rota atravessar o script sem levantar exceção**, porque um
+dicionário de quatro chaves serve qualquer um dos três templates de duas.
 
 **6. O roteador exposto.** No mesmo arquivo, faça `get_prompt_template_by_question` devolver também
 o `intent`, e imprima `intent == scenario` a cada iteração do laço. Agora o teste testa o roteador.
@@ -555,7 +589,7 @@ curta de que formato bonito não é evidência de fundamentação.
 Veja o modelo produzir um relatório coerente sobre a pessoa errada. Nenhuma instrução do template
 autoriza dizer "o contexto não fala disso" — porque ela não existe.
 
-**3. Acrescente a frase da Aula 03.** Agora adicione ao template: _"If the context doesn't contain
+**3. Acrescente a frase da Aula 03, adaptada ao personagem.** Agora adicione ao template: _"If the context doesn't contain
 relevant information about the character, say so and stop."_ Repita o teste 2. A diferença entre as
 duas execuções é a dívida que esta aula veio pagar.
 
