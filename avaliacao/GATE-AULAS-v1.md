@@ -3206,3 +3206,62 @@ número de vetores no vectorstore para os filhos` depois de já ter dito para os
 string de 1.745 caracteres` depois de já ter dado o número. **É a regra que eu mesmo derivei nesta
 sessão**, a de ancorar na frase inteira, e violei duas vezes no mesmo lote. As duas foram pegas
 pelo `cauda.js` na verificação seguinte.
+
+## S6, remedição das em 4/12: as três medidas passam, e o padrão do defeito se repete
+
+| Aula | R8 | S6 | E | C | H | O | D | A | O que mudou |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [16](../AULA-16-indice-hierarquico-multi-representacao.md) | 4/12 | **9**/12 | 2 | 1 | 2 | 1 | 2 | 1 | A mais alta da S6. Os dois consertos que mais pesavam se sustentam sob remedição independente, inclusive a parte que dependia de ler o fonte da biblioteca. |
+| [07](../AULA-07-chunking.md) | 4/12 | **8**/12 | 2 | 1 | 1 | 0 | 2 | 2 | **O `H` zero, único do curso, subiu.** A razão fabricada foi apagada sem resíduo: `grep` por `unstructured` no arquivo devolve nada, nem o termo nem a negação dele. |
+| [12](../AULA-12-query-construction.md) | 4/12 | **7**/12 | 2 | 1 | 2 | 0 | 1 | 1 | Os três defeitos conhecidos estão consertados de fato, e o `E` foi de 1 a 2: catorze citações de linha conferidas no fonte, todas certas. |
+
+Somadas às duas em 3/12, **cinco de cinco remedições passaram o portão**, com notas de 7 a 9. O
+`C` ficou em 1 nas cinco, sem exceção, e a razão é sempre a mesma: **o conserto introduz defeito
+novo, mais fino que o que ele removeu.**
+
+### As formas novas, e nenhuma ferramenta pega nenhuma delas
+
+**Explicação causal errada colada a um número certo.** Já registrada na AULA-15, e é a mais fina
+do dia. Repetiu-se na AULA-16 com o número do `diff`: escrevi "remove 73 linhas e acrescenta 28"
+sem declarar que contava só linhas com conteúdo, e o `git diff --numstat` devolve **78 e 32**.
+Metodologia legítima apresentada como medição.
+
+**A mesma ideia dita duas vezes, reescrita.** Três ocorrências hoje, em três aulas: a proposição
+corrigida reaparecendo 86 linhas adiante na AULA-15, o mecanismo do `docstore` enunciado três vezes
+em nove linhas na AULA-16, e o caminho de embedding local dito duas vezes com 66 linhas de
+distância na AULA-07. **Não é cauda literal**, é paráfrase, e o `cauda.js` não tem como ver.
+
+**Conserto aplicado no meio do parágrafo e não no título.** Na AULA-07 troquei "dois comentários"
+por três no corpo e deixei o cabeçalho da seção e o exercício 4 na versão antiga: o leitor lê
+"Dois" dois centímetros acima de "linhas 5, 7 e 8".
+
+**Hedge que não alcança a própria conclusão.** Também na AULA-07: o parêntese hedgeia a premissa e
+a frase seguinte afirma a consequência sem hedge, e o Checkpoint 1 mandava o aluno afirmar como
+fato o que a ressalva declara não medido. A AULA-06 era, hoje, mais honesta sobre a AULA-07 do que
+a AULA-07 sobre si mesma.
+
+**Discriminador que não discrimina**, já registrado na AULA-15.
+
+### Dois defeitos meus criados hoje e quebrados hoje
+
+A âncora `AULA-12:244-246`, que eu escrevi na AULA-14 nesta mesma sessão, **já estava errada quando
+o auditor a leu**: a requebra da AULA-12, feita horas depois, moveu o trecho para 256-258. E a
+ponte entre as duas apontava nas duas direções ao mesmo tempo, cada aula atribuindo à outra a
+classificação do recorte temporal como roteamento lógico. Quem classifica é a 14, na tabela dela.
+
+**Requebra move número de linha, e âncora de fora não é revalidada por ferramenta nenhuma.** É a
+segunda vez hoje: a `AULA-24:34` também quebrou, apontando para `AULA-15:46-54` depois de uma
+inserção de quatro linhas.
+
+### Uma declaração de contrato que vale registrar
+
+O auditor da AULA-07 fechou o laudo declarando espontaneamente que havia violado o contrato: usou
+`tee` num comando de contagem e criou um arquivo em `Temp`, fora dos dois repositórios. Não repetiu
+e não usou `rm`. **A declaração vale mais que o deslize**, e é o comportamento que o contrato
+pretende produzir: o problema não é errar, é não dizer.
+
+### Estado do portão
+
+Soma: **188/348**. **Nove aulas abaixo de 6/12**: 01 (5), 02 (4), 03 (5), 04 (5), 06 (5), 13 (5),
+17 (5), 18 (5), 19 (5). A AULA-02 continua em 4/12 porque a remedição dela **falhou por travamento
+do agente**, sem produzir laudo.

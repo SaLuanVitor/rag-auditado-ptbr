@@ -284,6 +284,18 @@ feito é RAG, porque o que se recupera vem de fora do modelo e entra no contexto
 módulo, não um fato assentado; a Aula 06 usa "RAG" no sentido estrito de busca vetorial e opõe os
 dois. A Aula 01 traz a nota de fronteira, com a orientação prática de leitura.
 
+**IndexNode** — Nó do LlamaIndex que herda de `TextNode` e carrega, além do texto, um `index_id`
+apontando para outro índice. É o mecanismo de encadeamento do índice hierárquico: o texto dele é o
+resumo que a busca de nível 1 casa.
+
+**RecursiveRetriever** — Retriever do LlamaIndex que segue os apontamentos de um `IndexNode` e
+desce ao índice referenciado. Não confundir com `Recursive chunking` nem com
+`Recursive retrieval`, que são outras coisas e também estão neste glossário.
+
+**MultiVectorRetriever** — Retriever do LangChain com dois armazenamentos: um vetorstore com as
+representações indexadas e um docstore com os originais, ligados pelo `id_key`. Indexa o resumo,
+entrega o documento.
+
 **HyDE (Hypothetical Document Embeddings)** — Gerar com o LLM um documento hipotético que
 _responderia_ à pergunta, e buscar pelo embedding dele em vez do da pergunta. A intuição: resposta
 se parece mais com resposta do que pergunta se parece com resposta. Custa uma chamada de LLM antes

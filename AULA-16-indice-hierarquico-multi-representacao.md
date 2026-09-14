@@ -96,14 +96,15 @@ no `03`, FAISS no `98`. A técnica é independente do banco; o que muda é onde 
 
 ### O que separa o imaturo do bem-sucedido
 
-O `diff` remove 73 linhas e acrescenta 28, e o peso da mudança **não está no nível grosseiro**,
+O `diff` remove 78 linhas e acrescenta 32 (73 e 28 se você contar só as com conteúdo), e o peso da
+mudança **não está no nível grosseiro**,
 está no de detalhe. Duas leituras, e a segunda é a que importa.
 
 A primeira é de nomenclatura, e é real: o `01` declara `FieldSchema(name="summary",
 dtype=DataType.VARCHAR, max_length=500)` e insere `"summary": sheet_name`, ou seja, o campo se chama
 resumo e recebe **o nome da planilha**. O `02` traz o comentário `# Insert the summary data - only
 store the table name`, tornando explícito o que está armazenado. Um campo chamado `summary` que
-guarda um identificador induz quem lê a erro. Mas isso é **uma linha das 73**.
+guarda um identificador induz quem lê a erro. Mas isso é **uma linha das 78**.
 
 A segunda leitura é a que muda o veredito. O `01` insere **uma entidade por linha da planilha**
 (`01-...:93`, `for _, row in df.iterrows()`), dez por aba, e o segundo nível ordena dez candidatos
@@ -271,10 +272,16 @@ por documento. Faça uma pergunta sobre um detalhe específico que o resumo não
 não é selecionado, e nenhum ajuste no nível 2 recupera. É a cascata cobrando.
 
 **2. Compare contra o baseline, depois de igualar o resto.** O `00` lê um PDF com `PyMuPDFReader`,
-embute com `text-embedding-3-small` e gera com `gpt-3.5-turbo`; os two-tier leem a planilha,
-embutem com `bge-m3` ou `all-MiniLM-L6-v2` e geram com `deepseek-chat`. Rodar a mesma pergunta nos
-dois compara **quatro coisas de uma vez**, e nenhuma delas é a hierarquia. Antes de comparar,
-aponte o `00` para a mesma planilha e iguale embedder e gerador; só então a diferença que sobrar é
+embute com `text-embedding-3-small` e gera com `gpt-3.5-turbo`. Nos two-tier, o `01`, o `02` e o
+`99` embutem com `bge-m3`, o `98` com `all-MiniLM-L6-v2`, e os quatro geram com `deepseek-chat`.
+Contra esses, rodar a mesma pergunta compara **quatro coisas de uma vez**, e nenhuma delas é a
+hierarquia.
+
+**O `03` é a exceção, e é o atalho:** as linhas 24 e 25 dele já usam `gpt-3.5-turbo` e
+`text-embedding-3-small`, os mesmos do `00`, então ali sobram só dois eixos, corpus e loader. É o
+ponto do módulo onde a comparação chega mais perto de ser justa de fábrica. Nos outros, antes de
+comparar, aponte o `00` para a mesma planilha, troque o `PyMuPDFReader` por um leitor de planilha
+e iguale embedder e gerador; só então a diferença que sobrar é
 da arquitetura. A comparação continua sendo a medição que quase ninguém faz, e o repositório não a
 entrega pronta.
 
@@ -291,6 +298,12 @@ uma lista que mapeie a posição do índice de volta ao nome da aba. Aí compare
 segundo nível decorativo e um funcional — e o exercício ensina duas coisas, porque a primeira
 tentativa mede zero.
 
+**E o repositório já tem o padrão certo, em dois lugares que esta aula não usava.** O
+`99-QueryTest.py:48` e o `02-TwoTierIndex-Milvus-SuccessfulHierarchicalIndex.py:180` fazem
+`filter=f"table_name == '{matched_table}'"`: o Milvus restringe o segundo nível por metadado, e a
+lista paralela deixa de ser necessária. Num `IndexFlatL2` não há metadado, então ali a lista é o
+equivalente mais próximo, mas se você for reescrever isso em Milvus, copie de lá.
+
 **4. Não popule o docstore do multi-representação.** Pule o `mset`, em vez de remover o
 `docstore`: sem ele o construtor recusa a montagem, pedindo um `byte_store`. Sem popular, o
 retriever devolve **lista vazia** — e
@@ -300,8 +313,8 @@ compreensão de lista que vem depois filtra todos. Some tudo, silenciosamente.
 
 Isso é mais instrutivo que o resumo teria sido: **o resumo nunca é entregue ao LLM em nenhum
 caminho.** Ele existe só para ser encontrado. Confirmado na fonte do `MultiVectorRetriever`, cujo
-`_get_relevant_documents` termina em `docs = self.docstore.mget(ids)` seguido de `return [d for d in
-docs if d is not None]` — sem docstore populado, a lista sai vazia.
+`_get_relevant_documents` termina em `docs = self.docstore.mget(ids)` seguido de
+`return [d for d in docs if d is not None]`.
 
 **5. Adicione uma segunda representação.** Ao lado dos resumos, indexe palavras-chave extraídas dos
 mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índice passou a ter.
@@ -347,7 +360,7 @@ mesmos documentos. Meça se o recall melhora — e conte quantos vetores o índi
 
 ## Vocabulário
 
-`índice hierárquico` · `multi-representação` · `IndexNode` · `RecursiveRetriever` ·
+`multi-representação` · `IndexNode` · `RecursiveRetriever` ·
 `MultiVectorRetriever` · `parent-child` · `small-to-big`
 
 Definições em [`GLOSSARIO.md`](GLOSSARIO.md).

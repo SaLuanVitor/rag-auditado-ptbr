@@ -32,8 +32,8 @@ O lado do embedding merece cuidado, porque a intuição engana. Um chunk grande 
 com mais informação" — produz um vetor que se aproxima da **média** das direções dos assuntos que
 ele contém. (Isto vale para modelos que reduzem os tokens por média; não medi qual dos modelos deste
 curso o faz.) Média de direções distintas aponta para o meio de lugar nenhum: o vetor fica
-equidistante de tudo e próximo de nada. É por isso que chunk grande degrada recuperação em vez de
-melhorá-la.
+equidistante de tudo e próximo de nada. **Onde o modelo agrega por média**, é isso que degrada a
+recuperação em vez de melhorá-la.
 
 Do outro lado, a sentença isolada "o prazo é de 30 dias" tem embedding lindo e é inútil na
 geração: prazo de quê?
@@ -95,7 +95,7 @@ algoritmo muda.
 Repare no nome do arquivo `02`: `Recursiveharacter`, sem o `C`. Erro de digitação do
 repositório, preservado aqui porque é assim que você vai encontrá-lo.
 
-### Dois comentários que mentem — e por que isso interessa
+### Três comentários que mentem — e por que isso interessa
 
 Abra `01-LangChain-CharacterTextSplitter.py` nas linhas 5, 7 e 8. A 5 já mente nos dois valores
 (`# Configure the splitter: chunk size of 50 characters, no overlap`, sobre um splitter de 100 com
@@ -107,7 +107,7 @@ sobreposição de 10), e as duas seguintes repetem a mentira campo a campo:
 ```
 
 O comentário da linha 7 diz **50**; o valor é **100**. O da linha 8 diz que **não há**
-sobreposição; o valor é **10**. Ambos errados, ambos plausíveis, ambos no primeiro arquivo do
+sobreposição; o valor é **10**. Os três errados, os três plausíveis, os três no primeiro arquivo do
 módulo.
 
 Isso não é curiosidade. É o hábito profissional que esta aula quer instalar: **o comentário é
@@ -191,15 +191,15 @@ Os dois parâmetros que governam o corte:
   `90` corta nos 10% de fronteiras mais dissimilares; subir para `98` corta menos, gerando
   chunks maiores.
 
-O arquivo documenta esses parâmetros em prosa nas linhas 49 e 52, e é justamente ali que ele erra:
-o modelo que o comentário descreve, "every 3 sentences are treated as a group", não é o que o
-código faz. Vale como exemplo do hábito que esta aula acabou de instalar, duas seções acima.
+O arquivo documenta esses parâmetros em prosa nas linhas 31 a 34 e 49 a 53, e é justamente ali que
+ele erra: o modelo que o comentário descreve, _"every 3 sentences are treated as a group"_ (linhas
+33-34), não é o que o código faz. Vale como exemplo do hábito que esta aula acabou de instalar,
+três seções acima.
 
-As linhas 12–13 trazem comentado um caminho de embedding local com `HuggingFaceEmbedding`, e o
-semântico embute muito, então a conta chega. Mas **atenção ao que está comentado ali**: é o
-`bge-small-zh`, o modelo chinês que esta aula classificou como resíduo da origem, sobre um corpus
-em inglês. Descomente trocando o `model_name` por um modelo da sua língua, e note que isso pede
-`sentence-transformers`, que o `requirements.txt` deste módulo não declara.
+As linhas 12–13 trazem comentado um caminho de embedding local, e o semântico embute muito, então
+a conta chega. **Atenção ao que está comentado ali:** é o `bge-small-zh`, o modelo chinês que esta
+aula classificou como resíduo da origem, sobre um corpus em inglês. O Passo 3 diz o que trocar
+antes de descomentar.
 
 ### O arquivo cujo nome engana
 
@@ -306,8 +306,10 @@ cada. **Antes de rodar, escreva sua previsão.**
 **Previsão do autor, não medição.** Não rodei este experimento: exige chave de API da OpenAI, uma
 chamada de embedding por chunk e uma de LLM por execução, três execuções ao todo. Nada abaixo é
 saída observada. E um aviso de unidade antes da previsão: o `chunk_size` do `SentenceSplitter`
-conta **tokens** do `cl100k_base`, não caracteres. Medido, `chunk_size=50` produz nós de até 50
-tokens e 281 caracteres. É o que eu espero, e o motivo — que é
+conta **tokens** do `cl100k_base`, não caracteres. Medido no `yungang_grottoes.txt` com
+`chunk_overlap=0`, `chunk_size=50` produz 28 nós, o maior com 50 tokens e 281 caracteres; **com o
+`chunk_overlap=20` do próprio script um nó chega a 58 tokens**, porque a sobreposição entra por
+cima do teto. É o que eu espero, e o motivo — que é
 exatamente o que vale comparar com a sua própria previsão. Se a sua execução divergir, a execução
 ganha.
 
@@ -340,8 +342,9 @@ corte cair uma palavra fora do lugar, não contra perder a frase.
 `from_language(Language.PYTHON)`. Os separadores dele são
 `['\nclass ', '\ndef ', '\n\tdef ', '\n\n', '\n', ' ', '']`, com quebra de linha antes de `class` e
 `def`, e a **cauda** dessa lista é literalmente a lista default. Como os três primeiros não
-aparecem em prosa, o splitter cai na cauda e vira o splitter genérico: medido no corpus do módulo,
-**56 chunks nos dois casos, saída idêntica**. Nada degenera, e é aí que está a lição: a aposta
+aparecem em prosa, o splitter cai na cauda e vira o splitter genérico: medido no corpus do módulo
+com `chunk_size=100` e `chunk_overlap=0`, **56 chunks nos dois casos, saída idêntica**. A
+identidade vale em qualquer configuração; o número, não. Nada degenera, e é aí que está a lição: a aposta
 falhada não custa nem entrega nada, ela simplesmente não acontece, e é por isso que o mecanismo
 não avisa.
 
@@ -350,7 +353,7 @@ não avisa.
 contagem com a do `base_splitter`. Em que ponto os chunks ficam grandes demais para produzir
 embedding útil?
 
-**4. Corrija os comentários errados.** Edite mentalmente as linhas 7 e 8 do arquivo `01` para
+**4. Corrija os comentários errados.** Edite mentalmente as linhas 5, 7 e 8 do arquivo `01` para
 que digam a verdade. É trivial, e é, **julgamento**, o exercício de leitura crítica mais valioso
 do módulo,
 porque a próxima divergência entre comentário e código que você encontrar estará no seu
@@ -387,7 +390,8 @@ código, e ninguém vai apontá-la.
 
 ## Checkpoint
 
-1. Por que um chunk grande produz embedding _pior_, e não apenas mais caro?
+1. Sob que mecanismo de agregação um chunk grande produziria embedding _pior_, e não apenas mais
+   caro? O que faltaria medir para afirmar isso dos modelos deste curso?
 2. Qual a diferença de mecanismo entre `CharacterTextSplitter` e
    `RecursiveCharacterTextSplitter`? Por que o segundo produz fronteiras melhores?
 3. O que `from_language` troca em relação ao splitter recursivo comum? E o que acontece se
@@ -414,8 +418,8 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 ---
 
-**Anterior:** [AULA 06 — Tabelas, CSV e SQL](AULA-06-tabelas-csv-sql.md) — na ordem de leitura do
-curso. Na ordem de **dependência**, esta aula só precisa das Aulas 00 a 03 (ver nota abaixo)
+**Anterior:** [AULA 06 — Tabelas, CSV e SQL](AULA-06-tabelas-csv-sql.md)
+
 **Próxima:** [AULA 08 — Embeddings na prática, BM25 esparso e BGE-M3 híbrido](AULA-08-embeddings-bm25-bge-m3.md)
 
 > **Nota de ordem:** esta aula é autossuficiente e depende apenas das Aulas 00 a 03, embora venha

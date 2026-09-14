@@ -56,8 +56,9 @@ terceiro não tem par antes/depois, mas tem exemplo, e é o da Parte 1: os dois 
 junção em prosa (`02-Text2SQL-LLM-DeepSeek.py:41`), casando `scenic_spots.city` com
 `city_info.city_name` por igualdade de string, entre colunas de nomes diferentes e sem chave
 estrangeira. Um erro de grafia devolve menos linhas sem levantar exceção. Um `grep` por `JOIN` em
-caixa alta não encontra nenhuma cláusula de junção, nem par antes/depois. Fica como alerta
-conceitual, sem exemplo — e é justamente o mais difícil de pegar.
+caixa alta não encontra nenhuma cláusula de junção em lugar nenhum do módulo: a instrução é toda
+em prosa dentro do prompt. É o modo de falha mais difícil de pegar, porque nada no repositório o
+exibe como erro.
 
 ---
 
@@ -70,7 +71,7 @@ Comece pelos dois arquivos mais simples, `Text2SQL/02-Text2SQL-LLM-DeepSeek.py` 
 |                  | DeepSeek                         | OpenAI                |
 | ---------------- | -------------------------------- | --------------------- |
 | Caminho do banco | `'90-Data/tourism.db'` (linha 3) | `'data/tourism.db'`   |
-| Carrega `.env`   | não, nesse trecho                | sim (`load_dotenv()`) |
+| Carrega `.env`   | **não, em nenhuma das 95 linhas** | sim (`load_dotenv()`) |
 
 ⚠️ **Os dois apontam para caminhos diferentes do mesmo banco.** Um espera rodar da raiz do
 repositório (`90-Data/`), o outro de um diretório com uma pasta `data/` ao lado. Pelo menos um
@@ -110,7 +111,7 @@ SELECT COUNT(*) FROM film;
 o driver recebe a cerca de markdown e a frase em português junto com o SQL, e estoura.
 
 A correção do `v2` tem duas frentes, e é importante notar que são **duas** e não uma. O `diff`,
-porém, traz mais duas mudanças que não são o conserto e confundem a comparação: `gpt-4o` vira
+porém, traz mais **três** mudanças que não são o conserto e confundem a comparação: `gpt-4o` vira
 `o4-mini`, o `top_k` das descrições vai de 5 para 8, e `temperature=0` é **comentada**, devolvendo o
 padrão da API. O `v2` é menos determinístico que o `v1`, o que importa para o exercício 1, que manda
 rodar várias vezes.
@@ -224,7 +225,16 @@ no `diff` (o `extract_sql` ausente), e este não tem.
 brinde**: título, autor, duração, data de publicação, contagem de views. É a Aula 04 outra vez —
 o loader define o que você poderá filtrar depois.
 
-**`02-GenerateMetadataInQuery.py`** — os imports contam a arquitetura (linhas 4 a 9):
+⚠️ **E o mesmo resíduo que a Aula 13 nomeia está aqui.** A linha 43 do
+`02-GenerateMetadataInQuery.py` embute com `BAAI/bge-small-zh`, modelo chinês, sobre transcrições
+de YouTube que não são chinesas. São cinco arquivos de `05-PreRetrieval/` com esse resíduo, quatro
+deles no módulo da Aula 13, e este é o quinto. Troque por `BAAI/bge-small-en-v1.5` antes de tirar
+qualquer conclusão sobre o que o self-query recupera.
+
+**`02-GenerateMetadataInQuery.py`** — os imports contam a arquitetura (linhas 4 a 11), com uma
+ressalva: o `ChatPromptTemplate` da linha 4 é importado e **nunca usado**, e import não é uso. Quem
+trabalha de verdade são o `HuggingFaceEmbeddings` da linha 10 e o par `BaseModel, Field` da 11, que
+sustenta a classe `VideoMetadata` das linhas 16 a 24:
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
@@ -297,7 +307,7 @@ python 02-Text2SQL-LLM-DeepSeek.py
 ⚠️ **Duas correções na receita, e as duas são do repositório, não suas.** O `mkdir` é necessário
 porque o `01-*` grava o banco numa pasta chamada `90-Data`, relativa ao diretório de trabalho, e
 essa pasta não existe dentro de `Text2SQL` — o `sqlite3` não cria diretório, então sem o `mkdir` o
-passo 1 já quebra. E o `02-*` escolhido é o **DeepSeek**, não o OpenAI: o OpenAI procura o banco numa
+passo 1 já quebra. E o `02-*` escolhido é o **DeepSeek**, não o OpenAI, que procura o banco numa
 pasta chamada `data`, que o `01-*` nunca escreve. Confira a linha do `sqlite3.connect` antes de
 rodar: linha 3 no `01-*` e no `02-*-DeepSeek`, linha 9
 no `02-*-OpenAI`, que tem imports e `load_dotenv()` antes. Os dois `02-*` divergem entre si, como
@@ -308,9 +318,9 @@ arquivos de ingestão sem executar** — a arquitetura é o conteúdo, e ela se 
 `diff` entre `05-text2sql-rag-v1-error.py` e `-v2-ok.py` é o exercício que rende mais por
 minuto:
 
-```bash
+```powershell
 # você continua em Text2SQL/ depois do bloco anterior
-diff Sakila/05-text2sql-rag-v1-error.py Sakila/05-text2sql-rag-v2-ok.py
+git diff --no-index Sakila/05-text2sql-rag-v1-error.py Sakila/05-text2sql-rag-v2-ok.py
 ```
 
 Text2Cypher exige Neo4j com SNOMED CT carregado — infraestrutura pesada. Leia o par e compare as
