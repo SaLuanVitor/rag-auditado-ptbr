@@ -94,8 +94,21 @@ r = roda('# vazio\n');
 checa('aula sem nota gravada fecha o portao', r.code === 1 && /SEM NOTA/.test(r.saida), r.saida);
 
 // ---------- 8. portao aberto quando tudo passa ----------
+// Nota 10 livra do -1 por aritmetica, entao nao sobra desconhecida.
 r = roda(gate('', 10));
 checa('portao ABERTO com as 29 acima do minimo e sem -1', r.code === 0 && /PORTAO: ABERTO/.test(r.saida), r.saida);
+
+// ---------- 8b. criterio 1 passando nao basta: desconhecida deixa INCONCLUSIVO ----------
+// O defeito que este caso fixa esteve invisivel enquanto o criterio 1 sempre
+// reprovava: o portao fechava por ele e este ramo nunca rodava. No dia em que a
+// ultima aula passou, o script imprimiu "INCONCLUSIVO no resto" no criterio 2 e
+// "PORTAO: ABERTO" tres linhas abaixo, com 12 aulas sem dimensao.
+// Nota 8: acima do minimo de 6, e abaixo do 10 que livraria por aritmetica.
+r = roda(gate('', 8));
+checa('criterio 1 passa e o portao nao abre com desconhecida', /PORTAO: INCONCLUSIVO/.test(r.saida), r.saida);
+checa('e o INCONCLUSIVO nao sai com codigo de sucesso', r.code === 1, 'code=' + r.code);
+checa('e ele diz quantas aulas faltam', /faltam as dimensoes de 29 aula/.test(r.saida), r.saida);
+checa('e nao se declara ABERTO em lugar nenhum', !/PORTAO: ABERTO/.test(r.saida), r.saida);
 
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {

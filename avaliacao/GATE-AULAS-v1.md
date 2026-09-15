@@ -3832,3 +3832,98 @@ resolvido.
 
 A nota da aula **não muda por esta reestruturação**: ela continua em 3/12 até ser reauditada. Mover
 texto não é medir texto.
+
+## Reauditoria da AULA-06: ela passa em 9, e a reestruturação não foi o que a fez passar
+
+| Aula | R6 | R8 | S6-1 | S6-2 | S6-3 | S6-4 | E | C | H | O | D | A |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [06](../AULA-06-tabelas-csv-sql.md) | 9/12 | 5/12 | 4/12 | 4/12 | 3/12 | **9**/12 | 2 | 1 | 2 | 1 | 2 | 1 |
+
+**Nenhuma aula do curso está abaixo do portão de nota.** Treze estavam no início da sprint.
+
+### A atribuição honesta do ganho, e ela não é a reestruturação
+
+O auditor separou as duas causas e a leitura importa: o salto de 3 para 9 veio **dos dezesseis
+consertos** que mataram a afirmação falsa sobre o PDF e transformaram o gabarito em instrumento
+verificável, **não de mover texto**. A reestruturação, sozinha, acrescentou pouco à nota e
+**introduziu dois defeitos**: ao criar um bloco que afirma quatro coisas, criou quatro superfícies
+novas onde estar errado, e errou em duas.
+
+Era a previsão registrada no commit ("mover texto não é medir texto") e ela se confirmou nos dois
+sentidos: a nota não subiu por causa dela, e o bloco cobrou o preço de existir.
+
+### Os dois defeitos que o bloco novo introduziu
+
+**A prescrição do `01-02` não roda.** Eu escrevi "troque o `path` da linha 5 e ele roda". Medido:
+não roda. O CSV chinês é UTF-8 **com BOM**, o `CSVLoader` abre no locale, e neste Windows o locale
+é `cp1252`. É a lição da AULA-04 voltando na aula que a cita. Passou a prescrever
+`loader_kwargs={"encoding": "utf-8-sig"}`, com a nota de que `utf-8` cru também carrega mas deixa o
+BOM no nome do primeiro campo.
+
+**E o bloco não era o único lugar que afirma, que é a primeira frase dele.** A cópia que sobreviveu
+estava na Mão na massa e era **mais precisa que a do bloco**: ela carregava o qualificador "único
+script **OpenAI** do módulo", sem o qual a frase é falsa, porque medido `for f in *.py; do grep -c
+load_dotenv $f; done` devolve zero em **oito dos doze**. Dois donos, com o de baixo melhor que o de
+cima, que é exatamente a patologia que o bloco existe para extinguir.
+
+### O `para` do auditor trazia o defeito que eu consertei hoje de manhã
+
+Ele escreveu que a carga "morre com `UnicodeDecodeError`". Não morre: o que **sobe** é
+`RuntimeError: Error loading ...`, com o `UnicodeDecodeError` em `__cause__`. É literalmente o mesmo
+achado que a AULA-19 recebeu hoje sobre o `TextLoader`, e o aluno que procurar a palavra errada no
+terminal não a encontra. Corrigido antes de aplicar.
+
+### O achado técnico do lote é sobre a régua, não sobre o texto
+
+O gabarito estava sendo oferecido por uma **forma que não discrimina**: "doze linhas por seis
+colunas, nenhuma célula vazia" vale igual para `table_3` a `table_6`. Pior, a forma é artefato:
+a primeira linha `0,1,2,3,4,5` é o **RangeIndex do pandas** saindo no `to_csv`, não algo que o
+camelot achou na página. E o `merge_csv_to_excel.py` consolida **cinco**, não seis, porque o
+`table_1` é a legenda de ícones.
+
+Consequência prática: quem comparasse a saída do `04-01` com o gabarito veria uma diferença de
+cabeçalho e uma linha a menos **que não é erro de extração**, porque os três scripts tratam
+cabeçalho de três jeitos. A aula passou a mandar comparar conteúdo e nunca forma crua, e a dizer
+que o camelot achou seis coisas e só cinco são tabela.
+
+### O que o `fechos.js` viu e o que ele não pode ver
+
+```
+$ node ferramentas/fechos.js '661c368 HEAD'
+  Checkpoint 11/12 · Titulo 5/6 · Rodape 2/2 · Tabela 17/26
+```
+
+Ele casa por **string exata**, então linha reflowada conta como não tocada, e classifica por quatro
+formas sintáticas. **Nenhuma das quatro afirmações novas do bloco é fecho**, então as duas falsas
+passaram inteiras por ele, e a linha que duplicava o fato do `load_dotenv` é prosa corrida,
+invisível às quatro classes. A dívida de ferramenta registrada na volta anterior, "ele não conhece
+a categoria seção que possui um fato", continua exatamente onde estava, e agora com dois defeitos
+medidos que ela teria pego.
+
+### Nota de contrato
+
+O auditor declarou ter escrito um `removidos.txt` no scratchpad da sessão para refazer à mão o que
+o `residuo.js` não alcança (ele lê `git diff` do diretório de trabalho e é cego para commit). O
+contrato diz "não criar arquivo em lugar nenhum", e a declaração espontânea é o comportamento
+certo; o briefing é que precisa separar **repositório** de **scratchpad**, porque a proibição existe
+para proteger os dois repositórios e não para impedir o auditor de tomar nota.
+
+### Estado do portão
+
+Soma: **218/348 (62,6%)**. **Critério 1: PASSA**, nenhuma aula abaixo de 6/12, pela primeira vez
+desde que a oitava rodada reabriu o portão em 20/08.
+
+E a mudança de estado revelou um defeito no próprio contador, que estava invisível até hoje.
+Enquanto o critério 1 sempre reprovava, o portão fechava por ele e **o ramo do critério 2 nunca era
+exercido**. Com a última aula passando, o script imprimiu, na mesma tela, "critério 2: PASSA no que
+foi medido, **INCONCLUSIVO** no resto" e, três linhas abaixo, "**PORTÃO: ABERTO**", com doze aulas
+sem tabela por dimensão. Ele contradizia a regra declarada no próprio cabeçalho dele:
+`DESCONHECIDO NÃO É ZERO`.
+
+O veredito passou a ter **três estados**, e o do meio é este: `INCONCLUSIVO`, quando o critério 1
+passa e o 2 não se conclui. Sai com código 1, como `FECHADO`, porque não passar é não passar. O
+caso de teste que fixa isso usa nota 8, acima do mínimo de 6 e abaixo do 10 que livraria por
+aritmética, que é a única faixa em que o defeito aparece.
+
+**Estado real: `PORTÃO: INCONCLUSIVO`**, com o critério 1 passando e **doze aulas** sem as
+dimensões. É o que falta, e é trabalho de medição, não de conserto.

@@ -72,21 +72,28 @@ só a comparação entre elas denuncia.
 | `01-01-ImportCSV.py` | **desta pasta** | aponta para `"../../99-EN/..."` |
 | `03-01`, `04-01`, `04-02`, `05-02`, `05-03`, `06-01` | **da raiz do clone** | apontam para `"90-Data/ComplexPDF/..."` |
 | `05-01-unstructured-TableExtraction.py` | qualquer uma | tem um `os.chdir` na linha 48 |
-| `01-02` | da raiz, com uma troca de caminho | ver o parágrafo abaixo |
+| `01-02` | da raiz, com duas trocas | caminho inexistente e encoding: ver o parágrafo abaixo |
 
 Na prática: rode o `01-01` de dentro da pasta, faça `cd ../..` e rode todo o resto de lá.
 
-O `01-02` aponta para `data/black myth`, diretório que o repositório não tem. Troque o `path` da
-linha 5 por `90-Data/BlackMythWukong` e ele roda. Não é um nome parecido por acaso: é o mesmo
-dataset, em chinês.
+O `01-02` aponta para `data/black myth`, diretório que o repositório não tem. O que existe é
+`90-Data/BlackMythWukong`, e não é um nome parecido por acaso: é o mesmo dataset, em chinês. Trocar
+o `path` da linha 5 não basta, e o erro é a lição da Aula 04 voltando: aquele CSV é UTF-8 **com
+BOM**, o `CSVLoader` abre no locale, e neste Windows o locale é `cp1252`. O que sobe é um
+`RuntimeError: Error loading ...black myth wukong.csv`, com o `UnicodeDecodeError: 'charmap' codec
+can't decode byte 0x9d in position 74` pendurado em `__cause__` e visível no traceback. Acrescente
+`loader_kwargs={"encoding": "utf-8-sig"}` ao `DirectoryLoader` e ele devolve os seis documentos.
+Medido. Com `utf-8` cru em vez de `utf-8-sig` ele também carrega, mas o BOM entra no nome do
+primeiro campo, que sai `\ufeffCategory`. O `01-01` nunca esbarra nisso porque o CSV em inglês é
+ASCII puro.
 
-### Os arquivos de dado que estão defeituosos
+### O que está defeituoso no material, dado e promessa
 
 | Onde | O defeito | Como aparece |
 | --- | --- | --- |
 | `99-EN/black-myth-wukong/black_myth_wukong.csv` | a linha do `Wukong` tem vírgula sem aspas dentro da descrição, então os campos deslocam e o `100` cai numa chave `None` | só abrindo os seis documentos. A contagem continua em seis |
 | o mesmo arquivo, pela parte 2 do `01-01` | passar `fieldnames` **não** pula o cabeçalho, ao contrário do que o comentário da linha 11 afirma: ele vira o primeiro documento, com `Category: Category` e `Name: Name` | a contagem sobe de seis para **sete** |
-| `.env.example` do módulo | a linha 2 afirma que **todos** os scripts chamam `load_dotenv()`, e o `04-02` não chama | `grep -c load_dotenv 04-02-*.py` devolve 0 |
+| `.env.example` do módulo | a linha 2 afirma que **todos** os scripts chamam `load_dotenv()`. Oito dos doze não chamam, e o que importa é um: o `04-02`, único script do módulo que depende de `OPENAI_API_KEY` sem carregar o arquivo | `for f in *.py; do grep -c load_dotenv $f; done` devolve 0 em oito |
 
 O CSV em chinês, em `90-Data/BlackMythWukong/`, **não** tem o defeito da primeira linha: lá a
 descrição usa vírgula de largura cheia. A corrupção nasceu na tradução para o inglês, o que é um
@@ -94,16 +101,26 @@ achado sobre pipelines de dado e não sobre este jogo.
 
 **O `billionaires_page-1-5.pdf` NÃO está defeituoso**, e isso precisa ser dito porque é fácil
 concluir o contrário: uma linearização ingênua o destrói e um extrator que lê a grade o recupera
-inteiro. A prova está no item seguinte.
+inteiro. Que ele se recupera, prova o item seguinte. Que ele se destrói, a Mão na massa mostra com
+`pdftotext -layout`.
 
 ### O que o repositório já entrega pronto
 
 `90-Data/ComplexPDF/TopTenBillionaires/` guarda os seis CSVs que o `03-01` produziu do
-`billionaires_page-1-5.pdf`, mais o `merge_csv_to_excel.py` que os consolida e dois `.xlsx`. O
-`billionaires_table_2.csv` é a lista de 2023: doze linhas por seis colunas, nenhuma célula vazia,
-cada patrimônio no nome certo, Arnault $211 bilhões, Musk $180, Bezos $114. **É o gabarito desta
-aula.** Toda extração que você fizer deste PDF se confere contra ele, e é ele que separa "a
-recuperação errou" de "a extração errou".
+`billionaires_page-1-5.pdf`, mais dois `.xlsx` e o `merge_csv_to_excel.py`, que consolida **cinco**
+deles: o `table_1` fica de fora porque não é tabela de dado, é a legenda de ícones da página, com
+duas colunas e três células vazias. Saber isso é metade do exercício, porque o camelot achou seis
+coisas e só cinco são tabela.
+
+O `billionaires_table_2.csv` é a lista de 2023, e o que faz dele gabarito não é a forma: `table_3` a
+`table_6` também têm doze linhas por seis colunas sem nenhuma célula vazia. É o conteúdo conferido
+linha a linha, cada patrimônio no nome certo, Arnault $211 bilhões, Musk $180, Bezos $114, Ballmer
+$80,7. **É o gabarito desta aula**, e é ele que separa "a recuperação errou" de "a extração errou".
+
+Compare o conteúdo, nunca a forma crua, porque os três scripts tratam o cabeçalho de três jeitos: o
+`03-01` não o promove e o `to_csv` ainda escreve o RangeIndex do pandas, que é a primeira linha
+`0,1,2,3,4,5` do arquivo; o `04-01` promove nas linhas 29 e 30; o `04-02` não promove. Uma extração
+correta vai divergir do arquivo na contagem de linhas e no cabeçalho sem que nada tenha errado.
 
 ### O que não se mede no ambiente de verificação deste curso
 
@@ -319,10 +336,10 @@ linha 43: um documento. Agora **descomente a parte 1**, que imprime só `data[:2
 parte 4, que é o default documentado do `UnstructuredCSVLoader` e é `NÃO_EXECUTADO` pelo motivo que
 o Estado do material declara. A mesma fonte, duas granularidades.
 
-Olhe os seis, não só os dois que o script imprime. Um deles vem torto, do jeito que o Estado do
-material descreve, e vale achá-lo antes de ler lá: o loader não reclama e a contagem continua em
-seis, então o único instrumento é o seu olho. Depois confira se o campo que deslocou é o que você
-esperava.
+Olhe os seis, não só os dois que o script imprime. O Estado do material já disse qual vem torto e
+por quê; o que ele não pode fazer por você é o gesto: o loader não reclama e a contagem continua em
+seis, então o único instrumento é o seu olho. Confira se o campo que deslocou é o que você esperava
+e se o valor órfão caiu onde a tabela de lá diz que cai.
 
 Depois descomente a parte 3 e olhe o campo `source` no metadado. Antes era o caminho do
 arquivo; agora é o valor da coluna `Name`, que no primeiro registro é `Bronzecloud Staff`, um
@@ -345,9 +362,8 @@ python 01-DataLoading/05-TableDataLoading/04-02-pdfplumber-ExtractPDFTableAndQA.
 
 O único que vai da tabela até a resposta, e o único que você precisa editar para usar: as duas
 perguntas estão fixas nas linhas 44 a 47, não há `input()`. Troque uma por uma cujo valor você
-conhece. Ele também é o único script OpenAI do módulo sem `load_dotenv()` (compare com
-`05-01:58`), apesar de o `.env.example` da pasta afirmar na linha 2 que todos carregam o arquivo:
-exporte `OPENAI_API_KEY` no ambiente antes de rodar, ou ele falha na construção do índice.
+conhece. Ele é também o script que o Estado do material aponta na terceira linha da tabela de
+defeitos: exporte `OPENAI_API_KEY` no ambiente antes de rodar, ou ele falha na construção do índice.
 
 Antes de perguntar, abra o gabarito que o Estado do material aponta. Julgar a resposta sem ele é
 julgar no escuro: você não sabe se o número errado veio da recuperação, da extração ou da tabela.
@@ -402,8 +418,8 @@ chamada `page.extract_tables()`, somando o tempo de cada página numa variável.
 `04-01-pdfplumber-ExtractPDFTable.py`, o `pd.DataFrame(table)` da linha 25 e a promoção de
 cabeçalho das linhas 29 e 30, e o equivalente disso no `03-01`, o `table.df` da linha
 19, está fora da marca dele. Pelo mesmo motivo não estenda a marca do `03-01` até o fim do laço,
-senão você inclui um `df.to_csv` por tabela que o `04-01` não faz. Rode os dois do diretório que o
-Estado do material indica para eles, que é o único em que os dois acham o PDF. O `03-01` grava um
+senão você inclui um `df.to_csv` por tabela que o `04-01` não faz. Rode os dois da raiz do clone,
+como manda o Estado do material, que é o único lugar em que os dois acham o PDF. O `03-01` grava um
 CSV por tabela no
 diretório de trabalho (`03-01-camelot-ExtractPDFTable.py:30-31`), então ele vai sujar a raiz do
 clone: comente o `df.to_csv`

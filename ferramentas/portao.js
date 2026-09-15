@@ -93,6 +93,22 @@ console.log(`  DESCONHECIDAS: ${desconhecidas.length}${desconhecidas.length ? ' 
 console.log(`  -1 contados: ${menosUm}`);
 console.log(`  veredito: ${menosUm > 1 ? 'REPROVA' : desconhecidas.length ? 'PASSA no que foi medido, INCONCLUSIVO no resto' : 'PASSA'}`);
 
+// Tres estados, e o do meio existe por um defeito medido em 15/09/2026.
+//
+// Ate aquele dia o criterio 1 sempre reprovava, entao o portao fechava por ele e
+// este ramo nunca era exercido. No dia em que a ultima aula passou de 3 para 9, o
+// script imprimiu "criterio 2: PASSA no que foi medido, INCONCLUSIVO no resto" e
+// logo abaixo "PORTAO: ABERTO", com DOZE aulas sem a tabela por dimensao. Ele
+// contradizia, na mesma tela, a regra que o cabecalho dele declara: DESCONHECIDO
+// NAO E ZERO.
+//
+// Nao ha atalho aritmetico aqui. O criterio 2 nao se conclui contando zero -1
+// entre as medidas: conclui-se medindo as que faltam. INCONCLUSIVO sai com codigo
+// 1, como FECHADO, porque nao passar e nao passar.
 const reprova = abaixo.length > 0 || menosUm > 1 || semNota.length > 0;
-console.log(`\nPORTAO: ${reprova ? 'FECHADO' : 'ABERTO'}`);
-process.exit(reprova ? 1 : 0);
+const estado = reprova ? 'FECHADO' : desconhecidas.length ? 'INCONCLUSIVO' : 'ABERTO';
+console.log(`\nPORTAO: ${estado}`);
+if (estado === 'INCONCLUSIVO') {
+  console.log(`  Criterio 1 passa. O criterio 2 nao se conclui: faltam as dimensoes de ${desconhecidas.length} aula(s).`);
+}
+process.exit(estado === 'ABERTO' ? 0 : 1);
