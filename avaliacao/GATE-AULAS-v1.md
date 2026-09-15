@@ -4168,7 +4168,8 @@ As duas `−1` do dia são as duas versões extremas disso:
 - **AULA-21:** fato correto, localizador inventado para lhe dar autoridade. E o localizador nasceu
   de consertar uma invenção anterior.
 
-Formas que entraram na lista hoje e não estavam nela:
+Formas que entraram na lista hoje e não estavam nela, **seis**, levando a lista de seis para
+doze:
 
 1. **Corrigir invenção inventando outro detalhe** (AULA-21, duas vezes na mesma frase).
 2. **Atribuir à fonte uma propriedade do instrumento** (AULA-20, AULA-05, AULA-06: três ocorrências).
@@ -4177,6 +4178,18 @@ Formas que entraram na lista hoje e não estavam nela:
 4. **Citar um arquivo novo reescreve a resolução de toda citação solta que venha depois**, mesmo
    centenas de linhas acima (sete âncoras quebradas hoje, duas por esta via).
 5. **Consertar em uma superfície só é cometer a forma 4**, inclusive dentro do conserto dela.
+6. **Citar referência móvel dentro de documento vivo**, que só pode apodrecer. Acrescentada no fim
+   do dia, e o caso é o próprio plano de fechamento: ele citava o hash da ponta de `main` em duas
+   superfícies, e o hash envelheceu **duas vezes em duas horas**, uma ao commitar o `HANDOFF` e
+   outra ao commitar a suíte do `gerar-fatos.js`. Consertar o número não resolve, porque o próximo
+   commit o quebra de novo: **cita-se o que não se move** (o pin `17c6942`, o commit de um evento
+   passado como o `f1cb4c0` da S0) **ou a afirmação que se mantém verdadeira sem manutenção**. É a
+   mesma decisão que este registro já tinha tomado ao trocar a citação de linha da nota da AULA-18
+   por citação de commit.
+
+   A forma tem um irmão que não é defeito e não se toca: **registro de auditoria cita o estado do
+   dia em que mediu**, e uma citação que envelhece ali está certa. É a mesma distinção que faz o
+   `entreaulas.js` varrer as aulas e os documentos vivos e **não** varrer `avaliacao/`.
 
 ## Sobre as ferramentas, que foram o outro achado do dia
 
