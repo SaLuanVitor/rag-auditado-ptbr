@@ -54,8 +54,9 @@ A escolha entre as duas não é estética:
 | Sensível a outlier de score | sim                 | não                          |
 | Perde informação            | não                 | **sim** — descarta magnitude |
 
-RRF é mais robusto e menos ajustável. Weighted é mais ajustável e mais frágil. A Aula 17 volta
-a isso com a aritmética do `k=60`.
+RRF é mais robusto e menos ajustável. Weighted é mais ajustável e mais frágil. O `k=60` não é
+invenção da Aula 17: o `v3` já o fixa em `rrf_k = 60`
+(`Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py:108`), e a Aula 17 volta à aritmética dele.
 
 ---
 
@@ -70,10 +71,14 @@ esparso de uma vez) sobre Milvus:
 | `Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py` | 203     | `WeightedRanker` (L99)                   |
 | `Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py` | 212     | `WeightedRanker` **e** `RRFRanker` (L99) |
 
-⚠️ **O arquivo chamado "Minimal" é o maior dos três** — 326 linhas contra 203 e 212. O `diff`
-explica por quê: o `v1` carrega um bloco extenso de **inspeção de vetores esparsos**, imprimindo
-tipo, shape, índices de coluna e dados das primeiras posições, com `hasattr` para lidar com
-formatos diferentes de matriz esparsa do `scipy`.
+⚠️ **O arquivo chamado "Minimal" é o maior dos três**, 326 linhas contra 203 e 212. O `diff` com o
+`v2` mostra que a diferença não vem de um bloco só: o `v1` tem 70 chamadas a `print(` contra 22 do
+`v2`, e a instrumentação está espalhada. A parte mais visível é a **inspeção de vetores esparsos**,
+nas linhas 69 a 84, que imprime tipo, shape, índices de coluna e dados das primeiras posições, com
+`hasattr` para lidar com formatos diferentes de matriz esparsa do `scipy`. A outra é mecânica: o
+`v1` converte cada linha esparsa para o dicionário do Milvus à mão (linhas 162 a 168 e 254 a 259),
+enquanto o `v2` entrega `docs_embeddings["sparse"]._getrow(j)` direto
+(`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:90`).
 
 Ou seja, "minimal" descreve a **estratégia de fusão** (uma só, sem alternativas), não o tamanho
 do arquivo. Se você abrir esperando o exemplo curto, vai se surpreender — e é mais um caso
@@ -124,8 +129,11 @@ passadas ao `hybrid_search` — trocar os dois inverte a mistura sem lançar err
 > o que a leitura recomendada deixa
 > para depois.
 >
-> **Limite declarado, e o que ele não abrange.** Não rodei o pipeline — isso exigiria um servidor
-> Milvus de pé. Mas parte da pergunta se responde no próprio arquivo, sem biblioteca alguma:
+> **Limite declarado, e o que ele não abrange.** Não rodei o pipeline, e o motivo não é servidor:
+> o `v2` abre um banco em arquivo com `connections.connect(uri="./wukong.db")`
+> (`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:48`). O que falta é ambiente Python com o
+> `milvus-model` e os pesos do BGE-M3. Mas parte da pergunta se responde no próprio arquivo, sem
+> biblioteca alguma:
 > `weights` é `{"sparse": 0.7, "dense": 1.0}` (linha 106) e a chamada é
 > `WeightedRanker(weights["sparse"], weights["dense"])` (linha 147) — **dois floats posicionais nus**,
 > `0.7` e depois `1.0`. As chaves `"sparse"` e `"dense"` são resolvidas dentro do script e nunca
@@ -169,7 +177,18 @@ imagem e texto no mesmo espaço vetorial:
 | `Milvus+Visual-BGE-MultimodalRetrieval-English.py` | o mesmo, outra variante       |
 | `Milvus+Visual-BGE-PureRetrievalProgram.py`        | só a recuperação, sobre um store já construído¹ |
 
-E — prática rara, mas não exclusiva: o `10-AdvanceRAG/04-AgenticRAG/` também versiona os PNGs do grafo que o `02-LangChain-AdaptiveRAG.py:220` gera — **três imagens de saída** versionadas:
+E o nome engana aqui também, como na Parte 1. `Chinese.py` e `English.py` diferem em **duas
+linhas**, as 37 e 38, e são o nome e o caminho do modelo: `BAAI/bge-m3` contra
+`BAAI/bge-base-en-v1.5`. Os dois carregam o mesmo dataset em inglês, na mesma linha 76
+(`Milvus+Visual-BGE-MultimodalRetrieval-Chinese.py:76`). O par nomeia o **modelo**, não o idioma
+dos dados nem do código.
+
+E, prática rara mas não exclusiva, o `10-AdvanceRAG/04-AgenticRAG/` também versiona três PNGs. Vale
+olhar de onde eles vêm, porque só um corresponde a código vivo: o `02-LangChain-AdaptiveRAG.py:220`
+grava `AdaptiveRAG-Graph.png`, sem o prefixo `02-` do arquivo commitado; o bloco que geraria o
+`01-AgenticRAG-Graph.png` está inteiro comentado (`01-LangChain-AgenticRAG.py:180-188`); e nenhum
+arquivo do repositório menciona o `02-AdaptiveRAG-Flow.png`. Aqui são **três imagens de saída**
+versionadas:
 
 - `search_results.jpg`
 - `search_without_filter.jpg`
@@ -179,9 +198,10 @@ Os dois últimos nomes contam a história do módulo: é uma comparação **com 
 escalar**, aplicada a busca de imagens, e vale saber o que cada lado mostra antes de abri-las. O acervo tem 9 imagens, mas o `metadata.json` traz 10 entradas, porque `09.jpg` aparece duas vezes com títulos diferentes, e as 10 são inseridas. Com `limit=9`, o lado **sem filtro** devolve praticamente o acervo inteiro: não é demonstração de ordenação, é o corpus. O lado **com filtro** aplica `environment == "snowfield" and category == "combat"`, e como `category` vale `combat` nas 10 linhas, só o `environment` seleciona: **uma imagem**, com oito células vazias na grade. A comparação é entre os dois extremos, e é isso que ela ensina bem: filtro escalar não reordena, ele corta o candidato antes de a distância entrar na conta. Guardar o resultado visual faz sentido aqui, e é julgamento meu sobre o motivo: a saída
 é visual — você _vê_ quais imagens foram recuperadas, e vê o filtro mudar o conjunto.
 
-Isso conecta com a Aula 10 de forma direta: `03-filtered-search.py` mostrou a mecânica do
-filtro em dados sintéticos; aqui o efeito do filtro aparece em imagens que você reconhece. É o
-mesmo recurso, com feedback visual.
+Isso conecta com a Aula 10 de forma direta: `03-filtered-search.py` mostrou a mecânica do filtro em
+dados sintéticos; aqui ela aparece sobre imagens que você reconhece. O feedback visual é o ganho, e
+o preço é que este corpus só permite o caso extremo: com uma linha sobrevivendo ao filtro, dá para
+ver que o filtro cortou, não como ele reordena o que sobra.
 
 O que "mesmo espaço vetorial" habilita, e vale enunciar sem exagero: você busca imagem
 **escrevendo texto**, sem legenda, sem tag, sem metadado descritivo. O embedding do texto e o
@@ -198,18 +218,29 @@ formalizar.
 
 ## Mão na massa
 
-```powershell
-cd RAG-from-First-Principles/04-VectorDB/Milvus
-docker compose up -d   # se ainda não estiver rodando
-cd ..
-```
+⚠️ **Nenhum script desta aula precisa do servidor Milvus.** Os seis usam **Milvus Lite**, um banco
+em arquivo local: `connections.connect(uri="./wukong.db")` no `v2`
+(`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:48`) e no `v3`
+(`Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py:48`); `MILVUS_URI = "./wukong_v4.db"`, literal na
+linha 20 do `Milvus+BGE-M3-HybridRetrieval-v1-Minimal.py`, apesar do nome sugerir variável de
+ambiente; e `MilvusClient(uri="./wukong_images.db")` nos três multimodais
+(`Milvus+Visual-BGE-MultimodalRetrieval-English.py:93`). O `.env.example` das duas pastas declara o
+mesmo, em inglês: elas usam uma instância local. O `docker compose` de `04-VectorDB/Milvus/` serve
+aos scripts daquela pasta, que apontam para `http://localhost:19530`
+(`04-VectorDB/Milvus/01-CollectionsAndEntities/01-database.py:24`), e são os das Aulas 09 e 10.
 
-O `cd` até `Milvus/` é necessário — o `docker-compose.yml` está lá, e de `04-VectorDB` o Compose
-responde `no configuration file provided`.
+```powershell
+cd RAG-from-First-Principles/04-VectorDB
+```
 
 ⚠️ **E instale uma dependência que a Aula 00 não instalou.** Os três scripts de `HybridRetrieval/`
 importam `milvus_model.hybrid` (linha 30 do `v2`), e o `milvus-model` **não** está em nenhum dos dois
-`requirements_*_NoGPU_Mac-Win.txt` — mas está em `04-VectorDB/requirements.txt`, em `10-AdvanceRAG/requirements.txt` e nos dois requirements de Ubuntu. Se você instalou pelo caminho Ubuntu da Aula 00, já tem. Sem ele o import falha
+`requirements_*_NoGPU_Mac-Win.txt` (são dois arquivos, e nenhum o traz). Ele está em
+`04-VectorDB/requirements.txt:6`, em `10-AdvanceRAG/requirements.txt:15` e em **dois dos quatro**
+requirements de Ubuntu que a Aula 00 tabela: `requirements_langchain_Ubuntu-with-CPU.txt:263` e
+`requirements_llamaindex_20250413_Ubuntu-with-GPU.txt:232`. Os dois não formam par, é um de cada
+linha da tabela e de frameworks diferentes. Como a Aula 00 manda instalar os dois arquivos da sua
+linha, quem seguiu o caminho Ubuntu acaba com o pacote de um jeito ou de outro. Sem ele o import falha
 antes de qualquer conexão:
 
 ```powershell
@@ -251,8 +282,9 @@ cd ../MultimodalRetrieval
 python "Milvus+Visual-BGE-PureRetrievalProgram.py"
 ```
 
-E abra `search_without_filter.jpg` ao lado de `search_with_filter.jpg`. A comparação visual
-economiza um parágrafo de explicação.
+E abra `search_without_filter.jpg` ao lado de `search_with_filter.jpg`, sabendo o que vai
+encontrar: nove células preenchidas de um lado, uma e oito vazias do outro. A imagem não substitui
+a explicação da Parte 2, ela mostra o extremo que a explicação descreve.
 
 ---
 
@@ -267,7 +299,11 @@ medição do pareamento que a aula deixou em aberto. Faça uma consulta com par�
 do corpus — e note que o exemplo de identificador da tabela do "Modelo mental" (`SKU-88213-B`) **não
 se reproduz aqui**: o corpus é o `battle_scenes.json`, cinco registros, e apesar do nome do arquivo só dois são de categoria `combat` (os outros são `scene`, `ability` e `story`); o único
 campo parecido com identificador (`id`, valores como `COMBAT_001`) **nunca entra no texto indexado** —
-o `v2` monta os documentos a partir de `title`, `description`, `combat_details` e `scene_info`. Para
+o `v2` monta os documentos de `title` e `description` inteiros, mas só de **cinco subcampos** dos
+dois objetos: `combat_style` e `abilities_used` de `combat_details`, e `location`, `environment` e
+`time_of_day` de `scene_info` (`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:11-22`). A distinção
+decide o exercício: `Giant Mountain Spirit` é único no JSON e **não** está indexado, porque vive em
+`combat_details.opponent`. Para
 ver o esparso ganhar, use um nome próprio que caia em **um só documento indexado**: `White Bone
 Spirit` está apenas no `COMBAT_002`. O `Water Curtain Cave` serve também, com uma ressalva que ilustra
 o ponto anterior — ele aparece em dois registros do JSON, `SCENE_001` e `STORY_001`, e só o do

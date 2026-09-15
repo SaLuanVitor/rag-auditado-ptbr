@@ -803,7 +803,8 @@ Usados na Aula 23; guardados aqui para não precisar reextrair.
   LLM), cada comparação repetida 5× e mediada; head-to-head porque não há gold standard; juiz devolve
   JSON com `winner` e `reasoning`.
 
-**Ferramenta:** o extrator de PDF por `zlib` (descrito na seção 9) funciona nos PDFs deste repo e foi
+**Ferramenta:** o extrator de PDF por `zlib` (descrito no exercício 1 da AULA-25, com o limite dele
+medido ali) funciona nos PDFs deste repo e foi
 como esses números foram obtidos.
 
 ---

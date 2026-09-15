@@ -3927,3 +3927,126 @@ aritmética, que é a única faixa em que o defeito aparece.
 
 **Estado real: `PORTÃO: INCONCLUSIVO`**, com o critério 1 passando e **doze aulas** sem as
 dimensões. É o que falta, e é trabalho de medição, não de conserto.
+
+# As doze desconhecidas, medidas por dimensão
+
+Doze aulas tinham nota total e nenhuma tabela por dimensão, e por isso o critério de `−1` estava
+`INCONCLUSIVO`. Doze auditorias independentes, uma por aula, com a definição estreita de `−1` citada
+verbatim no briefing e a instrução de procurá-la com vontade e não fabricá-la.
+
+| Aula | Registrado | Medido | E | C | H | O | D | A | `−1` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [00](../AULA-00-setup-do-ambiente.md) | 8 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 | não |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | 6 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 | não |
+| [09](../AULA-09-milvus-collections-schema-entidades.md) | 6 | **7**/12 | 1 | 1 | 1 | 1 | 2 | 1 | não |
+| [11](../AULA-11-busca-hibrida-multimodal.md) | 6 | **6**/12 | 1 | 1 | 1 | 1 | 1 | 1 | não |
+| [20](../AULA-20-saida-estruturada.md) | 8 | **5**/12 | −1 | 1 | 1 | 1 | 2 | 1 | **SIM** |
+| [21](../AULA-21-self-rag.md) | 9 | **7**/12 | −1 | 2 | 2 | 1 | 2 | 1 | **SIM** |
+| [23](../AULA-23-graphrag.md) | 6 | **8**/12 | 2 | 1 | 1 | 1 | 2 | 1 | não |
+| [24](../AULA-24-contextual-retrieval.md) | 6 | **10**/12 | 2 | 2 | 1 | 1 | 2 | 2 | não |
+| [25](../AULA-25-modular-rag.md) | 6 | **10**/12 | 2 | 2 | 2 | 1 | 1 | 2 | não |
+| [26](../AULA-26-agentic-adaptive-rag.md) | 6 | **10**/12 | 2 | 1 | 1 | 2 | 2 | 2 | não |
+| [27](../AULA-27-multimodal-rag.md) | 7 | **8**/12 | 1 | 2 | 2 | 0 | 2 | 1 | não |
+| [28](../AULA-28-projeto-final.md) | 8 | **9**/12 | 2 | 2 | 1 | 1 | 2 | 1 | não |
+
+**Nove das doze subiram ou empataram, e as duas que mais caíram são as duas com `−1`.** Não é
+acaso: a `−1` custa três pontos contra o teto, então uma aula boa com uma invenção pontual desce.
+
+**E dois destes totais eu tive de corrigir, porque os auditores somaram errado as próprias
+dimensões.** A AULA-20 veio com "−1 + 1 + 1 + 1 + 2 + 1 = 6", que é 5, e a AULA-23 com
+"2 + 1 + 1 + 1 + 2 + 1 = 9", que é 8. Eu transcrevi os dois sem refazer a conta, e quem pegou foi a
+autoconferência que o `portao.js` tem desde que foi escrito: se as seis dimensões não somam o total
+gravado, uma das duas está errada. **Vale o que foi medido, que são as dimensões; o total é
+derivado.** E a correção tem consequência: a AULA-20 cai para 5/12 e volta a reprovar o critério 1.
+
+## As duas `−1`, e as duas são minhas
+
+**AULA-21.** _"O paper adota três valores seguindo a escala de atribuição de Yue et al., **citada na
+Seção 4**"_. Medido no PDF do Self-RAG: `Section 4` aparece **zero** vezes no arquivo inteiro, e a
+escala está no **Apêndice A.1**, na definição do token `ISSUP`. A Seção 4 é `EXPERIMENTS` e não
+contém `Yue`, `attribution`, `three scale` nem `partially supported`.
+
+E o histórico é pior que o defeito: a oitava rodada **trocou uma invenção por outra na mesma
+frase**. O texto anterior dizia que o paper tem `partially supported` "porque essa é a categoria que
+mais aparece", motivo inventado; o conserto acertou o motivo, que é taxonômico, e inventou a seção.
+**Corrigir invenção inventando outro detalhe** é forma nova, e entra na lista.
+
+**AULA-20.** _"**Medido** no `pydantic` 2.13.4 que o repositório pina"_. O repositório pina
+`2.10.6`, doze vezes, e a string `2.13.4` não existe nele: ela é do `ferramentas/montar-ambiente.sh`,
+linha 45, que é o ambiente de medição **deste curso**. A medição está certa e a propriedade foi
+atribuída ao objeto errado.
+
+É a terceira ocorrência da mesma família, depois do "15 dos 16 PDFs" da AULA-05 e do `pdftotext` da
+AULA-06, e a mais afiada: aqui o objeto errado é a fonte, e o certo é o instrumento. **O carimbo
+"Medido" é o que torna a classe cara**, porque ele faz o leitor parar de conferir.
+
+As duas foram corrigidas, e **isso não fecha o critério**. A tabela acima é o que foi medido, e é o
+que o contador lê: com duas `−1` registradas, ele reprova. Escrever aqui que o curso "tem zero
+`−1` hoje" seria decidir que o conserto funcionou sem remedir, que é o hábito que esta rodada
+inteira persegue. **Conserto aplicado não é conserto verificado**, e as duas aulas só saem do
+vermelho por reauditoria.
+
+## O achado de maior alcance não é nenhuma das duas
+
+A **AULA-20** promete, no grau `4a`, uma exceção que `function calling` **não levanta**. Medido no
+`langchain-core` 0.3.33: `parse_tool_call` apenas desserializa o JSON dos argumentos, e um tool call
+**sem o campo obrigatório** chega a `tool_call['args']` sem levantar nada. Só o
+`OpenAIPydanticProgram` instancia o modelo Pydantic; o caminho do `bind_tools` não valida.
+
+Importa porque **seis aulas e o glossário se apoiam nessa taxonomia**, e duas delas foram corrigidas
+hoje usando o grau `4a` como autoridade. A coerência externa da AULA-20 saiu impecável na auditoria,
+o que torna o defeito mais caro: a taxonomia está bem citada em todo lugar, e a definição é que
+estava larga.
+
+## Um título que contradizia a própria aula, intocado em dez commits
+
+A **AULA-23** se chamava _"GraphRAG: quando o grafo ganha do vetor"_, e a linha 217 dela diz que o
+83% de comprehensiveness é do `TS`, **sem grafo**, contra 72% do vetorial. O título credita ao grafo
+o que a aula prova vir de ser **global**, e era o do commit inicial, sobrevivente inclusive ao
+commit que reescreveu a tese em três partes. Forma 4 na superfície mais visível que uma aula tem,
+replicada em quatro arquivos.
+
+## O que mais saiu, e o padrão é um só
+
+- **AULA-11:** nenhum dos seis scripts precisa do servidor Milvus. Os seis usam **Milvus Lite**, em
+  arquivo, e o `.env.example` das duas pastas declara isso. A aula abria mandando `docker compose up
+  -d`, e o limite declarado dela nomeava "exigiria um servidor de pé" como motivo de não ter rodado.
+- **AULA-09:** `MilvusClient.load` **não existe** no `pymilvus` 2.5.4, e o `04-entity(data).py` a
+  chama na linha 68. A aula o classificava entre os que "carregam a collection", como exemplo de
+  "ausência de string não é ausência de comportamento". O caso real é o inverso e é mais didático.
+- **AULA-27:** os scripts multimodais **não enumeram** o diretório: leem um `metadata.json` com dez
+  entradas sobre nove arquivos. O número da aula estava certo e o mecanismo, errado, e o mecanismo
+  inventado é o que o exercício 6 dela descreve como fatal.
+- **AULA-24:** uma nota de rodapé que **nega o próprio conserto**, achado registrado há rodadas e
+  ainda vivo; e um `wheel 0.14.24` que não existe em nenhum ambiente desta máquina nem em nenhuma
+  outra aula, sobrevivente ao commit que existia para consertar versões de ambiente.
+- **AULA-25:** o achado central dela vale para **um terço** do que reivindica. `Orchestration` tem
+  três submódulos, e o curso ensina dois com código; ausente de verdade é só o `Scheduling`.
+- **AULA-08:** "falham em conjuntos **disjuntos**" é falso, e é a tese em negrito que sustenta a
+  busca híbrida. Um identificador digitado errado derruba os dois.
+
+**Sete dos doze achados principais são explicação causal errada colada a número certo, ou alcance
+perdido entre a medição e a frase.** Nenhum é invenção do zero. É a mesma leitura que a oitava
+rodada produziu, agora com denominador: quando o material erra, quase sempre errou **depois** de
+medir.
+
+## Estado do portão
+
+| Critério | Estado |
+| --- | --- |
+| 1. Nenhuma aula abaixo de 6/12 | **REPROVA**: a AULA-20, em 5 |
+| 2. No máximo um `−1` no curso | **REPROVA**: duas registradas, o limite é uma |
+| Aulas medidas por dimensão | **28**, mais a 22 livre por aritmética. **Zero desconhecidas** |
+
+Soma: **236/348 (67,8%)**, contra 218 antes desta rodada. O curso **subiu 18 pontos** ao ser medido
+com mais cuidado, que é o oposto do que a oitava rodada produziu, e a leitura é a mesma dos dois
+lados: a nota media quanto o instrumento tinha olhado. Aqui ele olhou doze aulas que ninguém tinha
+aberto por dimensão, e nove delas valiam mais do que o registro dizia.
+
+**O portão fecha, e pela primeira vez fecha por uma razão medida em vez de desconhecida.** É
+progresso: antes ele não fechava nem abria, porque doze aulas não tinham sido olhadas. Agora foram,
+e o que apareceu é um número que reprova.
+
+O caminho para abrir é curto e é de medição, não de conserto: reauditar a **AULA-20** e a **AULA-21**
+sobre o texto já corrigido. Se as duas `−1` tiverem saído, o critério 2 passa e o portão abre.
+Recontar sempre com `node ferramentas/portao.js`, que é a fonte.

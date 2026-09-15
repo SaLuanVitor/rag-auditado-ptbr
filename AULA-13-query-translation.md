@@ -143,8 +143,9 @@ embutir, `TextLoader` e `RecursiveCharacterTextSplitter` para o acervo, e `Chrom
 
 A explicação curta não é que o espaço de embedding ignore a pergunta, nem que ele não saiba ligar
 pergunta a passagem: bi-encoders como a família BGE são treinados **exatamente** em pares
-consulta-passagem, como a Aula 08 mostra e como a entrada `Assimetria consulta/passagem` do
-glossário registra, e é esse treino que aproxima a pergunta curta do parágrafo longo.
+consulta-passagem, como a entrada `Assimetria consulta/passagem` do glossário registra (a Aula 08
+trata da assimetria e do prefixo, não do treino), e é esse treino que aproxima a pergunta curta do
+parágrafo longo.
 
 **O HyDE nasceu para o caso em que essa supervisão não vale**: recuperação zero-shot, domínio fora
 da distribuição de treino, consulta subespecificada. Aí o ganho vem de a resposta hipotética

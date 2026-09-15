@@ -179,8 +179,8 @@ lembrança que a Aula 17 registra: reranking não recupera — ele reordena o qu
 | Saída livre ou schema                       | campo obrigatório sem fonte é invenção contratada; JSON válido não é dado correto (Aula 20) |
 | Laço de autocrítica: existe?                | laço sem contador é dívida; regerar sem mudar a entrada (Aula 21)                           |
 
-Quatro trabalhos do prompt, e a Aula 19 mostrou o exemplo do repositório que cobre três: delimitar a
-fonte, fixar o formato, fixar o tom. O quarto — **autorizar a abstenção** — é o que faltava, e é uma
+Quatro trabalhos do prompt, e o template que a Aula 19 lê cobre três: delimitar a
+fonte (na linha 28, fora do trecho que a aula transcreve), fixar o formato, fixar o tom. O quarto — **autorizar a abstenção** — é o que faltava, e é uma
 frase: a Aula 19 registra que os exemplos do módulo cobrem "formato com cuidado e abstenção com
 nada".
 
@@ -282,13 +282,13 @@ repositório normal, lido com cuidado.
 | #   | O caso, em uma linha                                                                               |
 | --- | -------------------------------------------------------------------------------------------------- |
 | 1   | `99-Tool-PDF-Splitting.py` não faz chunking — extrai páginas de PDF                                |
-| 2   | O par `-ch`/`-en` de BM25 difere em duas linhas de texto de exemplo, e nenhum configura analisador |
+| 2   | O par `-ch`/`-en` de BM25 difere em duas linhas, e nenhum configura analisador de idioma           |
 | 3   | `01-LangChain-AgenticRAG.py:18` importa `ToolNode` e `tools_condition` e nunca os usa              |
 | 4   | `04-Pydantic-v1.py` não chama LLM e usa `model_dump()`, API do Pydantic v2                         |
 | 5   | O `HybridRetrieval-v1-Minimal` é o **maior** dos três arquivos                                     |
 | 6   | `01-ModelSelectionAndInvocation/` invoca, mas não seleciona: modelo fixo nos dois arquivos         |
 | 7   | "Comprehensiveness and Diversity" não passa `n`, e o laço de candidatos imprime um só              |
-| 8   | Um "pipeline RAG" cujo corpus de 779 bytes cabe num chunk de 1000                                  |
+| 8   | Um "pipeline RAG" cujo corpus de 773 bytes cabe num chunk de 1000                                  |
 | 9   | `04-Pydantic-v1/v2` não são um par: compartilham duas linhas de import                             |
 | 10  | `05-function-calling-v1/v2` usam **o mesmo** provedor; o que difere é a camada                     |
 | 11  | `Self-RAG-FullImplementation.py` compila o grafo e **nunca o executa**                             |
@@ -392,7 +392,9 @@ para ampliar cobertura, é legítimo.
 **Entregável:** um RAG de cinco linhas, e a primeira medição.
 
 Carregue, divida, indexe, busque, gere. Sem reranking, sem reescrita, sem laço. Meça com as métricas
-da Parte 2 e **anote o número com a configuração**.
+da Parte 2 e **anote o número com a configuração**. Rode a medição pelo menos três vezes: o item 5
+da rubrica cobra o desvio entre execuções, e uma execução única não o produz. Sobre ids, `hit
+rate@k` e `MRR` dão desvio zero por construção, e é isso que se registra; onde há juiz, não dão.
 
 Este número é o seu ponto de comparação para tudo o que vem depois. Sem ele, qualquer melhoria é
 alegação — e a primeira armadilha da Aula 03 é literalmente "aceitar os padrões do
@@ -407,6 +409,10 @@ Imprima os trechos recuperados **antes** de olhar a resposta. Classifique cada f
 - o trecho certo **não estava** no índice → problema de ingestão (Fase 1)
 - estava no índice e **não voltou** → problema de recuperação (Fases 2 a 5)
 - voltou e a resposta o **ignorou ou contradisse** → problema de geração (Fase 7)
+
+E faça aqui o teste que o item 8 da rubrica cobra e nenhuma outra etapa produz: dê ao gerador um
+contexto que não responde à pergunta, colhido das próprias falhas acima, e veja se ele se abstém ou
+preenche a lacuna. É o quarto trabalho do prompt da Fase 7, e só se sabe se ele está lá provocando-o.
 
 Essa classificação decide o que fazer na etapa seguinte. Mexer no prompt antes de fazê-la é o erro
 de método que a Aula 19 nomeou: prompt é o último estágio da ordem de diagnóstico, e mudá-lo antes
@@ -489,8 +495,11 @@ arquivo registra é meia hora de trabalho e ensina mais sobre variância que qua
 falhar, é ali que você vai depurar.
 
 **Leia os papers que estão no repositório.** São quatro, e os quatro foram usados aqui: Self-RAG e RRR (na
-Aula 21), GraphRAG (na 23) e Modular RAG (na 25). Eles cedem texto com uma dúzia de linhas de Python
-e stdlib — a ferramenta que a Aula 21 improvisou está descrita no `HANDOFF.md`.
+Aula 21), GraphRAG (na 23) e Modular RAG (na 25). A rota só com stdlib, descomprimir cada `stream`
+com `zlib` e coletar os literais entre parênteses, está no exercício 1 da Aula 25, que também mede o
+limite dela: este PDF quebra palavras no meio por kerning, e sem uma etapa de rejunção nenhuma
+citação longa fica localizável por busca literal. As citações foram conferidas com `pdftotext`; a
+rota por `zlib` vale pelo que ensina sobre como um PDF guarda texto.
 
 ---
 

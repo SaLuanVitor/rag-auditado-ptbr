@@ -90,9 +90,9 @@ Cinco deles têm correspondência no curso, e ela é aproximada em vez de exata:
 | **Generation**     | Fase 7 (Aulas 19–21)                     |
 | **Orchestration**  | **em nenhuma fase**                      |
 
-Essa última linha é o achado desta aula. O curso — como o repositório, e como a maioria dos tutoriais — organiza o aprendizado pelos **estágios do dado**: entra, é dividido, é indexado, é buscado, é reordenado, é gerado. A orquestração não é um estágio do dado; é o que decide **qual estágio roda em seguida**. Ela aparece transversalmente nas Aulas 14, 18, 21 e vai reaparecer na 26, sempre como propriedade de outro assunto e nunca como assunto próprio.
+Essa última linha é o achado desta aula. O curso — como o repositório, e como a maioria dos tutoriais — organiza o aprendizado pelos **estágios do dado**: entra, é dividido, é indexado, é buscado, é reordenado, é gerado. A orquestração não é um estágio do dado; é o que decide **qual estágio roda em seguida**. Ela aparece transversalmente, sempre como propriedade de outro assunto: dos três submódulos da seção IV.F, o curso ensina `Routing` nas Aulas 14 e 19 e `Fusion` nas Aulas 11 e 17, os dois com código, e o RRF da Aula 17 é implementado à mão. Ausente de verdade é só o `Scheduling`, que aparece emprestado nas Aulas 18 e 21 e vai reaparecer na 26. Nenhum dos três é assunto próprio de nenhuma fase.
 
-O paper diz que o nível de topo _"not only inherits the main processes from the Advanced RAG paradigm but also introduces an orchestration module to control the coordination of RAG processes"_. No nível dos **módulos**, essa é a única peça genuinamente nova do paradigma. Todo o resto é herança.
+O paper diz que o nível de topo _"not only inherits the main processes from the Advanced RAG paradigm but also introduces an orchestration module to control the coordination of RAG processes"_. No nível dos **módulos**, essa é a única peça genuinamente nova do paradigma. Todo o resto é herança. No nível de baixo a novidade encolhe: dos três submódulos dela, dois já tinham aparecido no curso sem esse nome.
 
 Os três níveis, na descrição do paper: o topo trata cada estágio como módulo independente; o meio _"is composed of sub-modules within each module, further refining and optimizing the functions"_; a base _"consists of basic units of operation—operators"_.
 
@@ -104,7 +104,7 @@ Julgamento de engenharia: a utilidade prática desses três níveis não é cata
 
 Esta é a parte que dá à aula seu valor prático. O paper define um padrão como uma sequência de módulos, cada um com seus operadores, e afirma que os padrões que ele catalogou _"transcend various application domains and demonstrate a high level of consistency and reusability"_.
 
-São quatro — e aqui o paper se contradiz três vezes sobre o próprio número, o que vale registrar
+São quatro — e aqui o paper dá três números diferentes para o próprio conjunto, o que vale registrar
 numa aula cujo tema é a taxonomia. O abstract lista quatro ("linear, conditional, branching, and
 looping"); a lista de contribuições afirma "six typical flow patterns"; e a seção V traz **cinco**
 subseções, sendo a quinta o `E. Tuning Pattern` — retriever FT, generator FT e dual FT, com RA-DIT
@@ -172,7 +172,7 @@ O paper mostra que não é uma ausência acidental — é a omissão de um parâ
 - no laço **recursivo**, há profundidade máxima e mecanismo explícito de saída;
 - e o **scheduling module** existe justamente para _"ensuring that the system makes informed decisions on when to cease generation or initiate a new retrieval loop"_.
 
-Cessar a geração é responsabilidade nomeada de um componente nomeado, e o nome dele é `scheduling module`, o submódulo 2 da seção IV.F. Os operadores dele o paper batiza um por um: `Rule judge`, `LLM judge` e `Knowledge-guide scheduling`.
+Cessar a geração é responsabilidade nomeada de um componente nomeado, e o nome dele é `scheduling module`, o submódulo 2 da seção IV.F, entre o `Routing` (1) e o `Fusion` (3). Este é o nível do meio da taxonomia, o dos submódulos, e é nele que o diagnóstico fica acionável: dizer "a orquestração falhou" ainda é vago, dizer "o escalonamento não parou" não é. Os operadores dele o paper batiza um por um: `Rule judge`, `LLM judge` e `Knowledge-guide scheduling`.
 
 Isso **reposiciona** o grader do repositório em vez de o deixar de fora: ele **é** um `LLM judge`, no primeiro dos dois modos que o paper descreve, aquele que _"leverages LLM's in-context learning capability, and make judgments through prompt engineering"_. O repositório tem escalonador. O que ele não tem é o **limite** — e o limite não é peça, é argumento: os algoritmos 5, 6 e 7 o exigem na entrada (`maximum iterative times T` no iterativo e no ativo, `maximum recursive depth Kmax` no recursivo), e nenhum grafo do repositório declara nenhum dos dois.
 
@@ -259,7 +259,7 @@ Sem código, os contrafactuais isolam peças do desenho.
 
 **Taxonomia como enfeite.** Nomear os módulos não melhora o sistema. O valor aparece quando o nome encurta o diagnóstico: "a orquestração escolheu o caminho errado" é uma hipótese acionável; "o RAG está ruim" não é.
 
-**Confiar na correspondência pelo nome.** Um arquivo chamado `AdaptiveRAG` pode ou não ser o `adaptive (active) retrieval` do paper. Este curso registrou treze casos em que o nome prometia o que o código não fazia — a taxonomia não isenta ninguém de abrir o arquivo.
+**Confiar na correspondência pelo nome.** Um arquivo chamado `AdaptiveRAG` pode ou não ser o `adaptive (active) retrieval` do paper. Este curso vem registrando, aula a aula, os casos em que o nome prometia o que o código não fazia, e a Aula 26 fecha o décimo quarto — a taxonomia não isenta ninguém de abrir o arquivo.
 
 ---
 

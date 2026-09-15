@@ -6,9 +6,11 @@
 
 ## Pergunta motivadora
 
-Você tem 396 arquivos à disposição (`git ls-files | wc -l`) — dos quais **189 são código** (`.py` e `.ipynb`); dos 207 restantes, o maior grupo é configuração, com **40 `.env.example`**, um por módulo, e é de um deles que você vai copiar no Passo 5; o resto
-é dado, PDF e imagem — e 12 arquivos de `requirements` em `91-Environment/` — dois deles em
-`archive/`, que você não vai usar. Qual instalar, e por que existem tantos?
+Você tem 396 arquivos à disposição (`git ls-files | wc -l`) — dos quais **189 são código** (`.py` e
+`.ipynb`); dos 207 restantes, o maior grupo é configuração, com **40 `.env.example`**, um por
+módulo, e é de um deles que você vai copiar no Passo 5; o resto é dado, PDF e imagem — e 12 arquivos
+de `requirements` em `91-Environment/` — dois deles em `archive/`, que você não vai usar. Qual
+instalar, e por que existem tantos?
 
 Porque RAG tem uma dependência incômoda: modelos de embedding rodam localmente e
 querem GPU. O autor separou os ambientes por SO e por presença de GPU, e separou
@@ -73,13 +75,13 @@ Uma nuance que vale saber desde já: **embedding e geração são decisões inde
 pesa numa etapa diferente. O modelo de **embedding** entra duas vezes: na indexação, quando os
 documentos viram vetores, e na recuperação, quando a pergunta vira vetor para buscar — trocá-lo
 obriga a reindexar tudo. O modelo de **geração** entra só no fim, ao sintetizar a resposta a partir
-do que foi recuperado, e trocá-lo não mexe no índice. Você pode embutir localmente e gerar via API. Os scripts
-`01_02_LlamaIndex_SwitchEmbeddingModel.py` e
-`01_03_LlamaIndex_SwitchGenerationModel.py` parecem existir para isolar essas duas trocas — mas
-não isolam. Abra o `01_03` na **linha 9**: ele define `Settings.embed_model` com o mesmo
-`BAAI/bge-small-zh` do `01_02` **e** troca o LLM para DeepSeek. O nome promete uma variável; o
-arquivo muda duas. É o primeiro caso de nome-vs-código do curso; a Aula 28 cataloga outros catorze. O que o par realmente demonstra é uma migração completa para fora da OpenAI, não um teste
-controlado.
+do que foi recuperado, e trocá-lo não mexe no índice. Você pode embutir localmente e gerar via API.
+Os scripts `01_02_LlamaIndex_SwitchEmbeddingModel.py` e `01_03_LlamaIndex_SwitchGenerationModel.py`
+parecem existir para isolar essas duas trocas — mas não isolam. Abra o `01_03` na **linha 9**: ele
+define `Settings.embed_model` com o mesmo `BAAI/bge-small-zh` do `01_02` **e** troca o LLM para
+DeepSeek. O nome promete uma variável; o arquivo muda duas. É o primeiro caso de nome-vs-código do
+curso; a Aula 28 cataloga outros quinze. O que o par realmente demonstra é uma migração completa
+para fora da OpenAI, não um teste controlado.
 
 ---
 
@@ -87,8 +89,11 @@ controlado.
 
 ### Passo 1 — Python e ambientes virtuais
 
-Use Python 3.10, 3.11 ou 3.12 — **não 3.13**. O bloqueio é uma dependência transitiva:
-`onnxruntime==1.19.2`, que entra pelo `chromadb` e publica wheel só até cp312. O `torch==2.6.0` e o
+Use Python 3.10, 3.11 ou 3.12 — **não 3.13**. O bloqueio é uma dependência transitiva da trilha
+LangChain: `onnxruntime==1.19.2`, que entra pelo `chromadb` e publica wheel só até cp312. Os dois
+estão pinados só ali (`chromadb` na linha 26, `onnxruntime` na 140); o
+`requirements_llamaindex_NoGPU_Mac-Win.txt` não pina nenhum dos dois. Como os dois ambientes saem do
+mesmo interpretador, a restrição vale para ambos mesmo assim. O `torch==2.6.0` e o
 `faiss-cpu==1.10.0` **já têm** wheel para 3.13, então não são o motivo (conferido na PyPI, release
 por release, para `win_amd64`).
 
@@ -174,13 +179,11 @@ LlamaIndex, mas **39 e 35 pins alterados** sobre o `NoGPU_Mac-Win` correspondent
 `numpy`, que o do LangChain leva de **1.26.4 a 2.2.4** — a mesma travessia de ABI que justifica os
 dois ambientes, agora dentro de um deles. Não instale o arquivo inteiro num venv que você quer
 preservar: leia o pacote que falta e instale só ele, pinado. Dos nomes novos, o do LangChain traz
-`colorama`,
-`langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz o mesmo `colorama` —
-que é o **único** acréscimo comum aos dois — mais
-`llama-cloud-services`, `python-dotenv`, `setuptools` e `sounddevice`. Dos **sete** pacotes
-distintos, dois têm uso amplo e antecipado: o `python-dotenv`, que **83** arquivos importam, e o
-`langchain-deepseek`, importado por **15** — entre eles o
-`00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03.
+`colorama`, `langchain-deepseek` e `langgraph-prebuilt`; o do LlamaIndex traz o mesmo `colorama` —
+que é o **único** acréscimo comum aos dois — mais `llama-cloud-services`, `python-dotenv`,
+`setuptools` e `sounddevice`. Dos **sete** pacotes distintos, dois têm uso amplo e antecipado: o
+`python-dotenv`, que **83** arquivos importam, e o `langchain-deepseek`, importado por **15** —
+entre eles o `00-SimpleRAG/02_01_LangChain_DeepSeek_Model_v1.py`, que é material da Aula 03.
 
 O `langgraph-prebuilt` não é acréscimo de capacidade: o
 `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py:18` importa o **módulo** `langgraph.prebuilt`,
@@ -227,8 +230,7 @@ que provoca a pausa de download que o Passo 6 descreve no fim.
 
 O `.gitignore` **da raiz** do repositório contém exatamente uma linha: `.env` (há também um
 `.idea/.gitignore` gerado pela IDE, com dez linhas — seis padrões e quatro comentários — que não
-interessam aqui). Isso é
-deliberado — chave de API nunca entra em commit.
+interessam aqui). Isso é deliberado — chave de API nunca entra em commit.
 
 ```powershell
 cd 00-SimpleRAG

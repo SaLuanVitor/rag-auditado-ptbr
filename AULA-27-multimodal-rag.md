@@ -13,7 +13,7 @@ Então o que sobra para esta aula?
 Três coisas, e as duas primeiras são as que fazem este módulo diferente de todos os outros do repositório:
 
 1. **Mais de duas modalidades.** O vetorizador aqui aceita imagem, áudio e vídeo — e o modelo por trás dele projeta ainda mais que isso.
-2. **Infraestrutura própria com teto declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é um `mem_limit` explícito: dos dois serviços do arquivo, o de inferência tem teto de memória escrito (`:21`), e é a única ocorrência de `mem_limit` em todo o repositório. Note o que isso é e o que não é — teto imposto pelo autor do compose, não requisito declarado pelo modelo.
+2. **Infraestrutura própria com teto declarado.** É a **segunda** vez que um exemplo traz o seu `docker-compose.yml` — a primeira foi o Milvus da Aula 09, com etcd, MinIO e standalone. O que é inédito aqui é um `mem_limit` explícito: dos dois serviços do arquivo, o de inferência tem teto de memória escrito (`10-AdvanceRAG/05-MultiModalRAG/docker-compose.yml:21`), e é a única ocorrência de `mem_limit` em todo o repositório. Note o que isso é e o que não é — teto imposto pelo autor do compose, não requisito declarado pelo modelo.
 3. **Geração multimodal.** O segundo script não termina na recuperação: ele descreve a imagem recuperada e **gera uma imagem nova**.
 
 E há a pergunta que o método deste curso obriga a fazer antes de qualquer entusiasmo: **os dois arquivos fazem o que os nomes dizem?** Um faz. O outro insere uma string de exemplo no lugar da imagem.
@@ -148,7 +148,11 @@ E há um detalhe que só aparece com `md5sum`: o diretório-pai `99-EN/assets/mu
 Isso explica um bloco comentado no fim do arquivo (`01-Weaviate-Multimodal-Search.py:120-128`), que insere um arquivo chamado `"02.jpg"` a partir do caminho de `wukong_fire_attack.jpg` — os dois nomes do mesmo arquivo, no mesmo trecho de código.
 
 Vale registrar o que fica de fora: as imagens `04.jpg` a `09.jpg` existem no repositório e **nenhum script deste módulo as usa** — mas elas não estão órfãs. Os scripts multimodais da Aula 11, em
-`04-VectorDB/MultimodalRetrieval/`, apontam para o diretório-pai inteiro, e portanto indexam as nove.
+`04-VectorDB/MultimodalRetrieval/`, não enumeram o diretório: leem `99-EN/multimodal/metadata.json`
+(`Milvus+Visual-BGE-MultimodalRetrieval-English.py:66-73`), e o diretório-pai entra só como prefixo de
+caminho (`:72`). O metadado lista **dez** entradas sobre **nove** arquivos, porque `09.jpg` aparece duas
+vezes com títulos diferentes: são nove imagens codificadas (`:82`, o dicionário é chaveado por caminho)
+e dez registros inseridos (`:106`). É o que a Aula 11 já registra.
 O acervo é compartilhado entre os dois módulos multimodais do repositório: o de Milvus usa tudo, o de
 Weaviate usa o subdiretório com as três duplicatas.
 
@@ -243,7 +247,7 @@ O SDK está importado (`:8`) e é usado só na segunda função. Julgamento: o `
 
 Duas fragilidades acompanham a chamada crua:
 
-- **`gpt-4-vision-preview`** (`:61`) é um identificador de preview. Conhecimento de domínio, não leitura deste arquivo: modelos com `-preview` no nome são retirados; a capacidade de visão hoje vive nos modelos principais. Não executei nada — nenhuma biblioteca deste módulo está instalada neste ambiente —, então não afirmo o que a chamada devolve hoje.
+- **`gpt-4-vision-preview`** (`:61`) é um identificador de preview. Conhecimento de domínio, não leitura deste arquivo: modelos com `-preview` no nome são retirados; a capacidade de visão hoje vive nos modelos principais. Não executei nada: o cliente `weaviate` não está instalado no ambiente pinado do curso, e sem ele o módulo não sobe. Então não afirmo o que a chamada devolve hoje.
 - **O resultado é acessado sem tratamento de erro** (`:74`): `response_oai.json()['choices'][0]['message']['content']`. Se a API devolver um objeto de erro, o que se vê é um `KeyError`, não a mensagem do provedor. `grep` por `try:` no arquivo não encontra nada.
 
 ### E dois defeitos de ciclo de vida
@@ -270,10 +274,13 @@ O que seria multimodal RAG no sentido pleno: recuperar imagem **e** o texto que 
 
 ## Parte 5 — Os dois arquivos, lado a lado
 
-São dois programas distintos, e o `diff -u` acha pouco em comum além do esqueleto —
-`client.collections.create(`, `audio_fields=["audio"]`, `"mediaType": "image"`. É justamente esse
-esqueleto compartilhado que explica a variável fantasma da Parte 2: os dois vêm de um ancestral
-comum, e o `01` herdou os comentários do `02` sem renomear.
+São dois programas distintos, e o `diff -u` acha quase nada: as linhas que ele dá como comuns são
+`import os`, `)`, `})` e `"mediaType": "image"`. O esqueleto que os dois de fato compartilham não
+aparece ali, porque o `diff` compara linhas inteiras e a indentação difere: `client.collections.create(`
+está na coluna 0 do `01` (`:15`) e dentro de uma função no `02` (`:19`), e `audio_fields=["audio"],`
+tem oito espaços no `01` (`:19`) e doze no `02` (`:22`). É esse esqueleto, visível ao olho e não ao
+`diff`, que explica a variável fantasma da Parte 2: o `01` carrega comentários que nomeiam a coleção
+do `02`, o que põe um dos dois arquivos, ou um original comum aos dois, na origem do outro.
 
 |                                 | `01-Weaviate-Multimodal-Search.py`            | `02-Weaviate-Multimodal-RAG.py`                 |
 | ------------------------------- | --------------------------------------------- | ----------------------------------------------- |
@@ -318,7 +325,7 @@ docker compose up -d
 
 Espere o serviço de inferência ficar pronto antes de rodar qualquer script — o ImageBind em CPU leva tempo para carregar.
 
-**1. Rode a busca que funciona.** Execute o `01` e leia os três blocos de resultado: `"Monkey with fire"`, `"Monsters"` e a busca por imagem. Compare os três conjuntos devolvidos. Você está buscando imagens sem que nenhuma legenda tenha sido indexada.
+**1. Rode a busca que funciona.** Execute o `01` e leia os três blocos de resultado: `"Monkey with fire"`, `"Monsters"` e a busca por imagem. Você está buscando imagens sem que nenhuma legenda tenha sido indexada. Antes de comparar, faça a aritmética: a coleção tem três objetos e as três buscas pedem `limit=3` (`01-Weaviate-Multimodal-Search.py:71`, `:81`, `:92`), então **as três devolvem o acervo inteiro**. O conjunto é sempre o mesmo; o que muda é a **ordem**, e é só ela que carrega sinal. É a mesma leitura que a Aula 11 fez do lado sem filtro: com `limit` igual ao tamanho do corpus, o resultado não demonstra recuperação. Para ver seleção de verdade, faça primeiro o exercício 6 e volte a este com nove imagens.
 
 **2. Conserte o `02` com o `01`.** Em `02-Weaviate-Multimodal-RAG.py`, substitua o placeholder da linha 33 pelo `to_base64` do `01` apontando para uma das três imagens do acervo, e troque a consulta da linha 99 por algo pertinente às imagens. Agora o pipeline de descrição e geração tem uma imagem de verdade.
 
@@ -330,7 +337,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 **6. Use as imagens que ninguém usa.** Aponte o `image_dir` do `01` para `99-EN/assets/multimodal/` em vez do subdiretório `weaviate/`. Duas coisas quebram antes de funcionar, e as duas são a lição. Primeira: o diretório-pai contém o **subdiretório `weaviate`**, e o `os.listdir` da linha 31 o devolve como se fosse arquivo — o `to_base64` chama `open()` sobre um diretório e o script morre (`PermissionError` no Windows, `IsADirectoryError` no Linux). Filtre por extensão. Segunda: o pai tem **dez** `.jpg`, não nove, porque `query_image.jpg` está lá — e é exatamente a imagem que a busca da linha 88 usa como consulta. Indexá-la faz o `near_image` encontrar a si mesmo em primeiro lugar; decida se você quer isso antes de rodar. Feito o filtro, você passa de 3 para 9 imagens (ou 10, com a de consulta), e três delas são duplicatas exatas das do subdiretório: verifique o que a busca faz com conteúdo idêntico e nomes diferentes.
 
-**7. Busque com e sem o filtro de modalidade.** Aplique o `Filter(path="mediaType")` do `02-Weaviate-Multimodal-RAG.py` (`:46`) às buscas do `01` e compare. Com um acervo só de imagens a diferença é nula — e é isso que você quer confirmar antes de acreditar que o filtro está funcionando.
+**7. Busque com e sem o filtro de modalidade.** Aplique o `Filter(path="mediaType")` do `02-Weaviate-Multimodal-RAG.py` (`:46`) às buscas do `01` e compare. O `01` não importa `Filter`: acrescente `import weaviate.classes as wvc`, como o `02` faz (`:6`), ou o script morre em `NameError` antes da primeira busca. Com um acervo só de imagens a diferença é nula — e é isso que você quer confirmar antes de acreditar que o filtro está funcionando.
 
 **8. Adicione uma segunda modalidade.** Descomente o bloco de áudio do `01-Weaviate-Multimodal-Search.py` (`:42-52`), **troque `animals` por `monkey`**, crie o diretório `./data/audio/` e coloque dois arquivos. Depois busque áudio por texto. Este é o exercício que mostra o espaço comum fazendo o que a Aula 11 não pôde demonstrar.
 
@@ -354,7 +361,7 @@ Espere o serviço de inferência ficar pronto antes de rodar qualquer script —
 
 ## Armadilhas de produção
 
-**Placeholder que roda.** `"<YOUR_IMAGE_BASE64_STRING>"` entregue a um banco é o gênero de erro que **pode** atravessar o pipeline e falhar longe da origem — se a inserção não o barrar antes. Um `assert` de que o campo se parece com base64 custa uma linha.
+**Placeholder que pode atravessar o banco.** `"<YOUR_IMAGE_BASE64_STRING>"` entregue a um banco é o gênero de erro que **pode** atravessar o pipeline e falhar longe da origem — se a inserção não o barrar antes. Um `assert` de que o campo se parece com base64 custa uma linha.
 
 **Inferência hospedada não some.** O custo de um serviço que você mantém de pé é permanente, diferente do custo por consulta — e note que o compose escreve um **teto** de 12 GB, não uma reserva: o `mem_limit` não retém memória, e o consumo real não está medido em lugar nenhum. O que não some é o contêiner. Se o seu acervo multimodal é pequeno, um serviço gerenciado por chamada pode sair mais barato que manter o contêiner de pé.
 

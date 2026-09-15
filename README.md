@@ -269,7 +269,7 @@ Ponto de partida assumido: **sólido em programação, zero em RAG.** Portanto:
 
 | Aula                                       | Tema                                          | Módulo do repo     |
 | ------------------------------------------ | --------------------------------------------- | ------------------ |
-| [AULA-23](AULA-23-graphrag.md)             | GraphRAG: quando o grafo ganha do vetor       | `10-AdvanceRAG/01` |
+| [AULA-23](AULA-23-graphrag.md)             | GraphRAG: a pergunta global, e quanto dela o grafo responde | `10-AdvanceRAG/01` |
 | [AULA-24](AULA-24-contextual-retrieval.md) | Contextual Retrieval                          | `10-AdvanceRAG/02` |
 | [AULA-25](AULA-25-modular-rag.md)          | Modular RAG como arquitetura                  | `10-AdvanceRAG/03` |
 | [AULA-26](AULA-26-agentic-adaptive-rag.md) | Agentic RAG e Adaptive RAG com LangGraph      | `10-AdvanceRAG/04` |

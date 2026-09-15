@@ -258,14 +258,23 @@ expressão do `except` só é avaliada quando alguma exceção sobe, a primeira 
 **segunda morre dentro do próprio tratador**, com `AttributeError: module 'pymilvus.exceptions' has no
 attribute 'AlreadyExistError'`. O tratamento é decorativo.
 
-Então: troque aquele nome por `exceptions.MilvusException`, que existe, e envolva também a criação de
+Então: troque aquele nome por `exceptions.MilvusException`, que existe e captura, com o custo
+de que ela é a **classe base de toda** exceção do `pymilvus`, `ConnectionNotExistException`
+entre elas. O tratador passa a engolir servidor fora do ar como se fosse "já existe", e em
+código de produção você imprimiria a exceção ou filtraria pelo código de erro. Envolva também
+a criação de
 `my_database_2` (linhas 40-43) no mesmo `try/except`. Com essas duas correções no tratador, a segunda execução cai no
 `except` nas duas databases; sem elas, ela estoura na linha 34 antes de chegar à segunda.
 
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
 da lição, uma em cada database.
 
-Depois de `04`, use `client.query` para conferir o que ficou. (O Milvus tem uma interface web, o
+Depois de `04`, use `client.query` para conferir o que ficou, e **conte com um traceback antes
+disso**: o arquivo chama `client.load()` na linha 68, que não existe no `pymilvus` 2.5.4, e morre
+ali com `AttributeError` sem chegar ao `query` da 69. Troque a linha 68 por
+`client.load_collection(collection_name="quick_setup")` e ele completa. As escritas das linhas 40
+a 64 já aconteceram quando o erro sobe, então o estado no servidor é o descrito abaixo mesmo na
+execução que falha. (O Milvus tem uma interface web, o
 Attu, mas **este repositório não a provisiona**: o `docker-compose.yml` sobe só `etcd`, `minio` e
 `standalone`, e `attu` não aparece em nenhum arquivo do repo. Subir o Attu é trabalho seu.) **E
 não espere dez entidades:** o script insere dez, faz `upsert` em duas (ids 0 e 1, virando
@@ -286,7 +295,11 @@ isso que este exercício mede. Compare com o truncamento silencioso do embedding
 **2. Troque `auto_id=False` por `True`.** Em `03-schema.py`, ative o auto-id — e note que este
 exercício exige uma linha sua: **o arquivo não tem `insert` nenhum** (`grep -c insert` devolve 0), só
 cria o schema, descreve e dropa. Antes do `drop_collection` da linha 144, acrescente o dicionário
-**completo** — o cliente recusa qualquer campo declarado que faltar:
+**completo**. O cliente recusa campo declarado que falte **e** não tenha `nullable` nem
+`default_value`, e neste schema isso vale para `id`, `text_vector`, `image_vector`, `age`,
+`metadata` e `tags`. Os outros dois podem faltar: `title` é `is_nullable=True` com
+`default_value="untitled"`, e `is_active` tem `default_value=True`. Passar todos é o caminho
+curto, e o exercício 4 mede a diferença:
 
 ```python
 client.insert(collection_name=collection_name, data=[{
@@ -336,17 +349,29 @@ nullable==true or set default_value`. A diferença entre os dois casos é a Arma
   metadado que você esqueceu, ao custo de armazenamento em JSON e de filtro menos eficiente que
   campo declarado. É mitigação, não equivalência: pense nos filtros **antes**, e é barato incluir um
   campo a mais agora.
-- 🔴 **Inserir não é publicar.** Depois do `insert`, a collection ainda precisa ser **carregada**
-  para o query node: `load_collection()` (e o par `release_collection()` para devolver a memória).
+- 🔴 **Inserir não é publicar.** Uma collection que nunca foi carregada não responde a busca: ela
+  precisa de `load_collection()` para subir ao query node, e o par `release_collection()` devolve
+  a memória. O atalho esconde esse passo, e vale saber onde: `_fast_create_collection` termina
+  chamando `load_collection` por você, então a collection dos exemplos `02` e `04` já sobe
+  carregada. Quem constrói o schema à mão, como o `03-schema.py`, carrega por conta.
   `grep -rln "load_collection"` encontra o nome em 16 dos 27 `.py` de `04-VectorDB/` — e a
   conclusão fácil aqui é falsa: dos 11 restantes, **nove leem a collection** — oito com
-  `search`/`hybrid_search`, e o `04-entity(data).py` com `query` — e por dois caminhos
+  `search`/`hybrid_search`, e o `04-entity(data).py` com `query` — e por três caminhos
   diferentes, que vale separar.
 
-  **Quatro carregam a collection com outro nome:** os três de `HybridRetrieval/` usam
-  `collection.load()`, e o `04-entity(data).py` **desta própria aula** usa `client.load()` na linha
-  68 antes de consultar na 69. Aqui a lição é direta: ausência da string não é ausência do
-  comportamento — a mesma armadilha do "import não é uso", virada do avesso.
+  **Três carregam a collection com outro nome:** os três de `HybridRetrieval/` usam
+  `collection.load()`, que existe no ORM (`pymilvus.Collection.load`). Aqui a lição é direta:
+  ausência da string não é ausência do comportamento — a mesma armadilha do "import não é uso",
+  virada do avesso.
+
+  **E um escreve a chamada sem que ela exista, que é a mesma lição do outro lado.** O
+  `04-entity(data).py` **desta própria aula** tem `client.load(collection_name="quick_setup")` na
+  linha 68, com o comentário `# load into memory` do autor, e consulta na 69. Mas
+  `MilvusClient.load` **não existe no `pymilvus` 2.5.4**, a versão que o curso pina: os nomes
+  reais são `load_collection` e `load_partitions`. O script insere, atualiza e remove, e então
+  morre na linha 68 com `AttributeError: 'MilvusClient' object has no attribute 'load'`, sem
+  imprimir o `query`. Presença da string também não é presença do comportamento, e conferir
+  custou uma linha: `hasattr(MilvusClient, "load")`.
 
   **Os outros cinco não carregam nada, e — julgamento — é o caso mais interessante:** `a-working-sample.py`,
   `create_milvus_db.py` e os três de `MultimodalRetrieval/` chamam `client.search()` sem nenhuma
@@ -374,7 +399,7 @@ nullable==true or set default_value`. A diferença entre os dois casos é a Arma
   validar uma ideia. FAISS ou Chroma primeiro; Milvus quando o volume justificar.
 - **Confundir database com collection.** Isolamento por database não é o mesmo que
   particionamento por partição, e a escolha entre eles muda o desenho multi-tenant.
-- **Não versionar o schema.** O schema é código. Ele deve estar num arquivo versionado, não em
+- **Não versionar o schema.** Ele é código. Ele deve estar num arquivo versionado, não em
   comandos digitados uma vez num notebook.
 
 ---
@@ -390,8 +415,9 @@ nullable==true or set default_value`. A diferença entre os dois casos é a Arma
 6. Por que `VARCHAR` exige `max_length` e o que acontece se você errar para menos?
 7. Para que serve o campo `color` em `04-entity(data).py`, se ele não participa da busca
    vetorial?
-8. O que acontece se a dimensão declarada na collection não bater com a saída do modelo de
-   embedding? Esse erro é silencioso?
+8. A dimensão declarada na collection não bate com a saída do modelo de embedding. Onde essa
+   divergência **não** é barrada, e como a aula sabe disso? O que continua em aberto sobre o
+   servidor, e o que faltaria para fechar?
 9. Por que adicionar um campo escalar depois é caro?
 
 ---

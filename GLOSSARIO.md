@@ -669,7 +669,7 @@ padrões, formular a próxima pergunta a partir da resposta anterior.
 **Graph index** — Índice em que nós são entidades, arestas são relações e covariáveis
 são afirmações, tudo extraído do texto por prompt de LLM — sem schema de banco de grafos e sem
 ontologia de relações. "Sem schema" não é literal: o prompt de extração recebe uma lista fechada de
-**tipos de entidade**, ajustada ao domínio (Aula 23).
+**tipos de entidade**. No experimento do paper ela foi ajustada ao domínio de cada dataset (§4.1.2); o prompt default do método é genérico, e o paper o declara aplicável de forma geral (Aula 23).
 
 **Community detection** — Particionar o grafo em grupos densamente conectados. O
 GraphRAG usa Leiden de forma hierárquica e recursiva.

@@ -32,7 +32,9 @@ A última linha é subestimada. Quando o denso traz um documento errado, você t
 nenhuma explicação. Quando o BM25 erra, você vê o termo que casou. Para depurar recuperação em
 produção, isso vale bastante.
 
-**As duas famílias não competem: falham em conjuntos disjuntos de casos.** É esse fato — e não
+**As duas famílias não competem: falham em conjuntos largamente complementares de casos.** Não são
+disjuntos, e o contraexemplo importa: um identificador digitado errado derruba os dois, porque o
+BM25 perde o literal e o denso nunca soube o código. É essa complementaridade — e não
 nostalgia — que sustenta a busca híbrida.
 
 ### Embedding não serve só para RAG
@@ -266,8 +268,10 @@ python 03-BM25.py
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
 **fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
 tem variável de consulta nenhuma. Ele calcula o **vetor esparso de cada documento**, com o IDF do
-próprio corpus. Pontuar uma consulta contra documentos é o que o repositório inteiro faz: **79** dos
-`.py` citam `retriever` ou `search` (`grep -rlE "retriever|search" --include=*.py .`). O que é raro é
+próprio corpus. Pontuar uma consulta contra documentos é o que a maior parte do repositório faz:
+**79 dos 182** `.py` citam `retriever` ou `search` (`grep -rlE "retriever|search" --include=*.py .`
+contra `find . -name '*.py' | awk 'END{print NR}'`), e citar o termo é indício, não prova de que o
+arquivo pontue. O que é raro é
 ver a **conta escrita à mão**, e pontuação de consulta aparece em outros dois lugares deste
 caminho: no
 `03-LangChain-BM25.py`, por biblioteca (`BM25Retriever`), e no `calculate_similarity()` de
@@ -306,7 +310,7 @@ chave e **não chama `load_dotenv()`**, então a variável tem de estar no ambie
 a falha vem da SDK, antes de qualquer embedding: `OpenAIError: The api_key client option must be
 set`. O que o `.env.example` **não** declara é `OPENAI_API_KEY`: os nomes que ele traz são
 `O3_API_KEY`/`O3_BASE_URL`, do `03-LangChain-BM25.py`. E não confie no cabeçalho dele, que afirma
-"Every script here loads this file via `load_dotenv()`" — é falso para quatro dos seis. Se não quiser gastar chave nestes dois, leia os
+"Every script here loads this file via python-dotenv's `load_dotenv()`" — é falso para quatro dos seis. Se não quiser gastar chave nestes dois, leia os
 arquivos em vez de rodá-los: o mecanismo já está claro pela Aula 02.
 
 ```powershell
@@ -331,8 +335,10 @@ vezes e confira. Troque a linha 13 por `sorted(set(...))`, ou imprima `{word: sc
 linha 30 para `embedding[word] = score`.
 
 Feito isso, rode com `b=0.75` e com `b=0`, e compare o peso de `Flaming Fist` no **log 3** (11
-campos) com o do **log 1** (9 campos). Com `b=0.75` o log longo é penalizado; com `b=0` os dois
-recebem o mesmo `idf`. **Dentro** de um único log a mudança não diz nada, e pela mesma razão o
+campos) com o do **log 1** (9 campos). Com `b=0.75` o log longo é penalizado (0,4425 contra 0,4851);
+com `b=0` os dois caem no mesmo 0,4700, que aqui é exatamente o `idf` do termo, porque com
+frequência 1 e sem normalização de comprimento o resto da fórmula vale 1. O `idf` nunca dependeu
+do `b`. **Dentro** de um único log a mudança não diz nada, e pela mesma razão o
 `k1` também não serve aqui: neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
 frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
 `Flaming Fist.` são termos diferentes. Com a frequência sempre em 1, mudar `k1` reescala tudo por
@@ -375,9 +381,12 @@ não está separando bem o seu domínio.
   incompatíveis. Trocou, reindexa tudo — e o custo disso é o argumento para escolher com
   cuidado desde o começo.
 - **Modelo no idioma errado.** Vale repetir o defeito real deste repositório, visto na Aula 03:
-  `bge-small-zh` sobre corpus inglês degrada recall sem lançar erro. Para português,
-  `intfloat/multilingual-e5-*` ou `paraphrase-multilingual-*` são pontos de partida melhores.
-- 🔴 **Recuperação com bi-encoder moderno costuma ser assimétrica, e o prefixo faz parte do texto.**
+  `bge-small-zh` sobre corpus inglês custa recall sem lançar erro. E vale repetir com a condição que
+  a Aula 03 mede: nos seis arquivos `01_*` o defeito é **latente**, porque o corpus cabe num nó
+  único e o recall é 1,0 com qualquer embedder. Ele só age em acervo que se fatie, onde o `k` tem de
+  escolher. Para português, `intfloat/multilingual-e5-*` ou `paraphrase-multilingual-*` são pontos
+  de partida melhores.
+- **Recuperação com bi-encoder moderno costuma ser assimétrica, e o prefixo faz parte do texto.**
   Sem o que o cartão do modelo pede, ele é usado fora da distribuição em que foi treinado e o recall
   cai — **sem erro, sem aviso**, que é a assinatura de falha que este curso inteiro ensina a caçar.
 

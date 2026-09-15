@@ -44,10 +44,14 @@ _mecanismo_ de validação posterior sem que haja geração alguma antes. Fica n
 se aprende o mecanismo, não porque seja um caso de grau 2.
 
 > ⚠️ **O grau 4 tem dois degraus, e o repositório só mostra o de baixo.**
-> **4a — schema validado depois:** function calling e `OpenAIPydanticProgram` **induzem** fortemente
-> a estrutura, e o Pydantic **valida** o que voltou. Se o modelo desobedecer, você recebe uma
-> exceção de validação — erro em vez de silêncio, que já é muito melhor que o grau 3, mas não é
-> garantia.
+> **4a — schema validado depois, quando alguém valida:** function calling e `OpenAIPydanticProgram`
+> **induzem** fortemente a estrutura, e só o segundo instancia o modelo Pydantic com o que voltou.
+> Ali, desobediência vira exceção de validação: erro em vez de silêncio, melhor que o grau 3 e ainda
+> assim não é garantia. No caminho do `bind_tools` não há validação alguma. **Medido** no
+> `langchain-core` 0.3.33: `parse_tool_call` apenas desserializa o JSON dos argumentos, e um tool
+> call sem o `temperature` obrigatório de `05-function-calling-v1-LangChain.py:13` chega a
+> `tool_call['args']` sem levantar nada. Quem quiser o erro precisa construir o modelo à mão:
+> `get_weather(**tool_call['args'])`.
 > **4b — schema imposto na decodificação:** `response_format={"type": "json_schema", …,
 "strict": true}` restringe a geração ao schema, e violação de estrutura deixa de ser possível.
 > Custo: o schema fica limitado ao subconjunto que o provedor suporta, e a latência do primeiro
@@ -63,7 +67,7 @@ intacta:
 
 - do 1 para o 2 você passa a **saber** que falhou;
 - do 2 para o 3 você deixa de receber texto que não é JSON;
-- do 3 para o 4 o campo errado deixa de passar em silêncio: vira exceção de validação em vez de objeto aceito;
+- do 3 para o 4 o campo errado deixa de passar em silêncio, mas só onde o schema é de fato instanciado: vira exceção de validação em vez de objeto aceito;
 - e depois do 4 **ainda** pode receber um objeto perfeito com valores inventados.
 
 O grau 4 é o teto do que a plataforma resolve. Verdade do conteúdo é assunto de recuperação
@@ -221,8 +225,10 @@ Um dicionário fixo é validado (`08-Generation/03-ControllingFormatViaOutputPar
 
 E aqui está o detalhe que dá nome ao achado: `model_dump()` e `model_dump_json()` são API do
 **Pydantic v2**. Num arquivo chamado `-v1`. O sufixo é numeração de variante do capítulo — como o
-`05-...-v1` e `-v2` da Parte 4 —, não versão de biblioteca. **Medido** no `pydantic` 2.13.4 que o
-repositório pina: o arquivo roda inteiro, `model_dump()` e `model_dump_json()` incluídos.
+`05-...-v1` e `-v2` da Parte 4 —, não versão de biblioteca. **Medido** no `pydantic` 2.13.4 do
+ambiente de medição deste curso: o arquivo roda inteiro, `model_dump()` e `model_dump_json()`
+incluídos. O repositório pina outra, `2.10.6`, nos doze `requirements` de `91-Environment/`, e a
+API é a mesma nas duas: `model_dump` existe desde a 2.0.
 
 O valor pedagógico do arquivo é real e independe do nome: ele mostra que `min_length`, `pattern` e
 `gt`/`lt` são **restrições que o schema carrega**. Quando esse mesmo modelo virar contrato de saída
@@ -552,7 +558,7 @@ o `02`, a necessidade da chave é verificável sem executar nada, e verifiquei: 
 `validate_openai_api_key(embed_model.api_key)` — o ramo `if embed_model == "default"` de
 `resolve_embed_model`, em `llama_index.core.embeddings.utils`.
 Sem chave, a própria mensagem do código diz o que acontece: "Could not load OpenAI embedding model
-(…) please check your OPENAI_API_KEY". Medido na 0.12.15, que é a versão que o repositório pina. O `02`
+(…) please check your OPENAI_API_KEY". Medido na 0.12.15, a mais frequente das três que o repositório pina (as outras são 0.12.23.post2 e 0.12.25). O `02`
 precisa da chave, e o `.env.example` poderia tê-lo nomeado.
 O `04-Pydantic-v1.py` roda sem chave nenhuma — comece por ele.
 

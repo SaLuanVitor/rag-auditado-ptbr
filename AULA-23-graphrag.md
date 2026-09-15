@@ -1,4 +1,4 @@
-# AULA 23 — GraphRAG: quando o grafo ganha do vetor
+# AULA 23 — GraphRAG: a pergunta global, e quanto dela o grafo responde
 
 **Fase 9 — Avançado** · Módulo do repo: `10-AdvanceRAG/01-GraphRAG/` — **dois arquivos**, e nenhum deles é código (`ls -A` no diretório: o PDF do paper e um `.env.example`; o `ls` simples mostra só o PDF)
 
@@ -61,7 +61,7 @@ Distinção que a palavra "grafo" esconde, e que este repositório permite ver l
   **lista fechada de tipos de entidade** (`entity type: One of the following types: [{entity
   types}]`, exemplificada com `ORGANIZATION,PERSON`), e a §4.1 diz que essa lista e os exemplos
   few-shot foram **ajustados ao domínio** de cada dataset. O que o GraphRAG dispensa é a modelagem
-  prévia das *relações*; os *tipos de nó* continuam sendo decisão humana antes da primeira chamada.
+  prévia das *relações*. Os *tipos de nó* são parâmetro do prompt, e o paper os trata como ajuste, não como pré-requisito: a §3.1.2 diz que o prompt default extrai a classe ampla de _"named entities"_ (pessoas, lugares, organizações) e é _"generally applicable"_, e que domínios especializados _"will benefit from"_ exemplos few-shot próprios. No experimento do paper esse ajuste foi feito (§4.1.2). O custo não é uma decisão obrigatória antes da primeira chamada, é o que separa o default genérico do resultado publicado.
 
 O primeiro tem código no repositório. O segundo não tem, e é o assunto desta aula.
 
@@ -120,7 +120,7 @@ o notebook da Aula 13 — só que para **desenhar** uma árvore de clarificaçã
 existe; GraphRAG não. E o `10-AdvanceRAG/requirements.txt` não pede nenhuma biblioteca de grafo: são
 vinte linhas de Weaviate, LangChain/LangGraph, Milvus, LlamaIndex, Tavily, `openai` e utilitários.
 
-O único `.py` do repositório que fala com um banco de grafos é o par Text2Cypher da Aula 12 —
+Os únicos dois `.py` do repositório que falam com um banco de grafos são o par Text2Cypher da Aula 12 —
 `05-PreRetrieval/01-QueryConstruction/Text2Cypher/03-Text2Cypher-SNOMED-v2-Succeeded.py:2` importa
 `GraphDatabase` do driver `neo4j`. É outra técnica, como a seção anterior separou.
 
@@ -141,7 +141,7 @@ A figura 1 do paper resume a arquitetura, e a legenda nomeia as três peças do 
 Três coisas a extrair de cada chunk, então: **entidades**, **relações** e **afirmações**. Isso vem de
 prompt, não de modelagem de grafo — mas o prompt carrega uma lista de tipos de entidade escolhida a
 mão (Apêndice E.1), e o paper diz que ela é adaptada ao domínio do dataset.
-Julgamento: essa é a primeira fonte de custo escondido, e a menos discutida. Um extrator de entidades
+Julgamento: essa é a primeira fonte de custo escondido da indexação. O paper não a ignora: o Apêndice A.2 descreve o `self-reflection`, em que a saída da extração volta ao LLM para "gleaning" das entidades perdidas, repetido até um máximo configurável, e registra que técnicas de prompt diferentes custam tokens diferentes. Some os dois: um extrator de entidades
 por prompt precisa ser ajustado ao domínio, e ajustá-lo exige olhar a saída.
 
 ### Do grafo para as comunidades
@@ -162,7 +162,7 @@ nível, todo nó pertence a exatamente uma comunidade. É o que permite ler os r
 inteiro sem contar nada duas vezes e sem deixar nada de fora — a cobertura que o top-k não tem.
 
 Detalhe de implementação que o paper dá e que vale para qualquer um que reimplemente: o Leiden foi
-rodado com a biblioteca `graspologic`, e a indexação usou janela de 600 tokens.
+rodado com a biblioteca `graspologic`, e a indexação usou janela de 600 tokens. A janela de contexto do resumo e da resposta é outra, e o paper a escolheu medindo: o Apêndice C testou 8k, 16k, 32k e 64k, e a **menor** venceu em comprehensiveness em todas as comparações (58,1% de win rate médio), empatando nas demais. Todo o "até a janela encher" desta seção são 8k tokens, e esse número é resultado, não herança do modelo.
 
 ### Como cada resumo de comunidade é montado
 
@@ -183,7 +183,7 @@ element summaries** da comunidade — nós, arestas e claims, o mesmo material d
 na janela, é isso que o LLM resume, exatamente como no nível folha. Só **quando não cabem** o paper
 ordena as subcomunidades por tokens de element summary, decrescente, e vai **substituindo** element
 summaries (longos) por resumos de subcomunidade (curtos) até caber. Então "níveis altos resumem os
-resumos de baixo" é o caso de sobrecarga, não a regra — e em nenhum dos dois casos o corpus é lido
+resumos de baixo" é o caso de sobrecarga, não a regra. Vale registrar que o próprio paper diz as duas coisas: a Introdução afirma, sem condição, que os resumos de nível alto incorporam recursivamente os de nível baixo (_"with summaries at higher levels of the hierarchy recursively incorporating lower-level summaries"_), e é a §3.1.5 que impõe a condição. Onde a prosa e o procedimento divergem, vale o procedimento. E em nenhum dos dois casos o corpus é lido
 outra vez.
 
 ### Como a pergunta é respondida
@@ -307,7 +307,7 @@ erra:
    TS"_. O incremento do grafo sobre o `TS` aparece na taxa de vitória julgada por LLM e **não**
    aparece em nenhuma das duas medidas por claim. Ler os dois juntos é o que impede transformar 57%
    e 64% em fato estabelecido.
-3. **No nível raiz**, você **troca** esse incremento por 97% menos tokens: 2,6% do orçamento
+3. **No nível raiz**, você **troca** esse incremento por 97% menos tokens: 2,6% do orçamento no Podcast e 2,3% nas Notícias,
    mantendo 72% de win rate contra o vetorial, com o que o paper chama de _"a modest drop in
    performance compared with other global methods"_.
 
@@ -421,7 +421,7 @@ igual, porque é o que você faria antes de adotar o método.
 sustentam a decisão de adotar ou não.
 
 **2. Extraia o texto do PDF.** Use `pdftotext "GraphRAG - 2404.16130v2.pdf" -`, que joga o texto em
-stdout sem criar arquivo, e `-layout` quando precisar da Table 2 alinhada. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
+stdout sem criar arquivo, e saiba que `-layout` **não** salva a Table 2: medido neste PDF, ele desloca os rótulos, e a linha `% Max` sai com os tokens (26.657, 225.756…) enquanto os percentuais caem na linha `Tokens`. Em nenhum dos dois modos a Table 2 sai alinhada; sem `-layout` os valores ao menos vêm agrupados por condição, na ordem unidades, tokens, percentual. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
 isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.502 literais —, com uma ressalva que é a
 própria lição: os espaços entre palavras são posicionamento, não literal. Buscar `mutually exclusive`

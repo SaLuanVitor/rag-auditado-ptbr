@@ -695,7 +695,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 ---
 
 **Anterior:** [AULA 21 — Self-RAG e estratégias dinâmicas de geração](AULA-21-self-rag.md)
-**Próxima:** [AULA 23 — GraphRAG: quando o grafo ganha do vetor](AULA-23-graphrag.md)
+**Próxima:** [AULA 23 — GraphRAG: a pergunta global, e quanto dela o grafo responde](AULA-23-graphrag.md)
 
 > **Fase 8 concluída.** A dívida das vinte e uma aulas anteriores tem agora um instrumento: quatro
 > frameworks, a tríade, e a diferença entre coerência e correção. A partir daqui, toda técnica nova

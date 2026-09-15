@@ -117,7 +117,7 @@ O roteamento depois do agente está em `01-LangChain-AgenticRAG.py:126-127`:
 
 A primeira condição é a correta: existe chamada de ferramenta. A segunda é um `or` que dispara se a palavra `retrieve` aparecer **em qualquer lugar** do texto da resposta. Um modelo que escreva "I could retrieve more information, but…" é roteado para a recuperação sem ter pedido nada.
 
-É exatamente o problema que o `tools_condition` importado e não usado resolve. Julgamento: o `or` provavelmente foi acrescentado para fazer o exemplo funcionar quando o modelo não chamava a ferramenta — o que aponta para a causa raiz, no defeito seguinte.
+É exatamente o problema que o `tools_condition` importado e não usado resolve. Julgamento: o `or` provavelmente foi acrescentado para fazer o exemplo funcionar quando o modelo não chamava a ferramenta. O candidato a causa está no parágrafo seguinte, e não no Defeito 2: uma descrição que promete três assuntos e entrega um faz o agente chamar a ferramenta com mais frequência, não com menos.
 
 Repare também na instrução que o agente recebe (`01-LangChain-AgenticRAG.py:112`):
 
@@ -158,8 +158,8 @@ A aresta `rewrite → agent` (`01-LangChain-AgenticRAG.py:174`) fecha o ciclo, e
 
 O comentário é honesto: `Reset messages here`. O histórico é descartado e **só a pergunta reescrita sobrevive**.
 
-A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura, e ela atinge quatro dos cinco nós, todos menos o próprio `agent`: a pergunta
-original é **destruída** no estado. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como os quatro leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
+A Aula 21 encontrou a deriva branda — o reescritor recebia a pergunta já reescrita, e a original não era guardada. Aqui é a versão dura: a pergunta original é **destruída** no estado, e o idioma que a lê como
+`msgs[0].content` está em quatro dos cinco nós, todos menos o próprio `agent`. Na segunda volta, nada no sistema sabe o que o usuário perguntou. E como os quatro leem `msgs[0].content` como sendo "a pergunta" (`:71`, `:93`, `:134`, `:148`), depois do primeiro `rewrite` a "pergunta" passa a ser o texto produzido pelo modelo.
 
 E, pela segunda vez neste curso — depois do Self-RAG da Aula 21 —, **o ciclo não tem contador**. Nada limita quantas vezes `agent → retrieve → grade_documents → rewrite → agent` pode girar.
 
@@ -175,7 +175,7 @@ E o `hub.pull("rlm/rag-prompt")` (`01-LangChain-AgenticRAG.py:150`) é o mesmo p
 
 ## Parte 3 — O arquivo `02`: o roteamento de fonte que finalmente decide algo
 
-`02-LangChain-AdaptiveRAG.py` é o exemplo mais completo do repositório em número de componentes: um roteador de fonte, três graders, um reescritor, busca na web e cinco nós.
+`02-LangChain-AdaptiveRAG.py` reúne mais componentes que qualquer outro dos seis grafos LangGraph do repositório: um roteador de fonte, três graders, um reescritor, busca na web e cinco nós. É o único que tem roteador **e** três graders **e** fonte alternativa; o CRAG tem fonte alternativa com um grader, e o Self-RAG tem três graders sem fonte alternativa.
 
 E ele traz o que a Aula 25 apontou como faltando, com a mesma ressalva que a Aula 25 registrou. O paper Modular RAG diz que rotas divergem em _"retrieval sources, retrieval processes, configurations, models, and prompts"_ — cinco eixos. O eixo da **fonte** já apareceu no curso: `05-PreRetrieval/03-QueryRouting/01-LogicalRouting.py:12-17` declara `class RouteQuery` com `datasource: Literal["python_docs", "js_docs", "golang_docs"]`, a mesma classe e o mesmo campo que aqui. O que é novo não é a técnica; é o que se faz com o resultado. Lá o rótulo era impresso e morria — `route_question` devolve `result.datasource` e o `__main__` só imprime. Aqui ele **governa uma aresta do grafo**, e as duas fontes existem de fato (`02-LangChain-AdaptiveRAG.py:50-54`):
 
@@ -303,7 +303,7 @@ construção.
 | `10-AdvanceRAG/04-AgenticRAG/01-LangChain-AgenticRAG.py`                                  | 1 (`:174`)                                    | ausente       |
 | `10-AdvanceRAG/04-AgenticRAG/02-LangChain-AdaptiveRAG.py`                                 | 3 (`:201`, `:208`)                            | ausente       |
 
-O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Os três têm o **juízo** desse módulo, que é o `LLM judge` identificado na Aula 25. O que nenhum deles tem é o **limite de voltas**, que os algoritmos 5, 6 e 7 do paper exigem na entrada (`maximum iterative times T` no iterativo e no ativo, `maximum recursive depth Kmax` no recursivo).
+O paper Modular RAG especifica o freio em todos os três subtipos de laço, e nomeia o componente responsável — o `scheduling module`, cuja função é decidir _"when to cease generation or initiate a new retrieval loop"_. Os três arquivos com laço têm o **juízo** desse módulo, que é o `LLM judge` identificado na Aula 25. O que nenhum deles tem é o **limite de voltas**, que os algoritmos 5, 6 e 7 do paper exigem na entrada (`maximum iterative times T` no iterativo e no ativo, `maximum recursive depth Kmax` no recursivo).
 
 Julgamento de engenharia, e é a recomendação prática desta aula: se você copiar qualquer um desses grafos, o primeiro acréscimo é um contador no estado, o segundo é a mudança de entrada entre as voltas, e o terceiro é uma resposta de última instância quando o contador estoura. Sem os três, o pior caso não é resposta errada — é uma exceção da plataforma no meio do caminho.
 
@@ -322,7 +322,7 @@ E há um agravante específico do `01`: o `rewrite` que reseta as mensagens torn
 
 ## Mão na massa
 
-Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **exige** três chaves antes de qualquer outra coisa (`:27-29`) — e só duas são usadas. A `TAVILY_API_KEY` alimenta a busca na web (`:118`). A `COHERE_API_KEY` é pedida em `:28` e **nada no arquivo a consome**: `grep -in "cohere\|rerank"` devolve só o comentário de `pip install` (`:19`) e o próprio `_set_env`. O `10-AdvanceRAG/04-AgenticRAG/.env.example:7` diz que ela serve "for reranking", e não há reranking nenhum no script — você pode digitar qualquer coisa nesse prompt. É o mesmo `.env.example` que afirma, na linha 2, que todo script carrega `.env` por `load_dotenv()`, o que também não acontece.
+Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **exige** três chaves antes de qualquer outra coisa (`:27-29`) — e só duas são usadas. A `TAVILY_API_KEY` alimenta a busca na web (`:118`). A `COHERE_API_KEY` é pedida em `:28` e **nada no arquivo a consome**: `grep -in "cohere\|rerank"` devolve só o comentário de `pip install` (`:19`) e o próprio `_set_env`. O `10-AdvanceRAG/04-AgenticRAG/.env.example:7` diz que ela serve "for reranking", e não há reranking nenhum no script — você pode digitar qualquer coisa nesse prompt. É o mesmo `.env.example` cuja linha 2 a Parte 1 já desmentiu.
 
 **1. Veja a decisão do agente.** No `01`, imprima `last_msg.tool_calls` dentro de `should_use_tools` (`:122-129`) e registre, a cada execução, se o roteamento veio da chamada de ferramenta ou da substring. Essa contagem diz quanto do comportamento "agentic" é real.
 
@@ -330,7 +330,7 @@ Os dois scripts pedem chaves por `getpass` e carregam páginas da web. O `02` **
 continuação de linha, então apagar só a 127 deixa o `if` pela metade e o arquivo para de compilar.
 Reescreva as duas como uma: `if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:`. Se o grafo passar a terminar sem recuperar, você descobriu que o exemplo dependia da substring — e o próximo item explica por quê.
 
-**3. Use o `tools_condition` que está importado.** Trocar `should_use_tools` pelo `tools_condition` da linha 18 e o nó `retrieve` pelo `ToolNode` exige duas mudanças que o import não anuncia. A primeira: o mapa de `add_conditional_edges` da linha 170 tem as chaves que `should_use_tools` devolve (`"retrieve"`/`"end"`); com o roteador pronto, o mapa precisa ser reescrito para as chaves que **ele** devolve — confira na versão de `langgraph` que você instalar, porque não pude confirmar aqui. A segunda, mais séria: `AgentState.messages` é `Sequence[BaseMessage]` **sem reducer**, e é por isso que o `Annotated` da linha 3 está morto e que o `retrieve` escrito à mão faz `msgs + [retrieval_msg]` na linha 97. Um nó pronto que devolve só a mensagem que produziu vai **substituir** a lista inteira. Anote `messages` como `Annotated[Sequence[BaseMessage], add_messages]` antes de trocar qualquer coisa. Esse é o exercício de verdade: o import prometia uma arquitetura que o estado não sustenta.
+**3. Use o `tools_condition` que está importado.** Trocar `should_use_tools` pelo `tools_condition` da linha 18 e o nó `retrieve` pelo `ToolNode` exige duas mudanças que o import não anuncia. A primeira: o mapa de `add_conditional_edges` da linha 170 tem as chaves que `should_use_tools` devolve (`"retrieve"`/`"end"`); com o roteador pronto, o mapa precisa ser reescrito para as chaves que **ele** devolve: medido no `langgraph` 0.2.69, `tools_condition` devolve `"tools"` quando a última mensagem traz `tool_calls`, e `"__end__"` caso contrário. Confira na versão que você instalar antes de escrever o mapa. A segunda, mais séria: `AgentState.messages` é `Sequence[BaseMessage]` **sem reducer**, e é por isso que o `Annotated` da linha 3 está morto e que o `retrieve` escrito à mão faz `msgs + [retrieval_msg]` na linha 97. Um nó pronto que devolve só a mensagem que produziu vai **substituir** a lista inteira. Anote `messages` como `Annotated[Sequence[BaseMessage], add_messages]` antes de trocar qualquer coisa. Esse é o exercício de verdade: o import prometia uma arquitetura que o estado não sustenta.
 
 **4. Conserte a descrição da ferramenta.** Descomente as duas URLs (`01-LangChain-AgenticRAG.py:29-30`) para que o índice cubra o que a descrição da linha 47 promete. Depois pergunte algo sobre prompt engineering, antes e depois da mudança, e compare o veredito do grader.
 

@@ -6,7 +6,7 @@
 
 ## Pergunta motivadora
 
-A Aula 18 deixou uma promessa que agora precisa ser paga. Ela está na linha 217 daquela aula, e a
+A Aula 18 deixou uma promessa que agora precisa ser paga. Ela está nas linhas 243 a 247 daquela aula, e a
 ressalva é parte da frase:
 
 > A diferença entre CRAG e Self-RAG, em uma linha: **CRAG critica o que foi recuperado; Self-RAG
@@ -51,8 +51,8 @@ saída estruturada, respondendo às mesmas perguntas. Nenhum treino, nenhum voca
 Julgamento, e é a diferença que mais importa na prática: a versão emulada é a que você consegue
 construir hoje, com API de terceiros e sem GPU — e paga uma chamada de LLM por juízo, por documento,
 por rodada. A versão treinada embute o juízo no próprio passo de geração e não multiplica chamadas —
-e exige treinar um modelo, o que a Aula 19 mostrou ser o único exemplo de fine-tuning do repositório
-e nada trivial.
+e exige treinar um modelo. O repositório não traz esse treino: o único fine-tuning que ele tem é o da
+Aula 19, sobre formato de resposta, e mesmo aquele não é trivial.
 
 ### Crítica é um laço, e laço precisa de freio
 
@@ -88,7 +88,7 @@ class GradeDocuments(BaseModel):
     )
 ```
 
-E o contrato é cobrado com o mecanismo da Aula 20
+E o contrato é cobrado com o grau 4 da Aula 20, aqui pelo `with_structured_output` do LangChain, que é o irmão do `OpenAIPydanticProgram` que aquela aula usou
 (`Self-RAG-FullImplementation.py:49-50`):
 
 ```python
@@ -217,8 +217,9 @@ prompt autoriza a abstenção**, que foi o assunto central da Aula 19. Não vou 
 **2. `model_name=` aqui, `model=` nas outras quatro.** As cinco instanciações de `ChatOpenAI` estão
 nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam, e agora está **medido** no `langchain-openai` 0.3.3, uma das duas versões que o repositório pina (a outra é
 0.3.9): `ChatOpenAI(model="gpt-4o")` e `ChatOpenAI(model_name="gpt-4o")` produzem o mesmo
-`.model_name`. A mistura no mesmo arquivo é motivo para copiar a linha literal em vez de parafrasear: quem copia a forma errada e depois grepa por `model=` não encontra. É o tipo de detalhe que o protocolo de
-citação existe para preservar: quem copia a linha errada e depois grepa por `model=` não encontra.
+`.model_name`. A mistura no mesmo arquivo é motivo para copiar a linha literal em vez de
+parafrasear: é o tipo de detalhe que o protocolo de citação existe para preservar, porque quem copia
+a linha errada e depois grepa por `model=` não encontra.
 
 **3. `format_docs` é definida e nunca usada.** As linhas `Self-RAG-FullImplementation.py:83-84` definem a função, e `grep -n
 "format_docs"` no arquivo retorna **só a linha 83**. O contexto vai cru para a cadeia
@@ -498,6 +499,11 @@ seu orçamento por consulta.
 
 ## Quebre de propósito
 
+> **Antes de todos.** Os seis exercícios abaixo observam o comportamento do grafo, e a Parte 5
+> mostrou que o grafo nunca é invocado. Faça primeiro o passo 3 da Mão na massa, que descomenta as
+> linhas 379-390. Sem isso nenhum produz o efeito descrito, e o 6 não chega sequer a falhar: a
+> linha 242 só é alcançada de dentro do grafo.
+
 **1. Torne o grader severo.** Troque a instrução da linha 54 (_"This does not need to be a strict
 test"_) por uma exigência de correspondência estrita. Rode com o grafo ligado. Documentos bons
 passam a ser descartados, `filtered_documents` esvazia, e o sistema entra no ciclo de reescrita sem
@@ -544,7 +550,8 @@ volta inteira. Não há, neste desenho, nada medindo a qualidade dos juízes; me
 
 **Binário esconde o meio.** Uma resposta parcialmente fundamentada — a mais comum em corpus real, no meu julgamento —
 tem que virar `yes` ou `no`. O paper adota três valores seguindo a escala de atribuição de Yue et
-al., citada na Seção 4; o motivo declarado é taxonômico, não de frequência.
+al. (2023) e Nakano et al. (2021), declarada no Apêndice A.1; o motivo é taxonômico, não de
+frequência.
 
 **Prompt vindo da rede.** `hub.pull` (`Self-RAG-FullImplementation.py:77`) torna o comportamento do sistema dependente de um
 recurso externo que você não versiona. Para produção, buscar uma vez e fixar no repositório é a
@@ -575,7 +582,7 @@ Responda sem consultar:
 5. Por que o grader de relevância é deliberadamente generoso?
 6. Por que `hub.pull("rlm/rag-prompt")` é um problema de auditoria neste curso?
 7. O que `format_docs` faz neste arquivo? E no CRAG da Aula 18?
-8. Descreva os ciclos do grafo. Qual deles muda a entrada entre as voltas?
+8. Descreva os três ciclos do grafo. Quais deles mudam a entrada entre as voltas, e qual não muda?
 9. Por que a aresta `"not supported": "generate"` tende a repetir o mesmo resultado?
 10. Que pergunta o `transform_query` recebe na segunda volta, e por que isso é um problema?
 11. Cite três diferenças estruturais entre o grafo do CRAG e o deste arquivo.

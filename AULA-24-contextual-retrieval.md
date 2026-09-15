@@ -27,7 +27,7 @@ Quatro respostas para o mesmo problema, três já vistas:
 | Técnica                       | Onde age    | O que é indexado                              |
 | ----------------------------- | ----------- | --------------------------------------------- |
 | `chunk_overlap` (Aula 07)     | chunking    | trecho com as bordas repetidas                |
-| Small-to-big (Aula 15)        | depende¹    | depende¹                                      |
+| Small-to-big (Aula 15)        | depende¹    | o trecho pequeno; entrega-se o maior          |
 | Multi-representação (Aula 16) | indexação   | um resumo **ao lado** do texto                |
 | **Contextual Retrieval**      | indexação   | o chunk **reescrito** com o contexto embutido |
 
@@ -116,7 +116,7 @@ Três confirmações por `grep`, porque asserção sobre comportamento exige ver
 
 - `CONTEXT_PROMPT_TEMPLATE` é definido em `LlamaIndex-Implementation.py:45` e a busca pelo nome no arquivo devolve **só essa linha**. O prompt de contextualização existe e nunca é usado.
 - `llm = OpenAI(model="gpt-3.5-turbo")` está em `LlamaIndex-Implementation.py:32`, e `llm` também aparece **só ali**. O modelo é instanciado e nunca chamado.
-- `generate_question_context_pairs` é importado em `LlamaIndex-Implementation.py:12` e nunca usado — a geração de dataset sintético do LlamaIndex está importada e substituída por três perguntas escritas à mão. A Aula 22 encontrou o análogo `DatasetGenerator` **comentado** no seu módulo (`AULA-22:406-427`): nos dois arquivos a geração automática está declarada e desligada.
+- `generate_question_context_pairs` é importado em `LlamaIndex-Implementation.py:12` e nunca usado — a geração de dataset sintético do LlamaIndex está importada e substituída por três perguntas escritas à mão. A Aula 22 encontrou o análogo `DatasetGenerator` **comentado** no seu módulo (`AULA-22:416-437`): nos dois arquivos a geração automática está declarada e desligada.
 
 Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendaria como ponto de partida. Como demonstração de que Contextual Retrieval melhora a recuperação, ele não pode demonstrar nada — o tratamento e o controle diferem por um prefixo de 98 caracteres, dos quais 50 são recortados do próprio chunk.
 
@@ -133,9 +133,9 @@ Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendari
 ```
 
 O campo `text` é **idêntico** ao do nó original; o contexto vive em `metadata`. Onde esse metadado entra é decidido pelo `metadata_mode`, e a fonte do `llama-index-core` responde
-sem ambiguidade — 0.12.15 extraída e wheel 0.14.24, texto idêntico; lido, não executado:
+sem ambiguidade na 0.12.15 extraída, que é a versão pinada pelo repositório; lido, não executado:
 
-- **O BM25 não vê o metadado.** a assinatura de `TextNode.get_content` em `llama_index.core.schema` traz
+- **O BM25 não vê o metadado.** A assinatura de `TextNode.get_content` em `llama_index.core.schema` traz
   `metadata_mode: MetadataMode = MetadataMode.NONE` como default, e o `get_metadata_str` da mesma
   classe devolve `""` no ramo `if mode == MetadataMode.NONE`, então
   o retorno é `self.text` puro. Como a linha 73 constrói os nós do BM25 com `text=node.get_content()`
@@ -322,7 +322,7 @@ E, mais abaixo, uma query cujo documento-ouro não foi encontrado é abandonada 
 
 O `continue` pula sem somar nada a `total_score`, mas `total_queries` **já foi incrementado**. A média final (`Milvus-Implementation.py:688`) divide por um denominador que inclui as queries puladas — cada uma entra valendo zero.
 
-Isso importa porque o dataset é truncado: `dataset = dataset[:5]` (`Milvus-Implementation.py:851`). Se o conjunto de avaliação apontasse para documentos fora desses cinco — que é o que se espera do gabarito oficial da Anthropic, por inferência de domínio, porque ele também é baixado em tempo de execução e não está em disco aqui com o gabarito oficial da Anthropic —, a maioria das queries seria pulada e contada como zero. O sistema apareceria péssimo por um motivo que não tem nada a ver com recuperação.
+Isso importa porque o dataset é truncado: `dataset = dataset[:5]` (`Milvus-Implementation.py:851`). Se o conjunto de avaliação apontasse para documentos fora desses cinco — que é o que se espera do gabarito oficial da Anthropic, por inferência de domínio, porque ele também é baixado em tempo de execução e não está em disco aqui —, a maioria das queries seria pulada e contada como zero. O sistema apareceria péssimo por um motivo que não tem nada a ver com recuperação.
 
 ### Ato 4 — O reranking não pode aparecer na métrica
 
@@ -400,7 +400,7 @@ Os dois scripts precisam de `OPENAI_API_KEY` e `COHERE_API_KEY` (`10-AdvanceRAG/
 
 **3. Conserte o gabarito — e descubra por que isso não muda o `hit_rate`.** Primeiro imprima `len(nodes)` (o script já o faz na linha 185) e o `adjusted_top_k` (linha 59). Se `top_k == len(nodes)`, todo retriever devolve o corpus inteiro e o `hit_rate` é 1,0 em qualquer gabarito — a diferença que você mediria é exatamente 0,00. Só então mapeie à mão cada pergunta ao chunk que **de fato** a responde, no lugar do mapeamento posicional das linhas 266-269, e compare os **`mrr`**: é essa a métrica que o gabarito ruim corrompe. Para o `hit_rate` voltar a discriminar, baixe o `similarity_top_k` para 1.
 
-**4. Veja o gabarito oficial que o script joga fora.** Antes de rodar o Milvus, execute apenas o `download_data()` e abra o `evaluation_set.jsonl` baixado. Leia três queries. Compare com as quatro que o `main` fabrica na linha 896. Guarde o arquivo com outro nome antes de rodar o script inteiro.
+**4. Veja o gabarito oficial que o script joga fora.** Antes de rodar o Milvus, execute apenas o `download_data()` e abra o `evaluation_set.jsonl` baixado. Leia três queries. Compare com as que o `main` fabrica na linha 896, no máximo quatro (2 documentos × 2 chunks), conforme os dois primeiros documentos tenham dois chunks cada. Guarde o arquivo com outro nome antes de rodar o script inteiro.
 
 **5. O experimento que falta.** Rode o Milvus com o `evaluation_set.jsonl` **oficial**: comente as linhas 892-906, insira o dataset completo (ou filtre o conjunto de avaliação para os documentos que você inseriu) e conserte o denominador movendo o `total_queries += 1` para depois da verificação da linha 660. Agora os experimentos 1 e 2 medem algo. O 3 continua idêntico ao 2, pelo Ato 4: para o reranking
 aparecer, é preciso separar a janela de candidatos do corte da métrica. Chame
@@ -449,7 +449,7 @@ uma métrica sensível a posição. Registre os três `Pass@5` antes e depois de
 
 **Ganho acumulado rotulado como incremental.** `reranker - standard` não é o que o reranking adicionou ao contextual. Rótulo errado num relatório de experimento propaga para a decisão.
 
-**Embedding de outro idioma.** `bge-large-zh` sobre corpus em inglês degrada tudo por igual — o que preserva a comparação relativa e destrói o número absoluto. Se você for comparar com um baseline externo, esse detalhe invalida.
+**Embedding de outro idioma.** `bge-large-zh` sobre corpus em inglês deve degradar tudo por igual, e isso é expectativa de domínio, não medição deste curso: preservaria a comparação relativa e destruiria o número absoluto. Se você for comparar com um baseline externo, meça antes de confiar no número.
 
 ---
 
@@ -482,7 +482,7 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 
 ---
 
-**Anterior:** [AULA 23 — GraphRAG: quando o grafo ganha do vetor](AULA-23-graphrag.md)
+**Anterior:** [AULA 23 — GraphRAG: a pergunta global, e quanto dela o grafo responde](AULA-23-graphrag.md)
 **Próxima:** [AULA 25 — Modular RAG como arquitetura](AULA-25-modular-rag.md)
 
 > Duas aulas seguidas encontraram promessa maior que entrega, em formas diferentes: a Aula 23, um
