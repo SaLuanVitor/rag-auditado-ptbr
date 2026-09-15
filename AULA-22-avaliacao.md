@@ -166,6 +166,24 @@ para a precisão.** No `ragas` 0.2.15 — a geração que este módulo pina com 
 neste dataset sem gabarito nenhum, e não foi. A ausência das duas métricas tem causas diferentes —
 o recall não tinha como; a precisão tinha.
 
+### O teto que não afeta este arquivo, e afeta quem aplicar o método
+
+Ao fechar as perguntas empíricas do curso, o `rlm/rag-prompt` foi puxado do hub e transcrito na
+Aula 21. Ele termina com _"Use three sentences maximum and keep the answer concise"_, e **seis**
+arquivos do repositório o usam para gerar resposta, entre eles o CRAG da Aula 18, o Self-RAG da
+Aula 21 e os dois grafos da Aula 26.
+
+**Este arquivo não é um deles, e o número dele não muda.** `grep` por `hub.pull` em
+`09-Evaluation/` devolve nada, e as três respostas avaliadas estão **escritas à mão** no dicionário
+(`09-Evaluation/01-RAGAS.py:25`), não geradas por pipeline nenhum. Nada aqui passa pelo teto.
+
+O aviso é para o passo seguinte, que é o que esta aula propõe: **ao apontar RAGAS, TruLens ou
+DeepEval para um dos pipelines do próprio curso, você está medindo resposta cortada em três
+frases**, e o corte é invisível no repositório porque o prompt vem da rede. `faithfulness`
+tende a subir com resposta curta, que afirma menos e portanto tem menos a contradizer;
+`answer relevancy` é o oposto e pode cair, porque a resposta curta cobre menos da pergunta. Qual
+dos dois efeitos domina é medição, não dedução, e **não a fiz**. O que está medido é o teto.
+
 ### O achado: o arquivo guarda uma execução real
 
 O fim do arquivo é um bloco de texto entre `'''` com a saída de uma execução do autor
@@ -641,6 +659,11 @@ observabilidade é a contradição do módulo. Avaliação vale pela série, nã
 o gerador, sobre trinta perguntas, a cada mudança. Some às chamadas de reranking, roteamento e
 graders das aulas anteriores. Avaliação é barata comparada a decidir errado — e ainda assim é uma
 conta que precisa ser feita antes, não descoberta na fatura.
+
+**Extensão decidida pelo prompt, e não pela métrica.** Medir um pipeline que puxa o
+`rlm/rag-prompt` é medir resposta cortada em três frases, e o corte não aparece no repositório
+porque o prompt vem da rede. Antes de comparar duas configurações, confira se as duas geram sob o
+mesmo teto: comparação entre um pipeline com teto e outro sem mede o teto, não a configuração.
 
 **Métrica única como gate.** Um limiar por métrica, e nunca uma média das quatro: a média deixa uma
 fidelidade péssima passar às costas de uma similaridade semântica ótima. Um buraco localizado não
