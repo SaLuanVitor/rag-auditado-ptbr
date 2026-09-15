@@ -3,11 +3,39 @@
 Copie o bloco abaixo inteiro e cole como **primeira mensagem** de uma sessão nova do Claude Code,
 aberta em `E:\Projetos\rag\rag-auditado-ptbr`.
 
-**Atualizado em 20/08/2026,** depois da **terceira** rodada de renota (29 de 29) e de 32 correções.
-A fase mudou duas vezes hoje: primeiro de "medir" para "subir a nota", e agora para **"subir a nota
-sabendo que o instrumento anterior media menos"** — a terceira rodada deu nota **menor** que a
-segunda porque foi a primeira com uma aula por auditor e orçamento dobrado. O bloco `ESTADO DA
-AVALIAÇÃO` abaixo explica, e é a coisa mais importante deste arquivo.
+> ## ESTADO CORRENTE, 15/09/2026. Leia este bloco antes de qualquer número abaixo.
+>
+> **O portão está ABERTO e a fase mudou: não há mais nota a subir.** Os dois critérios
+> eliminatórios passam ao mesmo tempo, o que nunca tinha acontecido: nenhuma aula abaixo de 6/12 e
+> **zero** notas `−1`, em **29 de 29** aulas medidas por dimensão, sem nenhuma desconhecida e
+> nenhuma livre por aritmética. O curso está em **259/348**.
+>
+> **O contador é a fonte, não este arquivo:** `node ferramentas/portao.js`.
+>
+> Tudo o que vem depois deste bloco é **registro de 20/08**, e continua valendo como método e como
+> história. Os números dele estão superados, e os que mais enganam são estes:
+>
+> | O texto abaixo diz | Hoje |
+> | --- | --- |
+> | "1638 OK" no verificador | mais de 2000; reconte, nunca decore |
+> | "nove commits em main" | dezenas; conte com `git log` |
+> | "leia estes quatro arquivos" | ver a lista corrigida logo abaixo |
+> | fase "subir a nota" | fase **manutenção**: o portão abriu e o que resta é vigiar |
+>
+> **O que mudou de ferramental:** eram duas ferramentas em 20/08 e são **doze**, com doze suítes em
+> `ferramentas/testes/`. As três que mudam o começo de uma sessão nova são o `portao.js`, que
+> reconta os critérios; o `entreaulas.js`, que valida citação de linha de uma aula para outra; e o
+> `vigia.js`, que diz se a fonte pinada ou as bibliotecas andaram. O `README.md` tem a lista
+> inteira por momento de uso.
+>
+> **O que ficou aberto**, e é decisão de quem paga e não trabalho pendente: reproduzir os três
+> números do RAGAS, que exige chave da OpenAI; e a condição 4 do DoD, verificação própria de cada
+> lote de conserto, que **não fecha por construção** e tem régua de parada declarada no `GATE`.
+
+**O bloco de 20/08 começa aqui.** Atualizado então depois da **terceira** rodada de renota (29 de
+29) e de 32 correções. A fase mudou duas vezes naquele dia: primeiro de "medir" para "subir a nota",
+e depois para **"subir a nota sabendo que o instrumento anterior media menos"** — a terceira rodada
+deu nota **menor** que a segunda porque foi a primeira com uma aula por auditor e orçamento dobrado.
 
 Este repositório é standalone, **sem o framework AIOX**. Não invoque agente do AIOX nesta sessão.
 
@@ -17,10 +45,11 @@ Este repositório é standalone, **sem o framework AIOX**. Não invoque agente d
 Estou retomando um trabalho em andamento. Leia estes quatro arquivos ANTES de qualquer outra
 coisa, na ordem:
 
-1. HANDOFF.md                    (estado, workflow, achados, próximo passo)
-2. agente/rag-specialist.md      (as 10 regras do protocolo de citação)
-3. avaliacao/RUBRICA-AULAS.md    (como a nota é atribuída)
-4. avaliacao/GATE-AULAS-v1.md    (notas e defeitos de todas as rodadas — leia a ÚLTIMA seção)
+1. HANDOFF.md                    (estado corrente no topo, depois o histórico)
+2. agente/rag-specialist.md      (protocolo de citação, ferramental obrigatório, vigilância)
+3. avaliacao/RUBRICA-AULAS.md    (como a nota é atribuída, e o que é e não é -1)
+4. avaliacao/GATE-AULAS-v1.md    (notas e defeitos de todas as rodadas — leia as ÚLTIMAS seções)
+5. README.md                     (as doze ferramentas, por momento de uso)
 
 CONTEXTO EM UMA FRASE: curso de RAG em português COMPLETO (29 aulas, AULA-00 a AULA-28) construído
 sobre o repositório de código de RAG from First Principles (Packt), que precisa estar clonado como
@@ -43,7 +72,10 @@ denied, e ele reportou de todo modo. Se precisar extrair PDF, use `pdftotext arq
 stdout, NUNCA com arquivo de saída.
 
 CONFIRA O ESTADO ANTES DE AGIR (da raiz deste repositório):
-  node ferramentas/verify-citations.js --all
+  node ferramentas/portao.js                    <- os dois criterios, e e a FONTE da nota
+  node ferramentas/verify-citations.js --all    <- citacoes contra o clone
+  node ferramentas/entreaulas.js                <- citacao de linha de aula para aula
+  bash ferramentas/testes/rodar.sh              <- as doze suites, com positivo plantado
   git -C ../RAG-from-First-Principles status --short --ignored
   git log --oneline
 
@@ -52,10 +84,11 @@ CUIDADO COM O SHELL: o terminal padrão aqui é PowerShell, onde `tail` NÃO exi
 NÃO use heredoc: neste ambiente ele colapsa a contrabarra e falha com "unexpected EOF". Escreva o
 trecho num arquivo e concatene com `cat arquivo >> destino`.
 
-O esperado em 20/08/2026: PASS, 1638 OK, zero inválidas (BAD_LINE, MISPLACED, NOT_FOUND e
-BAD_ANCHOR todos em 0; 16 SKIPPED e 20 NO_ANCHOR são conferência à mão por desenho); clone vazio
-inclusive com --ignored; nove commits em main, o mais recente sendo o que atualizou ESTE arquivo.
-Se divergir, o HANDOFF é que está velho — corrija-o antes de seguir.
+O esperado hoje: `PORTAO: ABERTO` com os dois critérios passando; `PASS` no verificador e no
+`entreaulas`, com zero inválidas; `SUITE VERDE`; clone vazio inclusive com `--ignored`. **As
+contagens saíram desta linha de propósito**, porque elas envelhecem a cada commit e já envelheceram
+duas vezes aqui: o número de citações cresce quando se escreve, e o de commits, sempre. Reconte, e
+se o veredito divergir, o `HANDOFF` é que está velho — corrija-o antes de seguir.
 
 Nota de método sobre a linha acima: ela NÃO fixa o hash do HEAD de propósito. Um arquivo que afirma
 o próprio hash fica falso no instante em que é commitado, e "afirmação de estado escrita quando era

@@ -4678,3 +4678,50 @@ Elas estavam no relatório e ninguém as tinha lido. Ficam registradas para não
 
 **Zero achados reais em pé nesta ferramenta hoje.** Reconhecer ordinais fecharia o caso da AULA-25 e
 é mais barato que ampliar a janela, porque não mexe na posição. Fica anotado e não feito.
+
+## A condição 9 do DoD estava reprovando, e eu a declarei cumprida
+
+A condição 9 diz, literalmente, que **o `HANDOFF` e o `PROMPT-CONTINUAR`** descrevem o estado
+medido. De manhã eu achei o bloco de estado do `HANDOFF` parado em 213/348, consertei, e **declarei
+a condição cumprida**. O irmão dele não foi aberto.
+
+**O `PROMPT-CONTINUAR.md` estava em 20/08**, três rodadas atrás. Ele é o arquivo que uma sessão nova
+cola como primeira mensagem, então o custo não é cosmético: quem retomasse por ele começaria com a
+fase errada, com a lista errada de leitura e com números que não fecham.
+
+| O arquivo dizia | Medido |
+| --- | --- |
+| fase: "subir a nota sabendo que o instrumento anterior media menos" | fase **manutenção**: o portão abriu |
+| "O esperado: PASS, **1638 OK**" | mais de 2000 |
+| "**nove commits** em main" | dezenas |
+| "leia estes **quatro** arquivos" | cinco, e o `README` entrou porque o ferramental passou de 2 para 12 |
+| `CONFIRA O ESTADO` com 3 comandos | 6, entre eles o `portao.js`, que é a **fonte** da nota |
+
+**É a forma 4 cometida dentro da condição que manda os documentos descreverem o estado medido**, e
+com um agravante: a condição **nomeia os dois arquivos**. Não foi preciso inferir qual era o irmão;
+bastava ler a própria condição que eu estava avaliando.
+
+**Nenhuma ferramenta podia pegar isto**, e vale dizer por quê: o defeito é prosa sobre o estado do
+projeto, e essa é a classe que o `README` também guardou por três semanas. O que pega é ler a
+condição do DoD **item a item contra o disco**, em vez de julgar o conjunto.
+
+### Duas notas de método que o próprio arquivo já trazia, e que a correção preservou
+
+Ele tem duas passagens raras de autoconsciência, escritas em 20/08, e as duas se confirmaram hoje:
+
+1. **"Ela NÃO fixa o hash do HEAD de propósito. Um arquivo que afirma o próprio hash fica falso no
+   instante em que é commitado."** É a décima segunda forma, escrita três semanas antes de eu
+   nomeá-la, e eu a cometi no artefato mesmo assim.
+2. **"Este cabeçalho não conta mais as regras, de propósito. Ele dizia AS CINCO e virou falso."**
+   É a mesma lição do "duas ferramentas" do agente, e do "1638 OK" que estava quatro linhas abaixo
+   dela. **O arquivo ensinava a regra e a violava em outro parágrafo.**
+
+Por isso a correção tirou as contagens do bloco `O esperado`: lá ficam os **vereditos**, que não
+envelhecem (`PORTAO: ABERTO`, `PASS`, `SUITE VERDE`), e a instrução de recontar.
+
+### Um alerta do `cauda.js` triado, e é falso positivo antigo
+
+`PROMPT-CONTINUAR.md:342`, "cauda de 1 palavra: resíduo". A frase é **"Isso é pior que resíduo:
+resíduo é frase que sobreviveu a uma emenda"**, repetição retórica deliberada que define o termo
+depois de usá-lo. Conferido contra o arquivo antes do conserto de hoje: o alerta já existia,
+então não nasceu desta edição. Fica registrado para não ser retriado.
