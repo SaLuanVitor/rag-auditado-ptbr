@@ -93,8 +93,9 @@ Três arquivos, e a progressão é de infraestrutura para uso:
 | `02-03-SQLDB-connection-test-sqlalchemy.py` | teste com `sqlalchemy` + `pandas` (linhas 1–2) |
 | `02-01-LlamaIndex-SQLDB.py`                 | `DatabaseReader` do LlamaIndex (linha 1)       |
 
-Os dois testes de conexão existem porque a maior parte do tempo perdido aqui não é RAG — é
-driver, credencial e rede. Rodá-los antes economiza depuração no lugar errado.
+Por que o autor escreveu dois testes de conexão, o repositório não diz. O uso deles é claro: a
+maior parte do tempo perdido aqui não é RAG — é driver, credencial e rede, e rodá-los antes
+economiza depuração no lugar errado.
 
 O `02-01` traz, em comentário nas linhas 7 a 14, o **DDL da tabela de exemplo** (a linha 3 é o
 cabeçalho da seção, as 4 e 5 são as instruções de criação e uso do banco; a 6 é o cabeçalho que
@@ -151,11 +152,12 @@ tables = camelot.read_pdf(pdf_path, pages="all")
 ```
 
 Especializado em tabelas e só nisso. Devolve objetos com `.df` (DataFrame do pandas), o que
-significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7) e cronometra a
-própria execução. Isso não diz nada sobre o camelot em particular: o `04-01` e o `06-01`
-cronometram do mesmo jeito, então a instrumentação é hábito do módulo e não queixa sobre uma
-biblioteca. Nenhum número de tempo aparece no repositório nem nesta aula, e produzi-lo é o
-exercício 4 do "Quebre de propósito".
+significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7) e
+cronometra a própria execução. Isso não diz nada sobre o camelot em particular: o `04-01` e o
+`06-01` também se cronometram, então a instrumentação é hábito do módulo e não queixa sobre uma
+biblioteca. O escopo das três marcas, porém, é diferente, e é disso que trata o exercício 4. Nenhum
+número de tempo aparece no repositório nem nesta aula, e produzi-lo é o exercício 4 do "Quebre de
+propósito".
 
 Exige dependências de sistema, e isso **está** documentado: o `01-DataLoading/requirements.txt`
 registra na linha 6 que "camelot-py needs Ghostscript installed on the system". Existe também um
@@ -181,7 +183,7 @@ extração sozinha não dá.
 ### Unstructured, em três degraus
 
 Os três arquivos `05-*` usam `partition_pdf` numa escada de parâmetros. Todo `diff` que envolve o
-`05-01` esconde a escada, porque é dominado pelo docstring de troubleshooting de 38 linhas e pelo
+`05-01` esconde a escada, porque é dominado pelo docstring de troubleshooting de 37 linhas e pelo
 bloco de `os.chdir` que só ele tem: 97 linhas de saída contra o `05-02`, 78 contra o `05-03`. Já o
 par `05-02` contra `05-03` sai limpo, em 28 linhas, e o degrau aparece de cara. A tabela abaixo
 compara só as chamadas:
@@ -198,7 +200,9 @@ reconstruir a **grade** da tabela, e não apenas detectar que há uma. Com ele, 
 preservadas. Isso é o que a documentação do Unstructured descreve, e não foi medido aqui: o
 ambiente de verificação do curso deixa o `unstructured` de fora. O que se confirma por leitura é
 onde olhar. Os três scripts imprimem `vars(element.metadata)`, então o campo, se aparecer, aparece
-nesse despejo, e comparar o do `05-03` com o dos outros dois é o teste que fecha a questão.
+nesse despejo. O controle limpo é o `05-01`, que roda o mesmo `hi_res` sem o
+`infer_table_structure`: só ele isola o parâmetro. O `05-02` roda na estratégia default, então a
+diferença contra ele mistura as duas variáveis.
 
 E o `05-02` merece atenção pelo nome: **WithContext**. Ele imprime, ao lado de cada tabela, os três
 elementos que a **precedem** — tipicamente o parágrafo que a introduz. Legenda posterior fica de
@@ -247,14 +251,15 @@ banco e consultar. As três valem quando a tabela precisa conviver com prosa no 
 
 ```powershell
 cd RAG-from-First-Principles/01-DataLoading/05-TableDataLoading
-# ⚠️ este módulo mistura duas bases de caminho — leia a nota abaixo antes de rodar tudo daqui
+# ⚠️ este módulo mistura duas bases de caminho: veja a nota da Parte 3 antes de rodar tudo daqui
 python 01-01-ImportCSV.py
 ```
 
 O `01-01-ImportCSV.py` roda a parte 4 (`UnstructuredCSVLoader`), que imprime a lista inteira na
 linha 43: um documento. Agora **descomente a parte 1**, que imprime só `data[:2]`, e acrescente um
-`print(len(data))` antes do laço para ver a contagem. Seis documentos na parte 1, um na parte 4: a
-mesma fonte, duas granularidades.
+`print(len(data))` antes do laço para ver a contagem. Seis documentos na parte 1, medidos; um na
+parte 4, que é o default documentado do `UnstructuredCSVLoader` e não foi medido aqui, pelo mesmo
+motivo da Parte 3. A mesma fonte, duas granularidades.
 
 Olhe os seis, não só os dois que o script imprime. O quinto vem torto: a linha do `Wukong` tem uma
 vírgula sem aspas dentro da descrição, então os campos deslocam e o documento sai com
@@ -267,8 +272,9 @@ arquivo; agora é o valor da coluna `Name`, que no primeiro registro é `Bronzec
 equipamento.
 
 ```powershell
-python 05-01-unstructured-TableExtraction.py
-python 05-03-unstructured-TableExtractionInferTableStructure.py
+cd ../..   # daqui em diante e da raiz do repositorio, pela nota da Parte 3
+python 01-DataLoading/05-TableDataLoading/05-01-unstructured-TableExtraction.py
+python 01-DataLoading/05-TableDataLoading/05-03-unstructured-TableExtractionInferTableStructure.py
 ```
 
 Compare os elementos `Table` dos dois. Com `infer_table_structure=True`, procure a
@@ -276,10 +282,19 @@ representação em HTML no metadado — é a grade preservada, com a ressalva de
 Parte 3.
 
 ```powershell
-python 04-02-pdfplumber-ExtractPDFTableAndQA.py
+# ainda na raiz do repositorio
+python 01-DataLoading/05-TableDataLoading/04-02-pdfplumber-ExtractPDFTableAndQA.py
 ```
 
-O único que vai da tabela até a resposta. Faça uma pergunta cujo valor você conhece e confira.
+O único que vai da tabela até a resposta. Faça uma pergunta cujo valor você conhece e confira, e
+saiba o que esperar. Neste PDF a coluna de patrimônio já sai deslocada da coluna de nomes na
+própria camada de texto: `pdftotext -layout` põe `2 Elon Musk` na mesma linha de `$114 billion`,
+que é o número do Bezos, e deixa as linhas 5 a 10 da tabela de 2023 sem valor nenhum, porque os
+dez números foram consumidos pelas quatro primeiras. A coluna de idade é a única que se mantém
+alinhada. Se o `pdfplumber` reproduz esse deslocamento, NÃO_EXECUTADO: a biblioteca está fora do
+ambiente de verificação deste curso. O ponto é que a resposta errada aqui tem uma causa muito
+mais provável que a recuperação, e é a grade. Este documento é a célula mesclada das armadilhas de
+produção, no material da própria aula.
 
 ---
 
@@ -297,21 +312,27 @@ responder uma pergunta sobre a tabela.
 **3. Pergunte um valor exato ao pipeline vetorial.** Use `04-02` e peça um número que exija
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que
 veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, sentido na pele.
+Antes de creditar o erro à soma, confira de onde veio cada parcela: neste PDF os valores já saem
+associados ao nome errado, e o `04-02` usa `page.extract_table()` no singular (linha 13), que
+guarda uma tabela por página, enquanto o `04-01` usa `extract_tables()` no plural (linha 14) e
+imprime quantas achou. Três causas produzem o mesmo sintoma, e separá-las é o exercício de verdade.
 
 **4. Meça o custo do camelot.** Três dos sete arquivos de PDF já cronometram, `03-01`, `04-01` e
 `06-01`, e os dois que interessam aqui são os dois primeiros. É aí que está a armadilha: no
 `03-01` as marcas estão nas linhas 9 e 11, cercando **só** a chamada de leitura do PDF; no `04-01`
 estão nas linhas 6 e 39, cercando abertura, extração de todas as páginas, montagem dos DataFrames
 **e** a impressão de cada um. Comparar os dois números impressos não compara as duas bibliotecas.
-Iguale o escopo pelo denominador comum, que é só a extração: no `03-01` a marca já está certa,
-cercando o `read_pdf`; no `04-01`, tire as marcas das linhas 6 e 39 e cerque apenas a linha 14, a
+Iguale o escopo pelo que der: o mais próximo é só a extração. No `03-01` a marca já está certa,
+cercando o `read_pdf`, com a ressalva de que ele também abre o arquivo, enquanto o
+`pdfplumber.open` da linha 9 ficaria fora da sua marca. A comparação melhora muito, exata não fica; no `04-01`, tire as marcas das linhas 6 e 39 e cerque apenas a linha 14, a
 chamada `page.extract_tables()`, somando o tempo de cada página numa variável. Não basta mover o
 `end_time` para antes do `print(df)`: dali para trás sobram o `pd.DataFrame(table)` da linha 25 e a
 promoção de cabeçalho das linhas 29 e 30, e o equivalente disso no `03-01`, o `table.df` da linha
 19, está fora da marca dele. Pelo mesmo motivo não estenda a marca do `03-01` até o fim do laço,
 senão você inclui um `df.to_csv` por tabela que o `04-01` não faz. Rode os dois da raiz do
-repositório, e note que o `03-01` grava um CSV por tabela no diretório de trabalho: rode-o onde
-esses arquivos não incomodem.
+repositório, que é a única base em que os dois acham o PDF. O `03-01` grava um CSV por tabela no
+diretório de trabalho (linhas 30 e 31), então ele vai sujar a raiz do clone: comente o `df.to_csv`
+antes de rodar, ou apague os `billionaires_table_*.csv` depois. Trocar de diretório não resolve.
 
 ---
 

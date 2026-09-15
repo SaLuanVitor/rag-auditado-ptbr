@@ -3543,3 +3543,60 @@ calculado e não ligado, o `portao.js` com a âncora rígida demais e o `lock.js
 errado. Nenhum dos três estava quebrado de forma visível; os três **passavam** e mediam menos do
 que podiam. É a mesma forma de defeito que a rodada persegue no texto, agora nas ferramentas que a
 perseguem.
+
+## S6, segunda volta na AULA-06: para de cair, e o PDF entregue está torto
+
+| Aula | R6 | R8 | S6 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [06](../AULA-06-tabelas-csv-sql.md) | 9/12 | 5/12 | **4**/12 | 1 | 1 | 1 | 0 | 1 | 0 | Para de cair e não sobe. Os onze consertos acertaram os alvos que tinham; o que a segura é a mesma classe de superfície, em três lugares novos, mais o dado que ninguém abriu. |
+
+Dos onze consertos da volta anterior, **seis pegaram sem efeito colateral**, um pegou e continua
+parcialmente errado, e **um pegou e introduziu outro defeito**: para justificar que cronometrar é
+hábito do módulo, ele escreveu que o `04-01` e o `06-01` "cronometram **do mesmo jeito**", frase que
+o exercício 4 da mesma aula existe para refutar. Medido, o `03-01` marca só a linha 10, o `04-01`
+marca das 6 às 39 (impressão inclusive) e o `06-01` das 22 às 28.
+
+### O achado é o análogo exato do CSV corrompido, do outro lado do módulo
+
+O `billionaires_page-1-5.pdf`, que **sete** scripts consomem, tem a grade desalinhada na própria
+camada de texto. Medido com `pdftotext -layout`:
+
+```
+1    Bernard Arnault &                                    74   France     LVMH
+     family                $211 billion                                   Tesla, SpaceX, X Corp.
+                           $180 billion
+2    Elon Musk             $114 billion                   51   United     Amazon
+```
+
+A linha do Arnault não carrega valor nenhum, a do Musk carrega **os 114 bilhões que são do Bezos**,
+e das linhas 5 a 10 não sobra valor: os dez números foram consumidos pelas quatro primeiras. Só a
+coluna de idade se mantém alinhada.
+
+A aula lista "células mescladas, a maior fonte de grade corrompida" e "extraia, e **olhe** dez
+tabelas do seu acervo" como armadilhas de produção, e não aplicava nenhuma das duas ao próprio
+material. O exercício mandava "faça uma pergunta cujo valor você conhece e confira", sem dizer que
+a resposta sai errada por um motivo que não é recuperação.
+
+**São dois arquivos de dado defeituosos na mesma aula**, o CSV e o PDF, e os dois passaram por
+quatro rodadas. `grep -c "billionaires\|Arnault\|Musk"` na aula devolvia **zero**: o dado primário
+de sete scripts nunca tinha sido aberto.
+
+### A Mão na massa não roda do diretório que ela manda usar
+
+Ela manda `cd` para o módulo e depois roda dois scripts que a **própria aula**, 120 linhas antes,
+declara que só rodam da raiz. O `05-01` passa, porque tem um `os.chdir` na linha 48, e o `05-03`
+falha. **Sucesso parcial é o pior arranjo**: ele esconde a causa, porque o primeiro comando deu
+certo. A regra estava escrita e o fecho não a aplicava, que é a forma 4 pela terceira rodada
+seguida nesta aula.
+
+E o exercício 4 mandava rodar da raiz e, na frase seguinte, rodar "onde esses arquivos não
+incomodem", que designa o mesmo diretório: a raiz é a única base onde os dois scripts acham o PDF,
+então não havia para onde mudar. Virou instrução de comentar o `df.to_csv` ou limpar depois.
+
+### Um discriminador a mais, e ele estava no exercício-chave
+
+"O RAG vetorial não soma" é verdade e **concorre com outras duas causas** que produzem o mesmo
+sintoma neste pipeline: os valores já saem associados ao nome errado, e o `04-02` usa
+`page.extract_table()` no **singular** (linha 13), guardando uma tabela por página, enquanto o
+`04-01` usa `extract_tables()` no plural e imprime quantas achou. Separar as três é o exercício de
+verdade, e a aula creditava tudo à soma.
