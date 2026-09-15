@@ -143,8 +143,19 @@ output = llm(prompt.format(query="User ID 123"))
 arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33, o mais frequente dos dois pinos do repositório (quatro dos cinco `requirements` que o fixam com `==`; o quinto fixa 0.3.47, e outros oito o listam sem versão): a chamada emite
 ``LangChainDeprecationWarning: The method `BaseChatModel.__call__` was deprecated in langchain-core
 0.1.7 and will be removed in 1.0. Use :meth:`~invoke` instead.`` (markup Sphinx no literal, com crase
-simples, como a mensagem o traz). Não é
-previsão — há data de remoção anunciada.
+simples, como a mensagem o traz).
+
+**E a remoção aconteceu.** Medido em 15/09/2026 num segundo ambiente, com o `langchain-core`
+**1.6.3**, que era a versão corrente no PyPI naquele dia: **`BaseChatModel` não define mais
+`__call__`**, e chamar a instância levanta `TypeError: ... object is not callable` em vez de
+emitir aviso. A medição usou um modelo de mentira no lugar do `ChatDeepSeek`, porque instanciar o
+real pede chave; o mecanismo removido está na classe base, então vale para qualquer subclasse, e o
+nome que aparece na mensagem é o da classe que você usar. **O arquivo não roda mais com a
+biblioteca corrente**, e não roda por esta linha.
+
+Guarde as duas leituras juntas, porque elas não se anulam: **na versão que o repositório pina o
+script funciona**, e é sobre essa versão que esta aula fala; **na versão de hoje ele quebra**. Um
+aviso de depreciação com alvo de remoção nomeado é uma data, não uma opinião, e a data passou.
 
 **`PromptTemplate.from_template` com `{query}`** (linha 12) é o formato do LangChain. Guarde o
 contraste: o LlamaIndex, na Parte 5, usa `{query_str}`.

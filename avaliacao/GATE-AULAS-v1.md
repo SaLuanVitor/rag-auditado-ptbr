@@ -4539,16 +4539,33 @@ linha do curso envelheceu por essa via.
 | `langchain-community` | 0.3.16 | 0.4.2 | menor |
 | `ragas` | 0.2.15 | 0.4.3 | menor |
 
-### A consequência que a estreia levanta, e que NÃO está medida
+### A consequência que a estreia levantou, medida no mesmo dia
 
 As Aulas 20 e 26 citam verbatim dois avisos de depreciação, e os dois dizem **"will be removed in
-1.0"**. O `langchain-core` está em **1.6.3**. Ou seja, **o alvo de remoção foi ultrapassado**, e a
-probabilidade de `llm(...)` e de `retriever.get_relevant_documents()` terem deixado de existir é
-alta.
+1.0"**. O `langchain-core` está em **1.6.3**, então o alvo de remoção foi ultrapassado e a
+probabilidade de `llm(...)` e de `retriever.get_relevant_documents()` terem deixado de existir
+era alta. **Alta não é medido**, e por isso foi medido.
 
-**Alta não é medido.** Fechar isso exige um segundo ambiente, com as versões correntes, ao lado do
-pinado, e essa é a forma certa: medir a biblioteca nova **sem** trocar o instrumento com que o resto
-do acervo foi medido. O que está medido hoje é que o alvo passou.
+**Método: um segundo ambiente, e o pinado intocado.** `E:/tmp/rag-venv-corrente`, criado só para
+isto, com `langchain-core` 1.6.3. O `rag-venv` que serve de instrumento ao resto do acervo não
+foi tocado: atualizar a biblioteca nele responderia esta pergunta e invalidaria todas as outras
+medições, o que é trocar um achado por muitos.
+
+**As duas viraram remoção, e o veredito é idêntico:**
+
+| Chamada | `langchain-core` 0.3.33, o pin | `langchain-core` 1.6.3, corrente |
+| --- | --- | --- |
+| `llm(...)` | funciona, emite `LangChainDeprecationWarning` | `BaseChatModel` não define mais `__call__`; levanta `TypeError` |
+| `retriever.get_relevant_documents(...)` | funciona, emite o aviso | `BaseRetriever` não expõe mais o método; levanta `AttributeError` |
+
+Em 1.6.3, **zero avisos de depreciação** nos dois casos: não há mais o que depreciar. E o
+`invoke` que os avisos indicavam continua funcionando, o que fecha o conselho com evidência dos
+dois lados.
+
+**As duas leituras valem ao mesmo tempo, e não se anulam.** Na versão que o repositório pina, os
+scripts funcionam, e é sobre essa versão que as aulas falam. Na versão de hoje, os dois arquivos
+quebram, e quebram nessas linhas. **Aviso de depreciação com alvo nomeado é uma data, não uma
+opinião**, e este par é a prova disso dentro do próprio curso.
 
 **E nada disso obriga a mexer no curso.** As aulas afirmam comportamento numa versão nomeada, e
 continuam certas sobre aquela versão. O que o vigia produz é a **lista do que reler** se alguém

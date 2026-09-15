@@ -275,11 +275,17 @@ cada verificação custa o que custou montar tudo da primeira vez.
 bibliotecas vigiadas andaram, e cinco cruzaram versão maior**, entre elas
 `langchain-core` de 0.3.33 para 1.6.3.
 
-Isso tem consequência direta e ainda **não medida**: os avisos de depreciação que as Aulas 20
-e 26 citam verbatim dizem _"will be removed in 1.0"_, e a 1.0 passou. A probabilidade de
-`llm(...)` e `retriever.get_relevant_documents()` terem deixado de existir é alta, e
-**alta não é medido**. Fechar isso exige um segundo ambiente, com as versões correntes, ao
-lado do pinado. O que está medido é que o alvo de remoção foi ultrapassado.
+Isso teve consequência direta, e ela foi **medida no mesmo dia**, num segundo ambiente com
+`langchain-core` 1.6.3 e **sem tocar no pinado**: as duas depreciações que as Aulas 20 e 26 citam
+viraram **remoção**. `BaseChatModel` não define mais `__call__` e `BaseRetriever` não expõe
+mais `get_relevant_documents`; os dois scripts do repositório quebram com a biblioteca corrente,
+nessas linhas.
+
+**É o ciclo completo desta capacidade, e o modelo para as próximas:** o vigia **levanta** a
+hipótese, um ambiente separado **mede**, e a aula registra **as duas versões lado a lado** em vez de
+uma substituir a outra. Trocar o número no texto sem medir teria produzido afirmação nova não
+verificada; atualizar o ambiente pinado teria respondido uma pergunta e invalidado todas as outras
+medições.
 
 ## 8. Contexto AIOX
 
