@@ -7,11 +7,11 @@
 >
 > | | Valor | Onde se confere |
 > | --- | --- | --- |
-> | Nota corrente | **213/348 (61,2%)** | `node ferramentas/portao.js` |
-> | Rodada válida | **R8 mais a sprint de remedição S6** | `avaliacao/GATE-AULAS-v1.md`, seções finais |
-> | Abaixo do portão de 6/12 | **1**, a AULA-06 em 4 | idem |
-> | Critério `−1` | zero em 16 medidas por dimensão, 1 livre por aritmética, **12 desconhecidas** | idem |
-> | Veredito | **portão FECHADO**, por uma aula e por doze desconhecidas | idem |
+> | Nota corrente | **259/348 (74,4%)** | `node ferramentas/portao.js` |
+> | Rodada válida | **R8, a sprint S6 e a passada final de medição** | `avaliacao/GATE-AULAS-v1.md`, seções finais |
+> | Abaixo do portão de 6/12 | **nenhuma**. A mais baixa é 6 | idem |
+> | Critério `−1` | zero, em **29 de 29 medidas por dimensão**: nenhuma desconhecida, nenhuma livre por aritmética | idem |
+> | Veredito | **portão ABERTO**, os dois critérios eliminatórios passando | idem |
 >
 > **O contador é a fonte, não este arquivo.** Ele lê o GATE e devolve a nota vigente de cada aula,
 > que é a **última** registrada. Foi escrito porque somar de cabeça já produziu, duas vezes nesta
@@ -25,6 +25,16 @@
 > **A S6 remediou as treze abaixo do portão e doze passaram**, com **duas remedições que PIORARAM a
 > aula** (AULA-19, de 5 para 4, e AULA-06, de 5 para 4). Repara-se em um ciclo na maioria dos casos,
 > e não sempre. Detalhe nas seções `S6` do GATE.
+>
+> **A passada final mediu as catorze aulas cuja nota era anterior aos últimos consertos delas**, e o
+> achado dela não é sobre o material: **em onze das catorze, os defeitos principais eram dos meus
+> próprios consertos**. O que decide onde a rodada para não é o número de rodadas, é a **direção do
+> que cada uma acha**: a oitava achava defeito no material, a S6 nos consertos do material, esta nos
+> consertos dos consertos, e o pior achado dela foi uma palavra num cabeçalho.
+>
+> **Conserto aplicado não é conserto verificado.** As catorze receberam consertos depois destas
+> medições, então uma passada nova acharia coisa nova. Isso é a condição 4 do DoD, e ela continua
+> aberta por construção.
 
 **Data do bloco histórico abaixo:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
