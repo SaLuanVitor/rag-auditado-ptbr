@@ -4180,7 +4180,7 @@ doze:
 5. **Consertar em uma superfície só é cometer a forma 4**, inclusive dentro do conserto dela.
 6. **Citar referência móvel dentro de documento vivo**, que só pode apodrecer. Acrescentada no fim
    do dia, e o caso é o próprio plano de fechamento: ele citava o hash da ponta de `main` em duas
-   superfícies, e o hash envelheceu **duas vezes em duas horas**, uma ao commitar o `HANDOFF` e
+   superfícies, e o hash envelheceu **duas vezes na mesma tarde**, uma ao commitar o `HANDOFF` e
    outra ao commitar a suíte do `gerar-fatos.js`. Consertar o número não resolve, porque o próximo
    commit o quebra de novo: **cita-se o que não se move** (o pin `17c6942`, o commit de um evento
    passado como o `f1cb4c0` da S0) **ou a afirmação que se mantém verdadeira sem manutenção**. É a
@@ -4445,7 +4445,7 @@ oferecia as duas saídas. Pedida a aposentadoria, a medição de antes de apagar
 premissa estava errada em duas frentes:
 
 - **Ele roda e está correto.** `node ferramentas/gerar-fatos.js --stdout` sai com 0 e reproduz o
-  `FATOS.md` versionado. `diff -w` entre os dois devolve só as 22 linhas separadoras de tabela, que
+  `FATOS.md` versionado. `diff -w` entre os dois acusa **11 linhas**, uma por tabela, e as 11 são separadoras, que
   o arquivo commitado traz alinhadas e o gerador emite como `| --- |`. Zero divergência de conteúdo
   contra o clone pinado.
 - **Ele tem sete consumidores.** `FATOS.md` é citado por `agente/rag-specialist.md`,
