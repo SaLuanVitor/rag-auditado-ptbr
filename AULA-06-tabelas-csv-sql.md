@@ -30,9 +30,10 @@ onde a ingestão mais falha.
 | **Extrair** a grade (linhas × colunas) | células se misturam, colunas se fundem | `camelot`, `pdfplumber`, `infer_table_structure` |
 | **Representar** para o embedding       | o chunk perde cabeçalho ou contexto    | serialização e contexto adjacente                |
 
-A maioria das discussões sobre "RAG com tabelas" trata só do segundo. O terceiro é o que
-decide a qualidade da resposta, e é o menos discutido — uma tabela perfeitamente extraída,
-serializada sem cabeçalho, continua inútil.
+**Julgamento:** a maior parte do que se escreve sobre "RAG com tabelas" trata só do segundo, e o
+terceiro é o que decide a qualidade da resposta. Não medi a distribuição; o que sustenta o
+julgamento é verificável no próprio módulo, que tem sete arquivos de extração e nenhum de
+representação. Uma tabela perfeitamente extraída, serializada sem cabeçalho, continua inútil.
 
 ### A decisão que antecede tudo
 
@@ -59,9 +60,15 @@ ativa:
 | Parte                       | Chamada                                                | O que muda                                          |
 | --------------------------- | ------------------------------------------------------ | --------------------------------------------------- |
 | 1 (linha 4, comentada)      | `CSVLoader(file_path=file_path)`                       | o caso simples: uma linha do CSV vira um `Document` |
-| 2 (linha 12, comentada)     | `CSVLoader(...)` com argumentos                        | controla delimitador, nomes de coluna               |
+| 2 (linha 12, comentada)     | `CSVLoader(...)` com argumentos                        | controla delimitador e nomes de coluna, e passa a devolver **sete** documentos |
 | 3 (linha 29, comentada)     | `CSVLoader(file_path=file_path, source_column="Name")` | define qual coluna vira o `source` no metadado      |
 | 4 (linhas 39–40, **ativa**) | `UnstructuredCSVLoader(file_path=file_path)`           | trata o CSV como tabela, não como linhas            |
+
+O comentário da linha 11 diz que a parte 2 "pula a linha de cabeçalho". Não pula. Passar
+`fieldnames` faz o `csv.DictReader` tratar a primeira linha como dado, então o cabeçalho vira o
+primeiro documento, com `Category: Category` e `Name: Name`, e a contagem sobe de seis para sete.
+Medido. É a mesma classe da linha corrompida da Parte 3 da Mão na massa, com uma diferença útil:
+esta a contagem denuncia.
 
 **Julgamento:** a parte 3 é a mais importante, e é a que passa despercebida. `source_column="Name"`
 faz o metadado `source` de cada documento apontar para o valor da coluna `Name` em vez do caminho
@@ -135,11 +142,13 @@ dado estruturado.
 arquivos de PDF (`03-01`, `04-01`, `04-02`, `05-02`, `05-03`, `06-01`) apontam para
 `"90-Data/ComplexPDF/..."` e só rodam **da raiz** do repositório. A única exceção é o
 `05-01-unstructured-TableExtraction.py`, que se corrige sozinho com um `os.chdir` na linha 48. E há
-um terceiro caso, que não roda de canto nenhum: o `01-02` aponta para `data/black myth`, diretório
-que o repositório não tem. O parecido que existe é `90-Data/BlackMythWukong/`, com outro nome. Leia
-o `01-02` pelo padrão (`loader_cls`), não o execute. Rode o `01-01` daqui e faça `cd ../..` antes
-dos que
-leem PDF.
+um terceiro caso: o `01-02` aponta para `data/black myth`, diretório que o repositório não tem. O
+que existe é `90-Data/BlackMythWukong/`, e não é só um nome parecido, é o mesmo dataset em chinês,
+com o `black myth wukong.csv` que satisfaz o glob. Troque o `path` da linha 5 por
+`90-Data/BlackMythWukong` e ele roda, da raiz. Vale rodar: naquela versão a linha do Wukong não
+quebra, porque a descrição usa vírgula de largura cheia. A corrupção que você vai encontrar na
+Mão na massa nasceu na tradução para o inglês. Rode o `01-01` daqui e faça `cd ../..` antes dos
+que leem PDF.
 
 Aqui estão sete dos treze arquivos, cobrindo quatro bibliotecas. É o problema difícil da aula.
 
@@ -155,9 +164,9 @@ Especializado em tabelas e só nisso. Devolve objetos com `.df` (DataFrame do pa
 significa que a tabela sai **como grade**, não como texto. O arquivo importa `time` (linha 7) e
 cronometra a própria execução. Isso não diz nada sobre o camelot em particular: o `04-01` e o
 `06-01` também se cronometram, então a instrumentação é hábito do módulo e não queixa sobre uma
-biblioteca. O escopo das três marcas, porém, é diferente, e é disso que trata o exercício 4. Nenhum
-número de tempo aparece no repositório nem nesta aula, e produzi-lo é o exercício 4 do "Quebre de
-propósito".
+biblioteca. O escopo das marcas, porém, é diferente em cada um, e o exercício 4 mede os dois que dá
+para comparar, o `03-01` e o `04-01`. Nenhum número de tempo aparece no repositório nem nesta aula,
+e produzi-lo é o exercício 4 do "Quebre de propósito".
 
 Exige dependências de sistema, e isso **está** documentado: o `01-DataLoading/requirements.txt`
 registra na linha 6 que "camelot-py needs Ghostscript installed on the system". Existe também um
@@ -211,8 +220,8 @@ mental: uma tabela sem o texto que a apresenta perde o referente. "Tabela 3" nã
 trata; o parágrafo anterior diz.
 
 Note que o `05-02` tem `strategy="hi_res"` **comentado**, ao contrário dos outros dois. Ou
-seja, ele roda na estratégia default — mais rápida, menos fiel ao layout. Rode os três e
-compare: é a forma de sentir o que `hi_res` compra em tabela.
+seja, ele roda na estratégia default — mais rápida, menos fiel ao layout. O exercício 2 do
+"Quebre de propósito" transforma isso em medição.
 
 ### LlamaParse
 
@@ -286,15 +295,32 @@ Parte 3.
 python 01-DataLoading/05-TableDataLoading/04-02-pdfplumber-ExtractPDFTableAndQA.py
 ```
 
-O único que vai da tabela até a resposta. Faça uma pergunta cujo valor você conhece e confira, e
-saiba o que esperar. Neste PDF a coluna de patrimônio já sai deslocada da coluna de nomes na
-própria camada de texto: `pdftotext -layout` põe `2 Elon Musk` na mesma linha de `$114 billion`,
-que é o número do Bezos, e deixa as linhas 5 a 10 da tabela de 2023 sem valor nenhum, porque os
-dez números foram consumidos pelas quatro primeiras. A coluna de idade é a única que se mantém
-alinhada. Se o `pdfplumber` reproduz esse deslocamento, NÃO_EXECUTADO: a biblioteca está fora do
-ambiente de verificação deste curso. O ponto é que a resposta errada aqui tem uma causa muito
-mais provável que a recuperação, e é a grade. Este documento é a célula mesclada das armadilhas de
-produção, no material da própria aula.
+O único que vai da tabela até a resposta, e o único que você precisa editar para usar: as duas
+perguntas estão fixas nas linhas 44 a 47, não há `input()`. Troque uma por uma cujo valor você
+conhece. Ele também é o único script OpenAI do módulo sem `load_dotenv()` (compare com
+`05-01:58`), apesar de o `.env.example` da pasta afirmar na linha 2 que todos carregam o arquivo:
+exporte `OPENAI_API_KEY` no ambiente antes de rodar, ou ele falha na construção do índice.
+
+Antes de perguntar, saiba o que a tabela diz, e o repositório entrega isso pronto:
+`90-Data/ComplexPDF/TopTenBillionaires/` guarda os seis CSVs que o `03-01` produziu deste mesmo
+PDF, mais o `merge_csv_to_excel.py` que os consolida. Abra o `billionaires_table_2.csv`, que é a
+lista de 2023: doze linhas por seis colunas, nenhuma célula vazia, cada patrimônio no nome certo.
+Arnault $211 bilhões, Musk $180, Bezos $114.
+
+Essa é a régua, e ela mostra que a grade deste PDF é recuperável. O que não é recuperável é a
+linearização ingênua: `pdftotext -layout` põe `2 Elon Musk` na mesma linha de `$114 billion`, que
+é o número do Bezos, empilha os dez valores nas quatro primeiras linhas e deixa as linhas 5 a 10
+sem valor nenhum. Nome, idade e nacionalidade ficam no lugar; patrimônio e fonte de riqueza
+colapsam. A causa não é célula mesclada, que este documento não tem: é célula que ocupa mais de
+uma linha de texto (`Bernard Arnault &` / `family`, `United` / `States`), e o texto corrido não
+tem como dizer a quem a segunda linha pertence. Nenhum script deste módulo usa `pdftotext`; a
+comparação existe para você ver o que um extrator que ignora a grade faz com um documento cuja
+grade está intacta.
+
+Se o `pdfplumber` acerta a grade como o camelot acertou, NÃO_EXECUTADO: a biblioteca está fora do
+ambiente de verificação deste curso. Confira comparando a saída dele contra o
+`billionaires_table_2.csv`, e só então julgue se uma resposta errada veio da recuperação ou da
+extração.
 
 ---
 
@@ -304,16 +330,20 @@ produção, no material da própria aula.
 sem os nomes das colunas. Pergunte por um número. A resposta será errada ou ausente — e é a
 demonstração mais direta, na minha leitura, de por que representação importa mais que extração.
 
-**2. Rode `05-02` com e sem `hi_res`.** Ative `strategy="hi_res"` na linha 20 e compare com a
+**2. Rode `05-02` com e sem `hi_res`.** Da raiz do repositório, pela nota da Parte 3: ative
+`strategy="hi_res"` na linha 20 e compare com a
 versão default. Depois compare o resultado do `05-02` com o do `05-01`. O `05-02` não responde nada — ele
 **imprime** os nós vizinhos da tabela; leia o que saiu e julgue se aquele entorno bastaria para
 responder uma pergunta sobre a tabela.
 
-**3. Pergunte um valor exato ao pipeline vetorial.** Use `04-02` e peça um número que exija
+**3. Pergunte um valor exato ao pipeline vetorial.** Da raiz, use `04-02`, editando as perguntas
+das linhas 44 a 47 de `04-02-pdfplumber-ExtractPDFTableAndQA.py`, e peça um número que exija
 somar duas linhas. O RAG vetorial não soma — ele recupera e o LLM tenta aritmética sobre o que
 veio. Compare com o que um `SELECT SUM(...)` daria. É o argumento da Aula 12, sentido na pele.
-Antes de creditar o erro à soma, confira de onde veio cada parcela: neste PDF os valores já saem
-associados ao nome errado, e o `04-02` usa `page.extract_table()` no singular (linha 13), que
+Antes de creditar o erro à soma, confira de onde veio cada parcela contra o
+`billionaires_table_2.csv` que o repositório entrega: se o `pdfplumber` perdeu a associação entre
+nome e valor, o erro nasceu antes da soma. E o `04-02` usa `page.extract_table()` no singular
+(linha 13), que
 guarda uma tabela por página, enquanto o `04-01` usa `extract_tables()` no plural (linha 14) e
 imprime quantas achou. Três causas produzem o mesmo sintoma, e separá-las é o exercício de verdade.
 
@@ -326,12 +356,14 @@ Iguale o escopo pelo que der: o mais próximo é só a extração. No `03-01` a 
 cercando o `read_pdf`, com a ressalva de que ele também abre o arquivo, enquanto o
 `pdfplumber.open` da linha 9 ficaria fora da sua marca. A comparação melhora muito, exata não fica; no `04-01`, tire as marcas das linhas 6 e 39 e cerque apenas a linha 14, a
 chamada `page.extract_tables()`, somando o tempo de cada página numa variável. Não basta mover o
-`end_time` para antes do `print(df)`: dali para trás sobram o `pd.DataFrame(table)` da linha 25 e a
-promoção de cabeçalho das linhas 29 e 30, e o equivalente disso no `03-01`, o `table.df` da linha
+`end_time` para antes do `print(df)`: dali para trás sobram, em
+`04-01-pdfplumber-ExtractPDFTable.py`, o `pd.DataFrame(table)` da linha 25 e a promoção de
+cabeçalho das linhas 29 e 30, e o equivalente disso no `03-01`, o `table.df` da linha
 19, está fora da marca dele. Pelo mesmo motivo não estenda a marca do `03-01` até o fim do laço,
 senão você inclui um `df.to_csv` por tabela que o `04-01` não faz. Rode os dois da raiz do
 repositório, que é a única base em que os dois acham o PDF. O `03-01` grava um CSV por tabela no
-diretório de trabalho (linhas 30 e 31), então ele vai sujar a raiz do clone: comente o `df.to_csv`
+diretório de trabalho (`03-01-camelot-ExtractPDFTable.py:30-31`), então ele vai sujar a raiz do
+clone: comente o `df.to_csv`
 antes de rodar, ou apague os `billionaires_table_*.csv` depois. Trocar de diretório não resolve.
 
 ---
@@ -344,6 +376,12 @@ antes de rodar, ou apague os `billionaires_table_*.csv` depois. Trocar de diret�
   Extração por página quebra a associação, e nenhuma das bibliotecas resolve isso sozinha.
 - **Células mescladas.** Comuns em relatório corporativo, e a maior fonte de grade corrompida.
   Vale inspecionar manualmente uma amostra antes de confiar na extração em lote.
+- **Célula que ocupa mais de uma linha.** Distinta da mesclada, e mais comum. Nome longo ou
+  nacionalidade quebrada em duas linhas não confunde um extrator que lê a grade, e destrói
+  qualquer leitura do texto corrido: não há como dizer a quem a segunda linha pertence. É o que
+  acontece com o PDF desta aula.
+- **Campo com o separador dentro, sem aspas.** O loader não reclama, a contagem não muda, e o
+  registro entra no índice com os campos deslocados. Só aparece se você abrir as linhas.
 - **Usar busca vetorial onde SQL resolve.** Pergunta sobre valor exato, agregação ou contagem pede
   consulta estruturada. RAG vetorial devolve o trecho mais parecido, não o cálculo correto. Trocar
   a busca vetorial por Text2SQL é sair do RAG vetorial, que é o sentido em uso nesta aula; pela
@@ -372,6 +410,10 @@ antes de rodar, ou apague os `billionaires_table_*.csv` depois. Trocar de diret�
 8. Cite as três formas de representar uma tabela para o embedding e o trade-off de cada.
 9. Quando você **não** deve usar RAG vetorial para responder sobre uma tabela? E por que a Aula 12
    diria que a alternativa ainda é RAG?
+10. Um CSV carrega sem erro e a contagem de documentos bate. O que ainda pode estar errado, e
+    como você descobre?
+11. Por que dois scripts do mesmo diretório precisam de diretórios de trabalho diferentes, e o
+    que no `05-01` o dispensa disso?
 
 ---
 
@@ -389,8 +431,9 @@ Definições em [`GLOSSARIO.md`](GLOSSARIO.md).
 texto que a Fase 1 produziu.
 
 > **Fase 1 concluída.** Aulas 04, 05 e 06 cobrem os subdiretórios numerados de `01-DataLoading/`:
-> texto e diretórios, dados estruturados, PDF, imagem e tabela. Fica de fora o `99-Others/`, com 9
-> arquivos de material alternativo — entre eles um `99-UsingTextract.py`, que extrai PDF com o
+> texto e diretórios, dados estruturados, PDF, imagem e tabela. Fica de fora o `99-Others/`, com 8
+> scripts de material alternativo e um `.env.example` — entre eles um `99-UsingTextract.py`, que
+> extrai PDF com o
 > pacote PyPI `textract` (**não** o serviço AWS Textract, apesar do nome: a linha 1 é
 > `import textract` e não há `boto3` em nenhum arquivo do repositório) e seria uma sétima abordagem
 > para a Aula 05. O fio condutor das três é o mesmo — **o que o

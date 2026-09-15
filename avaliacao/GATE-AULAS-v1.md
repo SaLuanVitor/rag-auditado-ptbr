@@ -3672,3 +3672,110 @@ o estado.
 O critério de `−1` continua zero em **16** aulas medidas por dimensão, uma livre por aritmética
 (a 22) e **doze desconhecidas**. `DESCONHECIDO NÃO É ZERO`: o portão passa no que foi medido e
 segue inconclusivo no resto, e as doze são o que falta.
+
+## S6, terceira volta na AULA-06: o melhor achado de ontem era falso, e o repositório tinha a prova
+
+| Aula | R6 | R8 | S6-1 | S6-2 | S6-3 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [06](../AULA-06-tabelas-csv-sql.md) | 9/12 | 5/12 | 4/12 | 4/12 | **3**/12 | 1 | 0 | 1 | 0 | 1 | 0 | Terceira queda seguida, e esta é inteiramente minha: o conserto pôs uma explicação causal **falsa** colada a uma medição verdadeira, no parágrafo de maior visibilidade da aula. |
+
+### O PDF não tem a grade desalinhada. O `pdftotext -layout` tem.
+
+Ontem registrei aqui, como o melhor achado da volta, que o `billionaires_page-1-5.pdf` sai com a
+grade quebrada e que a aula entregava um dado defeituoso. **É falso, e o repositório entrega a
+prova commitada há anos:**
+
+```
+$ ls 90-Data/ComplexPDF/TopTenBillionaires/
+billionaires_table_1.csv ... billionaires_table_6.csv
+billionaires_merged.xlsx  merge_csv_to_excel.py  WorldTopTenBillionaires.xlsx
+```
+
+São os CSVs que o `03-01` produziu **deste mesmo PDF**, com o script que os consolida. Medido no
+`billionaires_table_2.csv`: **12 linhas por 6 colunas, zero células vazias**, Arnault $211 bilhões,
+Musk $180, Bezos $114, cada valor no nome certo. O camelot recuperou a grade inteira.
+
+O que eu medi foi o `pdftotext -layout`, **instrumento que nenhum dos sete scripts do módulo usa**
+(`grep -rn pdftotext --include=*.py .` devolve vazio). Três afirmações erradas saíram de uma
+medição certa:
+
+| O que eu escrevi | O que se mede |
+| --- | --- |
+| "a causa é a grade" | o único extrator medido neste PDF recuperou a grade exata |
+| "a coluna de idade é a única que se mantém alinhada" | Nome, Idade **e** Nacionalidade batem nas dez linhas; só Patrimônio e Fonte colapsam |
+| "este documento é a célula mesclada das armadilhas" | zero células mescladas. O fenômeno é **célula que ocupa mais de uma linha de texto**, que não era nenhuma das sete armadilhas |
+
+E a segunda afirmação contradiz a primeira dentro do mesmo parágrafo: "deslocada da coluna de
+nomes" pressupõe que os nomes saíram do lugar, e a frase seguinte diz que a idade é a única que
+não saiu.
+
+**A lição é a mais cara desta auditoria inteira, e é a segunda vez que ela aparece.** Na AULA-05 eu
+escrevi "15 dos 16 PDFs" e carimbei "medido nos bytes"; eram 14 de 15. Aqui eu medi com precisão um
+instrumento que o material não usa e apresentei o resultado como propriedade do documento. **Medir
+com o instrumento errado produz um número verdadeiro sobre a coisa errada**, e o carimbo "medido"
+faz o leitor parar de conferir.
+
+### A resposta à pergunta estrutural: a aula precisa de reestruturação, não de mais um lote
+
+O auditor rodou o enumerador que já existe no repositório contra o commit de conserto:
+
+```
+$ node ferramentas/fechos.js 'd1f6c27~1 d1f6c27'
+AULA-06  Checkpoint 9/9 · Titulo 6/6 · Rodape 2/2 · Tabela 17/17
+```
+
+**34 superfícies de fecho, e o commit que existia para parar a forma 4 tocou zero delas.** E a
+história por seção, por hash do bloco nos 14 commits que tocaram o arquivo:
+
+| Seção | Estados distintos em 14 commits |
+| --- | --- |
+| Mão na massa | 8 |
+| Quebre de propósito | 7 |
+| Armadilhas de produção | 5 |
+| **Checkpoint** | **2** |
+| **Vocabulário** | **1**, o do commit inicial |
+
+O corpo e os dois fechos executáveis absorvem quase toda a reescrita; o Checkpoint mudou uma vez em
+catorze e o Vocabulário nunca.
+
+**O mecanismo medido: a aula tem um corpo e cinco cópias de cada fato operacional espalhadas pelos
+fechos.** O fato "duas bases de caminho" está escrito em **cinco** lugares; "o `unstructured` está
+fora do ambiente" em três; "o escopo das marcas de tempo" em dois. **Toda queda desta aula caiu
+numa dessas listas**: a S6-1 quebrou uma cópia, a S6-2 quebrou duas, e esta rodada quebrou a do
+escopo das marcas, plantada pelo conserto anterior a 162 linhas do exercício que ela descreve.
+
+Não é descuido de quem revisa. **É que a aula não tem um lugar que possua esses fatos**, então
+consertar o corpo sempre deixa cópias para trás. A prescrição registrada, e ainda **não aplicada**,
+é um bloco único `## Estado do material` logo após o Modelo mental, que seja o único lugar a
+afirmar qual script roda de qual diretório, quais arquivos de dado são defeituosos, qual biblioteca
+está fora do ambiente e o que o repositório já entrega pronto. Reduz de dez sítios de forma 4 para
+um.
+
+### Uma quinta forma de quebrar âncora, distinta das cinco de ontem
+
+Ao citar o `billionaires_table_2.csv`, ele passou a ser a menção de arquivo mais próxima, e
+**quatro** citações `linha N` que resolviam contra os `.py` passaram a resolver contra um CSV de 22
+linhas. O texto novo não tocou em número nenhum: trocou o **arquivo âncora**. O
+`verify-citations.js` pegou as quatro, e os quatro trechos passaram a nomear o arquivo.
+
+### O que mais saiu desta volta
+
+- **A parte 2 do CSV devolve sete documentos, não seis.** O comentário da fonte diz que
+  `fieldnames` "pula a linha de cabeçalho"; não pula, faz a primeira linha virar dado, e sai um
+  documento com `Category: Category`. É o análogo da linha corrompida do Wukong, no mesmo arquivo,
+  com a diferença útil de que **aqui a contagem denuncia**, 6 contra 7. É a única variante que a
+  aula nunca manda descomentar.
+- **O `01-02` roda, com uma troca de caminho.** A aula dizia "não o execute". O
+  `90-Data/BlackMythWukong/` não é só um nome parecido: é o **mesmo dataset em chinês**, e nele a
+  linha do Wukong **não quebra**, porque a descrição usa vírgula de largura cheia. A corrupção
+  nasceu na tradução para o inglês, e a aula perdia esse contraste.
+- **O `04-02` não aceita pergunta.** Duas superfícies mandam "faça uma pergunta cujo valor você
+  conhece" e as duas perguntas estão fixas nas linhas 44 a 47, sem `input()`. E ele é o único
+  script OpenAI do módulo sem `load_dotenv()`, apesar de o `.env.example` da pasta afirmar na linha
+  2 que **todos** carregam o arquivo. Forma 6, e o `.env.example` é o décimo terceiro arquivo que a
+  aula conta no cabeçalho e nunca abriu.
+
+### Estado do portão
+
+Soma: **212/348**. Uma abaixo de 6/12, a **AULA-06 em 3**. Ela é a única aula do curso que caiu em
+**três rodadas seguidas**, e as três quedas têm a mesma causa estrutural.
