@@ -219,8 +219,11 @@ com `input_variables` `['context', 'question']`:
 
 **Ele autoriza a abstenção**, e essa era a pergunta da Aula 19: _"If you don't know the answer, just
 say that you don't know"_. Mas traz um segundo limite que nenhuma leitura do repositório revelaria:
-**teto de três frases**. Toda geração dos seis arquivos que puxam esse prompt sai com esse teto, e
-nenhum deles o menciona.
+**teto de três frases**. Toda geração dos **sete** arquivos que puxam esse prompt sai com esse teto,
+e nenhum deles o menciona. São seis `.py` mais o `00-SimpleRAG/04_LangGraph_RAG.ipynb`, e o
+notebook **não** é cópia do `.py` de mesmo nome: o conteúdo difere. Conte com
+`grep -rl "rlm/rag-prompt" --include=*.py --include=*.ipynb`, porque filtrar só `*.py` devolve
+seis e a diferença passa despercebida.
 
 **E a medição não fecha o problema de auditoria, ela o demonstra.** O valor acima é o de uma data; o
 prompt pode ter mudado desde então sem que nada no repositório mude. Se você rodar, confira antes de

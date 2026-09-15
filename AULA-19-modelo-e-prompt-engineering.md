@@ -50,13 +50,13 @@ crítica gratuita: é a leitura crítica que o curso propõe. O aluno que copiar
 `01-UsePromptTemplateToClarifyGenerationGoal.py` para produção herda um RAG que nunca diz "não sei".
 
 **O repositório tem um prompt que autoriza a abstenção, e ele não está neste módulo.** É o
-`rlm/rag-prompt`, que **seis** arquivos puxam do LangChain Hub pela rede, em tempo de execução, e
+`rlm/rag-prompt`, que **sete** arquivos puxam do LangChain Hub pela rede, em tempo de execução, e
 que a Aula 21 transcreve na íntegra. Ele resolve a linha "autorizar a abstenção" da tabela acima com
 uma frase, _"If you don't know the answer, just say that you don't know"_, e é a evidência mais
 direta de que o custo dessa linha é uma frase mesmo.
 
 **E ele traz de brinde uma decisão de formato que ninguém pediu: teto de três frases.** O texto
-termina com _"Use three sentences maximum and keep the answer concise"_, e nenhum dos seis arquivos
+termina com _"Use three sentences maximum and keep the answer concise"_, e nenhum dos sete arquivos
 menciona isso. Repare o que aconteceu com a tabela: o prompt preenche a linha da **abstenção** e
 preenche também a de **fixar o formato**, na dimensão extensão, sem que nada no repositório declare
 a segunda. Prompt pronto é decisão de outra pessoa que você herda inteira, e um que vem da rede você
@@ -673,7 +673,7 @@ troca de lugar com falso positivo. Onde calibrar isso depende do dano relativo e
 responder, e essa é decisão de produto, não de prompt.
 
 **Prompt pronto decide por você, e o da rede decide sem deixar rastro.** O `rlm/rag-prompt` que
-seis arquivos do repositório puxam resolve a abstenção **e** impõe teto de três frases, e o segundo
+sete arquivos do repositório puxam resolve a abstenção **e** impõe teto de três frases, e o segundo
 não está declarado em lugar nenhum do código. Antes de adotar um prompt de catálogo, leia-o inteiro
 e anote o que ele decide além do que você foi buscar: `print(prompt.messages[0].prompt.template)`.
 Vindo por `hub.pull`, some a isto que o valor pode mudar sem o seu repositório mudar, então a

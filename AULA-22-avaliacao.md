@@ -169,7 +169,7 @@ o recall não tinha como; a precisão tinha.
 ### O teto que não afeta este arquivo, e afeta quem aplicar o método
 
 Ao fechar as perguntas empíricas do curso, o `rlm/rag-prompt` foi puxado do hub e transcrito na
-Aula 21. Ele termina com _"Use three sentences maximum and keep the answer concise"_, e **seis**
+Aula 21. Ele termina com _"Use three sentences maximum and keep the answer concise"_, e **sete**
 arquivos do repositório o usam para gerar resposta, entre eles o CRAG da Aula 18, o Self-RAG da
 Aula 21 e os dois grafos da Aula 26.
 

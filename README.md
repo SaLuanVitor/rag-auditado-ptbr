@@ -339,8 +339,10 @@ lacuna por construção: se a citação vem de dados extraídos por script, não
 preenchendo o caminho. É a divisão que atravessa o ferramental inteiro: **o verificador é a rede
 de baixo, e o que evita a queda é sempre outra coisa.**
 
-Estado atual: **2192 citações verificadas, 0 inválidas**, mais 27 `SKIPPED` e 15 `NO_ANCHOR`, que
-são conferência à mão por desenho e não reprovam o portão.
+Estado atual: **`PASS`, zero citações inválidas**, mais os `SKIPPED` e `NO_ANCHOR`, que são
+conferência à mão por desenho e não reprovam o portão. **O total saiu desta linha de propósito**:
+ele cresce a cada parágrafo escrito, e a versão anterior dizia 2192 quando o comando já devolvia
+2193, no mesmo dia. Rode `node ferramentas/verify-citations.js --all` para o número de agora.
 
 ---
 
