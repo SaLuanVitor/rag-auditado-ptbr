@@ -21,9 +21,9 @@ A pergunta desta aula é onde colocar a garantia de formato:
 3. Na **API do provedor** — obrigar o formato na chamada.
 4. No **schema como contrato** — declarar a estrutura e deixar a plataforma cobrá-la.
 
-Os sete arquivos deste módulo dão exemplo de cada uma. E a lição que considero mais importante não é qual escolher
-— é que **nenhuma delas garante que o conteúdo esteja certo**. E a quarta, a mais forte, chega a
-forçar o modelo a inventar: a Parte 6 mostra dois casos disso no próprio módulo.
+Os sete arquivos deste módulo dão exemplo de cada uma. E a lição que considero mais importante não é
+qual escolher — é que **nenhuma delas garante que o conteúdo esteja certo**. E a quarta, a mais
+forte, chega a forçar o modelo a inventar: a Parte 6 mostra dois casos disso no próprio módulo.
 
 ---
 
@@ -36,7 +36,7 @@ forçar o modelo a inventar: a Parte 6 mostra dois casos disso no próprio módu
 | 1    | pedir no prompt      | nada                         | nada                             | `01`, e 3 dos 5 blocos de `02`                          |
 | 2    | validar depois       | que você **detecte** o erro  | que ele não aconteça             | `01` (`parser.parse`); `04-Pydantic-v1.py` só em espírito¹ |
 | 3    | obrigar na API       | JSON sintaticamente válido   | campos, tipos, semântica         | `03-JSON-Output.py:34`                                  |
-| 4    | schema como contrato | estrutura e tipos dos campos | que os valores sejam verdadeiros | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
+| 4    | schema como contrato | a estrutura, e só onde alguém instancia o schema | que os valores sejam verdadeiros | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
 
 ¹ **Em espírito, não em fato:** o grau 2 pressupõe saída de LLM sendo conferida, e o
 `04-Pydantic-v1.py` não chama LLM nenhum (Parte 3) — valida um dicionário fixo. Ele demonstra o
@@ -47,7 +47,10 @@ se aprende o mecanismo, não porque seja um caso de grau 2.
 > **4a — schema validado depois, quando alguém valida:** function calling e `OpenAIPydanticProgram`
 > **induzem** fortemente a estrutura, e só o segundo instancia o modelo Pydantic com o que voltou.
 > Ali, desobediência vira exceção de validação: erro em vez de silêncio, melhor que o grau 3 e ainda
-> assim não é garantia. No caminho do `bind_tools` não há validação alguma. **Medido** no
+> assim não é garantia. Esse segundo ramo foi **lido, não executado**: o `llama-index-program-openai`
+> não está no ambiente de medição, e o que se lê é o análogo da mesma família no core, que valida com
+> `output_cls.model_validate(...)` (`function_program.py:209`, no `llama-index-core`). No caminho do
+> `bind_tools` não há validação alguma. **Medido** no
 > `langchain-core` 0.3.33: `parse_tool_call` apenas desserializa o JSON dos argumentos, e um tool
 > call sem o `temperature` obrigatório de `05-function-calling-v1-LangChain.py:13` chega a
 > `tool_call['args']` sem levantar nada. Quem quiser o erro precisa construir o modelo à mão:
@@ -135,9 +138,10 @@ output = llm(prompt.format(query="User ID 123"))
 ```
 
 `llm(...)` é a forma antiga; a interface atual do LangChain é `.invoke(...)` — e é o que os outros
-arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33 que o repositório pina: a chamada emite
-`LangChainDeprecationWarning: The method BaseChatModel.__call__ was deprecated in langchain-core
-0.1.7 and will be removed in 1.0. Use invoke instead.` Não é previsão — há data de remoção anunciada.
+arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33, o mais frequente dos dois pinos do repositório (quatro dos cinco `requirements` que o citam; o quinto pina 0.3.47): a chamada emite
+`LangChainDeprecationWarning: The method ``BaseChatModel.__call__`` was deprecated in langchain-core
+0.1.7 and will be removed in 1.0. Use :meth:``~invoke`` instead.` (markup Sphinx no literal). Não é
+previsão — há data de remoção anunciada.
 
 **`PromptTemplate.from_template` com `{query}`** (linha 12) é o formato do LangChain. Guarde o
 contraste: o LlamaIndex, na Parte 5, usa `{query_str}`.
@@ -216,8 +220,9 @@ declarativa (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.
     age: Optional[int] = Field(gt=0, lt=120)
 ```
 
-Um dicionário fixo é validado (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.py:25`), e o resultado é serializado
-(`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.py:35` e `:39`):
+Um dicionário fixo é validado
+(`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.py:25`), e o resultado é
+serializado (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.py:35` e `:39`):
 
 ```python
     print(user.model_dump())
@@ -289,7 +294,9 @@ nomeia o provedor que os dois usam.
 
 ### A mesma ferramenta, declarada de duas formas
 
-Via classe Pydantic (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v1-LangChain.py:10-13` e `:19`):
+Via classe Pydantic
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v1-LangChain.py:10-13` e
+`:19`):
 
 ```python
 class get_weather(BaseModel):
@@ -302,7 +309,8 @@ class get_weather(BaseModel):
 llm_with_tools = llm.bind_tools([get_weather])
 ```
 
-Via JSON Schema escrito à mão (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:27-36`):
+Via JSON Schema escrito à mão
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:27-36`):
 
 ```python
             "parameters": {
@@ -318,10 +326,12 @@ Via JSON Schema escrito à mão (`08-Generation/03-ControllingFormatViaOutputPar
 ```
 
 O segundo é o que viaja no protocolo; o primeiro é gerado a partir da classe. Ver os dois lado a
-lado é, **julgamento**, a forma mais direta de entender que `bind_tools` não é mágica — é um serializador de schema.
+lado é, **julgamento**, a forma mais direta de entender que `bind_tools` não é mágica — é um
+serializador de schema.
 
 Preserve a leitura literal da descrição da ferramenta
-(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:26`), com os erros de digitação do repositório:
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:26`), com os
+erros de digitação do repositório:
 
 ```python
             "description": "Get weather of an location, the user shoud supply a location first",
@@ -332,7 +342,8 @@ prompt, e prompt com erro de digitação é prompt.
 
 ### A diferença que muda o que o exemplo ensina
 
-`v1` **para na intenção** (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v1-LangChain.py:25-30`):
+`v1` **para na intenção**
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v1-LangChain.py:25-30`):
 
 ```python
 if response.tool_calls:
@@ -347,7 +358,8 @@ Imprime o pedido do modelo e termina. Nenhuma função é executada, nada volta 
 suficiente quando o objetivo é **extração estruturada** — você queria o objeto, e o objeto está em
 `tool_call['args']`.
 
-`v2` **fecha o ciclo** (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:49-53`):
+`v2` **fecha o ciclo**
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:49-53`):
 
 ```python
 tool = message.tool_calls[0]
@@ -376,8 +388,8 @@ Duas ressalvas, uma de cada arquivo:
 ## Parte 5 — O único arquivo do módulo com RAG, e cinco modos de sintetizar
 
 `08-Generation/03-ControllingFormatViaOutputParsing/02-LlamaIndex-OutputParsing.py` tem 88 linhas e
-é o **único dos sete** que recupera algo: os outros seis operam sobre dados fixos no próprio arquivo.
-Ele carrega e indexa
+é o **único dos sete** que recupera algo: os outros seis operam sobre dados fixos no próprio
+arquivo. Ele carrega e indexa
 (`08-Generation/03-ControllingFormatViaOutputParsing/02-LlamaIndex-OutputParsing.py:19-20`):
 
 ```python
@@ -385,9 +397,9 @@ documents = SimpleDirectoryReader(input_files=["../../99-EN/black-myth-wukong/bl
 index = VectorStoreIndex.from_documents(documents)
 ```
 
-Note o corpus: `black_myth_wukong_wiki.txt`, e não o `black_myth_wukong_setting.txt` que a Aula 19 usou. `wc -c`
-devolve **4.462 bytes** — **5,7 vezes** o corpus de 779 bytes que a Aula 19 usou, e ainda assim
-pequeno. Guarde o número para a ressalva do fim desta parte.
+Note o corpus: `black_myth_wukong_wiki.txt`, e não o `black_myth_wukong_setting.txt` que a Aula 19
+usou. `wc -c` devolve **4.462 bytes** — **5,7 vezes** o corpus de 779 bytes que a Aula 19 usou, e
+ainda assim pequeno. Guarde o número para a ressalva do fim desta parte.
 
 O conteúdo novo do arquivo são os cinco `ResponseMode`, um por bloco:
 
@@ -421,12 +433,11 @@ texto concatenado exceder a janela de contexto. A implementação não falha —
 `_prompt_helper.truncate`, que corta o chunk para caber. Com os 4.462 bytes deste corpus não aparece;
 num acervo real, o modo **descarta texto sem avisar**, o que é pior que falhar.
 
-É uma decisão de custo por consulta e de como a informação se perde: refinar propaga o que já foi
-dito, acumular preserva a origem de cada resposta, e reempacotar troca número de chamadas por
-tamanho de prompt.
+A escolha é de custo por consulta: reempacotar troca número de chamadas por tamanho de prompt.
 
 🔴 **E há um problema anterior a todos esses, que invalida a comparação: os três templates não têm
-`{context_str}`.** As linhas 50, 64 e 79 declaram apenas `{query_str}`, e o `PromptTemplate` do
+`{context_str}`.** As linhas 50, 64 e 79 de `02-LlamaIndex-OutputParsing.py` declaram apenas
+`{query_str}`, e o `PromptTemplate` do
 LlamaIndex **descarta chave extra em silêncio** — verificado por execução no `llama-index-core`
 0.12.15: formatar um template de `{query_str}` passando também `context_str` devolve o prompt sem uma
 letra do contexto. O sintetizador passa o texto recuperado como `context_str`, e ele é jogado fora.
@@ -441,13 +452,13 @@ de template, porque a saída continua plausível, e a próxima seção mostra as
 
 O diretório se chama `03-ControllingFormatViaOutputParsing`. Neste arquivo, **um** dos cinco blocos
 usa parsing de fato — o bloco 2, com `output_cls=GameInfo` na linha 36, o único lugar do arquivo
-onde o schema `GameInfo` (linhas 9–16) é usado. Dos outros quatro, **três** controlam formato por **instrução
-de prompt**: tabela (`:50`), lista numerada (`:64`), linha de tempo (`:79`).
+onde o schema `GameInfo` (linhas 9–16) é usado. Dos outros quatro, **três** controlam formato por
+**instrução de prompt**: tabela (`:50`), lista numerada (`:64`), linha de tempo (`:79`).
 
 Ou seja: três dos cinco blocos são grau 1 num capítulo sobre grau 4 — e o bloco 1 não controla
-formato de forma alguma: a chamada passa só o modo, e a query não pede formato nenhum. Não é erro — é o material
-que permite comparar os dois no mesmo arquivo. Rode o bloco 3 e o bloco 2 e olhe qual dos dois
-resultados você conseguiria consumir por programa sem escrever um parser à mão.
+formato de forma alguma: a chamada passa só o modo, e a query não pede formato nenhum. Não é erro —
+é o material que permite comparar os dois no mesmo arquivo. Rode o bloco 3 e o bloco 2 e olhe qual
+dos dois resultados você conseguiria consumir por programa sem escrever um parser à mão.
 
 ### Dois cuidados de leitura
 
@@ -496,8 +507,9 @@ Esta é a parte que fecha a aula, e ela atravessa dois arquivos.
 ```
 
 O `...` do `Field` é o marcador de obrigatório do Pydantic. Agora olhe o que é enviado ao modelo: o
-`prompt_template_str` (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v2.py:24-32`) tem uma única variável, `{code}`, e a chamada
-passa apenas o código (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v2.py:50`):
+`prompt_template_str` (`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v2.py:24-32`)
+tem uma única variável, `{code}`, e a chamada passa apenas o código
+(`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v2.py:50`):
 
 ```python
     analysis = program(code=sample_code)
@@ -518,7 +530,8 @@ obrigatórios (`08-Generation/03-ControllingFormatViaOutputParsing/05-function-c
 `temperature` é o que uma função de clima **devolve**, não o que quem pergunta informa. Declarada
 como parâmetro obrigatório, ela força o modelo a chegar com um número de temperatura para poder
 pedir a temperatura. Compare com a versão em JSON Schema do outro arquivo
-(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:35`), que exige apenas `location`:
+(`08-Generation/03-ControllingFormatViaOutputParsing/05-function-calling-v2-DeepSeek.py:35`), que
+exige apenas `location`:
 
 ```python
                 "required": ["location"]
@@ -600,9 +613,15 @@ um valor absurdo (`"-90℃"`) e leia a resposta final da linha 54. O modelo rela
 disse. Essa é a lição de confiança: o resultado da ferramenta entra no contexto como fato, sem
 crítica — o mesmo problema do contexto recuperado, num canal diferente.
 
-**8. Os cinco modos.** Em `02-LlamaIndex-OutputParsing.py`, rode os cinco blocos e compare as
-saídas. Verifique a ressalva da Parte 5: com 4.462 bytes de corpus, quanto os modos realmente
-divergem? Depois aponte o `input_files` da linha 19 para um documento grande e repita.
+**8. Os cinco modos, com a variável certa isolada.** Em `02-LlamaIndex-OutputParsing.py`, rode os
+cinco blocos e compare as saídas. Como está, a comparação não mede modo de síntese: os blocos 3, 4 e
+5 respondem sem o acervo, pelo defeito de `{context_str}` da Parte 5. Então conserte primeiro,
+acrescentando `{context_str}` aos templates de `02-LlamaIndex-OutputParsing.py:50`, `:64` e `:79`, e só depois compare. Aí sim a
+segunda ressalva vira pergunta: com 4.462 bytes, quantos chunks o índice produz, e os modos chegam a
+divergir? Para levar o corpus adiante você terá de trazer texto de fora: medido com
+`find . -name '*.txt' -printf '%s %p\n' | sort -rn`, o maior documento em inglês do domínio é o que
+o arquivo já carrega, e o de 20.648 bytes em `90-Data/BlackMythWukong/` está em chinês, contra
+perguntas escritas em inglês.
 
 ---
 

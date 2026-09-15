@@ -108,7 +108,7 @@ parser frágil.
 > todos no `else`.
 >
 > O efeito é pior que aleatório, porque é **assimétrico**: o `else` significa "documento irrelevante"
-> e "resposta não sustentada". Um grader que responda com maiúscula esvazia `filtered_documents` e
+> e "resposta não sustentada" (e "resposta inútil", em `:322`). Um grader que responda com maiúscula esvazia `filtered_documents` e
 > empurra o grafo para o ciclo de reescrita — sem que nada tenha dado errado na recuperação. Com
 > `Literal["yes", "no"]` o desvio viraria exceção de validação, visível, em vez de decisão de
 > roteamento errada e silenciosa.
@@ -171,10 +171,8 @@ deixou a verificação para cá. Verificado — a implementação critica o mate
 recupera sempre (`Self-RAG-FullImplementation.py:344`). O "decide se precisa recuperar" é verdade do
 paper e não da implementação, exatamente como a Aula 18 antecipou.
 
-Duas anotações de leitura:
-
-**A granularidade caiu.** `ISSUP` no paper tem três valores; `GradeHallucinations` tem dois. `ISUSE`
-tem cinco; `GradeAnswer` tem dois.
+Uma anotação de leitura. A perda de granularidade que o Modelo mental contabilizou já está
+localizada na tabela acima: `ISSUP` e `ISUSE` caem nos dois graders binários.
 
 **Um vestígio de migração.** A linha `Self-RAG-FullImplementation.py:37` é um import comentado:
 

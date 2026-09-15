@@ -4050,3 +4050,156 @@ e o que apareceu é um número que reprova.
 O caminho para abrir é curto e é de medição, não de conserto: reauditar a **AULA-20** e a **AULA-21**
 sobre o texto já corrigido. Se as duas `−1` tiverem saído, o critério 2 passa e o portão abre.
 Recontar sempre com `node ferramentas/portao.js`, que é a fonte.
+
+## Reauditoria da AULA-20 e da AULA-21: as duas `−1` saíram
+
+| Aula | Antes | Agora | E | C | H | O | D | A | `−1` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [20](../AULA-20-saida-estruturada.md) | 5/12 | **9**/12 | 2 | 2 | 1 | 1 | 2 | 1 | não |
+| [21](../AULA-21-self-rag.md) | 7/12 | **12**/12 | 2 | 2 | 2 | 2 | 2 | 2 | não |
+
+**A AULA-21 é a primeira 12/12 medida com este instrumento.** As duas 12/12 anteriores do curso, na
+sexta rodada, caíram para 5 e 4 quando alguém olhou fundo. Esta foi medida com o briefing que
+declara o histórico da frase e manda conferir contra o PDF.
+
+### A cadeia de invenções parou na terceira versão
+
+A frase do Self-RAG já tinha produzido **duas invenções seguidas, cada uma nascida de consertar a
+anterior**: motivo inventado ("é a categoria que mais aparece") virou seção inventada ("citada na
+Seção 4"). A terceira versão foi conferida no PDF por dois medidores independentes, e os quatro
+elementos batem: três valores, a palavra `attribution`, o Apêndice A.1, e **os dois** trabalhos com
+os anos certos.
+
+O que fez diferença foi o briefing declarar o histórico e pedir **desconfiança proporcional**. O
+auditor não parou na frase: reconferiu a Table 1 inteira, a citação do Modelo mental e o segundo
+paper, com a razão explícita de que "uma frase que já mentiu duas vezes não prova que as vizinhas
+estão bem".
+
+### O conserto do grau 4a deixou duas superfícies para trás, e uma delas em outro arquivo
+
+Consertei a escada e a ressalva do grau `4a`, e não a **tabela** quinze linhas acima, que continuava
+prometendo "estrutura e tipos dos campos" e listando o `bind_tools` na mesma célula. **Consertar em
+uma superfície só é cometer a forma 4, e eu a cometi dentro do conserto dela.**
+
+Pior: o `GLOSSARIO.md` afirmava que "function calling com Pydantic **induz e valida**, devolvendo
+exceção quando o modelo desobedece", que é exatamente o que a medição do dia refutou. O verbete
+descrevia a técnica pela propriedade de um dos caminhos dela. **Forma 4 atravessando arquivo**, e o
+`fechos.js` não a alcança porque não conhece verbete de glossário como superfície de fecho.
+
+E a ressalva que escrevi trazia **"Medido" para metade do parágrafo e nada para a outra**: o pacote
+que implementa o `OpenAIPydanticProgram` não está no ambiente, então aquele ramo é lido, não
+executado, e passou a declarar isso.
+
+### Sexta e sétima âncoras quebradas hoje, e as duas por troca de arquivo âncora
+
+Ao citar três `.txt` no exercício 8 da AULA-20, roubei a âncora de dois blocos, e **um deles está 240
+linhas acima** do texto que escrevi. O verificador resolve `linha N` contra o arquivo citado mais
+perto, e uma citação nova se interpõe entre um bloco antigo e o arquivo dele.
+
+É a mesma forma que apareceu na AULA-06 hoje, com quatro citações de uma vez, e ela merece nome
+próprio: **citar um arquivo novo reescreve a resolução de toda citação solta que venha depois**. A
+defesa que não depende de distância é nomear o arquivo na própria citação.
+
+### Estado dos dois critérios
+
+Recontar com `node ferramentas/portao.js`, que é a fonte, e **não somar de cabeça**: neste GATE isso
+já produziu o número que eu queria ver duas vezes hoje.
+
+---
+
+# Consolidação: o portão abre, e o que isso significa e não significa
+
+```
+$ node ferramentas/portao.js
+Notas gravadas: 29 de 29
+Soma: 245/348  (70.4%)
+Criterio 1, nenhuma abaixo de 6/12: PASSA
+Criterio 2, no maximo um -1: PASSA   (DESCONHECIDAS: 0, -1 contados: 0)
+PORTAO: ABERTO
+```
+
+**É a primeira vez que o portão abre**, e ele não abriu por o material ter melhorado hoje: abriu
+porque as **doze aulas que nunca tinham sido medidas por dimensão** foram medidas, e nove delas
+valiam mais do que o registro dizia. A cobertura saiu de 17 aulas contáveis para 29.
+
+## A trajetória do dia, e ela não é uma linha
+
+| Momento | Soma | Critério 1 | Critério 2 |
+| --- | --- | --- | --- |
+| Início (fim da oitava rodada mais S6 parcial) | 204/348 | 5 abaixo | 16 desconhecidas |
+| Depois das remedições de 01, 03, 04, 06, 19 | 213/348 | 1 abaixo | 12 desconhecidas |
+| Depois da AULA-06 fechar em 9 | 218/348 | **passa** | 12 desconhecidas |
+| Depois das doze medidas por dimensão | 236/348 | 1 abaixo (a 20, em 5) | **2 `−1`** |
+| Depois de reauditar a 20 e a 21 | **245/348** | **passa** | **passa** |
+
+O curso cruza os **70%** e sai de `Requer revisão` para a faixa de `Publicável com ressalvas`, cujas
+portas obrigatórias são no máximo uma `−1` e nenhuma aula abaixo de 50%. As duas estão cumpridas.
+
+## A ressalva que tem de vir junto, e ela é grande
+
+**A nota de cada aula foi medida antes dos últimos consertos dela.** Catorze das 29 aulas foram
+tocadas depois da auditoria que produziu a nota vigente, algumas por lotes de dez a vinte consertos.
+O portão abre sobre um estado em que **medição e artefato não estão sincronizados**.
+
+Isso não é vício desta rodada, é a mecânica: auditar produz achado, aplicar achado muda o texto, e a
+nota só volta a valer com nova auditoria. O dia inteiro mostrou o custo disso nos dois sentidos, e
+as duas direções importam:
+
+- **Para cima:** nove das doze desconhecidas subiram porque o registro media uma versão anterior aos
+  consertos. A AULA-08 estava marcada 6 e vale 10; a AULA-24 e a AULA-25 idem.
+- **Para baixo:** duas remedições **pioraram** a aula (AULA-19 de 5 para 4, AULA-06 de 5 para 4), e
+  uma delas levou três voltas para fechar.
+
+**O que fecha essa dívida é uma passada final de medição sobre o texto como está**, não mais
+consertos. Enquanto ela não acontecer, o número honesto de citar é "245/348, medido, com catorze
+aulas tocadas depois da própria medição".
+
+## O que a rodada ensinou, e o que sobra de método
+
+**Sete dos doze achados principais das aulas novas são explicação causal errada colada a número
+certo, ou alcance perdido entre a medição e a frase.** Nenhum é invenção do zero. Quando este
+material erra, ele quase sempre errou **depois** de medir, e é isso que faz o carimbo "Medido" ser a
+coisa mais cara de escrever.
+
+As duas `−1` do dia são as duas versões extremas disso:
+
+- **AULA-20:** medição correta, propriedade atribuída ao objeto errado. O `pydantic` 2.13.4 é do
+  instrumento, e a frase o deu como pino da fonte.
+- **AULA-21:** fato correto, localizador inventado para lhe dar autoridade. E o localizador nasceu
+  de consertar uma invenção anterior.
+
+Formas que entraram na lista hoje e não estavam nela:
+
+1. **Corrigir invenção inventando outro detalhe** (AULA-21, duas vezes na mesma frase).
+2. **Atribuir à fonte uma propriedade do instrumento** (AULA-20, AULA-05, AULA-06: três ocorrências).
+3. **Medir com o instrumento que o material não usa**, que produz número verdadeiro sobre a coisa
+   errada (o `pdftotext` da AULA-06).
+4. **Citar um arquivo novo reescreve a resolução de toda citação solta que venha depois**, mesmo
+   centenas de linhas acima (sete âncoras quebradas hoje, duas por esta via).
+5. **Consertar em uma superfície só é cometer a forma 4**, inclusive dentro do conserto dela.
+
+## Sobre as ferramentas, que foram o outro achado do dia
+
+Três passavam verdes medindo menos do que podiam, e nenhuma estava visivelmente quebrada:
+
+- `contagem.js` calculava o desconto de coluna e **não o usava**;
+- `portao.js` exigia uma coluna fixa antes da nota, e deixava duas aulas como desconhecidas com as
+  dimensões escritas ao lado;
+- `lock.js` abortava com "casou 0x" diante de fim de linha misturado, mandando procurar erro de
+  digitação num texto correto.
+
+E o `portao.js` se declarava **`ABERTO` com doze desconhecidas**, contradizendo a regra do próprio
+cabeçalho dele. O ramo nunca tinha sido exercido porque o critério 1 sempre reprovava antes. Hoje
+ele tem três estados, e o do meio existe por isso.
+
+**A autoconferência dele foi o que pegou dois totais somados errado pelos auditores**, que eu tinha
+transcrito sem refazer a conta. Se as seis dimensões não somam o total, uma das duas está errada, e
+vale o que foi medido.
+
+## O que falta
+
+1. **A passada de medição final**, sobre o texto como está, nas catorze aulas tocadas depois da
+   própria nota. É o que sincroniza medição e artefato.
+2. **O `fechos.js` não conhece duas categorias** que produziram defeito hoje: "seção que possui um
+   fato" e "verbete de glossário". As duas foram achadas por leitura humana.
+3. **Os ~70 commits sem push**, que são do @devops.

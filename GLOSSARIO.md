@@ -400,8 +400,11 @@ agir é do modelo (Aula 26).
 
 **Structured output** — Saída do modelo que obedece a uma estrutura declarada (esquema), em vez de
 texto livre. **"Garante" depende do grau** (Aula 20): pedir no prompt não garante nada; `json_object`
-garante JSON sintático e não os campos; function calling com Pydantic **induz e valida**, devolvendo
-exceção quando o modelo desobedece — não é garantia; só `json_schema` com `strict: true` restringe a
+garante JSON sintático e não os campos; function calling com Pydantic **induz** a estrutura, e valida
+apenas onde alguém instancia o schema com o que voltou, como fazem `with_structured_output` e o
+`OpenAIPydanticProgram`; no `bind_tools` cru de `05-function-calling-v1-LangChain.py` nada valida, e
+o campo obrigatório ausente chega a `tool_call['args']` em silêncio — nem o degrau que valida é
+garantia; só `json_schema` com `strict: true` restringe a
 geração, e nenhum arquivo deste repositório usa isso. Em nenhum grau há garantia sobre a
 **veracidade** dos valores.
 
