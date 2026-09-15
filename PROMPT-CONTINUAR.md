@@ -22,7 +22,7 @@ aberta em `E:\Projetos\rag\rag-auditado-ptbr`.
 > | "leia estes quatro arquivos" | ver a lista corrigida logo abaixo |
 > | fase "subir a nota" | fase **manutenção**: o portão abriu e o que resta é vigiar |
 >
-> **O que mudou de ferramental:** eram duas ferramentas em 20/08 e são **treze**, com treze suítes em
+> **O que mudou de ferramental:** eram duas ferramentas em 20/08 e são **quinze**, com quinze suítes em
 > `ferramentas/testes/`. As três que mudam o começo de uma sessão nova são o `portao.js`, que
 > reconta os critérios; o `entreaulas.js`, que valida citação de linha de uma aula para outra; e o
 > `vigia.js`, que diz se a fonte pinada ou as bibliotecas andaram. O `README.md` tem a lista
@@ -55,7 +55,7 @@ coisa, na ordem:
 2. agente/rag-specialist.md      (protocolo de citação, ferramental obrigatório, vigilância)
 3. avaliacao/RUBRICA-AULAS.md    (como a nota é atribuída, e o que é e não é -1)
 4. avaliacao/GATE-AULAS-v1.md    (notas e defeitos de todas as rodadas — leia as ÚLTIMAS seções)
-5. README.md                     (as treze ferramentas, por momento de uso)
+5. README.md                     (as quinze ferramentas, por momento de uso)
 
 CONTEXTO EM UMA FRASE: curso de RAG em português COMPLETO (29 aulas, AULA-00 a AULA-28) construído
 sobre o repositório de código de RAG from First Principles (Packt), que precisa estar clonado como
@@ -81,7 +81,8 @@ CONFIRA O ESTADO ANTES DE AGIR (da raiz deste repositório):
   node ferramentas/portao.js                    <- os dois criterios, e e a FONTE da nota
   node ferramentas/verify-citations.js --all    <- citacoes contra o clone
   node ferramentas/entreaulas.js                <- citacao de linha de aula para aula
-  bash ferramentas/testes/rodar.sh              <- as treze suites, com positivo plantado
+  node ferramentas/dod.js                       <- as dez condicoes do DoD, uma a uma
+  bash ferramentas/testes/rodar.sh              <- as quinze suites, com positivo plantado
   git -C ../RAG-from-First-Principles status --short --ignored
   git log --oneline
 

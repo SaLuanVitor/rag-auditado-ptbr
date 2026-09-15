@@ -88,7 +88,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | `agente/` | o `@rag-specialist`: persona, protocolo de citação de 10 regras, limites declarados |
 | `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
 | `exercicios/` | script executável de similaridade (cosseno, IP, L2, com bug proposital) |
-| `ferramentas/` | treze ferramentas de verificação e edição, com treze suítes em `ferramentas/testes/` |
+| `ferramentas/` | quinze ferramentas de verificação, medição e edição, com quinze suítes em `ferramentas/testes/` |
 | [`HANDOFF.md`](HANDOFF.md) | estado verificado, achados, e o que falta |
 
 ## Como cada aula é feita
@@ -293,7 +293,7 @@ pode reordenar conforme a necessidade do seu projeto.
 
 ## Ferramental (CLI First)
 
-O curso tem **treze** ferramentas em `ferramentas/`, com **treze suítes** em
+O curso tem **quinze** ferramentas em `ferramentas/`, com **quinze suítes** em
 `ferramentas/testes/`. Zero dependências externas em todas. As duas primeiras nasceram depois que
 o gate v1 do agente `@rag-specialist` registrou 3 alucinações de citação; as outras dez nasceram
 durante a auditoria adversarial, cada uma de um defeito que passou.
@@ -309,11 +309,13 @@ durante a auditoria adversarial, cada uma de um defeito que passou.
 | `node ferramentas/contagem.js <arq>` | Numeral anunciado contra itens entregues ("duas anotações" seguidas de três) |
 | `node ferramentas/fechos.js <arq>` | Enumera as superfícies de fecho a reler quando um conceito muda, **dentro** de um arquivo |
 | `node ferramentas/superficies.js "<termo>"` | Onde um fato mora **através** do acervo, separando superfície viva de registro |
+| `node ferramentas/decisoes.js ["<termo>"]` | Onde uma decisão foi tomada: seções do `GATE` pelo título, commits pelo assunto |
 
 **Para medir e registrar:**
 
 | Comando | O que decide |
 | --- | --- |
+| `node ferramentas/dod.js` | **As dez condições do DoD, uma a uma.** A décima não é decidível por máquina, e ele diz isso em vez de somar dez |
 | `node ferramentas/portao.js` | Reconta os dois critérios eliminatórios do `GATE`. Desconhecido **não** é zero |
 | `node ferramentas/vigia.js` | Se a fonte pinada ou as bibliotecas que as aulas declaram ter medido andaram |
 | `node ferramentas/gerar-fatos.js` | Regenera `FATOS.md`, o índice com `arquivo:linha` **mais o conteúdo literal**: mais de 300 linhas de fato |
@@ -327,7 +329,7 @@ durante a auditoria adversarial, cada uma de um defeito que passou.
 | `node ferramentas/requebra.js <arq>` | Requebra parágrafo **provando** que a sequência de palavras não mudou |
 | `node ferramentas/eol.js <arq>` | Normaliza fim de linha misto, provando que o conteúdo não mudou |
 
-`bash ferramentas/testes/rodar.sh` roda as treze suítes, sempre com **positivo plantado**: sem ele,
+`bash ferramentas/testes/rodar.sh` roda as quinze suítes, sempre com **positivo plantado**: sem ele,
 suíte verde não prova nada, e sete verificadores deste projeto já aprovaram por não medir.
 
 **Por que o `FATOS.md` e não só o verificador:** o verificador pega caminho inexistente e linha

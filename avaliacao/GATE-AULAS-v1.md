@@ -4817,3 +4817,63 @@ definição que ainda está assentando, e reusar o v2 mediria memória das corre
 `HANDOFF` já proíbe.
 
 **Ferramental: treze scripts, treze suítes, zero sem exercício.**
+
+# Os três adiados, resolvidos
+
+As quatro pendências foram decididas em 15/09 e três ficaram **adiadas com motivo escrito**. Adiado
+com motivo continua sendo adiado, então foram resolvidas.
+
+## Estado: `ferramentas/dod.js`, e ele se recusa a somar dez
+
+A capacidade de estado virou o verificador do DoD, condição por condição, e a forma dele vem do pior
+defeito do dia: **eu declarei cumprida a condição que nomeia dois arquivos tendo aberto um.** Julguei
+o conjunto em vez de ler o critério item a item. O script não deixa julgar o conjunto: imprime dez
+linhas.
+
+**A decisão de desenho é o oposto de um portão verde.** A décima condição, "o `HANDOFF` e o
+`PROMPT-CONTINUAR` descrevem o estado medido", **não é decidível por máquina**: exige comparar prosa
+com o mundo. Um script que imprimisse `10/10` institucionalizaria o meu erro. Então ele separa
+**decididas** de **pendente de leitura**, e fecha com a frase que importa:
+
+> `Nove verdes NAO sao dez. A ultima e trabalho de ler, e nenhum verde a substitui.`
+
+O positivo plantado da suíte move a condição humana para a lista das decidíveis e exige que a suíte
+perceba. **A suíte é de integração**, contra o repositório real, e isso vai declarado porque contraria
+o padrão das outras: ela verifica a composição de nove ferramentas, e simular as nove testaria o
+simulador.
+
+## Localização: `ferramentas/decisoes.js`
+
+O plano nomeava a lacuna: "um índice de decisões, hoje espalhadas em commits". Elas estão em **dois**
+lugares que não se procuram do mesmo jeito: as seções do `GATE`, onde mora a **razão**, e os assuntos
+de commit, onde moram a **data** e o que mudou junto. Quem não sabe que são dois acha metade.
+
+**A escolha de referência vem da décima segunda forma de defeito:** seção se cita pelo **título**,
+porque a linha anda a cada seção acrescentada; commit se cita pelo **hash**, que não se move. O
+número de linha aparece marcado como o que é, conveniência de hoje.
+
+Ele casa **título** de seção e **assunto** de commit, nunca o corpo, e diz isso na saída junto com
+onde procurar o corpo. Metade da suíte fixa esse limite, porque um índice que parecesse buscar no
+corpo faria alguém concluir "não foi decidido" a partir de meia busca.
+
+## Exame v3: escrito, e não aplicado
+
+`avaliacao/EXAME-RAG-v3.md`, 30 questões novas. O eixo mudou, e a razão está medida no gate v2: o
+gargalo deixou de ser **localizar**, que o ferramental resolveu com zero erros de citação, e passou a
+ser **verificar comportamento**, que ficou em 65%.
+
+Metade das questões `F` exige executar ou comparar versões, não localizar, e seis miram o que mudou
+depois do v2: vigilância, as doze formas, pin contra instrumento, as remoções do `langchain-core`
+1.x, superfície viva contra registro, e o DoD. Nenhuma se responde de memória do v2.
+
+**Não foi aplicado, e isso é parte da resolução.** Aplicar exige despachar o agente e corrigir, e a
+correção não pode ser minha nem dele: **o agente não corrige o próprio exame**, pela mesma razão que
+a `RUBRICA-AULAS.md` proíbe auto-atribuir nota ao material. Até a aplicação, o nível vigente continua
+sendo **L3**.
+
+**E a distribuição declarada estava errada no primeiro rascunho.** Eu escrevi "8 `C`, 6 `A`, 6 `J`",
+que era o **desenho**, e as questões escritas deram 7, 8 e 5. Contado por comando antes de publicar,
+e o cabeçalho agora diz "distribuição **contada, não pretendida**". É a forma que este projeto mais
+cometeu, no documento que existe para medir quem a comete.
+
+**Ferramental: quinze scripts, quinze suítes, zero sem exercício.**
