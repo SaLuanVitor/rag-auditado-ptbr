@@ -4486,3 +4486,72 @@ reprovam. Sem essa prova, um caso escrito para impedir aprovação sem medição
 medir.
 
 **Ferramental: onze scripts, onze suítes, zero sem exercício.**
+
+## `ferramentas/vigia.js`: a primeira capacidade do agente, e o que ela achou na estreia
+
+Décimo segundo script, décima segunda suíte. É a capacidade de **vigilância** que o plano de
+fechamento recomendou construir primeiro, pelo argumento de que é a única cujo valor **cresce com
+o tempo**: as outras aceleram conserto, e não há conserto previsto; esta impede o acervo de passar a
+mentir sem que ninguém perceba.
+
+### O que ele decide
+
+| Via | Instrumento | Veredito |
+| --- | --- | --- |
+| A fonte | `git ls-remote` contra o commit pinado | andou / não andou / não respondeu |
+| As bibliotecas | PyPI contra a versão que **a aula declara ter medido** | andou / corrente / não respondeu |
+
+**A lista de vigilância se deriva, não se escreve.** Ela sai das próprias aulas, por busca de
+`` `pacote` X.Y.Z ``, e é classificada contra os 23 `requirements` do clone. São 11 declarações,
+**8 PIN** e **3 INSTRUMENTO**, e essa separação é o miolo da ferramenta: uma versão que a aula cita
+e que o repositório **não** pina é o ambiente de quem mediu, e vigiá-la contra o PyPI seria vigiar a
+coisa errada. Foi exatamente essa confusão que produziu uma nota `−1` nesta auditoria.
+
+Conferidas as três de INSTRUMENTO à mão: as três estão **corretamente rotuladas** no texto. A
+AULA-00 é exemplar, "instalado fora deste repositório; não executei o teste. Versão diferente pode
+diferir". O vigia não sabe distinguir rótulo declarado de rótulo ausente, e isso vai como limite.
+
+### O que ele NÃO faz, e cada uma é escolha
+
+- **Não dá `fetch` no clone.** O contrato é que o clone pinado não se modifica, e `fetch` escreve
+  refs dentro dele. Por isso a ponta se pergunta com `ls-remote`, que não escreve nada em lugar
+  nenhum. **O preço é não saber quantos commits o upstream andou, só que andou**, e o preço está
+  pago de propósito.
+- **Não decide repinar**, porque repinar é reauditar.
+- **Não vigia os mais de 1700 pins** dos arquivos de ambiente. Vigia o que o acervo diz ter medido,
+  que é o conjunto cujo envelhecimento torna uma afirmação falsa.
+
+### A estreia, e o resultado é assimétrico
+
+**A fonte não andou.** O upstream continua em `17c6942`, o mesmo commit pinado: nenhuma citação de
+linha do curso envelheceu por essa via.
+
+**As oito bibliotecas vigiadas andaram, e cinco cruzaram versão maior:**
+
+| Pacote | Medido | Corrente | |
+| --- | --- | --- | --- |
+| `langchain` | 0.3.17 | **1.4.0** | maior |
+| `langchain-core` | 0.3.33 | **1.6.3** | maior |
+| `langchain-openai` | 0.3.3 | **1.6.2** | maior |
+| `langgraph` | 0.2.69 | **1.2.11** | maior |
+| `pymilvus` | 2.5.4 | **3.0.1** | maior |
+| `llama-index-core` | 0.12.15 | 0.14.24 | menor |
+| `langchain-community` | 0.3.16 | 0.4.2 | menor |
+| `ragas` | 0.2.15 | 0.4.3 | menor |
+
+### A consequência que a estreia levanta, e que NÃO está medida
+
+As Aulas 20 e 26 citam verbatim dois avisos de depreciação, e os dois dizem **"will be removed in
+1.0"**. O `langchain-core` está em **1.6.3**. Ou seja, **o alvo de remoção foi ultrapassado**, e a
+probabilidade de `llm(...)` e de `retriever.get_relevant_documents()` terem deixado de existir é
+alta.
+
+**Alta não é medido.** Fechar isso exige um segundo ambiente, com as versões correntes, ao lado do
+pinado, e essa é a forma certa: medir a biblioteca nova **sem** trocar o instrumento com que o resto
+do acervo foi medido. O que está medido hoje é que o alvo passou.
+
+**E nada disso obriga a mexer no curso.** As aulas afirmam comportamento numa versão nomeada, e
+continuam certas sobre aquela versão. O que o vigia produz é a **lista do que reler** se alguém
+decidir repinar, e ela nomeia as aulas: são **18 pares pacote-aula, em 13 das 29**, contados pelo próprio vigia e não de cabeça. A primeira redação dizia “treze menções em nove aulas”, e os dois números estavam errados.
+
+**Ferramental: doze scripts, doze suítes, zero sem exercício.**
