@@ -4424,3 +4424,52 @@ que são o registro funcionando. Varrer `avaliacao/` transformaria história em 
 É a única forma que a ferramenta não pode separar, e ela só pode apodrecer, porque o número descreve
 um arquivo que mudou. A referência ao estado antigo da nota da AULA-18 passou a ser pelo **commit**,
 que não se move.
+
+## `gerar-fatos.js`: a decisão era exercer ou aposentar, e a medição decidiu
+
+O plano de fechamento listava o `gerar-fatos.js` como **sem uso**, única ferramenta sem suíte, e
+oferecia as duas saídas. Pedida a aposentadoria, a medição de antes de apagar mostrou que a
+premissa estava errada em duas frentes:
+
+- **Ele roda e está correto.** `node ferramentas/gerar-fatos.js --stdout` sai com 0 e reproduz o
+  `FATOS.md` versionado. `diff -w` entre os dois devolve só as 22 linhas separadoras de tabela, que
+  o arquivo commitado traz alinhadas e o gerador emite como `| --- |`. Zero divergência de conteúdo
+  contra o clone pinado.
+- **Ele tem sete consumidores.** `FATOS.md` é citado por `agente/rag-specialist.md`,
+  `avaliacao/EXAME-RAG-v2.md`, os dois `GATE-RAG-SPECIALIST`, `RESPOSTAS-v2.md`, `HANDOFF.md` e
+  `README.md`. O `rag-specialist.md:144` manda regenerá-lo quando o repositório mudar, que é a
+  capacidade de vigilância que o plano recomenda construir.
+
+**`Sem uso` queria dizer `sem suíte`, e eu escrevi como se fosse `sem consumidores`.** Uma decisão
+de apagar chegou apoiada nessa palavra. Fica como forma: **declarar ausência sem dizer ausência de
+quê** é convite a decidir pelo motivo errado.
+
+### A décima primeira suíte, e o positivo que ela planta
+
+O contrato que ela fixa é um só, e é a razão de o `FATOS.md` existir: citação `arquivo:linha`
+acompanhada do **conteúdo literal** daquela linha. O gate v1 do agente registrou três alucinações,
+todas de asserção factual feita de memória.
+
+Por isso o positivo plantado é o **off-by-one na numeração de linha**, e não uma falha ruidosa:
+trocado `index + 1` por `index`, o gerador continua saindo com **exit 0** e produzindo um índice de
+aparência íntegra, com cada citação apontando uma linha adiante do conteúdo que alega. É a forma
+mais cara de errar aqui, porque produz uma citação com aparência de prova.
+
+Doze casos mais o plantado. Quatro fixam o que ele **não** pode fazer: indexar linha de arquivo que
+não é código, emitir seção para módulo ausente, contar a mesma linha duas vezes quando ela casa dois
+padrões, e escrever o `FATOS.md` quando chamado com `--stdout`. O caso da fonte ausente exige
+**exit 2**: sem ele o script escreveria um índice vazio, e o vazio se leria como "o repositório não
+tem nenhum fato".
+
+### Um caso meu, frouxo, achado antes do commit
+
+O caso do escape de pipe media `\|` na **saída inteira**, não na linha do arquivo plantado. Como a
+linha de tabela sempre contém pipes, o teste caía no segundo ramo de um `||` e aprovava com qualquer
+`\|` em qualquer lugar do documento. Reescrito para olhar a linha, mais um caso irmão que confere
+que ela segue tendo três colunas.
+
+Conferido por prova avulsa, fora da suíte: removido o `replace` que escapa o pipe, os **dois** casos
+reprovam. Sem essa prova, um caso escrito para impedir aprovação sem medição estaria aprovando sem
+medir.
+
+**Ferramental: onze scripts, onze suítes, zero sem exercício.**
