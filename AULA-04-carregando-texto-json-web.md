@@ -100,13 +100,26 @@ manual: o que quebra a instalação não aparece na lista de imports.
 stderr. O que ele de fato tira de você é o **fluxo de controle**: a ingestão termina com status de
 sucesso, e o aviso vira uma linha entre milhares num log que ninguém lê. A correção que ocorre
 primeiro, contar os arquivos do diretório contra os `Document` devolvidos, é necessária e não
-basta. Neste próprio diretório ela mede 9 contra 8, e o 1 de diferença é o `.pptx` que o aviso já
-tinha nomeado. Quem escapa dos dois instrumentos é o `black_myth_wukong_slides.pdf`: o
-`TextLoader` o decodifica sem erro e devolve 4609 caracteres de encanamento de PDF
-(`%PDF-1.4`, `ReportLab`, `FlateDecode`), sem uma palavra do slide, porque os fluxos de texto
-estão comprimidos. Ele entra na contagem como sucesso. O buraco real é 2 e a régua acusa 1.
-Contagem pega o arquivo que falhou; ela não pega o arquivo que "carregou" lixo. Para esse, a
-verificação é olhar o `page_content` do primeiro documento de cada extensão presente.
+basta. Nesta máquina ela mede 9 contra 8, e o 1 de diferença é o `.pptx` que o aviso já tinha
+nomeado. Quem escapa dos dois instrumentos é o `black_myth_wukong_slides.pdf`: o `TextLoader`
+o decodifica sem erro e devolve 4609 caracteres de encanamento de PDF (`%PDF-1.4`, `ReportLab`,
+`FlateDecode`), sem uma palavra do slide, porque os fluxos de texto estão comprimidos. Ele entra
+na contagem como sucesso. O buraco real é 2 e a régua acusa 1.
+
+**"Nesta máquina" é literal, e é a armadilha de Encoding lá embaixo agindo aqui.** Quem decide se
+o `.pdf` passa é o default do `open()`. Em `cp1252`, default deste Windows, ele decodifica
+inteiro, porque não contém nenhum dos cinco bytes que aquela tabela deixa indefinidos, e a
+contagem dá 9 contra 8. Em `utf-8`, default de Linux e de macOS, o mesmo arquivo levanta
+`UnicodeDecodeError` no byte `0x93` da posição 11, vira o segundo aviso em stderr, e a contagem
+dá 9 contra 7. No Windows a contagem esconde o segundo buraco; no Linux ela o encontra. Rode os
+dois lados com `loader_kwargs={"encoding": "cp1252"}` e depois `{"encoding": "utf-8"}` no
+`DirectoryLoader`, e note que o `.pptx` falha nas duas, porque nele o byte proibido existe
+(`0x9d`, posição 1277).
+
+A lição sobrevive à troca de máquina, e fica maior. Contagem pega o arquivo que falhou e não pega
+o arquivo que "carregou" lixo; e **o que decide em qual dos dois grupos um binário cai não é o
+formato dele, é a codificação padrão de quem roda**. A verificação que não depende da máquina é
+olhar o `page_content` do primeiro documento de cada extensão presente.
 
 ---
 
@@ -221,7 +234,13 @@ importam `unstructured.partition` sem wrapper nenhum. A Aula 05 mantém essa mes
   associados a ele. Repare nas linhas 8 e 9: o autor **comentou** a inicialização de
   `parent_id` e `current_parent`. O script só sobrevive se o primeiro elemento devolvido for
   `Title` ou `Table`; se não for, a linha 16 lê uma variável local ainda não atribuída e o
-  script morre com `UnboundLocalError`. Descomente as duas antes de rodar.
+  script morre com `UnboundLocalError`. E descomentar as duas, que é o conserto óbvio, **não
+  conserta o caso para o qual serve**: com `parent_id = None`, um elemento órfão anterior ao
+  primeiro `Title` faz `doc.metadata.get("parent_id")` devolver `None`, a comparação da linha 16
+  passa por igualdade de `None`, e a linha 17 empilha `(None, doc)`. O script morre sete linhas
+  depois, na 23, com `AttributeError: 'NoneType' object has no attribute 'metadata'`. Para fechar
+  os dois buracos, descomente as duas **e** troque a linha 16 por
+  `elif parent_id is not None and doc.metadata.get("parent_id") == parent_id:`.
 
 ⚠️ **Uma distinção fácil de confundir, e o nome é o culpado:** isto **não é** a estratégia
 parent-child de indexação da Aula 15. Aqui
@@ -254,8 +273,13 @@ python 03-01-LoadAllDocumentsInDirectoryWithLangChain.py
 python 03-02-SpecifyParamsWhenLoadingDirectoryWithLangChain.py
 ```
 
-Compare a **contagem de documentos**. O `03-01` pega tudo; o `03-02` filtra por `**/*.md`.
-A diferença é o que o filtro excluiu — e a pergunta é se você queria excluir aquilo.
+Estes dois são os que caem no default `UnstructuredFileLoader`, então são os primeiros a cobrar a
+dependência invisível da seção anterior: sem `unstructured[all-docs]` e sem os pacotes de dados do
+`nltk`, eles não chegam a imprimir contagem. O `requirements.txt` do módulo pede os dois, e avisa
+no cabeçalho que `poppler` e `tesseract-ocr` precisam estar no sistema.
+
+Com eles no lugar, compare a **contagem de documentos**. O `03-01` pega tudo; o `03-02` filtra por
+`**/*.md`. A diferença é o que o filtro excluiu, e a pergunta é se você queria excluir aquilo.
 
 Agora o contraste central:
 
@@ -265,13 +289,12 @@ python 01-LangChain-TextLoader-JSON.py
 python 02-LangCHain-JSONLoader-JSON.py
 ```
 
-Antes de comparar, troque o caminho do `01` para `black_myth_wukong_characters.json`, o mesmo que
-o `02` usa: como estão, os dois leem arquivos diferentes e a comparação mede duas coisas ao mesmo
+Antes de comparar, troque o caminho do `01` para `black_myth_wukong_characters.json`, o mesmo que o
+`02` usa: como estão, os dois leem arquivos diferentes e a comparação mede duas coisas ao mesmo
 tempo. Com o arquivo igualado, conte os `Document` que cada um produziu e leia o `page_content` do
 primeiro de cada. O `TextLoader` produz um blob com sintaxe JSON no meio; o `JSONLoader` produz
-frases limpas.
-Pergunte-se qual dos dois você gostaria de ter no índice quando alguém perguntar "quem é o
-personagem principal?".
+frases limpas. Pergunte-se qual dos dois você gostaria de ter no índice quando alguém perguntar
+"quem é o personagem principal?".
 
 E o modo do Markdown:
 
@@ -316,19 +339,24 @@ ValueError: Expected page_content is string, got <class 'dict'> instead.
 Set `text_content=False` if the desired input for `page_content` is not a string
 ```
 
-Não é migração silenciosa para texto bruto: é exceção, com a instrução do conserto na própria
-mensagem. Em `02-LangCHain-JSONLoader-JSON.py`, use `jq_schema='.'`. O ramo que serializa o objeto
-com `json.dumps` só é alcançado com `text_content=False`, então o desfecho esperado é a exceção, não
-o texto bruto. É a prova de que o ganho do `JSONLoader` está no esquema, não na classe: sem um
-`jq_schema` que produza string, ele não aceita o documento — ao contrário do `TextLoader`, que
-aceitaria qualquer coisa.
+A mensagem acima está quebrada em duas linhas para caber aqui; no terminal ela sai em uma linha só,
+porque a contrabarra do fonte (`json_loader.py:180-183`) é continuação de literal e não quebra de
+linha, e as duas dobras viram corridas de 21 espaços. Não é migração silenciosa para texto bruto: é
+exceção, com a instrução do conserto na própria mensagem. Em `02-LangCHain-JSONLoader-JSON.py`, use
+`jq_schema='.'`. O ramo que serializa o objeto com `json.dumps` só é alcançado com
+`text_content=False`, então o desfecho esperado é a exceção, não o texto bruto. É a prova de que o
+ganho do `JSONLoader` está no esquema, não na classe: sem um `jq_schema` que produza string, ele não
+aceita o documento — ao contrário do `TextLoader`, que aceitaria qualquer coisa.
 
 ---
 
 ## Armadilhas de produção
 
-- **Metadado perdido.** Se `metadata` sai vazio, você perdeu filtro, citação e diagnóstico de
-  uma vez. Verifique o `metadata` do primeiro documento **sempre**, logo após carregar.
+- **Metadado perdido, e o que quase nunca acontece.** `metadata` vazio é raro: o `TextLoader`
+  preenche `source` sempre, o `JSONLoader` preenche `source` e `seq_num`. Conferir se está vazio
+  aprova tudo. O que arruína filtro e citação é metadado **presente e inconsistente**, como os
+  dois `source` do `02` que diferem por um espaço no fim. Imprima os valores distintos do campo
+  que você pretende filtrar, logo após carregar, e veja se a contagem deles é a que você esperava.
 - **`silent_errors` sem contagem.** O aviso existe e vai para o log; o que se perde é o fluxo de
   controle. Não contar o que ficou de fora é criar um acervo incompleto sem registro. E contar não
   fecha a conta: o arquivo que o parser aceita e transforma em lixo entra na contagem como
@@ -343,7 +371,8 @@ aceitaria qualquer coisa.
   docstring diz isso em `text.py:20`). Qual é ela depende da máquina, então o mesmo arquivo lido
   no Linux e no Windows pode dar textos diferentes sem erro em nenhum dos dois. Medido no Windows
   desta aula, onde `locale.getpreferredencoding(False)` devolve `cp1252`: um arquivo Latin-1 lê
-  correto e um arquivo **UTF-8** é que vira mojibake, com `ção` saindo como `Ã§Ã£o`. Acentuação
+  correto e um arquivo **UTF-8** é que vira mojibake, com `ção` saindo como `cÃ§Ã£o`, dois bytes
+  por acento. Acentuação
   quebrada destrói a tokenização de qualquer texto em português. Passe `encoding=` sempre, e não
   só quando a origem for incerta: sem ele o resultado depende da máquina de quem roda.
 - **Ordem e duplicata em diretório.** `DirectoryLoader` não garante ordem, e o mesmo conteúdo
@@ -368,6 +397,9 @@ aceitaria qualquer coisa.
 7. Em `05-02`, o agrupamento pai-filho **é** a estratégia parent-child de indexação? Justifique
    a diferença.
 8. Por que `silent_errors=True` resolve um problema e cria outro?
+9. Contar 8 documentos contra 9 arquivos acha um buraco no diretório. Por que havia dois, qual
+   instrumento acha o segundo, e por que a resposta muda conforme o sistema operacional de quem
+   roda?
 
 ---
 

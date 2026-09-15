@@ -3600,3 +3600,75 @@ sintoma neste pipeline: os valores já saem associados ao nome errado, e o `04-0
 `page.extract_table()` no **singular** (linha 13), guardando uma tabela por página, enquanto o
 `04-01` usa `extract_tables()` no plural e imprime quantas achou. Separar as três é o exercício de
 verdade, e a aula creditava tudo à soma.
+
+## S6, as duas últimas passam, e a AULA-06 fica sozinha abaixo
+
+| Aula | R6 | R8 | S6 | E | C | H | O | D | A | O que decidiu |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [04](../AULA-04-carregando-texto-json-web.md) | 7/12 | 5/12 | **6**/12 | 2 | 0 | 1 | 1 | 1 | 1 | Passa raspando, e o `C` continua em zero. O melhor achado da volta anterior era verdadeiro **nesta máquina**. |
+| [19](../AULA-19-modelo-e-prompt-engineering.md) | 11/12 | 5/12 | **7**/12 | 1 | 2 | 1 | 0 | 2 | 1 | Sai do fundo. Primeiro `C` = 2 desde a AULA-18, e um `O` zero: parou de mentir, não parou de se contradizer. |
+
+### O conserto reinstalou, um nível acima, a forma que ele veio consertar
+
+Ontem eu escrevi que a contagem de arquivos contra documentos não pega o `.pdf` que carrega como
+lixo, e que esse é o furo do remédio. **A afirmação é verdadeira em `cp1252` e falsa em `utf-8`.**
+Medido:
+
+```
+cp1252   OK  4759 chars
+utf-8    FALHA  'utf-8' codec can't decode byte 0x93 in position 11
+```
+
+Em Linux ou macOS de fábrica o `.pdf` levanta `UnicodeDecodeError`, vira o segundo aviso em stderr,
+e a contagem lê 9 contra 7: **a régua que eu declarei insuficiente é suficiente lá.** O que salva o
+arquivo aqui é o acaso de ele não conter nenhum dos cinco bytes que a `cp1252` deixa indefinidos, e
+foi por conter um deles (`0x9d`, posição 1277) que o `.pptx` falhou nas duas codificações.
+
+E a aula diz isso sobre si mesma, **240 linhas adiante**, na armadilha de Encoding que a mesma
+rodada tinha acabado de corrigir: "qual é ela depende da máquina". A tese nova passou por cima da
+armadilha nova, no mesmo documento, no mesmo dia. A lição sobreviveu à correção e ficou maior: o
+que decide em qual grupo um binário cai não é o formato dele, é a codificação padrão de quem roda.
+
+### E o outro conserto não conserta o caso para o qual é prescrito
+
+Eu mandei descomentar as duas inicializações do `05-02` para evitar o `UnboundLocalError`. Medido:
+com `parent_id = None`, um elemento órfão anterior ao primeiro `Title` faz o `get` devolver `None`,
+a comparação passa **por igualdade de `None`**, e o script morre sete linhas depois com
+`AttributeError: 'NoneType' object has no attribute 'metadata'`. Troca uma exceção por outra,
+exatamente no caso que motivou a prescrição.
+
+### Na AULA-19, o conserto fechou uma ruptura com a AULA-14 e abriu outra com a mesma aula
+
+Eu tinha escrito que a saída estruturada entrega "uma exceção de validação em vez de rota inválida
+seguindo em silêncio". A AULA-14 enumera **três** desfechos, e chama o terceiro de mais provável
+justamente para pergunta fora do conjunto: o modelo responde em prosa sem chamar a tool,
+`with_structured_output` devolve `None` **em silêncio**, e o erro estoura como `AttributeError`, sem
+mencionar rota nenhuma. Ou seja, a saída estruturada **troca** o modo de falha e não o elimina, e a
+minha frase invertia a conclusão prática do leitor.
+
+### Duas coisas que a rodada aprendeu sobre a própria mecânica
+
+**Um `grep` de alternância nunca prova ausência.** A aula escrevia "não há PEFT nem LoRA, o mesmo
+`grep` acima confirma a ausência", e o grep de cima era
+`grep -rln "TrainingArguments\|SFTTrainer\|peft\|LoraConfig"`, que **retornou** o arquivo. Uma
+alternância que casa prova presença de alguma alternativa, jamais ausência das outras. A conclusão
+estava certa e a evidência citada não a sustentava.
+
+**Consertar a forma 4 em uma superfície só é cometer a forma 4.** Ao acrescentar a ressalva de
+decodificação ao exercício do roteador, criei uma citação pendurada (`linha 106` sem o arquivo) em
+**duas** superfícies, o Quebre 6 e a Mão na massa 6, e consertei uma. O `verify-citations.js` pegou
+a segunda porque eu rodei de novo depois de consertar a primeira.
+
+### Estado do portão
+
+Soma: **213/348**. **Uma aula abaixo de 6/12**, a AULA-06, em 4.
+
+Registro a correção porque ela é da mesma classe que esta rodada persegue: eu escrevi aqui que o
+portão de nota fechava, e escrevi **antes de rodar o contador**. Eram treze abaixo no início da
+sprint, doze foram remedidas, e a que sobrou é a única que caiu duas vezes seguidas. Somar de
+cabeça produziu o número que eu queria ver. O `portao.js` devolveu 213 e uma aula abaixo, e é esse
+o estado.
+
+O critério de `−1` continua zero em **16** aulas medidas por dimensão, uma livre por aritmética
+(a 22) e **doze desconhecidas**. `DESCONHECIDO NÃO É ZERO`: o portão passa no que foi medido e
+segue inconclusivo no resto, e as doze são o que falta.

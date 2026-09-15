@@ -138,6 +138,11 @@ response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 inteiro, sem cortar o prefixo de entrada. Você vai ver o prompt ecoado antes da resposta, e isso é
 comportamento esperado do código como está escrito, não bug do modelo.
 
+Fora das três, um detalhe que a Parte 4 vai virar princípio: `import torch` está na linha 2 e o
+símbolo não reaparece no arquivo. O `torch` de `02-FineTuningQwen3.py` também não (linha 9), nem o
+`os` da linha 10 dele. Nenhum dos três muda o que o script faz; contam porque a lista de imports é a
+primeira coisa que se lê para adivinhar o que um arquivo faz.
+
 ### O que este subdiretório não faz
 
 Ele se chama `01-ModelSelectionAndInvocation`. **Invocação** existe. **Seleção** não: os dois
@@ -182,8 +187,10 @@ Os hiperparâmetros estão todos explícitos
 (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:60-71`), o que é a virtude
 pedagógica do arquivo. Quatro observações de custo:
 
-**Treino é completo, não adaptador.** Não há PEFT nem LoRA — o mesmo `grep` acima confirma a
-ausência. Ajustar todos os pesos de um modelo de 0,6 B é factível numa GPU modesta; a técnica não
+**Treino é completo, não adaptador.** Não há PEFT nem LoRA, e isso pede um `grep` próprio: o de cima
+é uma alternância que casou por `TrainingArguments`, então prova presença, não ausência. O que mede é
+`grep -rn -i "peft\|LoraConfig\|SFTTrainer" --include=*.py .`, e ele devolve zero no repositório
+inteiro. Ajustar todos os pesos de um modelo de 0,6 B é factível numa GPU modesta; a técnica não
 sobe direto para modelos maiores sem trocar a estratégia.
 
 **`fp16=True`** (`08-Generation/01-ModelSelectionAndInvocation/02-FineTuningQwen3.py:70`) pressupõe GPU com suporte a meia precisão. Rodar
@@ -255,9 +262,12 @@ falso.
 
 **E não é hipótese: já está acontecendo no exemplo entregue.** A consulta da linha 22 pergunta pelas
 características e pelo estilo de combate de Baigujing, e `grep -o -i` no corpus devolve **zero**
-ocorrências de `Baigujing`, `character`, `skill`, `combat` e `ability`. Os 771 caracteres falam de
+ocorrências de `Baigujing`, `character`, `skill`, `combat` e `ability`. Os 773 bytes do arquivo
+(771 no chunk, pela conta da seção seguinte) falam de
 capítulos, finais, cinemáticas e templos. O relatório que sai é inteiramente da memória do modelo, e
-a Aula 03 mediu a mesma coisa neste mesmo arquivo.
+a Aula 03 mediu o mesmo defeito no mesmo corpus, por outro script:
+`00-SimpleRAG/01_01_LlamaIndex_5LineCode.py:19` carrega este arquivo e a linha 25 pergunta por
+"combat tools", que também não está lá.
 
 ### O detalhe aritmético: a recuperação é decorativa neste exemplo
 
@@ -457,9 +467,12 @@ O contraste vale a comparação explícita:
 `temperature=0`, e ali os dois modos de falha da coluna direita mudam de natureza. Texto extra na
 saída deixa de existir, porque o rótulo vem dos argumentos de uma tool e não de prosa livre, e a
 decodificação é reprodutível. Rótulo fora do conjunto **não fica impossível**: é o grau 4a da Aula
-20, indução forte mais validação, e o que você recebe é uma **exceção de validação** em vez de rota
-inválida seguindo em silêncio. Mesmo destino do `raise ValueError` da linha 91, por um caminho mais
-confiável. O que este arquivo demonstra, então,
+20, indução forte mais validação. O desfecho, porém, não é único: a Aula 14 enumera três, e só o
+segundo é a **exceção de validação** que corresponde ao `raise ValueError` da linha 91. O terceiro
+é pior que o daqui, e é o que ela chama de mais provável justamente para pergunta fora do conjunto:
+o modelo responde em prosa sem chamar a tool, `with_structured_output` devolve `None` em silêncio, e
+o erro estoura como `AttributeError`, sem mencionar rota nenhuma. A saída estruturada troca o modo
+de falha; não o elimina. O que este arquivo demonstra, então,
 não é "roteamento por LLM", é a versão frágil dele.
 
 Julgamento: o roteador por LLM em texto livre é mais flexível para rótulos que dependem de nuance, e
@@ -548,9 +561,11 @@ O subdiretório 01 não precisa de chave; o 02 precisa. Comece pelo que roda sem
 E rode **de dentro do subdiretório do script**, não da raiz: o
 `01-UsePromptTemplateToClarifyGenerationGoal.py` carrega o corpus por caminho relativo na linha 10,
 que só resolve com o diretório de trabalho em `08-Generation/02-OptimizingResponseViaPrompts`. Da
-raiz do repositório ele levanta `FileNotFoundError` antes de chegar a qualquer coisa que os itens
-abaixo pedem para observar. Ou seja: `cd` para `01-ModelSelectionAndInvocation` nos itens 1 e 2, e
-`cd ../02-OptimizingResponseViaPrompts` nos itens 3 a 6.
+raiz do repositório o `TextLoader` embrulha a falha: o que sobe é `RuntimeError: Error loading
+../../99-EN/...`, com o `FileNotFoundError` pendurado em `__cause__` e visível no traceback. Isso
+acontece antes de chegar a qualquer coisa que os itens abaixo pedem para observar. Ou seja: `cd`
+para `01-ModelSelectionAndInvocation` nos itens 1 e 2, e `cd ../02-OptimizingResponseViaPrompts` nos
+itens 3 a 6.
 
 **1. Invocação local, e a diferença do formato de conversa.** Rode
 `08-Generation/01-ModelSelectionAndInvocation/01-UsingQwen3.py`. Observe duas coisas: quanto tempo a carga leva no
@@ -583,7 +598,11 @@ dicionário de quatro chaves serve qualquer um dos três templates de duas.
 
 **6. O roteador exposto.** No mesmo arquivo, faça `get_prompt_template_by_question` devolver também
 o `intent`, e imprima `intent == scenario` a cada iteração do laço. Agora o teste testa o roteador.
-Guarde o resultado: a taxa de acerto do roteador é uma métrica, e métrica é o assunto da Aula 22.
+Antes de chamar o resultado de métrica, fixe a decodificação: o `OpenAI()` de
+`04-SelectAppropriatePromptTemplateViaRouting.py:106` não passa
+`temperature`, e o default do `langchain-openai` é **0,7**, então três perguntas num laço são uma
+amostra, não uma taxa. Passe `temperature=0` e repita. É a cilada do item 2 desta mesma lista, agora
+do lado do roteador, e o que sobrar é o assunto da Aula 22.
 
 ---
 
@@ -595,10 +614,12 @@ retrieved information:` e `{context}`) e deixe só a instrução de formato. O r
 saindo, completo e bem estruturado — agora inteiramente da memória do modelo. É a demonstração mais
 curta de que formato bonito não é evidência de fundamentação.
 
-**2. Troque o contexto por outro personagem.** Mantenha o template e substitua
-`retrieved_content` pelo texto de um personagem diferente do que a `query` da linha 22 pergunta.
-Veja o modelo produzir um relatório coerente sobre a pessoa errada. Nenhuma instrução do template
-autoriza dizer "o contexto não fala disso" — porque ela não existe.
+**2. Rode sem tocar em nada, e só depois troque o personagem.** Primeiro rode como está. A `query`
+da linha 22 pergunta por Baigujing, o corpus não o menciona, e o relatório que sair já é memória do
+modelo. Guarde essa saída. Agora substitua `retrieved_content` pelo texto de um personagem qualquer
+e compare. As duas saídas vêm igualmente completas e igualmente formatadas, e é esse o ponto: o
+template não tem como marcar a diferença, porque nenhuma instrução dele autoriza dizer "o contexto
+não fala disso".
 
 **3. Acrescente a frase da Aula 03, adaptada ao personagem.** Agora adicione ao template: _"If the context doesn't contain
 relevant information about the character, say so and stop."_ Repita o teste 2. A diferença entre as
@@ -616,8 +637,11 @@ custos.
 **6. Faça o roteador errar.** Em `04-SelectAppropriatePromptTemplateViaRouting.py`, mude a
 `test_queries["technical_support"]` para algo deliberadamente ambíguo (por exemplo, "meu pedido
 chegou com erro no sistema"). Compare o template impresso na linha 125 com o cenário do laço. Você
-verá o roteador errar **sem que a saída pareça errada** — porque os casos recuperados continuam
-vindo do cenário certo.
+verá o roteador errar **sem que a saída pareça errada**, porque os casos recuperados continuam
+vindo do cenário certo. Repita algumas vezes antes de concluir: o `OpenAI()` de
+`04-SelectAppropriatePromptTemplateViaRouting.py:106` não passa
+`temperature` e o default é 0,7, então a decisão pode mudar entre execuções sem você ter mudado
+nada. Ver isso acontecer já é metade da lição.
 
 ---
 
@@ -679,8 +703,9 @@ Responda sem consultar:
    documento inteiro?
 9. Em `02-UseFewShotsToProvideReferenceForResponse.py`, o que está indexado no FAISS — e por que
    isso é uma inversão em relação às aulas anteriores?
-10. Por que o laço "Candidate Analysis" de
-    `03-IncreaseComprehensivenessAndDiversityOfResponse.py` imprime um único candidato?
+10. Em `03-IncreaseComprehensivenessAndDiversityOfResponse.py`, o que a Parte 5 mediu sobre o
+    parâmetro `n` e o que ela declarou não ter medido? Por que o rótulo "Candidate Analysis" é
+    plural mesmo assim?
 11. Compare o roteamento da Aula 14 com o deste módulo em mecanismo, custo por consulta e modo de
     falha.
 12. Por que o laço de teste de `04-SelectAppropriatePromptTemplateViaRouting.py` não testa o
