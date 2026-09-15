@@ -3779,3 +3779,56 @@ linhas. O texto novo não tocou em número nenhum: trocou o **arquivo âncora**.
 
 Soma: **212/348**. Uma abaixo de 6/12, a **AULA-06 em 3**. Ela é a única aula do curso que caiu em
 **três rodadas seguidas**, e as três quedas têm a mesma causa estrutural.
+
+## A reestruturação da AULA-06: um bloco que possui os fatos, em vez de dez cópias
+
+A prescrição registrada na volta anterior foi aplicada. Entra um `## Estado do material` logo
+depois do Modelo mental, e ele passa a ser o **único lugar da aula que afirma** quatro coisas:
+
+1. de onde se roda cada script, em tabela, com a razão de cada caso;
+2. quais arquivos de dado estão defeituosos e como o defeito aparece;
+3. o que o repositório já entrega pronto, incluindo o gabarito do PDF;
+4. o que não se mede no ambiente pinado, e por isso vai marcado `NÃO_EXECUTADO`.
+
+**Dez sítios viraram um mais nove ponteiros.** A contagem antes e depois:
+
+| Fato | Cópias antes | Depois |
+| --- | --- | --- |
+| duas bases de caminho | 5 | 1 mais 4 ponteiros |
+| `unstructured`/`pdfplumber` fora do ambiente | 3 | 1 mais 3 ponteiros |
+| escopo do gabarito do PDF | 2 | 1 mais 3 ponteiros |
+
+Ponteiro aqui tem definição operacional: **ele não repete o conteúdo, só diz onde ele mora.** Foi
+preciso um segundo passe para isso, porque três dos ponteiros da primeira versão ainda afirmavam
+("daqui em diante os scripts rodam da raiz do clone", "rode os dois da raiz do repositório"), e
+eram exatamente as linhas que decairiam na próxima vez que o repositório mudasse.
+
+**O Checkpoint ganhou a pergunta que fecha o bloco.** Sem ela o `Estado do material` seria mais uma
+superfície de exposição e nenhuma de verificação, que é o defeito que a auditoria apontou no
+Checkpoint desta aula: ele mudou **uma vez em catorze commits**. A pergunta 12 é "você extraiu a
+tabela do PDF e obteve um número. Contra o que você confere se ele está certo, sem sair deste
+repositório?", e ela só tem resposta pelo bloco.
+
+### Duas coisas que eu escrevi no bloco e tive de corrigir antes de commitar
+
+**Exagero causal.** Escrevi que esta aula "caiu em três auditorias seguidas, e as três por uma
+cópia que o conserto não alcançou". Falso da terceira: lá o defeito dominante foi explicação causal
+errada, e a cópia não alcançada foi o defeito menor. Escrever a versão forte de uma generalização
+que quase fecha é o mesmo hábito que a seção existe para conter.
+
+**Bastidor de auditoria em material de aluno.** Citar achado de auditoria é convenção desta casa e
+está em outras duas aulas ("o achado que a primeira auditoria deste curso já havia registrado").
+Citar **a nota que esta aula tirou** não é a mesma coisa, e eu já tinha removido uma frase dessa
+classe da AULA-19 hoje pela mesma razão. O leitor precisa do mecanismo, não do boletim. O parágrafo
+passou a ensinar por que um fato com cinco donos não tem dono, sem contar a história das rodadas.
+
+### O que a reestruturação não resolve
+
+Ela reduz a **superfície** em que a forma 4 pode nascer; não a elimina. O bloco tem de ser
+reaberto sempre que o repositório mudar, e nada obriga isso: o `fechos.js` enumera Checkpoint,
+título, rodapé e tabela, e **não conhece a categoria "seção que possui um fato"**. Enquanto ele não
+souber, a garantia é humana. Fica registrado como o próximo trabalho de ferramenta, não como
+resolvido.
+
+A nota da aula **não muda por esta reestruturação**: ela continua em 3/12 até ser reauditada. Mover
+texto não é medir texto.
