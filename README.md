@@ -88,7 +88,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | `agente/` | o `@rag-specialist`: persona, protocolo de citação de 10 regras, limites declarados |
 | `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
 | `exercicios/` | script executável de similaridade (cosseno, IP, L2, com bug proposital) |
-| `ferramentas/` | o verificador de citações e o gerador do `FATOS.md` |
+| `ferramentas/` | doze ferramentas de verificação e edição, com doze suítes em `ferramentas/testes/` |
 | [`HANDOFF.md`](HANDOFF.md) | estado verificado, achados, e o que falta |
 
 ## Como cada aula é feita
@@ -293,21 +293,51 @@ pode reordenar conforme a necessidade do seu projeto.
 
 ## Ferramental (CLI First)
 
-O curso tem duas ferramentas em `ferramentas/`, criadas depois que o gate v1 do agente
-`@rag-specialist` registrou 3 alucinações de citação. Zero dependências externas.
+O curso tem **doze** ferramentas em `ferramentas/`, com **doze suítes** em
+`ferramentas/testes/`. Zero dependências externas em todas. As duas primeiras nasceram depois que
+o gate v1 do agente `@rag-specialist` registrou 3 alucinações de citação; as outras dez nasceram
+durante a auditoria adversarial, cada uma de um defeito que passou.
 
-| Comando                                      | O que faz                                                                                                                                     |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `node ferramentas/gerar-fatos.js`            | Regenera `FATOS.md` — índice canônico com inventário por módulo e ~330 linhas-chave, cada uma com `arquivo:linha` **mais o conteúdo literal** |
-| `node ferramentas/verify-citations.js --all` | Valida todas as citações dos `.md` do curso: caminho existe? linha está no range? Exit code 1 se houver inválida                              |
+**Antes de entregar:**
 
-**Por que as duas, e não só o verificador:** o verificador pega caminho inexistente e linha
+| Comando | O que decide |
+| --- | --- |
+| `node ferramentas/verify-citations.js --all` | Citações contra o **clone da fonte**: caminho existe? linha está no range? |
+| `node ferramentas/entreaulas.js` | Citação de linha **de uma aula para outra**, que o anterior não vê porque resolve contra o clone |
+| `node ferramentas/residuo.js` | Texto removido que sobrevive noutro arquivo |
+| `node ferramentas/cauda.js <arq>` | Oração antiga que colou na frase nova |
+| `node ferramentas/contagem.js <arq>` | Numeral anunciado contra itens entregues ("duas anotações" seguidas de três) |
+| `node ferramentas/fechos.js <arq>` | Enumera as superfícies de fecho a reler quando um conceito muda |
+
+**Para medir e registrar:**
+
+| Comando | O que decide |
+| --- | --- |
+| `node ferramentas/portao.js` | Reconta os dois critérios eliminatórios do `GATE`. Desconhecido **não** é zero |
+| `node ferramentas/vigia.js` | Se a fonte pinada ou as bibliotecas que as aulas declaram ter medido andaram |
+| `node ferramentas/gerar-fatos.js` | Regenera `FATOS.md`, o índice com `arquivo:linha` **mais o conteúdo literal** |
+| `bash ferramentas/montar-ambiente.sh` | Reconstrói o ambiente de medição com os pins do curso |
+
+**Para editar sem quebrar:**
+
+| Comando | O que decide |
+| --- | --- |
+| `ferramentas/lock.js` | Trava de casamento único: valida **todas** as âncoras antes de escrever qualquer uma |
+| `node ferramentas/requebra.js <arq>` | Requebra parágrafo **provando** que a sequência de palavras não mudou |
+| `node ferramentas/eol.js <arq>` | Normaliza fim de linha misto, provando que o conteúdo não mudou |
+
+`bash ferramentas/testes/rodar.sh` roda as doze suítes, sempre com **positivo plantado**: sem ele,
+suíte verde não prova nada, e sete verificadores deste projeto já aprovaram por não medir.
+
+**Por que o `FATOS.md` e não só o verificador:** o verificador pega caminho inexistente e linha
 fora de range, mas **não** pega citação cujo conteúdo alegado não está naquela linha — isso
 foi testado contra a alucinação real do gate, que passa como válida. O `FATOS.md` cobre essa
 lacuna por construção: se a citação vem de dados extraídos por script, não há memória
-preenchendo o caminho.
+preenchendo o caminho. É a divisão que atravessa o ferramental inteiro: **o verificador é a rede
+de baixo, e o que evita a queda é sempre outra coisa.**
 
-Estado atual: **1240 citações verificadas, 0 inválidas.**
+Estado atual: **2192 citações verificadas, 0 inválidas**, mais 27 `SKIPPED` e 15 `NO_ANCHOR`, que
+são conferência à mão por desenho e não reprovam o portão.
 
 ---
 

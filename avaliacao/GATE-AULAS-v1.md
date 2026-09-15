@@ -4586,7 +4586,7 @@ publicado na claude.ai, então **nenhum dos doze scripts o alcança**, e nenhum 
 | Ferramenta | O que ela varre | O artefato |
 | --- | --- | --- |
 | `verify-citations.js` | citações contra o clone da fonte | fora |
-| `entreaulas.js` | `AULA-*.md` mais três documentos vivos da raiz | fora |
+| `entreaulas.js` | `AULA-*.md` mais cinco documentos vivos, um deles em subdiretório | fora |
 | `residuo.js`, `cauda.js`, `contagem.js`, `fechos.js` | arquivos do repositório | fora |
 
 **A regra, então, é de processo e não de máquina:** ao medir algo novo, o artefato é a **quarta

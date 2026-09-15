@@ -133,7 +133,8 @@ obrigatório — não opcional:
 | --- | --- | --- |
 | **Índice de fatos** | ANTES de citar qualquer parâmetro, linha ou inventário | ler `FATOS.md` |
 | **Verificador de citações** | ANTES de entregar qualquer `.md` com citações | `node ferramentas/verify-citations.js --all` |
-| **Vigia** | ANTES de afirmar comportamento de biblioteca, e na cadência da seção 9 | `node ferramentas/vigia.js` |
+| **Validador entre aulas** | ANTES de entregar `.md` que cite **linha de outra aula** | `node ferramentas/entreaulas.js` |
+| **Vigia** | ANTES de afirmar comportamento de biblioteca, e na cadência da seção 7 | `node ferramentas/vigia.js` |
 
 **Fluxo para produzir uma aula ou resposta com citações:**
 
