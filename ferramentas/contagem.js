@@ -24,6 +24,20 @@ const NUM = {
   um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5,
   seis: 6, sete: 7, oito: 8, nove: 9, dez: 10,
 };
+// Ordinais NAO sao numerais que anunciam: eles FECHAM a conta. "Cinco deles tem
+// correspondencia... O SEXTO nao tem fase propria" descreve corretamente uma
+// tabela de seis, e o script acusava porque via o cinco e nao via o sexto.
+//
+// Eles entram so como ABSOLVICAO, nunca como acusacao: um ordinal que bate com a
+// contagem inocenta a linha, e um ordinal sozinho nunca abre alerta. Sem essa
+// assimetria, "o terceiro argumento" numa frase antes de uma lista de cinco
+// viraria falso positivo novo, que e o oposto do que este conserto quer.
+const ORD = {
+  primeiro: 1, primeira: 1, segundo: 2, segunda: 2, terceiro: 3, terceira: 3,
+  quarto: 4, quarta: 4, quinto: 5, quinta: 5, sexto: 6, sexta: 6,
+  setimo: 7, setima: 7, oitavo: 8, oitava: 8, nono: 9, nona: 9,
+  decimo: 10, decima: 10,
+};
 const semAcento = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 // Ate onde procurar a lista depois do numeral.
@@ -114,6 +128,11 @@ for (const arq of alvos) {
     // Se QUALQUER numeral da linha bate com a contagem, a linha esta coerente:
     // os outros sao referencia interna ("Tres coisas, e as duas primeiras...").
     if (achados.some((a) => a.v === bloco.n)) return;
+    // Absolvicao por ordinal: se a linha nomeia "o sexto" e o bloco tem seis, a
+    // conta fecha e o cardinal menor e um subconjunto declarado, nao um erro.
+    for (const m of l.matchAll(/\b([A-Za-zÀ-ÿ]+)\b/g)) {
+      if (ORD[semAcento(m[1])] === bloco.n) return;
+    }
     // Em tabela, o numeral pode nomear as COLUNAS em vez das linhas: "Os quatro,
     // lado a lado" sobre uma tabela de comparacao de quatro arquivos em quatro
     // colunas. O desconto estava calculado e nao estava sendo usado, e por isso

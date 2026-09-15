@@ -88,7 +88,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | `agente/` | o `@rag-specialist`: persona, protocolo de citação de 10 regras, limites declarados |
 | `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
 | `exercicios/` | script executável de similaridade (cosseno, IP, L2, com bug proposital) |
-| `ferramentas/` | doze ferramentas de verificação e edição, com doze suítes em `ferramentas/testes/` |
+| `ferramentas/` | treze ferramentas de verificação e edição, com treze suítes em `ferramentas/testes/` |
 | [`HANDOFF.md`](HANDOFF.md) | estado verificado, achados, e o que falta |
 
 ## Como cada aula é feita
@@ -293,7 +293,7 @@ pode reordenar conforme a necessidade do seu projeto.
 
 ## Ferramental (CLI First)
 
-O curso tem **doze** ferramentas em `ferramentas/`, com **doze suítes** em
+O curso tem **treze** ferramentas em `ferramentas/`, com **treze suítes** em
 `ferramentas/testes/`. Zero dependências externas em todas. As duas primeiras nasceram depois que
 o gate v1 do agente `@rag-specialist` registrou 3 alucinações de citação; as outras dez nasceram
 durante a auditoria adversarial, cada uma de um defeito que passou.
@@ -307,7 +307,8 @@ durante a auditoria adversarial, cada uma de um defeito que passou.
 | `node ferramentas/residuo.js` | Texto removido que sobrevive noutro arquivo |
 | `node ferramentas/cauda.js <arq>` | Oração antiga que colou na frase nova |
 | `node ferramentas/contagem.js <arq>` | Numeral anunciado contra itens entregues ("duas anotações" seguidas de três) |
-| `node ferramentas/fechos.js <arq>` | Enumera as superfícies de fecho a reler quando um conceito muda |
+| `node ferramentas/fechos.js <arq>` | Enumera as superfícies de fecho a reler quando um conceito muda, **dentro** de um arquivo |
+| `node ferramentas/superficies.js "<termo>"` | Onde um fato mora **através** do acervo, separando superfície viva de registro |
 
 **Para medir e registrar:**
 
@@ -326,7 +327,7 @@ durante a auditoria adversarial, cada uma de um defeito que passou.
 | `node ferramentas/requebra.js <arq>` | Requebra parágrafo **provando** que a sequência de palavras não mudou |
 | `node ferramentas/eol.js <arq>` | Normaliza fim de linha misto, provando que o conteúdo não mudou |
 
-`bash ferramentas/testes/rodar.sh` roda as doze suítes, sempre com **positivo plantado**: sem ele,
+`bash ferramentas/testes/rodar.sh` roda as treze suítes, sempre com **positivo plantado**: sem ele,
 suíte verde não prova nada, e sete verificadores deste projeto já aprovaram por não medir.
 
 **Por que o `FATOS.md` e não só o verificador:** o verificador pega caminho inexistente e linha

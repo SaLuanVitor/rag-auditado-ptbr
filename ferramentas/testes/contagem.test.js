@@ -84,6 +84,27 @@ checa('LIMITE: não olha o numeral 1', r.code === 0 && /Nenhuma divergencia/.tes
 r = roda('## Duas coisas\n\ntexto\n\nmais texto\n\noutro\n\n- a\n- b\n- c\n');
 checa('não alcança lista fora da janela', r.code === 0 && /Nenhuma divergencia/.test(r.saida), r.saida);
 
+// ---------- ordinal ABSOLVE, e e o caso real da AULA-25 ----------
+// "Cinco deles tem correspondencia... O sexto nao tem fase propria:" sobre uma
+// tabela de SEIS. A conta fecha, 5 + 1, e o script acusava porque via o cardinal
+// e nao via o ordinal que o completa.
+r = roda('Cinco deles têm correspondência, e o sexto não tem fase própria:\n\n'
+  + '| A | B |\n| --- | --- |\n| 1 | x |\n| 2 | x |\n| 3 | x |\n| 4 | x |\n| 5 | x |\n| 6 | x |\n');
+checa('ordinal que fecha a conta absolve o cardinal menor', r.code === 0, r.saida);
+
+// ---------- e a absolvicao NAO pode virar acusacao ----------
+// Se o ordinal acusasse, "o terceiro argumento" antes de uma lista de cinco
+// abriria alerta novo, que e o oposto do que o conserto quer. Ordinal sozinho,
+// sem cardinal na linha, nunca abre nada.
+r = roda('O terceiro argumento é o que decide:\n\n- a\n- b\n- c\n- d\n- e\n');
+checa('LIMITE: ordinal sozinho não acusa, só absolve', r.code === 0, r.saida);
+
+// ---------- e o cardinal errado continua reprovando com ordinal na linha ----------
+// A absolvicao e por IGUALDADE com a contagem: um ordinal que nao bate nao
+// inocenta nada, senao bastaria escrever "o segundo" para calar a ferramenta.
+r = roda('São três coisas, e a segunda é a mais cara:\n\n- a\n- b\n- c\n- d\n- e\n');
+checa('ordinal que NÃO bate com a contagem não absolve', r.code === 1, r.saida);
+
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {
   console.log('\n-- positivo plantado: cegando a comparação numeral × contagem --');

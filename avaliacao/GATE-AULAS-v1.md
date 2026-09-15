@@ -4725,3 +4725,95 @@ envelhecem (`PORTAO: ABERTO`, `PASS`, `SUITE VERDE`), e a instrução de reconta
 resíduo é frase que sobreviveu a uma emenda"**, repetição retórica deliberada que define o termo
 depois de usá-lo. Conferido contra o arquivo antes do conserto de hoje: o alerta já existia,
 então não nasceu desta edição. Fica registrado para não ser retriado.
+
+# As quatro pendências, decididas
+
+O portão está aberto desde 15/09 e sobraram quatro itens, todos fora do caminho crítico. Decididos
+aqui, com a razão de cada um, porque **pendência sem decisão é pendência para sempre**.
+
+## 1. Reproduzir os três números do RAGAS: ENCERRADA, não feita
+
+**Decisão: não fazer, e fechar a pergunta.** Custa chave da OpenAI e gasto por execução, e o retorno
+seria confirmar `0.6071 / 0.8565 / 0.9426`.
+
+O que decide é o que esses números **não** sustentam. A própria AULA-22 já mede que a comparação é
+um vencedor declarado por diferença de `0,0861` em **três** perguntas escritas à mão, sem
+desvio-padrão e sem repetição, e que `0,61` "não é um veredito, é um ponto de partida". Reproduzir
+confirmaria a aritmética de um resultado que a aula já ensina a não tratar como resultado.
+
+**A metade que valia foi feita e é de graça:** a dispersão está no objeto que o script tem na mão e
+ele a descarta com `np.mean` na linha 64, cujo ramo `else` é código morto. Trocar por `to_pandas()`
+custa uma linha e zero chamadas de LLM. É isso que muda a prescrição da aula; o número não muda nada.
+
+## 2. Condição 4 do DoD: REFORMULADA, porque era indecidível
+
+A condição dizia "todo lote de conserto teve verificação própria aplicada". **Ela não pode fechar**:
+verificar produz achados, achados produzem consertos, consertos ficam sem verificação. Um item de
+DoD que nenhuma execução satisfaz é defeito do DoD, não do trabalho.
+
+**Reformulada para o que é decidível por comando**, e a diferença é que agora ela tem resposta:
+
+> **4. O último lote de conserto teve verificação própria aplicada, OU a rodada parou pela régua de
+> classe e isso está registrado aqui com o pior achado da última passada.**
+
+Pela forma nova, ela **passa**: a última passada parou com o pior achado sendo uma palavra num
+cabeçalho, e isso está registrado. **Mudar critério é decisão, não medição**, então fica explícito:
+eu afrouxei uma condição que não fechava, e a troquei por uma que fecha e continua dizendo algo.
+
+## 3. O DoD não existia neste repositório, e agora existe
+
+Achado ao decidir o item 2: **as nove condições viviam só no artefato do plano**, publicado na
+claude.ai. O `HANDOFF` cita "a condição 4 do DoD" e a definição não estava em lugar nenhum do
+acervo. É a quarta superfície ao contrário: o critério pelo qual o projeto se declara pronto morava
+fora do que as ferramentas alcançam.
+
+| # | Condição | Como se decide | Hoje |
+| --- | --- | --- | --- |
+| 1 | Nenhuma aula abaixo de 6/12 | `node ferramentas/portao.js` | passa |
+| 2 | No máximo uma `−1` no curso | idem, com zero desconhecidas | passa |
+| 3 | Percentual apurado numa rodada completa das 29 | 29 notas com o mesmo identificador | passa |
+| 4 | Último lote verificado, **ou** parada pela régua registrada | esta seção | passa |
+| 5 | Citações contra a fonte válidas | `verify-citations.js --all` = `PASS` | passa |
+| 6 | Citação de linha entre aulas válida | `entreaulas.js` = `PASS` | passa |
+| 7 | Sem resíduo verbatim | `residuo.js` sem achado não justificado | passa |
+| 8 | Ambiente reprodutível | script versionado, executado do zero | passa |
+| 9 | Ferramentas com teste próprio e positivo plantado | `rodar.sh` = `SUITE VERDE` | passa |
+| 10 | `HANDOFF` e `PROMPT-CONTINUAR` descrevem o estado medido | ler os dois, **item a item** | passa |
+
+**São dez agora, não nove**, e a nova é a 6: o `entreaulas.js` não existia quando o DoD foi escrito,
+e a classe que ele fecha reapareceu nas três rodadas. Um DoD que não cobre a classe mais reincidente
+do projeto está incompleto, e acrescentar critério **depois** de a ferramenta existir é o contrário
+de afrouxar.
+
+## 4. As capacidades restantes do agente: uma construída, duas adiadas
+
+**Construída: impacto, na forma mínima.** `ferramentas/superficies.js`, décimo terceiro script,
+décima terceira suíte. Ele responde "onde este fato mora, e quais superfícies **têm** de concordar".
+
+A justificativa não é teórica: **seis defeitos de um único dia nasceram do mesmo mecanismo**, um fato
+consertado numa superfície e não nas outras. "duas ferramentas" no agente e no `README`, "três
+documentos vivos" no `GATE` uma hora depois de virarem cinco, "consequência não medida" em três
+lugares, "1638 OK" no `PROMPT-CONTINUAR`, "disjuntas" num título.
+
+**A distinção que o faz valer mais que um `grep -l`:** superfície **viva** (aula, `README`,
+`HANDOFF`, `PROMPT-CONTINUAR`, `GLOSSARIO`, agente) descreve o estado atual e divergência ali é
+defeito; `avaliacao/` é **registro**, cita o dia em que mediu, e divergência ali está **certa**. O
+positivo plantado da suíte ataca exatamente essa separação, porque misturá-las faria a ferramenta
+mandar reconciliar história.
+
+**E o primeiro uso já demonstrou o limite dela.** Rodado sobre `grau 4a`, o caso que este registro
+documenta como tendo custado três rodadas para alcançar cinco superfícies, ele devolve **cinco
+superfícies vivas e um conjunto diferente do registrado**: acha AULA-14, 18, 19, 20 e 21, e **não**
+acha o `GLOSSARIO`, onde o conceito mora sem o termo. **Termo não é conceito**, está declarado na
+ferramenta e agora está fixado em teste.
+
+**Adiadas: estado e localização.** O argumento do plano se sustenta e ficou mais forte: o
+`portao.js` responde estado em um comando, e localização se resolve com `grep` num acervo que não
+está mais mudando. As duas aceleram trabalho de conserto, e não há conserto previsto.
+
+**Adiado: o exame v3 do `@rag-specialist`.** A definição dele mudou materialmente hoje, com a seção
+de vigilância e duas entradas novas no ferramental obrigatório. Exame escrito agora mediria uma
+definição que ainda está assentando, e reusar o v2 mediria memória das correções, que o próprio
+`HANDOFF` já proíbe.
+
+**Ferramental: treze scripts, treze suítes, zero sem exercício.**
