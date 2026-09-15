@@ -117,7 +117,7 @@ O roteamento depois do agente está em `01-LangChain-AgenticRAG.py:126-127`:
 
 A primeira condição é a correta: existe chamada de ferramenta. A segunda é um `or` que dispara se a palavra `retrieve` aparecer **em qualquer lugar** do texto da resposta. Um modelo que escreva "I could retrieve more information, but…" é roteado para a recuperação sem ter pedido nada.
 
-É exatamente o problema que o `tools_condition` importado e não usado resolve. Julgamento: o `or` provavelmente foi acrescentado para fazer o exemplo funcionar quando o modelo não chamava a ferramenta. O candidato a causa está no parágrafo seguinte, e não no Defeito 2: uma descrição que promete três assuntos e entrega um faz o agente chamar a ferramenta com mais frequência, não com menos.
+É exatamente o problema que o `tools_condition` importado e não usado resolve. Julgamento: o `or` provavelmente foi acrescentado para fazer o exemplo funcionar quando o modelo não chamava a ferramenta. O candidato a causa está no parágrafo seguinte, onde o pedido para usar a ferramenta chega como `HumanMessage` em vez de mensagem de sistema, e não no Defeito 2: uma descrição que promete três assuntos e entrega um faz o agente chamar a ferramenta com mais frequência, não com menos.
 
 Repare também na instrução que o agente recebe (`01-LangChain-AgenticRAG.py:112`):
 

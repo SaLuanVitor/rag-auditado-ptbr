@@ -120,8 +120,9 @@ o notebook da Aula 13 — só que para **desenhar** uma árvore de clarificaçã
 existe; GraphRAG não. E o `10-AdvanceRAG/requirements.txt` não pede nenhuma biblioteca de grafo: são
 vinte linhas de Weaviate, LangChain/LangGraph, Milvus, LlamaIndex, Tavily, `openai` e utilitários.
 
-Os únicos dois `.py` do repositório que falam com um banco de grafos são o par Text2Cypher da Aula 12 —
-`05-PreRetrieval/01-QueryConstruction/Text2Cypher/03-Text2Cypher-SNOMED-v2-Succeeded.py:2` importa
+Os únicos dois `.py` do repositório que falam com um banco de grafos são o par Text2Cypher da Aula 12, e os dois importam na linha 2:
+`05-PreRetrieval/01-QueryConstruction/Text2Cypher/03-Text2Cypher-SNOMED-v1-Failed.py:2` e
+`03-Text2Cypher-SNOMED-v2-Succeeded.py:2` trazem
 `GraphDatabase` do driver `neo4j`. É outra técnica, como a seção anterior separou.
 
 **Consequência para esta aula:** a fonte primária é o paper. Onde a aula falar do
@@ -162,7 +163,7 @@ nível, todo nó pertence a exatamente uma comunidade. É o que permite ler os r
 inteiro sem contar nada duas vezes e sem deixar nada de fora — a cobertura que o top-k não tem.
 
 Detalhe de implementação que o paper dá e que vale para qualquer um que reimplemente: o Leiden foi
-rodado com a biblioteca `graspologic`, e a indexação usou janela de 600 tokens. A janela de contexto do resumo e da resposta é outra, e o paper a escolheu medindo: o Apêndice C testou 8k, 16k, 32k e 64k, e a **menor** venceu em comprehensiveness em todas as comparações (58,1% de win rate médio), empatando nas demais. Todo o "até a janela encher" desta seção são 8k tokens, e esse número é resultado, não herança do modelo.
+rodado com a biblioteca `graspologic`, e a indexação usou janela de 600 tokens. A janela de contexto do resumo e da resposta é outra, e o paper a escolheu medindo: o Apêndice C testou 8k, 16k, 32k e 64k, e a **menor** venceu em comprehensiveness em todas as comparações (58,1% de win rate médio), com desempenho comparável em diversity (52,4%) e empowerment (51,3%), que são os dois que o apêndice reporta. Todo o "até a janela encher" desta seção são 8k tokens, e esse número é resultado, não herança do modelo.
 
 ### Como cada resumo de comunidade é montado
 
@@ -421,7 +422,7 @@ igual, porque é o que você faria antes de adotar o método.
 sustentam a decisão de adotar ou não.
 
 **2. Extraia o texto do PDF.** Use `pdftotext "GraphRAG - 2404.16130v2.pdf" -`, que joga o texto em
-stdout sem criar arquivo, e saiba que `-layout` **não** salva a Table 2: medido neste PDF, ele desloca os rótulos, e a linha `% Max` sai com os tokens (26.657, 225.756…) enquanto os percentuais caem na linha `Tokens`. Em nenhum dos dois modos a Table 2 sai alinhada; sem `-layout` os valores ao menos vêm agrupados por condição, na ordem unidades, tokens, percentual. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
+stdout sem criar arquivo, e saiba que `-layout` **não** salva a Table 2: medido neste PDF, ele desloca os rótulos, e a linha `% Max` sai com os tokens (26.657, 225.756…) enquanto os percentuais caem na linha `Tokens`. Em nenhum dos dois modos a Table 2 sai alinhada, e sem `-layout` ela sai pior: os valores vêm em ordem de coluna, primeiro as unidades das três primeiras condições, depois os tokens, depois os percentuais, e só `C3` do Podcast e `C2` das Notícias calham de sair numa linha só. Para ler a Table 2, o caminho honesto é a página 10 do PDF. A rota "só stdlib" — inflar cada `stream` com `zlib` e coletar os
 literais entre parênteses — é instrutiva sobre como um PDF guarda texto, e vale rodar uma vez por
 isso; e neste PDF ela **funciona** — 75 streams, 73 inflados, 18.502 literais —, com uma ressalva que é a
 própria lição: os espaços entre palavras são posicionamento, não literal. Buscar `mutually exclusive`

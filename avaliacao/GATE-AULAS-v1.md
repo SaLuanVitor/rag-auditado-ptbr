@@ -4203,3 +4203,146 @@ vale o que foi medido.
 2. **O `fechos.js` não conhece duas categorias** que produziram defeito hoje: "seção que possui um
    fato" e "verbete de glossário". As duas foram achadas por leitura humana.
 3. **Os ~70 commits sem push**, que são do @devops.
+
+# A passada final de medição: as catorze sincronizadas
+
+A dívida declarada na consolidação anterior era esta: **a nota de catorze aulas fora medida antes
+dos últimos consertos delas**, então o portão abriu sobre um estado em que medição e artefato não
+estavam sincronizados. Oito auditorias, com escopo proporcional ao diff de cada aula.
+
+| Aula | Diff pós-medição | Antes | Agora |
+| --- | --- | --- | --- |
+| [00](../AULA-00-setup-do-ambiente.md) | 23/21 | 10 | **9** |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | 18/9 | 10 | **10** |
+| [09](../AULA-09-milvus-collections-schema-entidades.md) | 39/13 | 7 | **10** |
+| [11](../AULA-11-busca-hibrida-multimodal.md) | 58/22 | 6 | **8** |
+| [13](../AULA-13-query-translation.md) | 3/2 | 8 | **8** |
+| [20](../AULA-20-saida-estruturada.md) | 55/36 | 9 | **11** |
+| [21](../AULA-21-self-rag.md) | 3/5 | 12 | **11** |
+| [22](../AULA-22-avaliacao.md) | 7/6 | 10 (aritmética) | **12** (medida) |
+| [23](../AULA-23-graphrag.md) | 8/8 | 8 | **10** |
+| [24](../AULA-24-contextual-retrieval.md) | 8/8 | 10 | **10** |
+| [25](../AULA-25-modular-rag.md) | 5/5 | 10 | **10** |
+| [26](../AULA-26-agentic-adaptive-rag.md) | 7/7 | 10 | **12** |
+| [27](../AULA-27-multimodal-rag.md) | 17/10 | 8 | **9** |
+| [28](../AULA-28-projeto-final.md) | 16/7 | 9 | **11** |
+
+**Zero `−1` nas catorze.** A AULA-22 sai do regime de isenção por aritmética e passa a ter as seis
+dimensões medidas, então **nenhuma aula do curso depende mais do atalho**.
+
+## O achado da passada é sobre quem conserta, não sobre o material
+
+**Em onze das catorze, os achados principais são dos meus próprios consertos.** Não é acaso de
+amostra: a passada existe justamente para olhar o que o conserto tocou, e foi ali que ela achou.
+
+Os quatro mais instrutivos:
+
+**A AULA-00 desceu, de 10 para 9.** Meu conserto acertou o núcleo e pagou com duas coisas que a
+definição de `H` nomeia, na prescrição que o leitor executa primeiro: escrevi "os dois estão pinados
+**só ali**" a partir de uma base de dois arquivos, quando o `onnxruntime` está em cinco, um deles da
+trilha LlamaIndex e **sem `chromadb` junto**. A tabela da própria aula, 67 linhas abaixo, lista esse
+arquivo na coluna LlamaIndex: o conserto fez a aula se contradizer. E "como os dois ambientes saem
+do mesmo interpretador" é propriedade da **receita** do Passo 1, não dos pacotes, então desfazia em
+silêncio o achado que acabara de fazer.
+
+**A AULA-08 guardava a forma 4 dentro do conserto que a documenta.** Corrigi "disjuntos" no corpo e
+deixei "disjuntas" no **título da seção**, catorze linhas acima. Nenhuma ferramenta a pegaria: o
+`fechos.js` enumera título em negrito, não cabeçalho `###`.
+
+**A AULA-23 carimbou de medido a metade que não se mediu.** Eu medi o `-layout` e escrevi, no mesmo
+carimbo, que "sem `-layout` os valores ao menos vêm agrupados por condição". Não medi, e é falso:
+eles vêm em ordem de coluna. Estava dentro do conserto que existia para corrigir uma medição.
+
+**A AULA-21 desceu de 12 para 11 por uma troca de numeral.** Substituí "Duas anotações de leitura:"
+por "Uma anotação de leitura.", converti o primeiro item em prosa e **deixei o segundo em negrito**.
+O texto passou a anunciar um número que não bate com o que segue, que é a mesma família do "Duas
+anotações finais" que o `contagem.js` achou na AULA-27 pela manhã.
+
+## Cinco superfícies de um fato, e três rodadas para alcançá-las
+
+O grau `4a` da AULA-20 é a medida mais concreta que este dia produziu do custo de um fato sem dono:
+
+| Rodada | Superfície alcançada |
+| --- | --- |
+| Primeira | a escada e a ressalva, na AULA-20 |
+| Reauditoria | a tabela do grau 4, e o verbete do `GLOSSARIO.md` |
+| Passada final | a **AULA-18**, que dizia "o modelo é **restringido**", vocabulário que a AULA-20 reserva ao grau `4b` |
+
+A AULA-18 era a pior das cinco, porque a AULA-21 escreve a ressalva **oposta** sobre o grader
+idêntico, e o `binary_score` do CRAG é `str` puro com `'yes'`/`'no'` só na `description`.
+
+## A oitava âncora do dia, e ela é a mais limpa
+
+Sete âncoras quebraram hoje por reescrita ou por troca de arquivo âncora. A oitava é diferente:
+**eu editei o alvo.** O conserto do grau `4a` acrescentou cinco linhas à AULA-18 e empurrou a
+passagem citada de 243 para 248, quebrando a citação da AULA-21 que **eu mesmo tinha consertado**
+horas antes, quando ela apontava para 217.
+
+A mesma citação, errada três vezes, por três causas diferentes: envelhecida por reescrita alheia,
+depois corrigida, depois quebrada pelo meu próprio conserto de outra aula. **Editar um arquivo
+invalida toda citação de linha que aponte para ele**, e nenhuma ferramenta desta casa alcança isso
+entre arquivos de aula, porque o `verify-citations.js` resolve citação contra o **clone**, não
+contra as outras aulas.
+
+## Uma dívida minha que voltou por outra aula
+
+O 773/779 era achado da primeira auditoria da AULA-20 e **eu não o apliquei**. Ele voltou pela
+AULA-28, e estava em três superfícies: AULA-20 duas vezes e `HANDOFF.md` uma. A AULA-19 tinha feito
+o trabalho de separar os três números do mesmo arquivo (773 no blob, 779 no checkout Windows, 771 no
+`page_content`), e as vizinhas herdaram o do checkout nu. Fechado nas três.
+
+**Achado aplicado pela metade é achado que volta**, e volta mais caro, porque na segunda vez ele já
+se espalhou.
+
+## Uma redundância que valeu
+
+O auditor das cinco aulas menores despachou, por conta própria, uma varredura adversarial
+independente sobre o mesmo alvo, declarando que o relatório dele não dependia dela. **Foi essa
+varredura que achou a oitava âncora**, que o principal não viu. Fica registrado como método: em alvo
+já auditado, um segundo par de olhos independente encontra o que o primeiro não procura, e o custo é
+baixo comparado ao de um achado perdido.
+
+## Estado
+
+Recontar com `node ferramentas/portao.js`, que é a fonte, e **nunca somar de cabeça**: neste GATE
+isso já produziu o número que eu queria ver duas vezes hoje.
+
+## As catorze, por dimensão
+
+| Aula | Antes | Medida | E | C | H | O | D | A |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [00](../AULA-00-setup-do-ambiente.md) | 10 | **9**/12 | 2 | 1 | 1 | 1 | 2 | 2 |
+| [08](../AULA-08-embeddings-bm25-bge-m3.md) | 10 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 |
+| [09](../AULA-09-milvus-collections-schema-entidades.md) | 7 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 |
+| [11](../AULA-11-busca-hibrida-multimodal.md) | 6 | **8**/12 | 1 | 1 | 2 | 1 | 2 | 1 |
+| [13](../AULA-13-query-translation.md) | 8 | **8**/12 | 2 | 1 | 1 | 1 | 1 | 2 |
+| [20](../AULA-20-saida-estruturada.md) | 9 | **11**/12 | 1 | 2 | 2 | 2 | 2 | 2 |
+| [21](../AULA-21-self-rag.md) | 12 | **11**/12 | 2 | 2 | 2 | 1 | 2 | 2 |
+| [22](../AULA-22-avaliacao.md) | 10 | **12**/12 | 2 | 2 | 2 | 2 | 2 | 2 |
+| [23](../AULA-23-graphrag.md) | 8 | **10**/12 | 2 | 2 | 1 | 2 | 2 | 1 |
+| [24](../AULA-24-contextual-retrieval.md) | 10 | **10**/12 | 2 | 2 | 1 | 1 | 2 | 2 |
+| [25](../AULA-25-modular-rag.md) | 10 | **10**/12 | 2 | 2 | 2 | 1 | 1 | 2 |
+| [26](../AULA-26-agentic-adaptive-rag.md) | 10 | **12**/12 | 2 | 2 | 2 | 2 | 2 | 2 |
+| [27](../AULA-27-multimodal-rag.md) | 8 | **9**/12 | 1 | 2 | 2 | 1 | 2 | 1 |
+| [28](../AULA-28-projeto-final.md) | 9 | **11**/12 | 2 | 2 | 2 | 1 | 2 | 2 |
+
+## Onde esta rodada para, e por quê
+
+**As catorze receberam consertos depois destas medições.** São os achados que as próprias auditorias
+produziram, aplicados hoje. Pela disciplina que este registro sustenta, **conserto aplicado não é
+conserto verificado**, então uma nova passada acharia coisa nova, como esta achou.
+
+Isso é regresso infinito, e vale declará-lo em vez de fingir que fecha. O que decide onde parar não
+é o número de rodadas, é a **direção do que cada uma acha**:
+
+- a oitava rodada achava defeito no **material**;
+- a S6 achava defeito nos **consertos do material**;
+- esta passada achou defeito nos **consertos dos consertos**, e onze dos catorze já eram assim.
+
+Os achados encolheram de classe: nenhuma `−1`, nenhum BLOCK de mecanismo, e o mais grave foi um
+título de seção. **Uma rodada cujo pior achado é a palavra num cabeçalho mede um material diferente
+daquele em que a consulta gravada não tinha resposta no corpus.**
+
+O que fecharia de verdade não é mais uma passada: é uma **ferramenta que valide citação de linha
+entre aulas**, que é a única classe que reapareceu em todas as três rodadas e que nenhum instrumento
+desta casa alcança. Fica como o próximo trabalho, e é de máquina, não de leitura.

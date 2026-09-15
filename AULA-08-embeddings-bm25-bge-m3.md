@@ -18,7 +18,7 @@ progressão deliberada que termina na busca híbrida da Aula 11.
 
 ## Modelo mental
 
-### Duas famílias, falhas disjuntas
+### Duas famílias, falhas largamente complementares
 
 |             | **Denso** (embedding)               | **Esparso** (BM25)                             |
 | ----------- | ----------------------------------- | ---------------------------------------------- |
@@ -85,7 +85,8 @@ do `game_guide.json` (linha 31). O texto da avaliação **nunca é embutido**: `
 têm zero usos no arquivo, e o vetor do usuário é a **média das descrições dos jogos que ele
 avaliou** (linha 41). Depois compara com `cosine_similarity` do scikit-learn (linha 50, com o
 `[0,0]` para extrair o escalar da matriz 1×1). E a saída não recomenda jogos a um usuário: fixa um
-jogo-alvo (linha 25) e ranqueia os usuários mais propensos a gostar dele (linhas 54-57) — e o corpus tem exatamente 5, então o `head()` devolve a lista inteira, sem seleção.
+jogo-alvo (linha 25) e ranqueia os usuários mais propensos a gostar dele (linhas 54-57) — e o corpus
+tem exatamente 5, então o `head()` devolve a lista inteira, sem seleção.
 
 E aí está o defeito real do exemplo, que vale mais que o acerto: uma avaliação `rating=2` entra na
 média exatamente como uma `rating=5`. O sinal usado é "quais jogos este usuário tocou", não "o que
@@ -167,10 +168,12 @@ Um detalhe fácil de passar batido, na linha 23:
 tf = Counter(log.split(","))
 ```
 
-A tokenização é por **vírgula**, não por espaço. É deliberado e cobra caro, como a seção "Quebre de propósito" vai medir: cada campo vira um termo, nenhum se repete, e isso zera a saturação. Faz sentido para o formato do exemplo — logs de
-batalha em campos separados por vírgula — e é um lembrete útil: **BM25 depende inteiramente da
-tokenização**, e ela é escolha sua. Tokenizar mal destrói a técnica, e é por isso que BM25 em
-idiomas sem separação por espaço exige segmentação dedicada.
+A tokenização é por **vírgula**, não por espaço. É deliberado e cobra caro, como a seção "Quebre de
+propósito" vai medir: cada campo vira um termo, nenhum se repete, e isso zera a saturação. Faz
+sentido para o formato do exemplo — logs de batalha em campos separados por vírgula — e é um
+lembrete útil: **BM25 depende inteiramente da tokenização**, e ela é escolha sua. Tokenizar mal
+destrói a técnica, e é por isso que BM25 em idiomas sem separação por espaço exige segmentação
+dedicada.
 
 O nome da função também diz algo: `bm25_sparse_embedding`. O autor está enquadrando BM25 como
 **produtor de embedding esparso** — um vetor com uma posição por termo, quase todo zero. É a
@@ -268,7 +271,7 @@ python 03-BM25.py
 Comece por aqui, não pelo `01`. **Julgamento:** é o lugar mais didático do curso para ver a
 **fórmula do BM25** escrita por completo, sem abstração — **e note o que ele não é:** o arquivo não
 tem variável de consulta nenhuma. Ele calcula o **vetor esparso de cada documento**, com o IDF do
-próprio corpus. Pontuar uma consulta contra documentos é o que a maior parte do repositório faz:
+próprio corpus. Pontuar uma consulta contra documentos é comum no repositório, embora não na maioria dos arquivos:
 **79 dos 182** `.py` citam `retriever` ou `search` (`grep -rlE "retriever|search" --include=*.py .`
 contra `find . -name '*.py' | awk 'END{print NR}'`), e citar o termo é indício, não prova de que o
 arquivo pontue. O que é raro é
@@ -289,9 +292,10 @@ junto com a fórmula da linha 29.
 python 03-LangChain-BM25.py
 ```
 
-Este é o primeiro script desta sequência que gasta chave: ele embute com `OpenAIEmbeddings` (linhas 27-31)
-e gera com `gpt-4o` (linhas 49-52), ambos lendo `O3_API_KEY`/`O3_BASE_URL`. Sem o `.env`, o `print`
-do BM25 (linha 21) sai e o script morre ao construir o `OpenAIEmbeddings` das linhas 27-31, com `OpenAIError: The api_key client option must be set`, antes de o Chroma ser chamado.
+Este é o primeiro script desta sequência que gasta chave: ele embute com `OpenAIEmbeddings` (linhas
+27-31) e gera com `gpt-4o` (linhas 49-52), ambos lendo `O3_API_KEY`/`O3_BASE_URL`. Sem o `.env`, o
+`print` do BM25 (linha 21) sai e o script morre ao construir o `OpenAIEmbeddings` das linhas 27-31,
+com `OpenAIError: The api_key client option must be set`, antes de o Chroma ser chamado.
 
 Compare os resultados do `BM25Retriever` com os do Chroma para a mesma consulta. Anote uma
 consulta em que discordam — ela é o seu argumento a favor do híbrido.
@@ -337,15 +341,15 @@ linha 30 para `embedding[word] = score`.
 Feito isso, rode com `b=0.75` e com `b=0`, e compare o peso de `Flaming Fist` no **log 3** (11
 campos) com o do **log 1** (9 campos). Com `b=0.75` o log longo é penalizado (0,4425 contra 0,4851);
 com `b=0` os dois caem no mesmo 0,4700, que aqui é exatamente o `idf` do termo, porque com
-frequência 1 e sem normalização de comprimento o resto da fórmula vale 1. O `idf` nunca dependeu
-do `b`. **Dentro** de um único log a mudança não diz nada, e pela mesma razão o
-`k1` também não serve aqui: neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula produz
-frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
+frequência 1 e sem normalização de comprimento o resto da fórmula vale 1. O `idf` nunca dependeu do
+`b`. **Dentro** de um único log a mudança não diz nada, e pela mesma razão o `k1` também não serve
+aqui: neste corpus nenhum termo se repete dentro de nenhum log, porque a tokenização por vírgula
+produz frases inteiras como termo — 16 dos 25 tokens do vocabulário têm espaço, e `Flaming Fist` e
 `Flaming Fist.` são termos diferentes. Com a frequência sempre em 1, mudar `k1` reescala tudo por
 igual e a curva não aparece. Para vê-la, duplique um campo no **terceiro** log (`,Flaming Fist,`
-duas vezes, e é o terceiro porque é o mais longo, 11 campos, onde a duplicação também move o denominador de comprimento) e só então varie `k1` entre 0.1 e 3.0:
-a razão entre `Flaming Fist` e `summons` vai de 0,505 a 0,783. Ranking de verdade é no
-`03-LangChain-BM25.py`, que tem consulta.
+duas vezes, e é o terceiro porque é o mais longo, 11 campos, onde a duplicação também move o
+denominador de comprimento) e só então varie `k1` entre 0.1 e 3.0: a razão entre `Flaming Fist` e
+`summons` vai de 0,505 a 0,783. Ranking de verdade é no `03-LangChain-BM25.py`, que tem consulta.
 
 **2. Troque a tokenização.** Na linha 23, mude `log.split(",")` para `log.split()` e rode. O vetor
 impresso fica **vazio** — `Sparse embedding: {}` —, e o motivo é mais instrutivo que uma degradação:
@@ -381,7 +385,7 @@ não está separando bem o seu domínio.
   incompatíveis. Trocou, reindexa tudo — e o custo disso é o argumento para escolher com
   cuidado desde o começo.
 - **Modelo no idioma errado.** Vale repetir o defeito real deste repositório, visto na Aula 03:
-  `bge-small-zh` sobre corpus inglês custa recall sem lançar erro. E vale repetir com a condição que
+  `bge-small-zh` sobre corpus inglês custa recall sem lançar erro. E vale com a condição que
   a Aula 03 mede: nos seis arquivos `01_*` o defeito é **latente**, porque o corpus cabe num nó
   único e o recall é 1,0 com qualquer embedder. Ele só age em acervo que se fatie, onde o `k` tem de
   escolher. Para português, `intfloat/multilingual-e5-*` ou `paraphrase-multilingual-*` são pontos

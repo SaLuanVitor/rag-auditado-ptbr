@@ -79,7 +79,7 @@ O paper estabelece seis módulos de topo, e a frase é literal:
 
 > _"Based on the current stage of RAG development, we have established six main modules: Indexing, Pre-retrieval, Retrieval, Post-retrieval, Generation, and Orchestration."_
 
-Cinco deles têm correspondência no curso, e ela é aproximada em vez de exata: `Indexing` se espalha por quatro fases e divide as Aulas 09-11 com `Retrieval`, porque o repositório trata schema, índice ANN e busca no mesmo módulo. O sexto não tem correspondência nenhuma:
+Cinco deles têm correspondência no curso, e ela é aproximada em vez de exata: `Indexing` se espalha por quatro fases e divide as Aulas 09-11 com `Retrieval`, porque o repositório trata schema, índice ANN e busca no mesmo módulo. O sexto não tem fase própria:
 
 | Módulo do paper    | Onde está no curso                       |
 | ------------------ | ---------------------------------------- |

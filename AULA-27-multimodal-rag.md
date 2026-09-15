@@ -151,14 +151,14 @@ Vale registrar o que fica de fora: as imagens `04.jpg` a `09.jpg` existem no rep
 `04-VectorDB/MultimodalRetrieval/`, não enumeram o diretório: leem `99-EN/multimodal/metadata.json`
 (`Milvus+Visual-BGE-MultimodalRetrieval-English.py:66-73`), e o diretório-pai entra só como prefixo de
 caminho (`:72`). O metadado lista **dez** entradas sobre **nove** arquivos, porque `09.jpg` aparece duas
-vezes com títulos diferentes: são nove imagens codificadas (`:82`, o dicionário é chaveado por caminho)
+vezes com títulos diferentes: são nove imagens codificadas (`:83`, o dicionário é chaveado por caminho)
 e dez registros inseridos (`:106`). É o que a Aula 11 já registra.
 O acervo é compartilhado entre os dois módulos multimodais do repositório: o de Milvus usa tudo, o de
 Weaviate usa o subdiretório com as três duplicatas.
 
 ### Três modalidades declaradas, uma exercitada
 
-Áudio e vídeo estão configurados no vetorizador (`:19-20`) e comentados na inserção — `01-Weaviate-Multimodal-Search.py:42-52` para áudio e `:54-64` para vídeo —, assim como nas buscas por mídia (`:98-107` e `:109-118`). Os diretórios que eles esperam (`./data/audio/`, `./data/video/`) não existem no repositório.
+Áudio e vídeo estão configurados no vetorizador (`01-Weaviate-Multimodal-Search.py:19-20`) e comentados na inserção — `01-Weaviate-Multimodal-Search.py:42-52` para áudio e `:54-64` para vídeo —, assim como nas buscas por mídia (`:98-107` e `:109-118`). Os diretórios que eles esperam (`./data/audio/`, `./data/video/`) não existem no repositório.
 
 E aqui está o detalhe que denuncia a origem do código: os blocos comentados usam a variável `animals`
 (`01-Weaviate-Multimodal-Search.py:47`, `:59`, `:100`, `:111`, `:124`), e **esta variável não existe neste arquivo** — aqui a coleção se chama `monkey` (`:32`). `animals` é o nome usado no arquivo `02`. Cinco ocorrências de uma variável fantasma, herdadas de copy-paste.
@@ -325,7 +325,7 @@ docker compose up -d
 
 Espere o serviço de inferência ficar pronto antes de rodar qualquer script — o ImageBind em CPU leva tempo para carregar.
 
-**1. Rode a busca que funciona.** Execute o `01` e leia os três blocos de resultado: `"Monkey with fire"`, `"Monsters"` e a busca por imagem. Você está buscando imagens sem que nenhuma legenda tenha sido indexada. Antes de comparar, faça a aritmética: a coleção tem três objetos e as três buscas pedem `limit=3` (`01-Weaviate-Multimodal-Search.py:71`, `:81`, `:92`), então **as três devolvem o acervo inteiro**. O conjunto é sempre o mesmo; o que muda é a **ordem**, e é só ela que carrega sinal. É a mesma leitura que a Aula 11 fez do lado sem filtro: com `limit` igual ao tamanho do corpus, o resultado não demonstra recuperação. Para ver seleção de verdade, faça primeiro o exercício 6 e volte a este com nove imagens.
+**1. Rode a busca que funciona.** Execute o `01` e leia os três blocos de resultado: `"Monkey with fire"`, `"Monsters"` e a busca por imagem. Você está buscando imagens sem que nenhuma legenda tenha sido indexada. Antes de comparar, faça a aritmética: a coleção tem três objetos e as três buscas pedem `limit=3` (`01-Weaviate-Multimodal-Search.py:71`, `:81`, `:92`), então **as três devolvem o acervo inteiro**. O conjunto é sempre o mesmo; o que muda é a **ordem**, e é só ela que carrega sinal. A Aula 11 esbarrou no mesmo teto pelo outro lado: lá o `limit=9` devolve praticamente o acervo e ela conclui que o lado sem filtro não demonstra nada, nem ordenação. Aqui o `limit=3` devolve o acervo exato, então o conjunto não informa e a ordem é o que sobra para ler. Para ver seleção de verdade, faça primeiro o exercício 6 e volte a este com nove imagens.
 
 **2. Conserte o `02` com o `01`.** Em `02-Weaviate-Multimodal-RAG.py`, substitua o placeholder da linha 33 pelo `to_base64` do `01` apontando para uma das três imagens do acervo, e troque a consulta da linha 99 por algo pertinente às imagens. Agora o pipeline de descrição e geração tem uma imagem de verdade.
 

@@ -200,8 +200,13 @@ If the document contains keyword(s) or semantic meaning related to the question,
 Três coisas para notar:
 
 **1. É o mesmo padrão de saída estruturada da Aula 14.** `with_structured_output(GradeDocuments)`
-com Pydantic — o modelo é **restringido** a emitir um veredito, não instruído a emiti-lo. Isso torna
-a decisão discreta e utilizável como aresta de um grafo.
+com Pydantic — o veredito volta como campo de um objeto validado, não como prosa a parsear, e isso
+torna a decisão discreta e utilizável como aresta de um grafo. **Mas é o grau 4a da Aula 20, não o
+4b:** o schema é induzido e depois validado, nunca imposto na decodificação. E como `binary_score` é
+`str` com o `'yes'`/`'no'` só na `description`
+(`03-Correction/01-CRAG-ReflectiveRetrieval.py:85`), o que a validação garante é que **existe um
+campo string**; o valor não é garantido por nada. É a mesma ressalva que a Aula 21 registra sobre o
+grader idêntico do Self-RAG.
 
 **2. O critério é generoso de propósito.** "Contém palavra-chave **ou** significado relacionado"
 qualifica como relevante. É um avaliador com viés para aprovar — o que faz sentido para o papel: ele

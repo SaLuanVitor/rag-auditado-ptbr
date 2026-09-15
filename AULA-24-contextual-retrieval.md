@@ -133,7 +133,8 @@ Julgamento: como esqueleto de experimento, o arquivo é útil e eu o recomendari
 ```
 
 O campo `text` é **idêntico** ao do nó original; o contexto vive em `metadata`. Onde esse metadado entra é decidido pelo `metadata_mode`, e a fonte do `llama-index-core` responde
-sem ambiguidade na 0.12.15 extraída, que é a versão pinada pelo repositório; lido, não executado:
+sem ambiguidade na 0.12.15 extraída, a mais frequente das três que o repositório pina (as outras são
+0.12.23.post2 e 0.12.25), e é a que o `10-AdvanceRAG/requirements.txt` deixa livre; lido, não executado:
 
 - **O BM25 não vê o metadado.** A assinatura de `TextNode.get_content` em `llama_index.core.schema` traz
   `metadata_mode: MetadataMode = MetadataMode.NONE` como default, e o `get_metadata_str` da mesma

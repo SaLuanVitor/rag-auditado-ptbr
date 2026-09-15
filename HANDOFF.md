@@ -472,7 +472,7 @@ material de leitura crítica.
    (linha 34) recebe string literal de `get_code_snippet()` (linha 6).
 8. **`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py`**
    — o pipeline RAG é decorativo: o corpus `99-EN/black-myth-wukong/black_myth_wukong_setting.txt`
-   tem **779 bytes** e `chunk_size=1000` (linha 14) ⇒ um único chunk; `similarity_search(query)` sem
+   tem **773 bytes** no blob, 779 num checkout Windows, e `chunk_size=1000` (linha 14) ⇒ um único chunk; `similarity_search(query)` sem
    `k` e `docs[0]` (linhas 23–24) devolvem o documento inteiro.
 9. **`08-Generation/03-ControllingFormatViaOutputParsing/04-Pydantic-v1.py` e `04-Pydantic-v2.py`**
    — **não são um par.** `diff` mostra que compartilham só as duas primeiras linhas (imports de

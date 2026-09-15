@@ -6,7 +6,7 @@
 
 ## Pergunta motivadora
 
-A Aula 18 deixou uma promessa que agora precisa ser paga. Ela está nas linhas 243 a 247 daquela aula, e a
+A Aula 18 deixou uma promessa que agora precisa ser paga. Ela está nas linhas 248 a 252 daquela aula, e a
 ressalva é parte da frase:
 
 > A diferença entre CRAG e Self-RAG, em uma linha: **CRAG critica o que foi recuperado; Self-RAG
@@ -171,8 +171,8 @@ deixou a verificação para cá. Verificado — a implementação critica o mate
 recupera sempre (`Self-RAG-FullImplementation.py:344`). O "decide se precisa recuperar" é verdade do
 paper e não da implementação, exatamente como a Aula 18 antecipou.
 
-Uma anotação de leitura. A perda de granularidade que o Modelo mental contabilizou já está
-localizada na tabela acima: `ISSUP` e `ISUSE` caem nos dois graders binários.
+A perda de granularidade que o Modelo mental contabilizou já está localizada na tabela
+acima: `ISSUP` e `ISUSE` caem nos dois graders binários. Fica uma anotação de leitura.
 
 **Um vestígio de migração.** A linha `Self-RAG-FullImplementation.py:37` é um import comentado:
 

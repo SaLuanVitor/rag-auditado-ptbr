@@ -180,7 +180,8 @@ lembrança que a Aula 17 registra: reranking não recupera — ele reordena o qu
 | Laço de autocrítica: existe?                | laço sem contador é dívida; regerar sem mudar a entrada (Aula 21)                           |
 
 Quatro trabalhos do prompt, e o template que a Aula 19 lê cobre três: delimitar a
-fonte (na linha 28, fora do trecho que a aula transcreve), fixar o formato, fixar o tom. O quarto — **autorizar a abstenção** — é o que faltava, e é uma
+fonte (`08-Generation/02-OptimizingResponseViaPrompts/01-UsePromptTemplateToClarifyGenerationGoal.py:28`,
+fora do bloco `:31-39` que a aula transcreve), fixar o formato, fixar o tom. O quarto — **autorizar a abstenção** — é o que faltava, e é uma
 frase: a Aula 19 registra que os exemplos do módulo cobrem "formato com cuidado e abstenção com
 nada".
 
@@ -497,8 +498,9 @@ falhar, é ali que você vai depurar.
 **Leia os papers que estão no repositório.** São quatro, e os quatro foram usados aqui: Self-RAG e RRR (na
 Aula 21), GraphRAG (na 23) e Modular RAG (na 25). A rota só com stdlib, descomprimir cada `stream`
 com `zlib` e coletar os literais entre parênteses, está no exercício 1 da Aula 25, que também mede o
-limite dela: este PDF quebra palavras no meio por kerning, e sem uma etapa de rejunção nenhuma
-citação longa fica localizável por busca literal. As citações foram conferidas com `pdftotext`; a
+limite dela, e o limite muda com o PDF: no ModularRAG as palavras quebram no meio por kerning, no
+GraphRAG elas ficam inteiras e o que some é o espaço entre elas (Aula 23). Nos dois casos, sem uma
+etapa de rejunção nenhuma citação longa fica localizável por busca literal. As citações foram conferidas com `pdftotext`; a
 rota por `zlib` vale pelo que ensina sobre como um PDF guarda texto.
 
 ---

@@ -135,10 +135,11 @@ client.create_collection(
 Este é o **quick setup**: você informa a dimensão do vetor e o Milvus infere o resto — cria um
 campo de id, um campo de vetor, e um índice default. Uma linha, e você tem onde inserir.
 
-`dimension=5` é valor de brinquedo, escolhido para os vetores caberem legíveis na tela. Em uso
-real seria 384, 768 ou 1536 — e **precisa bater exatamente com a saída do seu modelo de
-embedding**. Divergência aqui **deve** dar erro na inserção, não degradação silenciosa — é das poucas falhas
-desta fase que aparecem na hora. _Previsão, não medição: verificar exigiria um servidor Milvus de pé, que não tenho aqui._
+`dimension=5` é valor de brinquedo, escolhido para os vetores caberem legíveis na tela. Em uso real
+seria 384, 768 ou 1536 — e **precisa bater exatamente com a saída do seu modelo de embedding**.
+Divergência aqui **deve** dar erro na inserção, não degradação silenciosa — é das poucas falhas
+desta fase que aparecem na hora. _Previsão, não medição: verificar exigiria um servidor Milvus de
+pé, que não tenho aqui._
 
 ### `03-schema.py` — o controle
 
@@ -206,22 +207,21 @@ res = client.insert(collection_name="quick_setup", data=data)   # linha 40
 São **10 entidades**, cada uma com três campos: `id`, `vector` de 5 dimensões, e `color` — uma
 string como `"pink_8682"`.
 
-O campo `color` parece decorativo e é, **julgamento**, o mais instrutivo da aula. Ele é o **campo escalar** que
-não participa da busca vetorial e existe para ser filtrado. Quando a Aula 10 mostrar filtered
-search — com o filtro real do `03-filtered-search.py`, `color like "color_%" and likes > 500` —, é
-este tipo de campo que estará em jogo. (As cores deste arquivo são `red_7025`, `pink_8682` e afins,
-numa collection diferente; `color like "red%"` filtraria aqui, mas não é a expressão que a Aula 10
-usa.)
+O campo `color` parece decorativo e é, **julgamento**, o mais instrutivo da aula. Ele é o **campo
+escalar** que não participa da busca vetorial e existe para ser filtrado. Quando a Aula 10 mostrar
+filtered search — com o filtro real do `03-filtered-search.py`, `color like "color_%" and likes >
+500` —, é este tipo de campo que estará em jogo. (As cores deste arquivo são `red_7025`, `pink_8682`
+e afins, numa collection diferente; `color like "red%"` filtraria aqui, mas não é a expressão que a
+Aula 10 usa.)
 
-Note também que a inserção é uma **lista de dicionários** — não há SQL, não há `INSERT INTO`.
-Cada dicionário é uma entity. E aqui há uma sutileza que a Armadilha "escalares esquecidos no
-schema" cobra mais adiante: o quick setup do `02` declara **apenas** `id` e `vector`, e liga
+Note também que a inserção é uma **lista de dicionários** — não há SQL, não há `INSERT INTO`. Cada
+dicionário é uma entity. E aqui há uma sutileza que a Armadilha "escalares esquecidos no schema"
+cobra mais adiante: o quick setup do `02` declara **apenas** `id` e `vector`, e liga
 `enable_dynamic_field=True` por conta própria — `_fast_create_collection` força o parâmetro quando
 você não o passa. Ou seja, `color` **não é campo declarado** nesta collection: é metadado absorvido
 pelo campo dinâmico. Funciona, filtra, e paga o preço em JSON e em eficiência de filtro. O
-`03-schema.py` é onde `color` seria declarado de verdade. O nome
-da collection, `quick_setup`, indica que ela veio pelo atalho do `02`, não pelo schema
-explícito do `03`.
+`03-schema.py` é onde `color` seria declarado de verdade. O nome da collection, `quick_setup`,
+indica que ela veio pelo atalho do `02`, não pelo schema explícito do `03`.
 
 ---
 
@@ -258,13 +258,16 @@ expressão do `except` só é avaliada quando alguma exceção sobe, a primeira 
 **segunda morre dentro do próprio tratador**, com `AttributeError: module 'pymilvus.exceptions' has no
 attribute 'AlreadyExistError'`. O tratamento é decorativo.
 
-Então: troque aquele nome por `exceptions.MilvusException`, que existe e captura, com o custo
-de que ela é a **classe base de toda** exceção do `pymilvus`, `ConnectionNotExistException`
-entre elas. O tratador passa a engolir servidor fora do ar como se fosse "já existe", e em
-código de produção você imprimiria a exceção ou filtraria pelo código de erro. Envolva também
-a criação de
-`my_database_2` (linhas 40-43) no mesmo `try/except`. Com essas duas correções no tratador, a segunda execução cai no
-`except` nas duas databases; sem elas, ela estoura na linha 34 antes de chegar à segunda.
+Então: troque aquele nome por `exceptions.MilvusException`, que existe e captura, com o custo de que
+ela é a **classe base de toda** exceção do `pymilvus`: nenhuma das 25 classes de
+`pymilvus.exceptions` fica de fora. O tratador passa a reportar "já existe" para qualquer falha do
+`create_database`, propriedade inválida ou erro de permissão inclusive, e em código de produção você
+imprimiria a exceção ou filtraria pelo código de erro. Servidor fora do ar não é um desses casos, e
+vale saber por quê: o `MilvusClient` das linhas 23-24 já conecta na construção, esperando o canal
+ficar pronto, então o script morre ali, antes de existir tratador. Envolva também a criação de
+`my_database_2` (linhas 40-43) no mesmo `try/except`. Com essas duas correções no tratador, a
+segunda execução cai no `except` nas duas databases; sem elas, ela estoura na linha 34 antes de
+chegar à segunda.
 
 É a diferença entre exemplo e script que sobrevive a um retry — e o arquivo mostra as duas metades
 da lição, uma em cada database.
@@ -272,15 +275,14 @@ da lição, uma em cada database.
 Depois de `04`, use `client.query` para conferir o que ficou, e **conte com um traceback antes
 disso**: o arquivo chama `client.load()` na linha 68, que não existe no `pymilvus` 2.5.4, e morre
 ali com `AttributeError` sem chegar ao `query` da 69. Troque a linha 68 por
-`client.load_collection(collection_name="quick_setup")` e ele completa. As escritas das linhas 40
-a 64 já aconteceram quando o erro sobe, então o estado no servidor é o descrito abaixo mesmo na
-execução que falha. (O Milvus tem uma interface web, o
-Attu, mas **este repositório não a provisiona**: o `docker-compose.yml` sobe só `etcd`, `minio` e
-`standalone`, e `attu` não aparece em nenhum arquivo do repo. Subir o Attu é trabalho seu.) **E
-não espere dez entidades:** o script insere dez, faz `upsert` em duas (ids 0 e 1, virando
-`updated_pink_8682` e `updated_red_7025`) e depois **deleta a de id 0** — linhas 47 a 64. O estado
-final tem **nove**, ids 1 a 9. O arquivo faz o ciclo completo de escrita (inserir, atualizar,
-remover) e é isso que vale ver, não só a inserção.
+`client.load_collection(collection_name="quick_setup")` e ele completa. As escritas das linhas 40 a
+64 já aconteceram quando o erro sobe, então o estado no servidor é o descrito abaixo mesmo na
+execução que falha. (O Milvus tem uma interface web, o Attu, mas **este repositório não a
+provisiona**: o `docker-compose.yml` sobe só `etcd`, `minio` e `standalone`, e `attu` não aparece em
+nenhum arquivo do repo. Subir o Attu é trabalho seu.) **E não espere dez entidades:** o script
+insere dez, faz `upsert` em duas (ids 0 e 1, virando `updated_pink_8682` e `updated_red_7025`) e
+depois **deleta a de id 0** — linhas 47 a 64. O estado final tem **nove**, ids 1 a 9. O arquivo faz
+o ciclo completo de escrita (inserir, atualizar, remover) e é isso que vale ver, não só a inserção.
 
 ---
 
@@ -313,8 +315,8 @@ client.insert(collection_name=collection_name, data=[{
 Com `auto_id=False` o `pymilvus` aceita. Com `auto_id=True` ele recusa **no cliente, sem tocar no
 servidor**: `DataNotMatchException: Attempt to insert an unexpected field 'id' to collection without
 enabling dynamic field`. A mensagem fala de campo dinâmico, mas a causa é o auto-id — o `id` deixou
-de ser campo que você fornece. Depois pense: se o Milvus gera o id, como
-você descobre a qual documento do seu sistema aquele resultado corresponde?
+de ser campo que você fornece. Depois pense: se o Milvus gera o id, como você descobre a qual
+documento do seu sistema aquele resultado corresponde?
 
 **3. Declare `VARCHAR` com `max_length` pequeno.** Em `03-schema.py`, baixe o `max_length` do campo
 `title` para 10 e insira um texto maior — reaproveitando o `client.insert` que o exercício 2 mandou
@@ -355,7 +357,7 @@ nullable==true or set default_value`. A diferença entre os dois casos é a Arma
   chamando `load_collection` por você, então a collection dos exemplos `02` e `04` já sobe
   carregada. Quem constrói o schema à mão, como o `03-schema.py`, carrega por conta.
   `grep -rln "load_collection"` encontra o nome em 16 dos 27 `.py` de `04-VectorDB/` — e a
-  conclusão fácil aqui é falsa: dos 11 restantes, **nove leem a collection** — oito com
+  conclusão fácil aqui é falsa: dos 11 restantes, **nove têm chamada de leitura** — oito com
   `search`/`hybrid_search`, e o `04-entity(data).py` com `query` — e por três caminhos
   diferentes, que vale separar.
 
@@ -399,7 +401,7 @@ nullable==true or set default_value`. A diferença entre os dois casos é a Arma
   validar uma ideia. FAISS ou Chroma primeiro; Milvus quando o volume justificar.
 - **Confundir database com collection.** Isolamento por database não é o mesmo que
   particionamento por partição, e a escolha entre eles muda o desenho multi-tenant.
-- **Não versionar o schema.** Ele é código. Ele deve estar num arquivo versionado, não em
+- **Não versionar o schema.** Ele é código, e deve estar num arquivo versionado, não em
   comandos digitados uma vez num notebook.
 
 ---

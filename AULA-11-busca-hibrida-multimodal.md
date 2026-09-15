@@ -6,7 +6,8 @@
 
 ## Pergunta motivadora
 
-A Aula 08 mostrou que denso e esparso falham em conjuntos disjuntos de casos. A Aula 10 mostrou
+A Aula 08 mostrou que denso e esparso falham em conjuntos largamente complementares de casos,
+e que não são disjuntos: um identificador digitado errado derruba os dois. A Aula 10 mostrou
 como construir um índice. Agora: como usar **os dois ao mesmo tempo** e transformar dois
 rankings em um?
 
@@ -84,9 +85,9 @@ Ou seja, "minimal" descreve a **estratégia de fusão** (uma só, sem alternativ
 do arquivo. Se você abrir esperando o exemplo curto, vai se surpreender — e é mais um caso
 deste curso em que o nome do arquivo promete algo diferente do que o código faz.
 
-Esse bloco de inspeção, aliás, é, **julgamento**, a parte mais didática do `v1`: ele **mostra o que é um vetor
-esparso** na prática — pares de índice e valor, em vez de uma lista densa de floats. Vale ler
-antes de tratá-lo como abstração.
+Esse bloco de inspeção, aliás, é, **julgamento**, a parte mais didática do `v1`: ele **mostra o que
+é um vetor esparso** na prática — pares de índice e valor, em vez de uma lista densa de floats. Vale
+ler antes de tratá-lo como abstração.
 
 ### O mecanismo, no `v2`
 
@@ -186,7 +187,7 @@ dos dados nem do código.
 E, prática rara mas não exclusiva, o `10-AdvanceRAG/04-AgenticRAG/` também versiona três PNGs. Vale
 olhar de onde eles vêm, porque só um corresponde a código vivo: o `02-LangChain-AdaptiveRAG.py:220`
 grava `AdaptiveRAG-Graph.png`, sem o prefixo `02-` do arquivo commitado; o bloco que geraria o
-`01-AgenticRAG-Graph.png` está inteiro comentado (`01-LangChain-AgenticRAG.py:180-188`); e nenhum
+`01-AgenticRAG-Graph.png` está inteiro comentado (`01-LangChain-AgenticRAG.py:177-190`); e nenhum
 arquivo do repositório menciona o `02-AdaptiveRAG-Flow.png`. Aqui são **três imagens de saída**
 versionadas:
 
@@ -194,9 +195,17 @@ versionadas:
 - `search_without_filter.jpg`
 - `search_with_filter.jpg`
 
-Os dois últimos nomes contam a história do módulo: é uma comparação **com e sem filtro
-escalar**, aplicada a busca de imagens, e vale saber o que cada lado mostra antes de abri-las. O acervo tem 9 imagens, mas o `metadata.json` traz 10 entradas, porque `09.jpg` aparece duas vezes com títulos diferentes, e as 10 são inseridas. Com `limit=9`, o lado **sem filtro** devolve praticamente o acervo inteiro: não é demonstração de ordenação, é o corpus. O lado **com filtro** aplica `environment == "snowfield" and category == "combat"`, e como `category` vale `combat` nas 10 linhas, só o `environment` seleciona: **uma imagem**, com oito células vazias na grade. A comparação é entre os dois extremos, e é isso que ela ensina bem: filtro escalar não reordena, ele corta o candidato antes de a distância entrar na conta. Guardar o resultado visual faz sentido aqui, e é julgamento meu sobre o motivo: a saída
-é visual — você _vê_ quais imagens foram recuperadas, e vê o filtro mudar o conjunto.
+Os dois últimos nomes contam a história do módulo: é uma comparação **com e sem filtro escalar**,
+aplicada a busca de imagens, e vale saber o que cada lado mostra antes de abri-las. O acervo tem 9
+imagens, mas o `metadata.json` traz 10 entradas, porque `09.jpg` aparece duas vezes com títulos
+diferentes, e as 10 são inseridas. Com `limit=9`, o lado **sem filtro** devolve praticamente o
+acervo inteiro: não é demonstração de ordenação, é o corpus. O lado **com filtro** aplica
+`environment == "snowfield" and category == "combat"`, e como `category` vale `combat` nas 10
+linhas, só o `environment` seleciona: **uma imagem**, com oito células vazias na grade. A comparação
+é entre os dois extremos, e é isso que ela ensina bem: filtro escalar não reordena, ele corta o
+candidato antes de a distância entrar na conta. Guardar o resultado visual faz sentido aqui, e é
+julgamento meu sobre o motivo: a saída é visual — você _vê_ quais imagens foram recuperadas, e vê o
+filtro mudar o conjunto.
 
 Isso conecta com a Aula 10 de forma direta: `03-filtered-search.py` mostrou a mecânica do filtro em
 dados sintéticos; aqui ela aparece sobre imagens que você reconhece. O feedback visual é o ganho, e
@@ -223,9 +232,12 @@ em arquivo local: `connections.connect(uri="./wukong.db")` no `v2`
 (`Milvus+BGE-M3-HybridRetrieval-v2-Detailed.py:48`) e no `v3`
 (`Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py:48`); `MILVUS_URI = "./wukong_v4.db"`, literal na
 linha 20 do `Milvus+BGE-M3-HybridRetrieval-v1-Minimal.py`, apesar do nome sugerir variável de
-ambiente; e `MilvusClient(uri="./wukong_images.db")` nos três multimodais
-(`Milvus+Visual-BGE-MultimodalRetrieval-English.py:93`). O `.env.example` das duas pastas declara o
-mesmo, em inglês: elas usam uma instância local. O `docker compose` de `04-VectorDB/Milvus/` serve
+ambiente; e `./wukong_images.db` nos três multimodais, literal em `MilvusClient(uri=...)` nos dois
+pipelines (`Milvus+Visual-BGE-MultimodalRetrieval-English.py:93`) e passado por variável no terceiro,
+que o declara em `Milvus+Visual-BGE-PureRetrievalProgram.py:143` e o entrega ao cliente em
+`Milvus+Visual-BGE-PureRetrievalProgram.py:34`. O `.env.example` de `HybridRetrieval/` diz o mesmo em
+inglês, que os scripts usam "a local Milvus instance"; o de `MultimodalRetrieval/` declara só o
+modelo local e não menciona o Milvus. O `docker compose` de `04-VectorDB/Milvus/` serve
 aos scripts daquela pasta, que apontam para `http://localhost:19530`
 (`04-VectorDB/Milvus/01-CollectionsAndEntities/01-database.py:24`), e são os das Aulas 09 e 10.
 
@@ -239,8 +251,11 @@ importam `milvus_model.hybrid` (linha 30 do `v2`), e o `milvus-model` **não** e
 `04-VectorDB/requirements.txt:6`, em `10-AdvanceRAG/requirements.txt:15` e em **dois dos quatro**
 requirements de Ubuntu que a Aula 00 tabela: `requirements_langchain_Ubuntu-with-CPU.txt:263` e
 `requirements_llamaindex_20250413_Ubuntu-with-GPU.txt:232`. Os dois não formam par, é um de cada
-linha da tabela e de frameworks diferentes. Como a Aula 00 manda instalar os dois arquivos da sua
-linha, quem seguiu o caminho Ubuntu acaba com o pacote de um jeito ou de outro. Sem ele o import falha
+linha da tabela e de frameworks diferentes. E a Aula 00 instala cada framework no **seu próprio
+venv** (`.venv-langchain` e `.venv-llamaindex`), avisando que instalar um dentro do outro quebra o
+`numpy`: em cada linha da tabela o `milvus-model` cai em **um** dos dois ambientes, e estes três
+scripts não importam nem LangChain nem LlamaIndex, então nada decide em qual deles você vai
+rodá-los. Confira com `pip show milvus-model` no ambiente ativo antes de supor. Sem ele o import falha
 antes de qualquer conexão:
 
 ```powershell
@@ -270,10 +285,9 @@ python "Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py"
 ```
 
 Rode com `rerank_method = "rrf"` em
-`04-VectorDB/HybridRetrieval/Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py`, na linha 106; anote
-os resultados, troque para `"weighted"` e
-rode de novo. **Mesma consulta, fusão diferente.** As diferenças de ordenação são o assunto da
-Aula 17.
+`04-VectorDB/HybridRetrieval/Milvus+BGE-M3-HybridRetrieval-v3-Reranked.py`, na linha 106; anote os
+resultados, troque para `"weighted"` e rode de novo. **Mesma consulta, fusão diferente.** As
+diferenças de ordenação são o assunto da Aula 17.
 
 Para o multimodal:
 

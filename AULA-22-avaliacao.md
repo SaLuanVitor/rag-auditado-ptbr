@@ -410,7 +410,8 @@ na mesma escala. `correctness` é 1 a 5, `semantic_similarity` é contínuo de 0
 `relevancy` são binários YES/NO agregados como proporção. Média entre elas não significa nada, e essa
 é a razão mais forte para o limiar **por métrica**. Segunda: o `get_results_df` calcula
 `np.array([r.score or 0.0 for r in ...]).mean()`, e o `CorrectnessEvaluator` devolve `score=None`
-quando não consegue ler a nota que o juiz escreveu. `None` vira **zero**, indistinguível de uma nota
+quando a resposta do juiz vem vazia (`default_parser`, `eval_utils.py:227-229` no
+`llama-index-core` 0.12.15). `None` vira **zero**, indistinguível de uma nota
 zero. Uma falha de parsing do juiz derruba a linha de uma das variantes, e nada na tabela avisa.
 
 ### O gabarito é sintético — e a geração está comentada

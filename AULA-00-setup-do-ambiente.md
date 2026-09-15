@@ -89,11 +89,15 @@ para fora da OpenAI, não um teste controlado.
 
 ### Passo 1 — Python e ambientes virtuais
 
-Use Python 3.10, 3.11 ou 3.12 — **não 3.13**. O bloqueio é uma dependência transitiva da trilha
-LangChain: `onnxruntime==1.19.2`, que entra pelo `chromadb` e publica wheel só até cp312. Os dois
-estão pinados só ali (`chromadb` na linha 26, `onnxruntime` na 140); o
-`requirements_llamaindex_NoGPU_Mac-Win.txt` não pina nenhum dos dois. Como os dois ambientes saem do
-mesmo interpretador, a restrição vale para ambos mesmo assim. O `torch==2.6.0` e o
+Use Python 3.10, 3.11 ou 3.12 — **não 3.13**. O bloqueio é uma dependência transitiva:
+`onnxruntime==1.19.2`, que entra pelo `chromadb` e publica wheel só até cp312. Dos dois arquivos que
+esta aula manda instalar, só o do LangChain pina os dois (`chromadb` na linha 26, `onnxruntime` na
+140); o `requirements_llamaindex_NoGPU_Mac-Win.txt` não pina nenhum. Isso **não** libera o 3.13 para
+quem quer só a trilha LlamaIndex, e a razão está no Passo 1 abaixo, não nos pacotes: os dois venvs
+saem do mesmo `python`, então a versão que o LangChain exige é a que os dois recebem. E a exclusão
+vale para esse par, não para `91-Environment/` inteiro: fora de `archive/`, o `onnxruntime` ainda
+aparece em quatro dos dez arquivos, um deles da trilha LlamaIndex
+(`requirements_llamaindex_20250413_Ubuntu-with-GPU.txt:136`, em 1.21.0 e sem `chromadb` junto). O `torch==2.6.0` e o
 `faiss-cpu==1.10.0` **já têm** wheel para 3.13, então não são o motivo (conferido na PyPI, release
 por release, para `win_amd64`).
 

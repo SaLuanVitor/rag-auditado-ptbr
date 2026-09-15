@@ -36,7 +36,7 @@ forte, chega a forçar o modelo a inventar: a Parte 6 mostra dois casos disso no
 | 1    | pedir no prompt      | nada                         | nada                             | `01`, e 3 dos 5 blocos de `02`                          |
 | 2    | validar depois       | que você **detecte** o erro  | que ele não aconteça             | `01` (`parser.parse`); `04-Pydantic-v1.py` só em espírito¹ |
 | 3    | obrigar na API       | JSON sintaticamente válido   | campos, tipos, semântica         | `03-JSON-Output.py:34`                                  |
-| 4    | schema como contrato | a estrutura, e só onde alguém instancia o schema | que os valores sejam verdadeiros | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
+| 4    | schema como contrato | a estrutura, e só onde alguém instancia o schema | a estrutura onde ninguém instancia (`05-v1:19`, `05-v2:12`), e os valores em qualquer caso | `02:36`, `04-Pydantic-v2.py:23`, `05-v1:19`, `05-v2:12` |
 
 ¹ **Em espírito, não em fato:** o grau 2 pressupõe saída de LLM sendo conferida, e o
 `04-Pydantic-v1.py` não chama LLM nenhum (Parte 3) — valida um dicionário fixo. Ele demonstra o
@@ -48,8 +48,10 @@ se aprende o mecanismo, não porque seja um caso de grau 2.
 > **induzem** fortemente a estrutura, e só o segundo instancia o modelo Pydantic com o que voltou.
 > Ali, desobediência vira exceção de validação: erro em vez de silêncio, melhor que o grau 3 e ainda
 > assim não é garantia. Esse segundo ramo foi **lido, não executado**: o `llama-index-program-openai`
-> não está no ambiente de medição, e o que se lê é o análogo da mesma família no core, que valida com
-> `output_cls.model_validate(...)` (`function_program.py:209`, no `llama-index-core`). No caminho do
+> não está no ambiente de medição, e o que se lê é o análogo da mesma família no core, que valida
+> instanciando o schema: `output_cls(**kwargs)` no caminho síncrono que o `program(code=sample_code)`
+> da linha 50 exercita (`function_program.py:63`, no `llama-index-core`), e
+> `output_cls.model_validate(...)` no de streaming (`function_program.py:209`). No caminho do
 > `bind_tools` não há validação alguma. **Medido** no
 > `langchain-core` 0.3.33: `parse_tool_call` apenas desserializa o JSON dos argumentos, e um tool
 > call sem o `temperature` obrigatório de `05-function-calling-v1-LangChain.py:13` chega a
@@ -138,9 +140,10 @@ output = llm(prompt.format(query="User ID 123"))
 ```
 
 `llm(...)` é a forma antiga; a interface atual do LangChain é `.invoke(...)` — e é o que os outros
-arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33, o mais frequente dos dois pinos do repositório (quatro dos cinco `requirements` que o citam; o quinto pina 0.3.47): a chamada emite
-`LangChainDeprecationWarning: The method ``BaseChatModel.__call__`` was deprecated in langchain-core
-0.1.7 and will be removed in 1.0. Use :meth:``~invoke`` instead.` (markup Sphinx no literal). Não é
+arquivos do repo usam, incluindo `05-function-calling-v1-LangChain.py:22`. **Medido**, no `langchain-core` 0.3.33, o mais frequente dos dois pinos do repositório (quatro dos cinco `requirements` que o fixam com `==`; o quinto fixa 0.3.47, e outros oito o listam sem versão): a chamada emite
+``LangChainDeprecationWarning: The method `BaseChatModel.__call__` was deprecated in langchain-core
+0.1.7 and will be removed in 1.0. Use :meth:`~invoke` instead.`` (markup Sphinx no literal, com crase
+simples, como a mensagem o traz). Não é
 previsão — há data de remoção anunciada.
 
 **`PromptTemplate.from_template` com `{query}`** (linha 12) é o formato do LangChain. Guarde o
@@ -398,8 +401,10 @@ index = VectorStoreIndex.from_documents(documents)
 ```
 
 Note o corpus: `black_myth_wukong_wiki.txt`, e não o `black_myth_wukong_setting.txt` que a Aula 19
-usou. `wc -c` devolve **4.462 bytes** — **5,7 vezes** o corpus de 779 bytes que a Aula 19 usou, e
-ainda assim pequeno. Guarde o número para a ressalva do fim desta parte.
+usou. `wc -c` num checkout Windows devolve **4.462 bytes**, e o blob versionado tem 4.422; a
+diferença são os fins de linha, como a Aula 19 registrou para o corpus dela. Pela medida que se
+escolher é **5,7 vezes** aquele corpus (779 no disco, 773 no blob), e ainda assim pequeno. Guarde o
+número para a ressalva do fim desta parte.
 
 O conteúdo novo do arquivo são os cinco `ResponseMode`, um por bloco:
 
@@ -433,7 +438,8 @@ texto concatenado exceder a janela de contexto. A implementação não falha —
 `_prompt_helper.truncate`, que corta o chunk para caber. Com os 4.462 bytes deste corpus não aparece;
 num acervo real, o modo **descarta texto sem avisar**, o que é pior que falhar.
 
-A escolha é de custo por consulta: reempacotar troca número de chamadas por tamanho de prompt.
+Escolher o modo é escolher esse custo: reempacotar troca número de chamadas por tamanho de prompt, e
+o `SIMPLE_SUMMARIZE`, que não reempacota, troca as duas coisas por texto descartado.
 
 🔴 **E há um problema anterior a todos esses, que invalida a comparação: os três templates não têm
 `{context_str}`.** As linhas 50, 64 e 79 de `02-LlamaIndex-OutputParsing.py` declaram apenas
@@ -483,11 +489,12 @@ consequências:
 E é o tipo de erro que não avisa: se o template cair num slot que aquele modo ignora, você vê a saída
 sem formatação e conclui que "o modelo não obedeceu".
 
-**O corpus é pequeno para o que os modos se propõem.** Com 4.462 bytes, o número de chunks é baixo,
-e `REFINE`, `TREE_SUMMARIZE` e `COMPACT_ACCUMULATE` só se diferenciam quando há **muitos** chunks para
-combinar — é justamente aí que refinar, resumir em árvore ou acumular divergem. Com um punhado de
-chunks, os cinco blocos tendem a produzir resultados parecidos, e a diferença que o arquivo quer
-demonstrar não aparece. É o mesmo padrão que a Aula 19 encontrou no corpus de 779 bytes: o exemplo
+**O corpus é pequeno para o que os modos se propõem.** **Medido** no `llama-index-core` 0.12.15: os
+4.462 bytes dão **888 tokens** em `cl100k_base`, e o `SentenceSplitter` padrão corta em 1.024, então o
+índice produz **um único chunk**. E `REFINE`, `TREE_SUMMARIZE` e `COMPACT_ACCUMULATE` só se
+diferenciam quando há **muitos** chunks para combinar — é justamente aí que refinar, resumir em
+árvore ou acumular divergem. Com um chunk só não sobra o que combinar, e a diferença que o arquivo
+quer demonstrar não tem como aparecer. É o mesmo padrão que a Aula 19 encontrou no corpus dela (773 no blob, 779 no disco): o exemplo
 está correto e o dado não o exercita.
 
 Por fim, a variável do template do LlamaIndex é `{query_str}` (`:50`, `:64`, `:79`), não `{query}`
@@ -617,8 +624,8 @@ crítica — o mesmo problema do contexto recuperado, num canal diferente.
 cinco blocos e compare as saídas. Como está, a comparação não mede modo de síntese: os blocos 3, 4 e
 5 respondem sem o acervo, pelo defeito de `{context_str}` da Parte 5. Então conserte primeiro,
 acrescentando `{context_str}` aos templates de `02-LlamaIndex-OutputParsing.py:50`, `:64` e `:79`, e só depois compare. Aí sim a
-segunda ressalva vira pergunta: com 4.462 bytes, quantos chunks o índice produz, e os modos chegam a
-divergir? Para levar o corpus adiante você terá de trazer texto de fora: medido com
+segunda ressalva vira experimento: a Parte 5 mede **um único chunk** para estes 4.462 bytes; confirme
+na tela e veja se, com um chunk só, algum dos cinco modos ainda diverge. Para levar o corpus adiante você terá de trazer texto de fora: medido com
 `find . -name '*.txt' -printf '%s %p\n' | sort -rn`, o maior documento em inglês do domínio é o que
 o arquivo já carrega, e o de 20.648 bytes em `90-Data/BlackMythWukong/` está em chinês, contra
 perguntas escritas em inglês.
