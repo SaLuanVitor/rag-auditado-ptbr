@@ -129,32 +129,59 @@ const palavras = (s) => s.replace(/\s+/g, ' ').trim();
 // citacao que envelhece ali esta CERTA. O GATE tem linhas como "AULA-13:196 na
 // versao anterior; a palavra foi removida em 7d516c0", que sao o registro
 // funcionando. Varrer `avaliacao/` transformaria historia em defeito.
-const VIVOS = ['HANDOFF.md', 'GLOSSARIO.md', 'README.md'];
+//
+// A lista tinha tres nomes e deixava de fora dois documentos igualmente vivos, o
+// `PROMPT-CONTINUAR.md` e a definicao do agente. Quando a lacuna foi medida
+// nenhum dos dois carregava citacao de linha para aula, entao ela era LATENTE:
+// nao custava nada naquele dia e custaria no primeiro que custasse, sem sinal
+// nenhum. Fechada aqui porque lacuna latente e a que se fecha barato.
+//
+// O caminho agora e RELATIVO A RAIZ, e nao um nome solto. A versao anterior
+// resolvia por `path.basename`, entao `agente/rag-specialist.md` seria procurado
+// na raiz. MEDIDO com a resolucao antiga: ele nao silencia, ele QUEBRA, com
+// ENOENT no `readFileSync`, e leva a varredura inteira junto.
+//
+// Fica o registro porque eu tinha escrito o contrario: supus silencio, que e o
+// modo de falhar mais comum deste projeto, e a prova avulsa mostrou barulho. A
+// consequencia pratica e a mesma, cobertura zero naquele arquivo, mas o
+// diagnostico nao e: um erro que aparece custa minutos, um que nao aparece custa
+// rodadas.
+const VIVOS = [
+  'HANDOFF.md',
+  'GLOSSARIO.md',
+  'README.md',
+  'PROMPT-CONTINUAR.md',
+  'agente/rag-specialist.md',
+];
 const alvos = process.argv.slice(2).length
   ? process.argv.slice(2)
   : fs.readdirSync(RAIZ)
-      .filter((f) => /^AULA-\d{2}-.*\.md$/.test(f) || VIVOS.includes(f));
+      .filter((f) => /^AULA-\d{2}-.*\.md$/.test(f))
+      .concat(VIVOS.filter((v) => fs.existsSync(path.join(RAIZ, v))));
 
 let reprova = 0, alertas = 0, ok = 0;
 for (const arq of alvos) {
-  const base = path.basename(arq);
-  const texto = fs.readFileSync(path.join(RAIZ, base), 'utf8');
+  // `rel` e o que aparece no relatorio, porque um nome solto nao acha o arquivo
+  // quando ele mora em subdiretorio. `base` serve so para a aula nao se citar.
+  const rel = arq.split(path.sep).join('/');
+  const base = path.basename(rel);
+  const texto = fs.readFileSync(path.join(RAIZ, rel), 'utf8');
   const linhas = texto.split(/\r?\n/);
   for (const c of citacoes(texto, base)) {
     const a = alvo(c.num);
     if (!a) {
-      console.log(`${base}:${c.linha}  FORA  "${c.bruto}": não há AULA-${c.num} neste diretório`);
+      console.log(`${rel}:${c.linha}  FORA  "${c.bruto}": não há AULA-${c.num} neste diretório`);
       reprova++;
       continue;
     }
     if (c.fim > a.linhas.length) {
-      console.log(`${base}:${c.linha}  FORA  "${c.bruto}": ${a.arquivo} tem ${a.linhas.length} linhas`);
+      console.log(`${rel}:${c.linha}  FORA  "${c.bruto}": ${a.arquivo} tem ${a.linhas.length} linhas`);
       reprova++;
       continue;
     }
     const cit = transcricao(linhas, c.linha);
     if (!cit) {
-      console.log(`${base}:${c.linha}  SEM_PROVA  "${c.bruto}" -> ${a.arquivo}: faixa cabe, conteúdo não conferível daqui`);
+      console.log(`${rel}:${c.linha}  SEM_PROVA  "${c.bruto}" -> ${a.arquivo}: faixa cabe, conteúdo não conferível daqui`);
       alertas++;
       continue;
     }
@@ -178,7 +205,7 @@ for (const arq of alvos) {
       for (let j = 0; j < alvoPal.length; j++) if (seq[i + j].p !== alvoPal[j]) { bate = false; break; }
       if (bate) { onde = seq[i].linha; break; }
     }
-    console.log(`${base}:${c.linha}  DESLOCADA  "${c.bruto}" -> ${a.arquivo}`);
+    console.log(`${rel}:${c.linha}  DESLOCADA  "${c.bruto}" -> ${a.arquivo}`);
     console.log(`    a transcrição não está em ${c.ini}-${c.fim}${onde ? `, e sim a partir de ${onde}` : ''}`);
     reprova++;
   }

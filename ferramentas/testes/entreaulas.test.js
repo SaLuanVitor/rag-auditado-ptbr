@@ -32,7 +32,11 @@ let n = 0;
 function acervo(arquivos, ferramenta) {
   const dir = path.join(TMP, 'a' + (++n));
   fs.mkdirSync(path.join(dir, 'ferramentas'), { recursive: true });
-  for (const [nome, txt] of Object.entries(arquivos)) fs.writeFileSync(path.join(dir, nome), txt, 'utf8');
+  for (const [nome, txt] of Object.entries(arquivos)) {
+    const alvo = path.join(dir, nome);
+    fs.mkdirSync(path.dirname(alvo), { recursive: true });
+    fs.writeFileSync(alvo, txt, 'utf8');
+  }
   const fonte = fs.readFileSync(ferramenta || path.join(FERR, 'entreaulas.js'), 'utf8');
   const script = path.join(dir, 'ferramentas', 'entreaulas.js');
   fs.writeFileSync(script, fonte);
@@ -118,6 +122,35 @@ r = acervo({
   'AULA-21-self-rag.md': '# AULA 21\n\nVer `AULA-99:3`.\n',
 });
 checa('acusa citação a aula inexistente', r.code === 1 && /FORA/.test(r.saida), r.saida);
+
+// ---------- 9. documento vivo em SUBDIRETORIO ----------
+// A lacuna que motivou isto: o `VIVOS` listava tres nomes da raiz, e a resolucao
+// era por `path.basename`. Acrescentar `agente/rag-specialist.md` sem mexer na
+// resolucao daria um script procurando o arquivo na raiz, nao achando, e
+// SILENCIANDO. O caso exige as duas coisas: que ele leia o subdiretorio e que o
+// relatorio traga o caminho que acha o arquivo.
+r = acervo({
+  'AULA-18-compressao.md': ALVO,
+  'agente/rag-specialist.md': [
+    '# Vetor',
+    '',
+    'A Aula 18 fixa a diferença. Ela está nas linhas 3 a 4 daquela aula:',
+    '',
+    '> A diferença entre CRAG e Self-RAG: CRAG critica o que foi recuperado.',
+    '',
+  ].join('\n'),
+});
+checa('lê documento vivo em subdiretório e acha a citação deslocada',
+  r.code === 1 && /DESLOCADA/.test(r.saida), r.saida);
+checa('e o relatório traz o caminho que acha o arquivo, não o nome solto',
+  /agente\/rag-specialist\.md:3/.test(r.saida), r.saida);
+
+// ---------- 10. LIMITE: vivo que nao existe nao quebra a varredura ----------
+// O `VIVOS` e uma lista fixa, e nem todo acervo tem os cinco. Um nome ausente
+// nao pode derrubar a ferramenta inteira.
+r = acervo({ 'AULA-18-compressao.md': ALVO });
+checa('LIMITE: documento vivo ausente é ignorado, não derruba a varredura',
+  r.code === 0 && /PASS/.test(r.saida), r.saida);
 
 // ---------- positivo plantado ----------
 if (process.argv.includes('--provar')) {

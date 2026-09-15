@@ -4609,3 +4609,16 @@ em subdiretório não é lido como está.
 
 Fica declarado em vez de consertado no mesmo fôlego, porque a lacuna é **latente** e o conserto tem
 um detalhe de implementação que pede o seu próprio teste.
+
+> **Fechada logo em seguida, e uma afirmação acima estava errada.** Eu escrevi que acrescentar os
+> nomes sem mexer na resolução daria "um script que silencia em vez de avisar". **Medido por prova
+> avulsa, com a resolução antiga: ele não silencia, ele quebra**, com `ENOENT` no `readFileSync`, e
+> leva a varredura inteira junto. Supus silêncio porque silêncio é o modo de falhar mais comum deste
+> projeto, e a prova mostrou barulho. A consequência prática é a mesma, cobertura zero naquele
+> arquivo; o diagnóstico não é, e a diferença importa: **erro que aparece custa minutos, erro que
+> não aparece custa rodadas.**
+>
+> O conserto resolve o caminho **relativo à raiz**, mantém o `basename` só para a aula não se citar,
+> e faz o relatório imprimir o caminho que acha o arquivo. Dois casos novos na suíte: o documento
+> vivo em subdiretório com citação deslocada, e o limite de um nome do `VIVOS` ausente do acervo não
+> derrubar a varredura.
