@@ -1,6 +1,32 @@
 # HANDOFF — Curso RAG PT-BR e agente `@rag-specialist`
 
-**Data:** 2026-08-20
+> ## ESTADO CORRENTE, 15/09/2026. Leia este bloco antes de qualquer número abaixo.
+>
+> Tudo o que vem depois é **registro histórico até a sexta rodada (R6)**, e continua valendo como
+> história do método. Os números de percentual e de classificação dele estão **superados**.
+>
+> | | Valor | Onde se confere |
+> | --- | --- | --- |
+> | Nota corrente | **213/348 (61,2%)** | `node ferramentas/portao.js` |
+> | Rodada válida | **R8 mais a sprint de remedição S6** | `avaliacao/GATE-AULAS-v1.md`, seções finais |
+> | Abaixo do portão de 6/12 | **1**, a AULA-06 em 4 | idem |
+> | Critério `−1` | zero em 16 medidas por dimensão, 1 livre por aritmética, **12 desconhecidas** | idem |
+> | Veredito | **portão FECHADO**, por uma aula e por doze desconhecidas | idem |
+>
+> **O contador é a fonte, não este arquivo.** Ele lê o GATE e devolve a nota vigente de cada aula,
+> que é a **última** registrada. Foi escrito porque somar de cabeça já produziu, duas vezes nesta
+> auditoria, o número que eu queria ver.
+>
+> **A oitava rodada derrubou o curso de 234 para 166/348, e isso não foi perda de qualidade: foi
+> ganho de medição.** A hipótese fechou em treze de treze, sem exceção: nota alta da R6 mais pouco
+> escrutínio previa queda. As duas aulas 12/12 do curso caíram para 5 e 4. A R6 media, em boa parte,
+> a própria superficialidade.
+>
+> **A S6 remediou as treze abaixo do portão e doze passaram**, com **duas remedições que PIORARAM a
+> aula** (AULA-19, de 5 para 4, e AULA-06, de 5 para 4). Repara-se em um ciclo na maioria dos casos,
+> e não sempre. Detalhe nas seções `S6` do GATE.
+
+**Data do bloco histórico abaixo:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
 **Verificação:** `verify-citations --all` = **PASS** — 1753 OK, zero inválidas. `BAD_LINE`,
 `MISPLACED`, `NOT_FOUND` e `BAD_ANCHOR` todos em **0**; restam 19 `SKIPPED` (glob ou elipse) e
@@ -10,10 +36,11 @@ duplicação nasceu de nove entradas dobradas que a de ausência não via)
 **Auditoria:** cobertura **29 de 29** — as 8 que faltavam (08, 15, 16, 19-23) foram auditadas nos
 lotes A-D em 19/08. **Recontado por script em 20/08:** as 29 aulas têm nota registrada no GATE, sem
 lacuna. Todas as 29 notas são **pré-correção**, então o que ainda bloqueia o veredicto é a renota
-**Renota:** ✅ **CINCO rodadas completas, 29 de 29 cada.** Curso em **234/348 = 67,2%** (R6, a
-medição válida e a mais recente). Histórico: R2 = 254/348 = 73,0%; R3 = 245/348 = 70,4%;
+**Renota:** ✅ **CINCO rodadas completas, 29 de 29 cada.** Curso em **234/348 = 67,2%** (R6, que era
+a medição válida quando este bloco foi escrito, e foi superada pela R8 e pela S6; ver o bloco de
+estado corrente no topo). Histórico: R2 = 254/348 = 73,0%; R3 = 245/348 = 70,4%;
 R4 = 231/348 = 66,4%; R5 = parcial, só as oito abaixo de 50%; **R6 = 234/348 = 67,2%**
-**A R6 é a nota a citar.** Ela é a primeira homogênea desde a R4: mesmo briefing nas 29, com duas
+**A R6 era a nota a citar até 20/08, e hoje não é.** Ela foi a primeira homogênea desde a R4: mesmo briefing nas 29, com duas
 mudanças de instrumento — ler fonte de biblioteca passou a ser **autorizado** (o contrato antigo
 confundia *ler* com *instalar*), e as nove classes de defeito viraram lista a percorrer em vez de
 critério de cada auditor
@@ -40,10 +67,15 @@ correções entre as duas rodadas e desceu para 70,4% — Δ médio **−0,31**,
 empataram. Não é contradição: **a R2 media menos.** Nas quatro aulas com dois auditores, em **4 de 4**
 o de orçamento dobrado deu nota menor e achou defeito verificável que o outro perdeu. Trate as notas
 das rodadas 1 e 2 como piso otimista, não como medida
-**Classificação:** **Requer revisão** — cinco rodadas completas convergindo no mesmo rótulo. Na R6 os
-67,2% ficam **abaixo do piso de 70%** de "Publicável com ressalvas", e o gate eliminatório reprova
-independentemente: **oito aulas abaixo de 50%** na R6 — 27 (4), 00 (5), 08 (5), 09 (5), 23 (5),
-24 (5), 25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
+**Classificação em 20/08:** **Requer revisão** — cinco rodadas completas convergindo no mesmo
+rótulo. Na R6 os 67,2% ficam **abaixo do piso de 70%** de "Publicável com ressalvas", e o gate
+eliminatório reprova independentemente: **oito aulas abaixo de 50%** na R6 — 27 (4), 00 (5), 08 (5),
+09 (5), 23 (5), 24 (5), 25 (5), 26 (5). Duas razões independentes para o mesmo rótulo.
+
+O rótulo continua o mesmo hoje, por razões diferentes e depois de duas rodadas a mais: 61,2%, uma
+aula abaixo do portão de nota, e doze aulas sem o critério de `−1` medido. **Nenhuma das oito
+aulas listadas acima ainda é o problema**, o que se lê como convergência do conserto e não do
+material.
 
 **Sétima rodada, 03/09: COMPLETA nas oito abaixo de 50%.** 27 sobe a **7**; 09, 23 e 26 a **6**;
 24 e 08 **caem a 4**; 00 a **3**; 25 a **2**, com a primeira nota **`−1`** destas oito. Soma:
