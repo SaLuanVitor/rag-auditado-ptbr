@@ -33,8 +33,11 @@
 > consertos dos consertos, e o pior achado dela foi uma palavra num cabeçalho.
 >
 > **Conserto aplicado não é conserto verificado.** As catorze receberam consertos depois destas
-> medições, então uma passada nova acharia coisa nova. Isso é a condição 4 do DoD, e ela continua
-> aberta por construção.
+> medições, então uma passada nova acharia coisa nova. Isso era a condição 4 do DoD, que **não
+> fechava por construção**: verificar produz achados, achados produzem consertos, consertos ficam
+> sem verificação. Em 15/09 ela foi **reformulada** para o que é decidível, o último lote verificado
+> **ou** a parada pela régua de classe registrada, e pela forma nova ela **passa**. O DoD inteiro,
+> com as dez condições e o comando que decide cada uma, está no `GATE`.
 
 **Data do bloco histórico abaixo:** 2026-08-20
 **Estado:** ✅ **CURSO COMPLETO — 29 de 29 aulas** (`AULA-00` a `AULA-28`) · agente em **L3**
@@ -339,8 +342,8 @@ faz `git pull` nunca conflitar.
 | Arquivo                              | Conteúdo                                                                                                     |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `README.md`                          | análise do repo + plano das 29 aulas + ritmos + link para tudo                                               |
-| `GLOSSARIO.md`                       | 162 termos de RAG, em inglês, definidos em português, agrupados por tema                                     |
-| `FATOS.md`                           | **gerado por script** — inventário por módulo + ~330 linhas-chave com `arquivo:linha` **e conteúdo literal** |
+| `GLOSSARIO.md`                       | verbetes de RAG, em inglês, definidos em português, agrupados por tema. Conte com `grep -c '^\*\*'`, e desconte a prosa que abre em negrito |
+| `FATOS.md`                           | **gerado por script** — inventário por módulo + mais de 300 linhas-chave com `arquivo:linha` **e conteúdo literal** |
 | `AULA-00` a `AULA-28`                | **29 aulas — curso completo** (ver seção 4)                                                                  |
 | `exercicios/aula-02-similaridade.py` | script executável: cosseno/IP/L2, bug de L2 invertido, negação, ponto cego com SKU                           |
 | `ferramentas/verify-citations.js`    | valida caminho e range de linha de toda citação nos `.md`                                                    |

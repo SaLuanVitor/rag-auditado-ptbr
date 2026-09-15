@@ -12,7 +12,7 @@ O diferencial não é a quantidade de aulas. É o aparato de verificação:
 | Aulas | **29** (`AULA-00` a `AULA-28`), ~86 mil palavras |
 | Citações `arquivo:linha` verificadas | **1 602**, zero inválidas |
 | Cobertura da auditoria adversarial | **29 de 29** aulas com nota independente |
-| Glossário | 162 termos de RAG, em inglês, definidos em português |
+| Glossário | 180 verbetes de RAG, em inglês, definidos em português |
 | Agente especialista versionado | `@rag-specialist` (Vetor), nível L3 |
 
 ## Por que "auditado"
@@ -83,7 +83,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | Caminho | Conteúdo |
 | --- | --- |
 | `AULA-00` … `AULA-28` | as 29 aulas, em oito seções fixas cada |
-| [`GLOSSARIO.md`](GLOSSARIO.md) | 162 termos, agrupados por tema |
+| [`GLOSSARIO.md`](GLOSSARIO.md) | 180 verbetes, agrupados por tema |
 | [`FATOS.md`](FATOS.md) | inventário por módulo, gerado por script, com `arquivo:linha` e conteúdo literal |
 | `agente/` | o `@rag-specialist`: persona, protocolo de citação de 10 regras, limites declarados |
 | `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
@@ -316,7 +316,7 @@ durante a auditoria adversarial, cada uma de um defeito que passou.
 | --- | --- |
 | `node ferramentas/portao.js` | Reconta os dois critérios eliminatórios do `GATE`. Desconhecido **não** é zero |
 | `node ferramentas/vigia.js` | Se a fonte pinada ou as bibliotecas que as aulas declaram ter medido andaram |
-| `node ferramentas/gerar-fatos.js` | Regenera `FATOS.md`, o índice com `arquivo:linha` **mais o conteúdo literal** |
+| `node ferramentas/gerar-fatos.js` | Regenera `FATOS.md`, o índice com `arquivo:linha` **mais o conteúdo literal**: mais de 300 linhas de fato |
 | `bash ferramentas/montar-ambiente.sh` | Reconstrói o ambiente de medição com os pins do curso |
 
 **Para editar sem quebrar:**

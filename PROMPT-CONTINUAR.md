@@ -28,9 +28,15 @@ aberta em `E:\Projetos\rag\rag-auditado-ptbr`.
 > `vigia.js`, que diz se a fonte pinada ou as bibliotecas andaram. O `README.md` tem a lista
 > inteira por momento de uso.
 >
-> **O que ficou aberto**, e é decisão de quem paga e não trabalho pendente: reproduzir os três
-> números do RAGAS, que exige chave da OpenAI; e a condição 4 do DoD, verificação própria de cada
-> lote de conserto, que **não fecha por construção** e tem régua de parada declarada no `GATE`.
+> **Não há pendência aberta.** As quatro que havia foram decididas em 15/09 e a razão de cada uma
+> está no `GATE`, na seção "As quatro pendências, decididas": o RAGAS foi **encerrado sem fazer**,
+> porque confirmaria três números que a própria AULA-22 ensina a não tratar como resultado; a
+> condição 4 foi **reformulada**, porque a forma antiga era um regresso que nenhuma execução
+> satisfaz; a capacidade de **impacto** foi construída (`superficies.js`); e **estado**,
+> **localização** e o **exame v3** ficaram adiados, com o motivo escrito.
+>
+> **O DoD vive no `GATE`**, com dez condições e o comando que decide cada uma. Ele morava só no
+> artefato publicado, fora do alcance de qualquer ferramenta, e isso era defeito.
 
 **O bloco de 20/08 começa aqui.** Atualizado então depois da **terceira** rodada de renota (29 de
 29) e de 32 correções. A fase mudou duas vezes naquele dia: primeiro de "medir" para "subir a nota",
