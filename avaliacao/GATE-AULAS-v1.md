@@ -4572,3 +4572,40 @@ continuam certas sobre aquela versão. O que o vigia produz é a **lista do que 
 decidir repinar, e ela nomeia as aulas: são **18 pares pacote-aula, em 13 das 29**, contados pelo próprio vigia e não de cabeça. A primeira redação dizia “treze menções em nove aulas”, e os dois números estavam errados.
 
 **Ferramental: doze scripts, doze suítes, zero sem exercício.**
+
+## A quarta superfície, e ela está fora do alcance de toda ferramenta
+
+As três últimas conferências deste dia acharam **a mesma coisa**, e isso deixou de ser coincidência:
+um fato medido alcançou as aulas, alcançou este registro, alcançou a definição do agente, e **não
+alcançou o artefato do plano**. A última foi a mais clara: as duas depreciações viraram remoção, eu
+atualizei três superfícies e o artefato seguiu dizendo "consequência levantada e não medida".
+
+**O artefato não é descuido meu: ele é estruturalmente invisível.** Ele mora no scratchpad e é
+publicado na claude.ai, então **nenhum dos doze scripts o alcança**, e nenhum pode alcançar:
+
+| Ferramenta | O que ela varre | O artefato |
+| --- | --- | --- |
+| `verify-citations.js` | citações contra o clone da fonte | fora |
+| `entreaulas.js` | `AULA-*.md` mais três documentos vivos da raiz | fora |
+| `residuo.js`, `cauda.js`, `contagem.js`, `fechos.js` | arquivos do repositório | fora |
+
+**A regra, então, é de processo e não de máquina:** ao medir algo novo, o artefato é a **quarta
+superfície e a mais fácil de esquecer**, porque é a única cuja omissão não produz nenhum sinal.
+Portão verde não diz nada sobre ele. A pergunta a fazer antes de encerrar um achado é quantas
+superfícies ele tem, e a resposta padrão neste projeto é **quatro**: a aula, este registro, a
+definição do agente e o artefato.
+
+### Uma lacuna medida de passagem, e ela é latente
+
+O `VIVOS` do `entreaulas.js` lista três documentos vivos da raiz: `HANDOFF.md`, `GLOSSARIO.md` e
+`README.md`. Ficaram de fora **dois** que também são vivos: `PROMPT-CONTINUAR.md` e
+`agente/rag-specialist.md`.
+
+**Hoje isso não custa nada**, e foi medido: nenhum dos dois carrega citação de linha para aula
+nenhuma, nem explícita nem em prosa. Custará no dia em que um deles carregar, e o defeito entrará
+sem sinal, que é exatamente a classe que o `entreaulas.js` existe para fechar. Fechar a lacuna exige
+mais que acrescentar dois nomes à lista: o script resolve o alvo por `path.basename`, então arquivo
+em subdiretório não é lido como está.
+
+Fica declarado em vez de consertado no mesmo fôlego, porque a lacuna é **latente** e o conserto tem
+um detalhe de implementação que pede o seu próprio teste.
