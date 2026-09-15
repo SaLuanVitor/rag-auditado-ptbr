@@ -4622,3 +4622,59 @@ um detalhe de implementação que pede o seu próprio teste.
 > e faz o relatório imprimir o caminho que acha o arquivo. Dois casos novos na suíte: o documento
 > vivo em subdiretório com citação deslocada, e o limite de um nome do `VIVOS` ausente do acervo não
 > derrubar a varredura.
+
+## O `contagem.js` não pegou um caso da própria família dele, e o motivo é a quebra de linha
+
+**O defeito:** a definição do agente dizia "Estas **duas** ferramentas não dependem" sobre uma tabela
+de **quatro**. Eu acrescentei duas linhas àquela tabela hoje, em dois commits diferentes, e não
+toquei na frase que as anuncia. É exatamente a forma que o `contagem.js` existe para pegar.
+
+**Por que ele não pegou.** O filtro de posição exige que o numeral esteja num cabeçalho ou numa
+frase que **fecha em dois-pontos**, e ele olha uma linha por vez. O acervo é quebrado em ~100
+colunas, então a frase caía assim:
+
+```
+Regra em prosa depende de memória. Estas duas ferramentas não dependem, e o uso delas é
+obrigatório — não opcional:
+```
+
+O numeral numa linha, os dois-pontos na seguinte. **A frase anuncia, a linha não.**
+
+### Ampliar o filtro foi medido, e reprovou
+
+Protótipo: incluir os numerais da linha anterior quando ela é continuação da mesma frase. Medido
+sobre as 29 aulas mais os documentos vivos:
+
+| | Alertas |
+| --- | --- |
+| Regra atual | 3 |
+| Regra ampliada | 10 |
+
+O saldo não é +7: a ampliação **resolve** um falso positivo antigo (`AULA-28:234`, onde "a tabela
+abaixo traz cinco linhas" está na linha anterior e bate com as 5) e acrescenta 8. Lidos um a um,
+pelo menos quatro dos 8 são ruído da mesma espécie que o filtro foi criado para cortar: o numeral
+está numa oração sobre **outra coisa** que calha de terminar perto dos dois-pontos, como "nenhum dos
+**cinco** arquivos de `02-Indexes/`" seguido de uma lista de custos, ou "a mais frequente das
+**três** que o repositório pina" seguida de dois itens sobre BM25.
+
+**Decisão: não ampliar.** A nota de desenho do próprio script já dizia que a posição é o que o torna
+utilizável, e a medição confirma. Trocar um achado real por quatro falsos numa ferramenta de alerta
+a transforma em ruído, e ruído constante treina a ignorar a saída.
+
+**A convenção que fica, e é barata:** numeral que anuncia lista vai **na linha que fecha em
+dois-pontos**. O conserto aplicado aqui faz isso, e foi conferido por positivo plantado: com
+"quatro" trocado por "sete", a ferramenta agora dispara; antes da reescrita ela ficava muda mesmo
+com o numeral errado.
+
+### As três divergências vivas, triadas: as três são falso positivo
+
+Elas estavam no relatório e ninguém as tinha lido. Ficam registradas para não serem retriadas:
+
+| Onde | Alerta | Leitura |
+| --- | --- | --- |
+| `AULA-03:256` | "nove" contra lista de 2 | Falso. "Para **nove** documentos" fala do corpus, e os dois-pontos introduzem explicação, não lista. O "2" é o resto da lista que envolve o trecho |
+| `AULA-25:82` | "Cinco" contra tabela de 6 | Falso, e é o mais sutil. A frase diz "**Cinco** deles têm correspondência" e "O **sexto** não tem fase própria": 5 + 1 = 6, e a tabela de 6 linhas está **certa**. O script casa cardinais e não ordinais, então nunca vê o "sexto" que fecha a conta |
+| `AULA-28:234` | "duas" contra tabela de 5 | Falso. A linha anterior diz "a tabela abaixo traz **cinco** linhas", e "as **duas** de geração" fala de um subconjunto |
+
+**Zero achados reais em pé nesta ferramenta hoje.** Reconhecer ordinais fecharia o caso da AULA-25 e
+é mais barato que ampliar a janela, porque não mexe na posição. Fica anotado e não feito.

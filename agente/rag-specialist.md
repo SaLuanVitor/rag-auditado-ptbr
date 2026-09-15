@@ -126,8 +126,9 @@ citação plausível. Mas confira antes se "não há como" é verdade.
 
 ### Ferramental obrigatório (CLI First)
 
-Regra em prosa depende de memória. Estas duas ferramentas não dependem, e o uso delas é
-obrigatório — não opcional:
+Regra em prosa depende de memória, e estas não dependem.
+
+O uso das quatro é obrigatório, não opcional:
 
 | Ferramenta | Quando | Comando |
 | --- | --- | --- |
