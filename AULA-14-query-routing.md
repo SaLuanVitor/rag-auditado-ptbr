@@ -111,7 +111,7 @@ atribuir ao índice uma falha que foi de rota.
 O exemplo usa três rotas de documentação de linguagens. A generalização óbvia: no seu sistema as
 rotas seriam `fiscal`, `juridico`, `suporte` — ou `sql`, `vetorial`, `grafo`, generalizando os três
 alvos de tradução da Aula 12 (SQL, Cypher e filtro de metadado) para uma decisão de rota. A Aula 12
-encaminha explicitamente o recorte temporal para cá (`AULA-12:256-258`), e **a classificação dele
+encaminha explicitamente o recorte temporal para cá (`AULA-12:266-267`), e **a classificação dele
 como roteamento lógico é desta aula**, na tabela da Parte 3. O resto da ponte, a generalização dos
 três alvos de tradução para uma decisão de rota, é minha.
 

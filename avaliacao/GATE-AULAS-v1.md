@@ -4391,3 +4391,36 @@ caso de teste para isso.
 **Metade da suíte fixa o que ele não pode acusar.** Dois dos quatro primeiros achados do `grep` que
 o originou eram falso positivo, "linha 5" falando de um `.py`, e uma ferramenta que os acusasse
 viraria ruído no acervo inteiro.
+
+### O `entreaulas.js` rodado no acervo: zero reprovando, dois defeitos
+
+Ele não reprovou nada, e mesmo assim achou dois. É o que o veredito `SEM_PROVA` existe para fazer:
+a faixa cabe, o conteúdo não se decide da máquina, e um humano lê. **Quatro alertas, dois eram
+defeito.**
+
+**A AULA-14 citava `AULA-12:256-258`** para o encaminhamento do recorte temporal. Ali está o exemplo
+da consulta composta; a passagem que de fato encaminha para a Aula 14 está em **266-267**. Dez linhas
+de deriva.
+
+**O `HANDOFF.md` apontava `AULA-18:157` como "a forma exemplar de ressalva do curso"**, e tinha dois
+defeitos, o segundo grave: a linha foi para 160, e **o texto citado é a versão anterior**, reescrita
+hoje justamente porque aquela nota **deixou de ser exemplar**. Ela dizia "não executei" 27 linhas
+abaixo de um parágrafo carimbado "Medido", e foi isso que zerou o `H` da AULA-18.
+
+**E eu consertei o número dessa citação hoje de manhã**, no mesmo commit em que registrei aqui que a
+nota "deixou de ser" exemplar, e deixei a alegação e a transcrição na versão antiga. Forma 4 no
+documento que descreve o método, sobrevivendo doze horas dentro do registro que a denunciava.
+
+### Duas decisões de escopo, e as duas custaram um achado para serem vistas
+
+**Documento vivo entra, registro de auditoria não.** O padrão passou a varrer `HANDOFF.md`,
+`GLOSSARIO.md` e `README.md` além das aulas, e a **excluir `avaliacao/`**. A razão é que os dois
+tipos de arquivo querem coisas opostas: documento vivo tem de apontar para o estado atual, e
+registro de auditoria cita o estado do dia em que mediu, então **uma citação que envelhece ali está
+certa**. O GATE tem linhas como "AULA-13:196 na versão anterior; a palavra foi removida em 7d516c0",
+que são o registro funcionando. Varrer `avaliacao/` transformaria história em defeito.
+
+**Citação de linha para um estado passado, dentro de documento vivo, não se conserta: se remove.**
+É a única forma que a ferramenta não pode separar, e ela só pode apodrecer, porque o número descreve
+um arquivo que mudou. A referência ao estado antigo da nota da AULA-18 passou a ser pelo **commit**,
+que não se move.

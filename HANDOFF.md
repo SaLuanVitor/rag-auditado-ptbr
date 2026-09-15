@@ -164,9 +164,13 @@ precisa varrer os irmãos, inclusive os do próprio parágrafo
 reauditado: das 27, cerca de doze são falsos positivos do regex (títulos de armadilha, perguntas de
 checkpoint, "hipótese" descrevendo o modelo e não o autor), e o resto é ressalva honesta e tersa —
 **ressalva sem razão não pode ter razão falsa**
-**📌 A forma exemplar de ressalva já existia no curso**, na aula que tirou 12/12: `AULA-18:157` —
-"Limite: conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.12.15; não executei."
-Ela nomeia **o que leu** e **o que não fez**. É o padrão que os consertos desta varredura adotaram, e
+**📌 A forma exemplar de ressalva, e o que aconteceu com ela.** O modelo era a nota de limite da AULA-18 (em `fcd3cdc`), "Limite:
+conferido lendo `llama_index.core.postprocessor.optimizer` e (…) 0.12.15; não executei", que nomeia
+**o que leu** e **o que não fez**. Em 15/09/2026 ela deixou de servir de modelo, e o motivo é mais
+instrutivo que o modelo: um conserto inseriu acima dela um parágrafo carimbado "Medido", e a mesma
+Parte 3 passou a dizer as duas coisas a 27 linhas de distância. A nota está hoje em
+`AULA-18-compressao-crag.md:160`, reescrita para declarar **o que o limite não alcança**.
+**Inserir um parágrafo acima de uma ressalva é editá-la.** É o padrão que os consertos desta varredura adotaram, e
 o que se deve exigir de qualquer ressalva nova
 **Varredura da classe 4: feita.** 595 contagens do curso reproduzidas por comando, em quatro lotes.
 **24 defeitos — 96% das contagens conferem.** Isso é informação sobre o material: ele erra menos em
@@ -1027,9 +1031,8 @@ produziu acusação falsa contra a AULA-09 na primeira versão.
 
 ### Efeito medido
 
-De 1 114 para **1 264 verificações automáticas** no material didático (medição daquele momento;
-hoje são 1 268). `BAD_LINE`, `MISPLACED` e
-`NOT_FOUND` seguem em **0**.
+De 1 114 para **1 264 verificações automáticas** no material didático (medição daquele momento; hoje
+são 1 268). `BAD_LINE`, `MISPLACED` e `NOT_FOUND` seguem em **0**.
 
 ### Aberto, e é trabalho real
 

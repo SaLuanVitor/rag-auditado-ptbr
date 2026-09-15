@@ -118,9 +118,22 @@ function transcricao(linhas, apos) {
 // mudar o texto, e uma comparacao literal acusaria todo reempacotamento.
 const palavras = (s) => s.replace(/\s+/g, ' ').trim();
 
+// O padrao varre as aulas E os documentos vivos da raiz, e NAO varre `avaliacao/`.
+//
+// A distincao e de proposito e custou um achado para ser vista: o `HANDOFF.md`
+// citava `AULA-18:157` como forma exemplar de ressalva, e a linha tinha ido para
+// 160 e o texto citado era a versao anterior, reescrita no mesmo dia. Documento
+// vivo tem de apontar para o estado atual.
+//
+// Registro de auditoria e o oposto: ele cita o estado do dia em que mediu, e uma
+// citacao que envelhece ali esta CERTA. O GATE tem linhas como "AULA-13:196 na
+// versao anterior; a palavra foi removida em 7d516c0", que sao o registro
+// funcionando. Varrer `avaliacao/` transformaria historia em defeito.
+const VIVOS = ['HANDOFF.md', 'GLOSSARIO.md', 'README.md'];
 const alvos = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : fs.readdirSync(RAIZ).filter((f) => /^AULA-\d{2}-.*\.md$/.test(f));
+  : fs.readdirSync(RAIZ)
+      .filter((f) => /^AULA-\d{2}-.*\.md$/.test(f) || VIVOS.includes(f));
 
 let reprova = 0, alertas = 0, ok = 0;
 for (const arq of alvos) {
