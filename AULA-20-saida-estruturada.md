@@ -483,8 +483,13 @@ consequências:
 
 - **os três blocos do script acertam o slot** — o conteúdo do template é outro problema, e é o da seção anterior; — o 3, em `TREE_SUMMARIZE`, passa `summary_template`; os
   4 e 5, em `COMPACT_ACCUMULATE` e `SIMPLE_SUMMARIZE`, passam `text_qa_template`;
-- **passar o slot errado não dá erro.** Como a assinatura aceita os dois, o argumento é válido; ele
-  simplesmente não é repassado adiante no ramo daquele modo. É descartado em silêncio.
+- **passar o slot errado não dá erro**, e agora está **executado**, não só lido, no
+  `llama-index-core` 0.12.15 que o repositório pina. Nos quatro cruzamentos entre os dois modos e os
+  dois slots, `get_response_synthesizer` aceita sem levantar e sem emitir aviso; o que muda é o que
+  sobra. Com o slot certo, `get_prompts()` devolve o template passado. Com o slot errado, devolve o
+  **default da biblioteca**, e o template passado não aparece em slot nenhum: `TREE_SUMMARIZE`
+  expõe só `summary_template` e `COMPACT_ACCUMULATE` só `text_qa_template`, nos dois casos.
+  É descartado em silêncio, e o silêncio é literal.
 
 E é o tipo de erro que não avisa: se o template cair num slot que aquele modo ignora, você vê a saída
 sem formatação e conclui que "o modelo não obedeceu".

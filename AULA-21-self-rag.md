@@ -206,11 +206,25 @@ rag_chain = prompt | llm | StrOutputParser()
 Três observações, em ordem de importância.
 
 **1. O prompt não está no repositório.** `hub.pull` busca no LangChain Hub, pela rede, em tempo de
-execução. Consequências concretas: o script não roda offline; o texto do prompt pode mudar sem que
-uma linha do repo mude; e — o que mais dói para este curso — **não é possível verificar aqui se esse
-prompt autoriza a abstenção**, que foi o assunto central da Aula 19. Não vou afirmar o que
-`rlm/rag-prompt` contém: não o abri, e ele não está em disco. Se você rodar, o primeiro comando útil
-é `print(prompt.messages[0].prompt.template)` — leia antes de confiar.
+execução. Consequências concretas: o script não roda offline, e o texto do prompt pode mudar sem que
+uma linha do repo mude.
+
+**O conteúdo, puxado em 15/09/2026** pelo mesmo caminho que o script usa
+(`hub.pull("rlm/rag-prompt")`, `langchain` 0.3.17). É um `ChatPromptTemplate` de uma mensagem só,
+com `input_variables` `['context', 'question']`:
+
+> You are an assistant for question-answering tasks. Use the following pieces of retrieved context to
+> answer the question. If you don't know the answer, just say that you don't know. Use three sentences
+> maximum and keep the answer concise.
+
+**Ele autoriza a abstenção**, e essa era a pergunta da Aula 19: _"If you don't know the answer, just
+say that you don't know"_. Mas traz um segundo limite que nenhuma leitura do repositório revelaria:
+**teto de três frases**. Toda geração dos seis arquivos que puxam esse prompt sai com esse teto, e
+nenhum deles o menciona.
+
+**E a medição não fecha o problema de auditoria, ela o demonstra.** O valor acima é o de uma data; o
+prompt pode ter mudado desde então sem que nada no repositório mude. Se você rodar, confira antes de
+confiar: `print(prompt.messages[0].prompt.template)`.
 
 **2. `model_name=` aqui, `model=` nas outras quatro.** As cinco instanciações de `ChatOpenAI` estão
 nas linhas `Self-RAG-FullImplementation.py:49`, `Self-RAG-FullImplementation.py:80`, `Self-RAG-FullImplementation.py:104`, `Self-RAG-FullImplementation.py:131` e `Self-RAG-FullImplementation.py:150`; só a `Self-RAG-FullImplementation.py:80` usa `model_name=`. As duas formas funcionam, e agora está **medido** no `langchain-openai` 0.3.3, uma das duas versões que o repositório pina (a outra é

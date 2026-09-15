@@ -828,25 +828,30 @@ como esses números foram obtidos.
 **O curso está completo: 29 aulas, `AULA-00` a `AULA-28`, cobrindo os 11 módulos do repositório.**
 Não há próxima aula a escrever. O que segue são trabalhos opcionais, em ordem de valor.
 
-### 9.1 — Fechar as perguntas empíricas (maior valor, menor esforço)
+### 9.1 — As perguntas empíricas: sete das oito fechadas, uma sobra
 
-Nada foi executado desde a Aula 19 porque nenhuma biblioteca do repositório está instalada neste
-ambiente. Sete pontos ficaram **declarados no texto** como não verificados, e cada um é um exercício
-de meia hora com o ambiente montado:
+> **Fechada em 15/09/2026, e a lista estava errada em duas direções.** Ela declarava oito pontos
+> abertos. Conferindo um a um contra as aulas, **cinco já estavam fechados no próprio texto**, com a
+> medição escrita e a versão da biblioteca declarada, e ninguém riscou a linha aqui apesar de a
+> própria seção mandar riscar. É o inverso de "desconhecido não é zero": aqui, fechado contado como
+> aberto. **Lista de pendência também envelhece, e esta media o registro em vez do acervo.**
 
-| #   | O que verificar                                                           | Onde                                                                                                    |
-| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| a   | Chaves extras no `PromptTemplate.format` — rejeita ou ignora?             | `08-Generation/02-OptimizingResponseViaPrompts/04-SelectAppropriatePromptTemplateViaRouting.py:133-138` |
-| b   | O que a chamada depreciada `llm(...)` faz hoje                            | `08-Generation/03-ControllingFormatViaOutputParsing/01-LangChain-OutputParsing.py:15`                   |
-| b2  | Idem para `retriever.get_relevant_documents()`                            | `10-AdvanceRAG/04-AgenticRAG/02-LangChain-AdaptiveRAG.py:132`                                           |
-| c   | Template no slot que o `ResponseMode` não consome é ignorado em silêncio? | `08-Generation/03-ControllingFormatViaOutputParsing/02-LlamaIndex-OutputParsing.py:54` vs `:68`         |
-| d   | O conteúdo do prompt `rlm/rag-prompt` — ele autoriza abstenção?           | citado em três arquivos (Aulas 21 e 26)                                                                 |
-| e   | Reproduzir os números e medir a variância que o arquivo não reporta       | `09-Evaluation/01-RAGAS.py:109-143`                                                                     |
-| f   | O metadado `generated_context` entra no texto embutido e no BM25?         | `10-AdvanceRAG/02-ContextRetrieval/LlamaIndex-Implementation.py:206-210`                                |
-| g   | `gpt-4-vision-preview` ainda responde?                                    | `10-AdvanceRAG/05-MultiModalRAG/02-Weaviate-Multimodal-RAG.py:61`                                       |
+| #   | O que verificar | Estado |
+| --- | --- | --- |
+| a   | Chaves extras no `PromptTemplate.format` | **Fechada na AULA-19**, e reconferida hoje: ignora em silêncio. A assimetria que faltava: chave **a menos** levanta `KeyError`, chave **a mais** passa |
+| b   | O que a chamada depreciada `llm(...)` faz | **Fechada na AULA-20**: `LangChainDeprecationWarning`, depreciada em 0.1.7, remoção anunciada para a 1.0. A chamada funciona e devolve `AIMessage` |
+| b2  | Idem `retriever.get_relevant_documents()` | **Fechada na AULA-26**: mesmo aviso, depreciada em 0.1.46, mesmo alvo de remoção |
+| c   | Slot que o `ResponseMode` não consome | **Fechada hoje por execução**, e a AULA-20 já a tinha decidido lendo a fonte. Aceita sem erro **e sem aviso**; `get_prompts()` devolve o default e o template passado não aparece em slot nenhum |
+| d   | O conteúdo de `rlm/rag-prompt` | **Fechada hoje**, puxando do hub: **autoriza a abstenção** e impõe **teto de três frases**, que ninguém tinha visto. Transcrito na AULA-21, com data, porque o valor pode mudar sem o repositório mudar. E são **seis** arquivos que o puxam, não três |
+| e   | Reproduzir os números do RAGAS e medir a variância | **ABERTA, e é a única.** Exige chave da OpenAI, gasto por execução e `sentence-transformers`, ausente do venv de medição. Não é meia hora de trabalho: é a única das oito que custa dinheiro |
+| f   | `generated_context` no texto embutido e no BM25 | **Fechada na AULA-24**, e confirmada hoje por execução: `get_content()` sem argumento **não** traz o metadado, e é assim que os nós do BM25 saem byte-idênticos; `MetadataMode.EMBED` traz, com `excluded_embed_metadata_keys` vazio por padrão |
+| g   | `gpt-4-vision-preview` ainda responde? | **Fechada hoje, por documentação e não por execução**: a página de depreciações da OpenAI o dá como desligado em **2024-12-06**, substituto `gpt-4o`. O clone pinado é de junho de 2026, então o script nasceu chamando um modelo retirado dezoito meses antes |
 
-Ao fechar qualquer um: atualizar a passagem correspondente na aula (todas dizem explicitamente que
-não foram verificadas) e riscar a linha aqui.
+**A distinção de evidência da linha `g` vale para o método inteiro.** Documentação do fornecedor
+decide se o identificador existe; só execução diria o que a API responde a quem insistir. As duas
+respondem perguntas diferentes, e carimbar uma com o verbo da outra é a forma 2 da lista de defeitos.
+
+Ao fechar a `e`: atualizar a passagem na AULA-22 e riscar a linha aqui.
 
 ### 9.2 — Exercícios executáveis
 

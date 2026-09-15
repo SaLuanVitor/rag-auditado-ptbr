@@ -169,7 +169,7 @@ E, pela segunda vez neste curso — depois do Self-RAG da Aula 21 —, **o ciclo
 
 **O bloco comentado de salvar o diagrama** (`01-LangChain-AgenticRAG.py:177-190`) grava num caminho que não existe: `10-AdvanceRAG/04-AgenticRAG/` seguido de `AgenticRAG-Graph.png`, relativo à raiz do repo e **sem** o prefixo `01-` do arquivo real — e a mensagem de sucesso na linha 188 diz `"Saved as: AdaptiveRAG-Graph.png"`, o nome do **outro** script. Três nomes diferentes para o mesmo arquivo.
 
-E o `hub.pull("rlm/rag-prompt")` (`01-LangChain-AgenticRAG.py:150`) é o mesmo prompt vindo da rede que a Aula 21 não pôde auditar. Segue não auditável.
+E o `hub.pull("rlm/rag-prompt")` (`01-LangChain-AgenticRAG.py:150`) é o mesmo prompt vindo da rede que a Aula 21 discute. O conteúdo dele está transcrito lá, puxado em 15/09/2026: autoriza a abstenção e impõe teto de três frases. O que continua não auditável é a **estabilidade** do valor, porque ele pode mudar sem que uma linha do repositório mude.
 
 ---
 

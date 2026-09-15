@@ -247,7 +247,7 @@ O SDK está importado (`:8`) e é usado só na segunda função. Julgamento: o `
 
 Duas fragilidades acompanham a chamada crua:
 
-- **`gpt-4-vision-preview`** (`:61`) é um identificador de preview. Conhecimento de domínio, não leitura deste arquivo: modelos com `-preview` no nome são retirados; a capacidade de visão hoje vive nos modelos principais. Não executei nada: o cliente `weaviate` não está instalado no ambiente pinado do curso, e sem ele o módulo não sobe. Então não afirmo o que a chamada devolve hoje.
+- **`gpt-4-vision-preview`** (`:61`) **está desligado, e desde antes do commit que este curso audita.** A página de depreciações da OpenAI o lista em "Past deprecations", sob "2024-06-06: GPT-4-32K and Vision Preview models", com **shutdown em 2024-12-06** e `gpt-4o` como substituto. O clone que serve de gabarito aqui está pinado em junho de 2026, ou seja, o script já nascia chamando um modelo retirado dezoito meses antes. **Documentado pelo fornecedor, não medido por mim:** eu não executei a chamada, que exigiria chave e gasto, e o cliente `weaviate` também não está instalado no ambiente pinado. A distinção importa porque as duas evidências respondem coisas diferentes: a documentação decide se o identificador existe, e só a execução diria o que a API responde a quem insistir.
 - **O resultado é acessado sem tratamento de erro** (`:74`): `response_oai.json()['choices'][0]['message']['content']`. Se a API devolver um objeto de erro, o que se vê é um `KeyError`, não a mensagem do provedor. `grep` por `try:` no arquivo não encontra nada.
 
 ### E dois defeitos de ciclo de vida
