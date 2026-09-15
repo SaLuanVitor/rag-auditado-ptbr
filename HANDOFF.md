@@ -828,7 +828,7 @@ como esses números foram obtidos.
 **O curso está completo: 29 aulas, `AULA-00` a `AULA-28`, cobrindo os 11 módulos do repositório.**
 Não há próxima aula a escrever. O que segue são trabalhos opcionais, em ordem de valor.
 
-### 9.1 — As perguntas empíricas: sete das oito fechadas, uma sobra
+### 9.1 — As perguntas empíricas: sete fechadas, e a oitava é meia
 
 > **Fechada em 15/09/2026, e a lista estava errada em duas direções.** Ela declarava oito pontos
 > abertos. Conferindo um a um contra as aulas, **cinco já estavam fechados no próprio texto**, com a
@@ -843,7 +843,7 @@ Não há próxima aula a escrever. O que segue são trabalhos opcionais, em orde
 | b2  | Idem `retriever.get_relevant_documents()` | **Fechada na AULA-26**: mesmo aviso, depreciada em 0.1.46, mesmo alvo de remoção |
 | c   | Slot que o `ResponseMode` não consome | **Fechada hoje por execução**, e a AULA-20 já a tinha decidido lendo a fonte. Aceita sem erro **e sem aviso**; `get_prompts()` devolve o default e o template passado não aparece em slot nenhum |
 | d   | O conteúdo de `rlm/rag-prompt` | **Fechada hoje**, puxando do hub: **autoriza a abstenção** e impõe **teto de três frases**, que ninguém tinha visto. Transcrito na AULA-21, com data, porque o valor pode mudar sem o repositório mudar. E são **seis** arquivos que o puxam, não três |
-| e   | Reproduzir os números do RAGAS e medir a variância | **ABERTA, e é a única.** Exige chave da OpenAI, gasto por execução e `sentence-transformers`, ausente do venv de medição. Não é meia hora de trabalho: é a única das oito que custa dinheiro |
+| e   | Reproduzir os números do RAGAS e medir a variância | **Meia fechada, e a linha escondia que eram duas perguntas.** A **variância** está medida: as notas por amostra existem no objeto que o script tem na mão (`EvaluationResult.__getitem__` devolve `List[float]`) e ele as descarta com `np.mean` na `01-RAGAS.py:64`, cujo ramo `else` é código morto. Custa uma linha e zero chamadas. **Reproduzir os números continua aberto**, e é a única das oito que custa dinheiro: chave da OpenAI, gasto por execução, `sentence-transformers` ausente do venv, e `text-embedding-ada-002` já não é o embedding corrente |
 | f   | `generated_context` no texto embutido e no BM25 | **Fechada na AULA-24**, e confirmada hoje por execução: `get_content()` sem argumento **não** traz o metadado, e é assim que os nós do BM25 saem byte-idênticos; `MetadataMode.EMBED` traz, com `excluded_embed_metadata_keys` vazio por padrão |
 | g   | `gpt-4-vision-preview` ainda responde? | **Fechada hoje, por documentação e não por execução**: a página de depreciações da OpenAI o dá como desligado em **2024-12-06**, substituto `gpt-4o`. O clone pinado é de junho de 2026, então o script nasceu chamando um modelo retirado dezoito meses antes |
 
@@ -851,7 +851,14 @@ Não há próxima aula a escrever. O que segue são trabalhos opcionais, em orde
 decide se o identificador existe; só execução diria o que a API responde a quem insistir. As duas
 respondem perguntas diferentes, e carimbar uma com o verbo da outra é a forma 2 da lista de defeitos.
 
-Ao fechar a `e`: atualizar a passagem na AULA-22 e riscar a linha aqui.
+**E a `e` ensinou uma segunda coisa sobre listas de pendência: ela era duas perguntas numa linha
+só, e a cara delas era a mesma.** Uma custava chave e dinheiro, a outra custava ler a biblioteca
+instalada. Enquanto vieram juntas, o preço da primeira manteve a segunda parada. **Item de lista que
+junta duas perguntas de custo diferente é decidido pela mais cara.**
+
+Ao fechar a metade que resta da `e`, que é reproduzir os três números: atualizar a passagem na
+AULA-22 e riscar a linha aqui. Ela exige autorização de gasto, então é decisão de quem paga, não
+trabalho pendente.
 
 ### 9.2 — Exercícios executáveis
 

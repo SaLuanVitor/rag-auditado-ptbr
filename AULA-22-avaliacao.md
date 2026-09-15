@@ -220,6 +220,32 @@ conclusão que uma avaliação existe para evitar. O procedimento correto — de
 perguntas, e a variância reportada ao lado da média — não caberia num exemplo didático, mas o
 veredito categórico também não deveria.
 
+**E o script não precisava de execução nenhuma a mais para reportar a dispersão: ele a tem na mão
+e a descarta.** Medido no `ragas` 0.2.15, a versão que o próprio módulo pina: o
+`EvaluationResult.__getitem__` devolve `t.List[float]`, uma nota **por amostra**, e o
+`to_pandas()` concatena essas notas ao dataset linha a linha, com um `assert len(self.scores) ==
+len(self.dataset)`. As três notas de fidelidade existem. O que o arquivo faz com elas
+(`09-Evaluation/01-RAGAS.py:64`):
+
+```python
+mean_score = np.mean(scores) if isinstance(scores, (list, np.ndarray)) else scores
+```
+
+Tira a média e imprime só ela. E o ramo `else` é **código morto**, porque o tipo de retorno é
+sempre lista. Trocar `np.mean(scores)` por `resultado.to_pandas()` custa uma linha e zero
+chamadas de LLM.
+
+**Há uma segunda variância, mais funda, e essa nenhum `to_pandas` mostra.** A fidelidade de uma
+amostra é uma razão, `faithful_statements / num_statements` no `_compute_score` do `ragas`, e o
+**denominador é gerado pelo próprio LLM**: ele decompõe a resposta em afirmações antes de julgar
+cada uma. Duas execuções da mesma resposta podem decompor em cinco ou em sete afirmações, e o
+0,61 muda sem que nada do pipeline avaliado tenha mudado. É por isso que **repetir** é diferente de
+reportar desvio entre amostras: um mede o juiz, o outro mede o conjunto.
+
+E o `answer relevancy` já é uma média antes da média: o `strictness` tem default **3**, então
+cada resposta vira três perguntas geradas e a nota é a similaridade média delas. A "média de três
+perguntas" que o arquivo imprime é, por baixo, média de três amostras de médias de três gerações.
+
 Detalhe honesto a favor do repositório: o `requirements.txt` deste módulo pina a versão e **explica
 por quê** (`09-Evaluation/requirements.txt:21-23`):
 
