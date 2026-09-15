@@ -4346,3 +4346,48 @@ daquele em que a consulta gravada não tinha resposta no corpus.**
 O que fecharia de verdade não é mais uma passada: é uma **ferramenta que valide citação de linha
 entre aulas**, que é a única classe que reapareceu em todas as três rodadas e que nenhum instrumento
 desta casa alcança. Fica como o próximo trabalho, e é de máquina, não de leitura.
+
+## `ferramentas/entreaulas.js`: a classe que reapareceu nas três rodadas
+
+Décimo script, décima suíte. Ele valida **citação de linha de uma aula para outra aula**, que o
+`verify-citations.js` não vê porque resolve citação contra o **clone da fonte**, e o alvo aqui é um
+`.md` do próprio repositório.
+
+A citação que o nomeia errou **três vezes, por três causas diferentes**, e a terceira é a razão de
+ele existir: apontava para `AULA-18:217`, correto quando escrito e envelhecido pela oitava rodada;
+foi corrigida para `:243-247`, com o alvo medido na hora; e quebrou **no mesmo dia** porque um
+conserto meu na AULA-18, de outra auditoria, acrescentou cinco linhas e empurrou a passagem para
+`:248`. **Editar um arquivo invalida toda citação de linha que aponte para ele**, e nada avisava.
+
+### O que ele decide, e o que declara não decidir
+
+| Veredito | Quando | Reprova |
+| --- | --- | --- |
+| `DESLOCADA` | a citação traz transcrição e ela **não** está nas linhas citadas | sim |
+| `FORA` | a linha citada passa do fim do alvo, ou a aula citada não existe | sim |
+| `SEM_PROVA` | a citação não traz transcrição: só a faixa foi conferida | **não** |
+
+**O `SEM_PROVA` é o limite declarado, e é grande.** Três das quatro citações do acervo caem nele: o
+alvo pode ter mudado de conteúdo sem mudar de tamanho, e daqui não se decide. A convenção que
+tornaria tudo decidível, citação de linha entre aulas acompanhada de transcrição, fica **declarada e
+não imposta**, porque impô-la de uma vez marcaria três das quatro.
+
+### Dois defeitos meus, achados ao construí-lo
+
+**A primeira versão passou verde com zero verificações de conteúdo.** A janela que procura a
+transcrição abortava na primeira linha de prosa, e a frase que cita quase sempre quebra em duas e
+termina em dois-pontos antes do bloco. Ela reportava `PASS` com `OK: 0`, que é exatamente a forma
+que este dia encontrou em três outras ferramentas: passar sem medir.
+
+**A busca por onde a transcrição de fato mora devolvia a linha errada.** Ela comparava uma janela de
+N linhas, então apontava 244 para uma passagem que começa em 248, porque a janela a partir de 244 já
+continha o trecho. Virou busca por **sequência de palavras com índice de linha**, e passou a devolver
+o conserto exato.
+
+A comparação é por palavras e não por linha, de propósito: o `requebra.js` roda em todo commit e
+move a quebra sem mudar o texto. Comparar linha a linha reprovaria todo reempacotamento, e há um
+caso de teste para isso.
+
+**Metade da suíte fixa o que ele não pode acusar.** Dois dos quatro primeiros achados do `grep` que
+o originou eram falso positivo, "linha 5" falando de um `.py`, e uma ferramenta que os acusasse
+viraria ruído no acervo inteiro.
