@@ -4928,3 +4928,45 @@ pé no `cauda.js` sobre as aulas**, e fica registrado para não ser retriado.
 **A lição é sobre quem achou.** Os seis numerais estavam em superfície viva, sobreviveram a oito
 conferências deste dia e ao `superficies.js`, e quem os viu foi **um agente respondendo uma prova**,
 olhando o acervo por uma pergunta que não era sobre eles.
+
+## A condição 10 lida item a item, pela primeira vez, e ela reprovava
+
+Duas vezes em 15/09 eu declarei esta condição cumprida sem fazer o que ela manda. A primeira vez
+consertei o `HANDOFF` e não abri o irmão; a segunda, a tabela do DoD marcava "passa" enquanto o
+`dod.js` a reportava pendente. Em 16/09 ela foi **lida**, e o resultado justifica a existência dela.
+
+### O que se confere por comando, e conferiu
+
+| Afirmação do `HANDOFF` / `PROMPT-CONTINUAR` | Comando | Resultado |
+| --- | --- | --- |
+| 259/348, portão aberto, 29 de 29 por dimensão, zero desconhecidas | `portao.js` | bate |
+| "a mais baixa é 6" | extração das notas vigentes | bate, e são **quatro** aulas em 6 |
+| "as duas aulas 12/12 caíram para 5 e 4" | série de notas por aula | bate: AULA-16 `12 → 4 → 9` e AULA-18 `12 → 5 → 9`, e eram **exatamente duas** |
+| "duas remedições PIORARAM a aula" | idem | bate: AULA-06 `… 5 → 4 …` e AULA-19 `11 → 5 → 4 → 7` |
+| "mais de 2000 citações" | `verify-citations --all` | bate, 2.201 |
+| "quinze ferramentas, quinze suítes" | `ls` | bate |
+
+### O que NÃO se confere por comando, e por quê
+
+A afirmação **"a S6 remediou as treze abaixo do portão e doze passaram"** não se decide por extração:
+as séries de nota têm comprimentos diferentes por aula, porque o número de colunas antes da nota
+varia por rodada, e o próprio `portao.js` documenta isso no cabeçalho. Um contador posicional devolve
+18 e está errado. **Ela se decide lendo**, e lendo confere: a seção de fecho da S6 registra "eram
+treze abaixo no início da sprint, doze foram remediadas, e a que sobrou é a única que caiu duas vezes
+seguidas".
+
+**É exatamente isto que torna a condição 10 não decidível por máquina**, e a tentativa de mecanizá-la
+produziu um número errado em trinta segundos.
+
+### O defeito que a leitura achou
+
+O bloco de estado do `PROMPT-CONTINUAR` dizia que **estado**, **localização** e o **exame v3**
+"ficaram adiados, com o motivo escrito". Os três foram entregues **no dia seguinte**: o `dod.js`, o
+`decisoes.js`, e o exame v3 escrito, aplicado a um agente, corrigido por outro, e seguido de um v4.
+
+É a forma 4 de novo, e desta vez no arquivo que uma sessão nova **cola como primeira mensagem**.
+Quem retomasse por ele começaria procurando trabalho que já está feito.
+
+**Corrigido, e com a leitura registrada dentro do próprio parágrafo**: ele agora diz que foi lido em
+16/09, que reprovava, e o que reprovava. A próxima leitura confere de novo, e é essa a única forma
+de fechar a condição.

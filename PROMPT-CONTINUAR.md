@@ -22,18 +22,28 @@ aberta em `E:\Projetos\rag\rag-auditado-ptbr`.
 > | "leia estes quatro arquivos" | ver a lista corrigida logo abaixo |
 > | fase "subir a nota" | fase **manutenção**: o portão abriu e o que resta é vigiar |
 >
-> **O que mudou de ferramental:** eram duas ferramentas em 20/08 e são **quinze**, com quinze suítes em
-> `ferramentas/testes/`. As três que mudam o começo de uma sessão nova são o `portao.js`, que
-> reconta os critérios; o `entreaulas.js`, que valida citação de linha de uma aula para outra; e o
-> `vigia.js`, que diz se a fonte pinada ou as bibliotecas andaram. O `README.md` tem a lista
-> inteira por momento de uso.
+> **O que mudou de ferramental:** eram duas ferramentas em 20/08 e são **quinze**, com quinze suítes
+> em `ferramentas/testes/`. A primeira a rodar numa sessão nova é o `dod.js`, que reporta as dez
+> condições do DoD uma a uma; depois o `portao.js`, que é a fonte da nota; o `entreaulas.js`, que
+> valida citação de linha de uma aula para outra; e o `vigia.js`, que diz se a fonte pinada ou as
+> bibliotecas andaram. O `README.md` tem a lista inteira por momento de uso.
 >
-> **Não há pendência aberta.** As quatro que havia foram decididas em 15/09 e a razão de cada uma
+> **Não há pendência aberta, e as quatro que havia foram decididas em 15/09.** A razão de cada uma
 > está no `GATE`, na seção "As quatro pendências, decididas": o RAGAS foi **encerrado sem fazer**,
 > porque confirmaria três números que a própria AULA-22 ensina a não tratar como resultado; a
 > condição 4 foi **reformulada**, porque a forma antiga era um regresso que nenhuma execução
-> satisfaz; a capacidade de **impacto** foi construída (`superficies.js`); e **estado**,
-> **localização** e o **exame v3** ficaram adiados, com o motivo escrito.
+> satisfaz; e as capacidades do agente foram construídas.
+>
+> **As três que ficaram adiadas naquele dia foram entregues no dia seguinte**, e a lista aqui
+> envelheceu por um dia: **impacto** é o `superficies.js`, **estado** é o `dod.js` e
+> **localização** é o `decisoes.js`. O **exame v3** foi escrito, aplicado a um agente e corrigido
+> por outro, e gerou um **v4** depois de a regra 11 fechar a lacuna que o v3 achou. O nível vigente
+> é **L3**, com quatro tentativas registradas em `avaliacao/`.
+>
+> **O que continua aberto é uma coisa só, e nenhuma ferramenta a fecha:** a condição 10 do DoD, que
+> manda ler este arquivo e o `HANDOFF` item a item contra comando. Ela foi lida assim em 16/09 e
+> **reprovava**: este parágrafo dizia que as três capacidades estavam adiadas. É o que ele diz
+> agora, e a próxima leitura confere de novo.
 >
 > **O DoD vive no `GATE`**, com dez condições e o comando que decide cada uma. Ele morava só no
 > artefato publicado, fora do alcance de qualquer ferramenta, e isso era defeito.
