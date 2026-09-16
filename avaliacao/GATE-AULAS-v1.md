@@ -4778,7 +4778,7 @@ fora do que as ferramentas alcançam.
 | 7 | Sem resíduo verbatim | `residuo.js` sem achado não justificado | passa |
 | 8 | Ambiente reprodutível | script versionado, executado do zero | passa |
 | 9 | Ferramentas com teste próprio e positivo plantado | `rodar.sh` = `SUITE VERDE` | passa |
-| 10 | `HANDOFF` e `PROMPT-CONTINUAR` descrevem o estado medido | ler os dois, **item a item** | passa |
+| 10 | `HANDOFF` e `PROMPT-CONTINUAR` descrevem o estado medido | ler os dois, **item a item** | **pendente de leitura**, e é assim que ela fica |
 
 **São dez agora, não nove**, e a nova é a 6: o `entreaulas.js` não existia quando o DoD foi escrito,
 e a classe que ele fecha reapareceu nas três rodadas. Um DoD que não cobre a classe mais reincidente

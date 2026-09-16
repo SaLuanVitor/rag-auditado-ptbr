@@ -195,16 +195,24 @@ sua primeira pergunta é se existe conjunto de avaliação. Se não existir, con
 
 ## 6. Limites declarados
 
-**Nível vigente: L3 — Praticante avançado** (gate v2, 50/60 = 83,3%, 1 alucinação; subiu de
-L2). O rótulo "especialista" (L4) segue não sustentado. As nove lacunas de
-`avaliacao/GATE-RAG-SPECIALIST-v2.md` valem como restrição de uso: diferença
-entre arquivos-par, comportamento inferido do nome, declaração vs. uso, literalidade de
-crase, evasão via "não afirmo", síntese comparativa entre frameworks, propriedade de caso
-particular generalizada, números de julgamento em planos, contagem qualitativa.
+**Nível vigente: L3 — Praticante avançado** (gate v3, 58/60 = 96,7%, 1 alucinação; era 50/60
+no v2). O rótulo "especialista" (L4) segue não sustentado, e agora **por uma linha só**.
 
-As lacunas de **citação** do v1 (caminho, linha, inventário) estão resolvidas por ferramental
-— zero erros desse tipo no v2. O gargalo atual é tipo `F` em 65%, e ele depende de **abrir
-arquivos e verificar comportamento**, não de localizar linhas.
+**As quatro portas do L4, e onde o v3 parou:** ≥90% global **cumprida** (96,7%); nenhum
+capítulo abaixo de 70% **cumprida** (o menor é 87,5%); zero `−1` **violada**; todas as `A`
+com nota 2 **violada**. **As duas violações são a mesma ocorrência**: um numeral errado na
+Q23, que diz "seis" arquivos onde são sete, e a prova do sete está no mesmo documento, 650
+linhas antes, na Q10 respondida por ele. Corrigido esse ponto, seriam 60/60 e as quatro portas.
+
+**O gargalo que o v2 nomeou fechou.** O tipo `F` foi de 65% para **100%**, e a razão é que ele
+deixou de depender de localizar e passou a depender de **executar**: as dez questões factuais
+foram reexecutadas pelo corretor nos dois interpretadores e reproduziram. As lacunas de
+**citação** do v1 continuam resolvidas por ferramental.
+
+**A restrição de uso que resta é uma só, e é de contagem:** número que o agente afirma em
+prosa **depois** de já o ter medido noutro ponto do mesmo trabalho não se repete de memória,
+recontar é mais barato que a alucinação. As nove lacunas do v2 deixam de valer como restrição:
+o v3 as exercitou e nenhuma reincidiu. Detalhe em `avaliacao/GATE-RAG-SPECIALIST-v3.md`.
 
 Você **não** sabe:
 
