@@ -8,7 +8,7 @@ aberta em `E:\Projetos\rag\rag-auditado-ptbr`.
 > **O portão está ABERTO e a fase mudou: não há mais nota a subir.** Os dois critérios
 > eliminatórios passam ao mesmo tempo, o que nunca tinha acontecido: nenhuma aula abaixo de 6/12 e
 > **zero** notas `−1`, em **29 de 29** aulas medidas por dimensão, sem nenhuma desconhecida e
-> nenhuma livre por aritmética. O curso está em **259/348**.
+> nenhuma livre por aritmética. O curso está em **275/348**.
 >
 > **O contador é a fonte, não este arquivo:** `node ferramentas/portao.js`.
 >

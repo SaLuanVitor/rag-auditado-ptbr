@@ -4970,3 +4970,88 @@ Quem retomasse por ele começaria procurando trabalho que já está feito.
 **Corrigido, e com a leitura registrada dentro do próprio parágrafo**: ele agora diz que foi lido em
 16/09, que reprovava, e o que reprovava. A próxima leitura confere de novo, e é essa a única forma
 de fechar a condição.
+
+# A rodada de `C` que virou remedição, e as quatro sobem 16 pontos
+
+O pedido era uma rodada de correção técnica nas quatro aulas em 6/12, porque as quatro tinham
+`C = 0`, que a rubrica define como **não atendida**. Antes de despachar, a premissa foi medida e
+**não se sustentava**.
+
+## Por que remedir em vez de consertar
+
+Os achados que produziram `C = 0` estão registrados aqui, são precisos, e **já tinham sido
+aplicados**. Provado para a AULA-03:
+
+```
+git show ff5a3ef~1:AULA-03-primeiro-rag.md | grep -c SENTENCE_CHUNK_OVERLAP   -> 0
+git show ff5a3ef:AULA-03-primeiro-rag.md   | grep -c SENTENCE_CHUNK_OVERLAP   -> 1
+```
+
+**O mesmo commit aplicou o conserto e registrou o 6/12.** A nota mediu o texto de antes dele, e o
+texto de depois nunca foi medido. É a mesma dívida que a passada final limpou para catorze aulas, e
+**estas quatro ficaram de fora dela**.
+
+Um auditor por aula, briefing proibindo ler a nota anterior antes de formar a sua, e os quatro
+declararam ter cumprido. O da AULA-14 recebeu uma ressalva de julgamento que se mostrou decisiva:
+**aula que descreve com precisão um defeito da fonte está certa**, e o errado seria a aula afirmar
+que o roteador roteia.
+
+## As quatro
+
+| Aula | Antes | Agora | E | C | H | O | D | A | O que a remedição achou |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [03](../AULA-03-primeiro-rag.md) | 6/12 | **9**/12 | 1 | 1 | 2 | 1 | 2 | 2 | Oito achados. O pior se autodesmente: "os únicos sem a cláusula são os seis `01_*`" e o `grep` que a própria aula cita devolve **nove** arquivos |
+| [04](../AULA-04-carregando-texto-json-web.md) | 6/12 | **10**/12 | 2 | 1 | 2 | 2 | 2 | 1 | Cinco achados. O pior: a "Mão na massa" manda rodar o loader de JSON, que exige `jq`, ausente do `requirements.txt` que a aula cita como fonte |
+| [10](../AULA-10-indices-ann.md) | 6/12 | **10**/12 | 2 | 1 | 2 | 1 | 2 | 2 | Seis achados. O pior: "o que governa latência é `nprobe` absoluto" contradiz a tabela duas linhas acima |
+| [14](../AULA-14-query-routing.md) | 6/12 | **11**/12 | 2 | 2 | 2 | 2 | 2 | 1 | Sete achados. `C` e `O` de 0 para 2: o roteador que não roteia é defeito do **repositório**, e a aula o reporta com precisão |
+
+**Zero `−1` nas quatro.** As quatro somas foram conferidas por quem despachou, uma a uma.
+
+## O que as quatro remedições provaram, e não é sobre as aulas
+
+**Os auditores mediram em vez de ler o conserto.** O da AULA-10 não aceitou a frase corrigida:
+rodou `argsort(-(V @ q))` contra `argsort(-(V @ q/‖q‖))` com mil vetores em 128 dimensões e obteve
+**permutação idêntica**, que é a prova do no-op. O da AULA-14 reproduziu os três desfechos com duplo
+de teste, **sem rede e sem chave**. O da AULA-04 replicou os dois lados da divergência de
+codificação, 8 documentos em `cp1252` contra 7 em `utf-8`.
+
+**E dois achados velhos voltaram, os dois meus.**
+
+O primeiro é o **773/779**, na AULA-03. Eu o achei na AULA-20, apliquei em três superfícies e
+**nunca grepei a AULA-03**. Este registro já dizia, sobre o mesmo par de números, que "achado
+aplicado pela metade é achado que volta, e volta mais caro porque na segunda vez ele já se
+espalhou". Voltou, pela quarta superfície.
+
+O segundo é sobre uma decisão de ferramenta. O auditor da AULA-10 achou "anuncia **cinco** coisas e
+lista **seis** marcadores". Esse é exatamente o alerta `AULA-10:316` que o protótipo da regra
+ampliada do `contagem.js` devolveu, e que **foi descartado** porque a ampliação custava quatro
+falsos positivos. Era real. **A decisão de não ampliar fica com um contraexemplo medido contra
+ela**, e o custo de achá-lo foi uma rodada de auditoria.
+
+## O estado depois das quatro
+
+**275/348 (79,0%)**, contra 259 antes. O portão segue **ABERTO**, e a nota mínima do curso deixa de
+ser 6 e passa a ser **7**, em duas aulas, a 12 e a 19.
+
+**Nenhuma aula tem mais `C = 0`.** A dimensão subiu de 36 para **41/58**, e o achado que motivou a
+rodada, quatro aulas com correção técnica não atendida, **deixou de existir sem que uma linha das
+quatro fosse editada hoje**. Ele era artefato de nota velha, não defeito de material.
+
+| Dimensão | Antes | Agora | Notas 0 |
+| --- | --- | --- | --- |
+| `E` evidência | 52 | **53** | 0 |
+| `C` correção | 36 | **41** | **0**, eram 4 |
+| `H` honestidade | 45 | **48** | 1 |
+| `O` coerência | 30 | **32** | 3, eram 4 |
+| `D` didática | 52 | **54** | 0 |
+| `A` acionabilidade | 44 | **47** | 0 |
+
+**`O` continua sendo a lacuna sistemática**, a mais baixa das seis com folga, e agora é a única com
+mais de uma nota zero. Faz sentido mecânico e vale registrar: **nenhuma ferramenta desta casa mede
+coerência**. O `entreaulas` valida que uma citação aponta para onde diz, o `superficies` acha onde um
+termo mora, e nenhum dos dois decide se duas afirmações se contradizem.
+
+**E fica a pergunta de régua que a rodada levantou e não decide:** o portão não exige mínimo por
+dimensão, então `0+0+2+2+2+0 = 6` passa. Enquanto as quatro estavam em `C = 0`, o portão dizia
+"aberto" sobre aulas com correção técnica declarada não atendida. Hoje isso não ocorre, e o risco
+estrutural continua de pé.

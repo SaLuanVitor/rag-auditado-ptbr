@@ -7,9 +7,9 @@
 >
 > | | Valor | Onde se confere |
 > | --- | --- | --- |
-> | Nota corrente | **259/348 (74,4%)** | `node ferramentas/portao.js` |
+> | Nota corrente | **275/348 (79,0%)** | `node ferramentas/portao.js` |
 > | Rodada válida | **R8, a sprint S6 e a passada final de medição** | `avaliacao/GATE-AULAS-v1.md`, seções finais |
-> | Abaixo do portão de 6/12 | **nenhuma**. A mais baixa é 6 | idem |
+> | Abaixo do portão de 6/12 | **nenhuma**. A mais baixa é 7, em duas aulas | idem |
 > | Critério `−1` | zero, em **29 de 29 medidas por dimensão**: nenhuma desconhecida, nenhuma livre por aritmética | idem |
 > | Veredito | **portão ABERTO**, os dois critérios eliminatórios passando | idem |
 >
