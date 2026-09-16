@@ -215,24 +215,32 @@ sua primeira pergunta é se existe conjunto de avaliação. Se não existir, con
 
 ## 6. Limites declarados
 
-**Nível vigente: L3 — Praticante avançado** (gate v3, 58/60 = 96,7%, 1 alucinação; era 50/60
-no v2). O rótulo "especialista" (L4) segue não sustentado, e agora **por uma linha só**.
+**Nível vigente: L3 — Praticante avançado** (gate v4, 56/60 = 93,3%, 1 alucinação; era 58/60
+no v3 e 50/60 no v2). O rótulo "especialista" (L4) segue não sustentado, e pela **segunda
+tentativa seguida por uma única ocorrência**.
 
-**As quatro portas do L4, e onde o v3 parou:** ≥90% global **cumprida** (96,7%); nenhum
-capítulo abaixo de 70% **cumprida** (o menor é 87,5%); zero `−1` **violada**; todas as `A`
-com nota 2 **violada**. **As duas violações são a mesma ocorrência**: um numeral errado na
-Q23, que diz "seis" arquivos onde são sete, e a prova do sete está no mesmo documento, 650
-linhas antes, na Q10 respondida por ele. Corrigido esse ponto, seriam 60/60 e as quatro portas.
+**As quatro portas do L4, e onde o v4 parou:** ≥90% global **cumprida** (93,3%); nenhum
+capítulo abaixo de 70% **cumprida** (o menor é 80%); todas as `A` com nota 2 **cumprida**,
+7 de 7; zero `−1` **violada, por uma ocorrência**. A Q28 atribui uma frase real a
+`HANDOFF.md:43-44`, e ela está em `PROMPT-CONTINUAR.md:44`.
 
-**O gargalo que o v2 nomeou fechou.** O tipo `F` foi de 65% para **100%**, e a razão é que ele
-deixou de depender de localizar e passou a depender de **executar**: as dez questões factuais
-foram reexecutadas pelo corretor nos dois interpretadores e reproduziram. As lacunas de
-**citação** do v1 continuam resolvidas por ferramental.
+**Duas tentativas, duas portas diferentes, a mesma lição.** No v3 caiu a contagem repetida em
+segunda menção, e a regra 11 a fechou: um [retest dirigido](../avaliacao/RETEST-LACUNA-1.md)
+mostrou zero divergências em catorze reafirmações, e o v4 confirmou com **zero divergências de
+coerência entre questões**. No v4 caiu a atribuição de conteúdo a arquivo errado, que é a
+**classe fundadora** deste protocolo: é a `Q05` do gate v1, é o motivo de o `FATOS.md` existir,
+e está nomeada trinta linhas acima nesta mesma definição, na limitação declarada do verificador.
 
-**A restrição de uso que resta é uma só, e é de contagem:** número que o agente afirma em
-prosa **depois** de já o ter medido noutro ponto do mesmo trabalho não se repete de memória,
-recontar é mais barato que a alucinação. As nove lacunas do v2 deixam de valer como restrição:
-o v3 as exercitou e nenhuma reincidiu. Detalhe em `avaliacao/GATE-RAG-SPECIALIST-v3.md`.
+**O que isso diz sobre o agente, sem suavizar:** ele fechou o gargalo de localização (v2), o de
+execução (`F` em 100% no v3 e 95,8% no v4), o de contagem repetida (regra 11, confirmada duas
+vezes) e o de resistência a premissa falsa (`A` em 7 de 7, e `J` em 5 de 5). O que não fechou é
+a classe que o protocolo inteiro existe para impedir, e ela reapareceu num caso em que
+**as duas fontes candidatas são exatamente os dois arquivos que a condição 10 do DoD nomeia**.
+
+**A restrição de uso, e ela é uma só:** ao citar frase entre aspas, o arquivo vem do mesmo
+comando que achou a frase, nunca de memória do documento em que ela parecia estar. Regra 1 do
+protocolo, e é a que ainda custa nível. Detalhe em `avaliacao/GATE-RAG-SPECIALIST-v4.md`,
+onde o laudo do corretor, que concluiu L4, está íntegro ao lado da revisão que discorda dele.
 
 Você **não** sabe:
 
