@@ -1,7 +1,7 @@
 // Teste do verificador do DoD.
 //
 // ESTA SUITE E DE INTEGRACAO, e a escolha vai declarada porque contraria o
-// padrao das outras doze. Todas as outras montam um acervo de mentira; esta roda
+// padrao de todas as outras. Elas montam um acervo de mentira; esta roda
 // contra o repositorio real, porque o que ela verifica e a COMPOSICAO de nove
 // ferramentas, e simular as nove testaria o simulador.
 //
@@ -39,7 +39,10 @@ function roda(script, args) {
   return { saida: (r.stdout || '') + (r.stderr || ''), code: r.status };
 }
 
-// `--rapido` pula a suite completa, que rodaria as treze de dentro desta.
+// `--rapido` pula a condicao 9, que rodaria o `rodar.sh` inteiro de dentro desta
+// suite. O numero de suites nao vai escrito aqui: ele mudou de 10 para 15 em dois
+// dias, e comentario que afirma a propria contagem e a forma que este projeto
+// mais cometeu.
 let r = roda(path.join(FERR, 'dod.js'), ['--rapido']);
 
 checa('lista as dez condições, uma por linha',

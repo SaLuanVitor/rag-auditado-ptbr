@@ -4877,3 +4877,54 @@ e o cabeçalho agora diz "distribuição **contada, não pretendida**". É a for
 cometeu, no documento que existe para medir quem a comete.
 
 **Ferramental: quinze scripts, quinze suítes, zero sem exercício.**
+
+## Os seis numerais defasados, e a triagem do `cauda.js` que veio junto
+
+Os seis foram reportados **pelo respondente do exame v4**, de passagem, ao conferir a condição 10 do
+DoD para uma questão de julgamento. O corretor do mesmo exame confirmou os seis, um a um. Nenhum era
+erro dele: são achados sobre o acervo, e todos em superfície viva.
+
+| Onde | Dizia | Medido |
+| --- | --- | --- |
+| `README.md:13` | 1.602 citações verificadas | 2.201, e cresce a cada parágrafo |
+| `README.md:43-45` | renota em **9 de 29**, 55/108 para 86/108 | 29 de 29, 259/348, portão **aberto** |
+| `README.md:52` | 16 `SKIPPED` e 20 `NO_ANCHOR` | 29 e 15 |
+| `README.md:89` | "dois exames do agente" | quatro exames e quatro gates |
+| `README.md:298` | "as outras **dez**" num parágrafo que abre com quinze | treze |
+| `ferramentas/testes/dod.test.js:4` | "o padrão das outras **doze**" | catorze |
+
+**E havia um sétimo, na linha 42 do mesmo teste**, que ninguém tinha reportado: "rodaria as treze de
+dentro desta". Achado varrendo os comentários de `ferramentas/` por numeral escrito por extenso,
+depois de corrigir os seis.
+
+### A regra que guiou o conserto, e ela não é trocar o número
+
+Onde o número **envelhece a cada commit**, ele sai e fica o comando: as citações do `README:13` e os
+`SKIPPED`/`NO_ANCHOR` do `:52`. Trocar 1.602 por 2.201 seria agendar o mesmo conserto para a semana
+que vem, e o próprio `README` já tinha essa linha consertada uma vez hoje, de 1.240 para 2.192, e
+ela envelheceu de novo em horas.
+
+Onde o número **descreve um estado que mudou de natureza**, o parágrafo se reescreve. O bloco
+"Estado honesto" dizia que declarar classificação seria "veredicto grande sobre amostra pequena", e
+a amostra deixou de ser pequena: ele agora declara o portão aberto **e** a distinção que importa,
+que portão aberto não é juízo de qualidade, é ausência de defeito eliminatório conhecido.
+
+No comentário do teste o número saiu de vez, com o motivo escrito: ele mudou de 10 para 15 em dois
+dias.
+
+### A triagem do `cauda.js`: nove alertas, nove falso positivo
+
+Rodado sobre as 29 aulas na mesma varredura, ele reporta **nove**, e nenhum tinha sido lido. Os nove
+são a mesma forma, **repetição retórica deliberada atravessando pontuação**, que é o padrão que o
+acervo usa para definir um termo logo depois de usá-lo:
+
+`cosseno** — cosseno` · `o problema. O problema` · `tabelas viram tabelas` · `assinatura, assinatura`
+· `a média.** A média` · `garantia". Garantia` · `de resumos de resumos` · `gabarito: gabarito` · e o
+par de `Flaming Fist` numa frase que manda **comparar** as duas ocorrências.
+
+É a mesma classe do `residuo: residuo` do `PROMPT-CONTINUAR`, triado ontem. **Zero achados reais em
+pé no `cauda.js` sobre as aulas**, e fica registrado para não ser retriado.
+
+**A lição é sobre quem achou.** Os seis numerais estavam em superfície viva, sobreviveram a oito
+conferências deste dia e ao `superficies.js`, e quem os viu foi **um agente respondendo uma prova**,
+olhando o acervo por uma pergunta que não era sobre eles.

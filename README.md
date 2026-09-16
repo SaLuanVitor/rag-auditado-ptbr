@@ -10,7 +10,7 @@ O diferencial não é a quantidade de aulas. É o aparato de verificação:
 | | |
 | --- | --- |
 | Aulas | **29** (`AULA-00` a `AULA-28`), ~86 mil palavras |
-| Citações `arquivo:linha` verificadas | **1 602**, zero inválidas |
+| Citações `arquivo:linha` verificadas | **zero inválidas**; o total sai de `verify-citations --all` |
 | Cobertura da auditoria adversarial | **29 de 29** aulas com nota independente |
 | Glossário | 180 verbetes de RAG, em inglês, definidos em português |
 | Agente especialista versionado | `@rag-specialist` (Vetor), nível L3 |
@@ -40,17 +40,24 @@ entre a tabela e a prosa da mesma aula, e superlativo não marcado como julgamen
 
 ## Estado honesto
 
-**Nenhuma classificação de publicação é declarada.** A cobertura da auditoria fechou
-em 29/29, mas a **renota** — reavaliar o material depois das correções — está em
-**9 de 29 aulas**. As nove subiram de 55/108 para 86/108, e duas aulas ainda não
-renotadas estão abaixo da porta mínima da rubrica.
+**O portão da auditoria está ABERTO**, e os dois critérios eliminatórios passam ao mesmo
+tempo: nenhuma aula abaixo de 6/12, e nenhuma nota `−1` em **29 de 29** aulas medidas por
+dimensão, sem nenhuma desconhecida. Reconte com `node ferramentas/portao.js`, que é a fonte;
+este arquivo não é.
 
-Declarar "publicável" agora seria o erro que a Aula 22 deste curso ensina a não
-cometer: veredicto grande sobre amostra pequena. O que falta está listado em
-[`HANDOFF.md`](HANDOFF.md).
+**Isso não é classificação de publicação, e a diferença importa.** O portão diz que o material
+não tem defeito eliminatório conhecido; não diz que ele é bom. A nota por aula está no
+[`GATE`](avaliacao/GATE-AULAS-v1.md), aula a aula e dimensão a dimensão, e é ela que sustenta
+qualquer julgamento de qualidade.
 
-Restam ainda 16 citações com glob ou elipse e 20 referências sem arquivo antecedente,
-que são conferência à mão **por desenho** — não defeito.
+**O que continua aberto, e por construção:** todo lote de conserto gera achados que geram
+consertos sem verificação própria. A régua de parada adotada está no `GATE`: a rodada para
+quando a **classe** do que ela acha encolhe até o cosmético, não quando o número de achados
+chega a zero. O DoD completo, com as dez condições e o comando que decide cada uma, está lá
+também, e `node ferramentas/dod.js` reporta nove delas.
+
+Restam citações com glob ou elipse e referências sem arquivo antecedente, que são conferência
+à mão **por desenho** e não defeito. Os números saem do mesmo `verify-citations --all`.
 
 ## Como usar
 
@@ -86,7 +93,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | [`GLOSSARIO.md`](GLOSSARIO.md) | 180 verbetes, agrupados por tema |
 | [`FATOS.md`](FATOS.md) | inventário por módulo, gerado por script, com `arquivo:linha` e conteúdo literal |
 | `agente/` | o `@rag-specialist`: persona, protocolo de citação de 11 regras, capacidade de vigilância, limites declarados |
-| `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
+| `avaliacao/` | rubricas, os exames do agente com as respostas e os gates de cada tentativa, gates de auditoria do material, dossiê mecânico |
 | `exercicios/` | script executável de similaridade (cosseno, IP, L2, com bug proposital) |
 | `ferramentas/` | quinze ferramentas de verificação, medição e edição, com quinze suítes em `ferramentas/testes/` |
 | [`HANDOFF.md`](HANDOFF.md) | estado verificado, achados, e o que falta |
@@ -295,8 +302,8 @@ pode reordenar conforme a necessidade do seu projeto.
 
 O curso tem **quinze** ferramentas em `ferramentas/`, com **quinze suítes** em
 `ferramentas/testes/`. Zero dependências externas em todas. As duas primeiras nasceram depois que
-o gate v1 do agente `@rag-specialist` registrou 3 alucinações de citação; as outras dez nasceram
-durante a auditoria adversarial, cada uma de um defeito que passou.
+o gate v1 do agente `@rag-specialist` registrou 3 alucinações de citação; as outras **treze**
+nasceram durante a auditoria adversarial, cada uma de um defeito que passou.
 
 **Antes de entregar:**
 
