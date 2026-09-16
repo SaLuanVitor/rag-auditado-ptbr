@@ -354,7 +354,7 @@ faz `git pull` nunca conflitar.
 
 `agente/rag-specialist.md` — persona **Vetor**, `model: opus`, invocável via
 `@rag-specialist`. Contém: fonte de conhecimento, três registros de resposta (fato / domínio /
-julgamento), o que recusa (premissa falsa), ordem de diagnóstico, **10 regras do protocolo de
+julgamento), o que recusa (premissa falsa), ordem de diagnóstico, **o protocolo de
 citação**, ferramental obrigatório, nível vigente e limites declarados.
 
 ---
@@ -398,9 +398,11 @@ Este processo não é opcional — ele existe porque a auditoria mostrou onde o 
 9. Conferir que git status no clone da Packt está vazio
 ```
 
-### As 10 regras do protocolo de citação
+### As regras do protocolo de citação
 
-Estão em `agente/rag-specialist.md`. As quatro mais importantes na prática:
+Estão em `agente/rag-specialist.md`, e o número **não vai declarado aqui de propósito**: ele
+mudou de 5 para 7, de 7 para 10 e de 10 para 11, e o cabeçalho ficou falso as três vezes. As
+quatro mais importantes na prática:
 
 - **Nunca `grep -h`** para citar — a flag suprime o caminho, e caminho ausente vira caminho
   inventado. Foi a causa mecânica da primeira alucinação.

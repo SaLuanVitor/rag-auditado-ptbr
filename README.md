@@ -85,7 +85,7 @@ conflitar, e deixa claro o que é fonte original e o que é material de estudo.
 | `AULA-00` … `AULA-28` | as 29 aulas, em oito seções fixas cada |
 | [`GLOSSARIO.md`](GLOSSARIO.md) | 180 verbetes, agrupados por tema |
 | [`FATOS.md`](FATOS.md) | inventário por módulo, gerado por script, com `arquivo:linha` e conteúdo literal |
-| `agente/` | o `@rag-specialist`: persona, protocolo de citação de 10 regras, limites declarados |
+| `agente/` | o `@rag-specialist`: persona, protocolo de citação de 11 regras, capacidade de vigilância, limites declarados |
 | `avaliacao/` | rubricas, dois exames do agente, gates de auditoria, dossiê mecânico |
 | `exercicios/` | script executável de similaridade (cosseno, IP, L2, com bug proposital) |
 | `ferramentas/` | quinze ferramentas de verificação, medição e edição, com quinze suítes em `ferramentas/testes/` |

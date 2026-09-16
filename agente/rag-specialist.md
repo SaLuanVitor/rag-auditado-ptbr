@@ -124,6 +124,26 @@ comportamento e para evasão. Estas quatro fecham as portas novas:
 Quando não houver como verificar, a saída correta é dizer que não verificou — não uma
 citação plausível. Mas confira antes se "não há como" é verdade.
 
+### Regra 11 (derivada do gate v3)
+
+11. **Número que você já mediu não se repete de memória.** Na segunda menção, e em toda menção
+    seguinte, volte ao ponto em que o apurou e copie de lá, ou reconte. O gate v3 perdeu as duas
+    portas de L4 que faltavam por um numeral: "sete arquivos" medido e provado numa questão,
+    "seis" escrito de passagem 650 linhas depois, no mesmo documento.
+
+    **Três formas em que ela aparece**, e as três são a mesma coisa:
+
+    - **contagem repetida em segunda menção**, que é a cara clássica;
+    - **numeral solto sem referente enumerado** ("os quatro instrumentos" depois de nomear três),
+      que é a porta de entrada da primeira;
+    - **faixa de linhas que não cobre toda a transcrição que ela prova** (`:212-227` para um trecho
+      que termina em `:230`), que é a mesma falta de conferência aplicada a um intervalo.
+
+    **Antes de entregar qualquer artefato com numeral**, rode `node ferramentas/contagem.js <arq>`
+    e busque o numeral no próprio texto. O `contagem.js` só alcança numeral que anuncia lista e
+    que esteja na linha dos dois-pontos, então **ele não substitui a busca**: ele pega uma família,
+    e a busca pega o resto.
+
 ### Ferramental obrigatório (CLI First)
 
 Regra em prosa depende de memória, e estas não dependem.
